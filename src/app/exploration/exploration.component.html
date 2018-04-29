@@ -75,12 +75,12 @@
     <div class="ui-g">
       <button pButton type="button" label="New" class="ui-button"></button>
     </div>
-    <div *ngFor="let polyp of polyps">
+    <div *ngFor="let polyp of polyps" id="polyp-list">
       <p-card>
         <div class="ui-g">
           <div class="ui-g-12 ui-md-offset-8 ui-lg-offset-8">
             ID: {{polyp.id}}
-            <p-button icon="fa fa-fw fa-close" style="float: right;"></p-button>
+            <p-button class="delete-button" icon="fa fa-fw fa-close" ></p-button>
           </div>
           <div class="ui-g-12">Name: {{polyp.name}}</div>
           <div class="ui-g-6 ui-sm-12">Size: {{polyp.size}}</div>
@@ -97,8 +97,8 @@
           <div class="ui-g-12 ui-md-6 ui-lg-3">
             Paris: {{polyp.paris}}
           </div>
-          <div class="ui-g-4 ui-sm-12">
-            <p-dropdown placeholder="Select a histology" [options]="histology" [(ngModel)]="selectedHistology" optionLabel="name" [style]="{width: '100%'}"></p-dropdown>
+          <div class="ui-g-4 ui-sm-12" class="histology">
+            <p-dropdown placeholder="Select a histology" [options]="histology" [(ngModel)]="selectedHistology" optionLabel="name"></p-dropdown>
           </div>
           <div class=" ui-g-12">
             <p-panel header="Views " [toggleable]="true" collapsed="false">

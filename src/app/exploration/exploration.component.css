@@ -1,0 +1,8 @@
+#polyp-list .delete-button {
+    float: right;
+}
+
+
+:host /deep/ .histology > p-dropdown > div {
+    width:100% !important;
+}
