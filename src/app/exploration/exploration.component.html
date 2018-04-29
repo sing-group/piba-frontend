@@ -29,6 +29,9 @@
 
 <p-tabView>
   <p-tabPanel header="Video">
+    <div>
+    <button pButton type="button" label="Upload" class="ui-button upload-button"></button>
+    </div>
     <p-dataView [value]="videos">
       <ng-template let-videos pTemplate="listItem">
 
@@ -62,9 +65,6 @@
           <div class="ui-g-12 ui-md-12 ui-md-offset-6 ui-lg-4 ui-lg-offset-0">
             <div class="ui-g-12">
               <button pButton type="button" label="Edit video" class="ui-button"></button>
-            </div>
-            <div class="ui-g-12">
-              <button pButton type="button" label="Upload" class="ui-button"></button>
             </div>
           </div>
         </div>
