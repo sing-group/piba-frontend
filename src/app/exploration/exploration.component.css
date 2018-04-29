@@ -2,11 +2,14 @@
     float: right;
 }
 
-
 :host /deep/ .histology > p-dropdown > div {
     width:100% !important;
 }
 
-.upload-button {
+:host /deep/ p-tabPanel .toolbar {
+    text-align: right;
+}
+
+:host /deep/ p-tabPanel .toolbar button {
     margin-bottom: 5px;
 }

@@ -1,1 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
+header {
+    padding: 10px;
+
+    margin-left: -8px;
+    margin-top: -8px;
+    margin-right: -8px;
+
+    background-color: #F8F8F8;
+    color: #678102;
+    font-family: "Roboto", "Trebuchet MS", sans-serif;
+
+    border-bottom: 1px solid #eeeeee;
+}
+
+h1 {
+    font-family: "Roboto", "Trebuchet MS", sans-serif;
+    font-size: 1.4em;
+    color: #678102;
+}
+
+header .appname {
+    font-size: 1.2em;
+}

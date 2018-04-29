@@ -29,8 +29,8 @@
 
 <p-tabView>
   <p-tabPanel header="Video">
-    <div>
-    <button pButton type="button" label="Upload" class="ui-button upload-button"></button>
+    <div class="toolbar">
+    <button pButton type="button" label="Upload" icon="fa-upload" class="ui-button upload-button"></button>
     </div>
     <p-dataView [value]="videos">
       <ng-template let-videos pTemplate="listItem">
@@ -57,14 +57,10 @@
                 <b>{{videos.observation}}</b>
               </div>
               <div class="ui-g-12">
-                <button pButton type="button" label="Edit" class="ui-button"></button>
+                <button pButton type="button" icon="fa-edit" label="Edit" class="ui-button-secondary"></button>
+                <button pButton type="button" icon="fa-file-video-o" label="Edit video" class="ui-button-secondary"></button>
               </div>
 
-            </div>
-          </div>
-          <div class="ui-g-12 ui-md-12 ui-md-offset-6 ui-lg-4 ui-lg-offset-0">
-            <div class="ui-g-12">
-              <button pButton type="button" label="Edit video" class="ui-button"></button>
             </div>
           </div>
         </div>
@@ -72,15 +68,16 @@
     </p-dataView>
   </p-tabPanel>
   <p-tabPanel header="Polyp">
-    <div class="ui-g">
-      <button pButton type="button" label="New" class="ui-button"></button>
+    <div class="toolbar">
+      <button pButton type="button" icon="fa-plus" label="New" class="ui-button"></button>
     </div>
+
     <div *ngFor="let polyp of polyps" id="polyp-list">
       <p-card>
         <div class="ui-g">
           <div class="ui-g-12 ui-md-offset-8 ui-lg-offset-8">
             ID: {{polyp.id}}
-            <p-button class="delete-button" icon="fa fa-fw fa-close" ></p-button>
+            <p-button class="delete-button" styleClass="ui-button-danger" icon="fa fa-fw fa-close" ></p-button>
           </div>
           <div class="ui-g-12">Name: {{polyp.name}}</div>
           <div class="ui-g-6 ui-sm-12">Size: {{polyp.size}}</div>
@@ -114,10 +111,10 @@
                   </div>
                   <div class="ui-g-6 ui-md-4 ui-lg-4">
                     <div class="ui-g-12">
-                      <button pButton type="button" label="Edit" class="ui-button"></button>
+                      <button pButton type="button" label="Edit" icon="fa-edit" class="ui-button-secondary"></button>
                     </div>
                     <div class="ui-g-12">
-                      <button pButton type="button" label="Play" class="ui-button"></button>
+                      <button pButton type="button" label="Play" icon="fa-play" class="ui-button-secondary"></button>
                     </div>
                   </div>
                 </div>
