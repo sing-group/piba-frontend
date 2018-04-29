@@ -13,6 +13,8 @@ import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ExplorationComponent } from './exploration/exploration.component';
+import { CardModule } from 'primeng/card';
+import { PanelModule } from 'primeng/panel';
 
 
 @NgModule({
@@ -38,7 +40,9 @@ import { ExplorationComponent } from './exploration/exploration.component';
       {
         path: '', redirectTo: 'exploration', pathMatch: 'full'
       }
-    ])
+    ]),
+    CardModule,
+    PanelModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
