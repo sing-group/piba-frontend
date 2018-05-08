@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { FieldsetModule } from 'primeng/fieldset';
@@ -15,12 +14,15 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { ExplorationComponent } from './exploration/exploration.component';
 import { CardModule } from 'primeng/card';
 import { PanelModule } from 'primeng/panel';
-
+import { VideoComponent } from './video/video.component';
+import { AppRoutingModule } from './/app-routing.module';
+import { DialogModule } from 'primeng/dialog';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ExplorationComponent
+    ExplorationComponent,
+    VideoComponent
   ],
   imports: [
     BrowserModule,
@@ -33,16 +35,10 @@ import { PanelModule } from 'primeng/panel';
     DropdownModule,
     FormsModule,
     FileUploadModule,
-    RouterModule.forRoot([
-      {
-        path: 'exploration', component: ExplorationComponent
-      },
-      {
-        path: '', redirectTo: 'exploration', pathMatch: 'full'
-      }
-    ]),
     CardModule,
     PanelModule,
+    AppRoutingModule,
+    DialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -13,3 +13,7 @@
 :host /deep/ p-tabPanel .toolbar button {
     margin-bottom: 5px;
 }
+
+.exploration-video{
+    width: 100%;
+}

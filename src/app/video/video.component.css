@@ -1,0 +1,108 @@
+#modal-button .add-button{
+  float: right
+}
+#dropdown {
+  vertical-align: top !important;
+}
+.input-timer{
+  width: 60%;
+}
+
+video {
+  border: 1px solid black;
+  width: 90%;
+  height: 100%;
+}
+
+.video {
+  position: relative;
+}
+  
+.controls {
+  opacity: 0.5;
+  width: 400px;
+  border-radius: 10px;
+  position: absolute;
+  bottom: 20px;
+  left: 45%;
+  margin-left: -200px;
+  background-color:black;
+  box-shadow: 3px 3px 5px black;
+  transition: 1s all;
+  display: flex;
+}
+@media only screen and (max-width: 600px) {
+  .controls{
+    left:2% !important;
+    bottom:5%;
+    margin-left: 0px !important;
+    width: 83.33%;
+  }
+  
+} 
+@media only screen and (max-width: 768px) {
+  .controls{
+    left:45%;
+  }
+  .input-timer{
+    width: 40%;
+  }
+} 
+  
+.video button, .controls {
+  background: linear-gradient(to bottom,#222,#666);
+}
+
+.video button, .i{
+  color:white;
+}
+  
+.video:hover .controls, video:focus .controls {
+  opacity: 1;
+}
+  
+.video button, .timer {
+  height: 38px;
+  line-height: 19px;
+  box-shadow: inset 0 -5px 25px rgba(0,0,0,0.3);
+  border-right: 1px solid #333;
+}
+  
+.video button {
+  position: relative;
+  border: 0;
+  flex: 1;
+  outline: none;
+}
+  
+.play {
+  border-radius: 10px 0 0 10px;
+}
+  
+.fullscreen {
+  border-radius: 0 10px 10px 0;
+}
+  
+.timer {
+  line-height: 38px;
+  font-size: 10px;
+  font-family: monospace;
+  text-shadow: 1px 1px 0px black;
+  color: white;
+  flex: 5;
+  position: relative;
+}
+ 
+.timer span {
+  position: absolute;
+  z-index: 3;
+  left: 19px;
+}
+  
+.video button:hover, .video button:focus {
+  box-shadow: inset 1px 1px 2px black;
+}
+  
+.video button:active {
+  box-shadow: inset 3px 3px 2px black;
+}

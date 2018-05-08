@@ -18,7 +18,7 @@
 
     <div class="ui-g-12">
       <div class="ui-inputgroup">
-        <label>Ubicación:</label>
+        <label>Location:</label>
         <input id="location" type="text" pInputText [disabled]="true" placeholder="Location" />
       </div>
     </div>
@@ -30,14 +30,17 @@
 <p-tabView>
   <p-tabPanel header="Video">
     <div class="toolbar">
-    <button pButton type="button" label="Upload" icon="fa-upload" class="ui-button upload-button"></button>
+      <button pButton type="button" label="Upload" icon="fa-upload" class="ui-button upload-button"></button>
     </div>
     <p-dataView [value]="videos">
       <ng-template let-videos pTemplate="listItem">
 
         <div class="ui-g">
           <div class="ui-g-12 ui-md-6 ui-lg-4">
-            <img src="{{videos.url}}" width="100%" height="100%">
+            <video class="exploration-video" controls>
+              <source src="{{videos.url}}.mp4" type="video/mp4" />
+              <source src="{{videos.url}}.ogg" type="video/ogg" /> Your browser does not support the video tag.
+            </video>
           </div>
 
           <div class="ui-g-12 ui-md-6 ui-lg-4">
@@ -58,9 +61,8 @@
               </div>
               <div class="ui-g-12">
                 <button pButton type="button" icon="fa-edit" label="Edit" class="ui-button-secondary"></button>
-                <button pButton type="button" icon="fa-file-video-o" label="Edit video" class="ui-button-secondary"></button>
+                <button pButton type="button" icon="fa-file-video-o" label="Edit video" class="ui-button-secondary" routerLink="/video/{{videos.id}}"></button>
               </div>
-
             </div>
           </div>
         </div>
@@ -77,7 +79,7 @@
         <div class="ui-g">
           <div class="ui-g-12 ui-md-offset-8 ui-lg-offset-8">
             ID: {{polyp.id}}
-            <p-button class="delete-button" styleClass="ui-button-danger" icon="fa fa-fw fa-close" ></p-button>
+            <p-button class="delete-button" styleClass="ui-button-danger" icon="fa fa-fw fa-close"></p-button>
           </div>
           <div class="ui-g-12">Name: {{polyp.name}}</div>
           <div class="ui-g-6 ui-sm-12">Size: {{polyp.size}}</div>
@@ -102,7 +104,10 @@
               <div *ngFor="let video of polyp.videos ">
                 <div class="ui-g">
                   <div class="ui-g-12 ui-md-4 ui-lg-4">
-                    <img src="{{video.url}} " width="100% " height="100% ">
+                    <video controls class="exploration-video">
+                      <source src="{{video.url}}.mp4" type="video/mp4" />
+                      <source src="{{video.url}}.ogg" type="video/ogg" /> Your browser does not support the video tag.
+                    </video>
                   </div>
                   <div class="ui-g-6 ui-md-4 ui-lg-4">
                     <p>{{video.title}}</p>
@@ -111,7 +116,7 @@
                   </div>
                   <div class="ui-g-6 ui-md-4 ui-lg-4">
                     <div class="ui-g-12">
-                      <button pButton type="button" label="Edit" icon="fa-edit" class="ui-button-secondary"></button>
+                      <button pButton type="button" label="Edit" icon="fa-edit" class="ui-button-secondary" routerLink="/video/{{videos.id}}"></button>
                     </div>
                     <div class="ui-g-12">
                       <button pButton type="button" label="Play" icon="fa-play" class="ui-button-secondary"></button>
