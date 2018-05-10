@@ -1,0 +1,8 @@
+:host /deep/ fieldset{
+    margin: 0.25%;
+}
+
+:host /deep/ legend{
+    font-size: 1em !important;
+}
+    

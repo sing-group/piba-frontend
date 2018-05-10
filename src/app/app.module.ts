@@ -17,12 +17,14 @@ import { PanelModule } from 'primeng/panel';
 import { VideoComponent } from './video/video.component';
 import { AppRoutingModule } from './/app-routing.module';
 import { DialogModule } from 'primeng/dialog';
+import { PatientComponent } from './patient/patient.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ExplorationComponent,
-    VideoComponent
+    VideoComponent,
+    PatientComponent
   ],
   imports: [
     BrowserModule,

@@ -1,4 +1,37 @@
-<header>
-    <span class="appname">PolyDeep Image Bank</span>
-</header>
-<router-outlet></router-outlet>
+<nav class="navbar navbar-dark sticky-top flex-md-nowrap p-0 bg-nav">
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0 nav-text-color" href="#">PolyDeep</a>
+    <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+            <a class="nav-link nav-text-color" href="#">Welcome user</a>
+        </li>
+    </ul>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/patients">
+                            <span data-feather="patients">
+                                Patients
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/explorations">
+                            <span data-feather="explorations"></span>
+                            Explorations
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <main role="main" class="col-md-9 col-lg-10">
+            <div class="d-flex flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <router-outlet></router-outlet>
+            </div>
+        </main>
+    </div>
+</div>
