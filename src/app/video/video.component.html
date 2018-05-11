@@ -1,38 +1,34 @@
-<div class="ui-g">
-  <div class="ui-g-1"></div>
-  <div class="ui-g-10">
-    <div class="video">
-      <div id="videocontainer">
-        <video controls>
-          <source src="{{video.url}}.mp4" type="video/mp4" />
-          <source src="{{video.url}}.ogg" type="video/ogg" /> Your browser does not support the video tag.
-        </video>
-
-        <div class="controls">
-          <button class="play" aria-label="play pause toggle">
-            <i class="fa fa-play"></i>
-          </button>
-          <button class="stop" aria-label="stop">
-            <i class="fa fa-stop"></i>
-          </button>
-          <div class="timer">
-            <span id="timer" aria-label="timer">00:00</span>
-          </div>
-          <button class="backward" aria-label="backward">
-            <i class="fa fa-fast-backward"></i>
-          </button>
-          <button class="forward" aria-label="fast forward">
-            <i class="fa fa-fast-forward"></i>
-          </button>
-          <button class="fullscreen" aria-label="fullscreen">
-            <i class="fa fa-arrows-alt"></i>
-          </button>
+<div class="video">
+    <div id="videocontainer">
+      <video controls>
+        <source src="{{video.url}}.mp4" type="video/mp4" />
+        <source src="{{video.url}}.ogg" type="video/ogg" /> Your browser does not support the video tag.
+      </video>
+  
+      <div class="controls">
+        <button class="play" aria-label="play pause toggle">
+          <i class="fa fa-play"></i>
+        </button>
+        <button class="stop" aria-label="stop">
+          <i class="fa fa-stop"></i>
+        </button>
+        <div class="timer">
+          <span id="timer" aria-label="timer">00:00</span>
         </div>
+        <button class="backward" aria-label="backward">
+          <i class="fa fa-fast-backward"></i>
+        </button>
+        <button class="forward" aria-label="fast forward">
+          <i class="fa fa-fast-forward"></i>
+        </button>
+        <button class="fullscreen" aria-label="fullscreen">
+          <i class="fa fa-arrows-alt"></i>
+        </button>
       </div>
     </div>
   </div>
-  <div class="ui-g-1"></div>
-  <div class="clearfix ui-g-12">
+
+  <!--div class="clearfix ui-g-12">
     <p-tabView>
       <p-tabPanel header="Polyps">
         <div *ngFor="let polyp of getVideoPolyps(video.id)">
@@ -54,10 +50,10 @@
             </div>
           </div>
 
-        </div>
+        </div-->
 
         <!-- new polyp-->
-        <div class="ui-lg-12">
+        <!--div class="ui-lg-12">
           <div class="ui-g-3 ui-md-3 ui-sm-12">
             <p-dropdown id="dropdown" [options]="polyps" [(ngModel)]="selectedPolyp" optionLabel="name"></p-dropdown>
             <p-dialog header="New polyp" [(visible)]="display" [modal]="true" [responsive]="true">
@@ -97,4 +93,4 @@
       </p-tabPanel>
     </p-tabView>
   </div>
-</div>
+</div-->

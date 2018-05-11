@@ -22,18 +22,22 @@ export class VideoComponent implements OnInit {
   initial: string;
   final: string;
 
-  display: boolean = false;
+  display: boolean;
 
   newPolyp: Polyp;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router
-  ) { }
+  ) {
+    this.display = false;
+  }
 
   ngOnInit() {
-    let id = this.route.snapshot.paramMap.get('id');
-    this.video = VIDEOS.find(item => item.id == +id);
+    const id = this.route.snapshot.paramMap.get('id');
+
+    this.video = VIDEOS.find(item => item.id === id);
+
     createControls();
   }
 
@@ -50,12 +54,21 @@ export class VideoComponent implements OnInit {
   }
 
   getVideoPolyps(id) {
-    return VIDEOS.find(item => item.id == +id).polyps;
+    return VIDEOS.find(item => item.id === id).polyps;
   }
 
   addPolyp(videoId) {
-    VIDEOS.find(item => item.id == +videoId).polyps.push({
-      id: 2, name: 'polyp 2', size: 11, location: 'left colon', wasp: 'Type I', nice: '1', lst: '1', paris: 'Category 0-1', histology: 'histology', videos: []
+    VIDEOS.find(item => item.id === videoId).polyps.push({
+      id: 'ee0d66af-f3fb-4d7d-85f8-456d5dc14bb5',
+      name: 'Polyp 2',
+      size: 11,
+      location: 'left colon',
+      wasp: 'Type I',
+      nice: '1',
+      lst: '1',
+      paris: 'Category 0-1',
+      histology: 'Histology',
+      videos: []
     });
   }
 

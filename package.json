@@ -1,7 +1,7 @@
 {
   "name": "@piba/frontend",
   "description": "PIBA - Polyp Image Bank",
-  "version": "0.1.0-alpha.9",
+  "version": "0.1.0-alpha.10",
   "license": "GPLv3",
   "author": {
     "name": "Miguel Reboiro-Jato",
@@ -41,9 +41,11 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
+    "@clr/angular": "^0.11.17",
+    "@clr/icons": "^0.11.17",
+    "@clr/ui": "^0.11.17",
+    "@webcomponents/custom-elements": "^1.0.0",
     "core-js": "^2.4.1",
-    "font-awesome": "^4.7.0",
-    "primeng": "^5.2.4",
     "rxjs": "^5.5.6",
     "zone.js": "^0.8.19"
   },

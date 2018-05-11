@@ -1,7 +1,7 @@
 import { Video } from './video';
 
 export class Polyp {
-    id: number;
+    id: string;
     name: string;
     size: number;
     location: string;

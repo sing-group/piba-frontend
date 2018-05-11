@@ -1,133 +1,101 @@
-<h1>Explorations</h1>
-<p-fieldset legend="Exploration data">
-  <div class="ui-g ui-fluid">
-    <div class="ui-g-12">
-      <div class="ui-inputgroup">
-        <label>Patient:</label>
-        <p-dropdown placeholder="Select a ambit" [options]="ambit" [(ngModel)]="selectedAmbit" optionLabel="name"></p-dropdown>
-        <input type="text" pInputText [disabled]="true" placeholder="id" />
-      </div>
-    </div>
-
-    <div class="ui-g-12">
-      <div class="ui-inputgroup">
-        <label>Date:</label>
-        <input id="date" type="text" pInputText [disabled]="true" placeholder="15/06/1988" />
-      </div>
-    </div>
-
-    <div class="ui-g-12">
-      <div class="ui-inputgroup">
-        <label>Location:</label>
-        <input id="location" type="text" pInputText [disabled]="true" placeholder="Location" />
-      </div>
-    </div>
-
+<div class="card">
+  <div class="card-header">
+    Exploration data
   </div>
+  <div class="card-block">
+    <form>
+      <section class="form-block">
+        <div class="form-group">
+          <label for="patient-id">Patient</label>
+          <div class="select">
+            <select id="patient-realm">
+              <option value="" disabled selected>&lt;Realm&gt;</option>
+              <option>Sergas</option>
+            </select>
+          </div>
+          <input type="text" id="patient-id" size="50" placeholder="Patient identifier"/>
+        </div>
 
-</p-fieldset>
+        <div class="form-group">
+          <label for="exploration-date">Exploration date</label>
+          <input type="date" clrDate id="exploration-date"/>
+        </div>
 
-<p-tabView>
-  <p-tabPanel header="Video">
-    <div class="toolbar">
-      <button pButton type="button" label="Upload" icon="fa-upload" class="ui-button upload-button"></button>
-    </div>
-    <p-dataView [value]="videos">
-      <ng-template let-videos pTemplate="listItem">
+        <div class="form-group">
+          <label for="exploration-location">Location</label>
+          <input type="text" id="exploration-location" size="60"/>
+          <clr-icon shape="map-marker"></clr-icon>
+        </div>
+      </section>
+    </form>
+  </div>
+</div>
 
-        <div class="ui-g">
-          <div class="ui-g-12 ui-md-6 ui-lg-4">
+<div class="card">
+  <div class="card-block">
+    <ul id="tabs-exploration" class="nav" role="tablist">
+        <li role="presentation" class="nav-item">
+            <button id="tab-videos" class="btn btn-link nav-link active" aria-controls="panel-videos"
+                    aria-selected="true" type="button">Videos</button>
+        </li>
+        <li role="presentation" class="nav-item">
+            <button id="tab-polyps" class="btn btn-link nav-link" aria-controls="panel-polyps"
+                    aria-selected="false" type="button">Polyps</button>
+        </li>
+    </ul>
+
+    <section id="panel-videos" role="tabpanel" aria-labelledby="tab-videos">
+      <div class="row">
+        <div class="col-lg-12 text-right">
+          <button type="button" class="btn btn-icon btn-link">
+            <clr-icon shape="upload"></clr-icon> Upload
+          </button>
+        </div>
+      </div>
+      
+      <clr-datagrid>
+        <clr-dg-column>Video</clr-dg-column>
+        <clr-dg-column>Information</clr-dg-column>
+
+        <clr-dg-row *ngFor="let video of videos">
+          <clr-dg-cell>
             <video class="exploration-video" controls>
-              <source src="{{videos.url}}.mp4" type="video/mp4" />
-              <source src="{{videos.url}}.ogg" type="video/ogg" /> Your browser does not support the video tag.
+              <source src="{{video.url}}.mp4" type="video/mp4" />
+              <source src="{{video.url}}.ogg" type="video/ogg" />
+              Your browser does not support the video tag.
             </video>
-          </div>
-
-          <div class="ui-g-12 ui-md-6 ui-lg-4">
-            <div class="ui-g">
-              <div class="ui-g-4 ui-sm-6">Id: </div>
-              <div class="ui-g-8 ui-sm-6">
-                <b>{{videos.id}}</b>
-              </div>
-
-              <div class="ui-g-4 ui-sm-6">Title: </div>
-              <div class="ui-g-8 ui-sm-6">
-                <b>{{videos.title}}</b>
-              </div>
-
-              <div class="ui-g-4 ui-sm-6">Observation: </div>
-              <div class="ui-g-8 ui-sm-6">
-                <b>{{videos.observation}}</b>
-              </div>
-              <div class="ui-g-12">
-                <button pButton type="button" icon="fa-edit" label="Edit" class="ui-button-secondary"></button>
-                <button pButton type="button" icon="fa-file-video-o" label="Edit video" class="ui-button-secondary" routerLink="/video/{{videos.id}}"></button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </ng-template>
-    </p-dataView>
-  </p-tabPanel>
-  <p-tabPanel header="Polyp">
-    <div class="toolbar">
-      <button pButton type="button" icon="fa-plus" label="New" class="ui-button"></button>
-    </div>
-
-    <div *ngFor="let polyp of polyps" id="polyp-list">
-      <p-card>
-        <div class="ui-g">
-          <div class="ui-g-12 ui-md-offset-8 ui-lg-offset-8">
-            ID: {{polyp.id}}
-            <p-button class="delete-button" styleClass="ui-button-danger" icon="fa fa-fw fa-close"></p-button>
-          </div>
-          <div class="ui-g-12">Name: {{polyp.name}}</div>
-          <div class="ui-g-6 ui-sm-12">Size: {{polyp.size}}</div>
-          <div class="ui-g-6 ui-sm-12">Location: {{polyp.location}}</div>
-          <div class="ui-g-12 ui-md-6 ui-lg-3">
-            NICE: {{polyp.nice}}
-          </div>
-          <div class="ui-g-12 ui-md-6 ui-lg-3">
-            WASP: {{polyp.wasp}}
-          </div>
-          <div class="ui-g-12 ui-md-6 ui-lg-3">
-            LST: {{polyp.lst}}
-          </div>
-          <div class="ui-g-12 ui-md-6 ui-lg-3">
-            Paris: {{polyp.paris}}
-          </div>
-          <div class="ui-g-4 ui-sm-12" class="histology">
-            <p-dropdown placeholder="Select a histology" [options]="histology" [(ngModel)]="selectedHistology" optionLabel="name"></p-dropdown>
-          </div>
-          <div class=" ui-g-12">
-            <p-panel header="Views " [toggleable]="true" collapsed="false">
-              <div *ngFor="let video of polyp.videos ">
-                <div class="ui-g">
-                  <div class="ui-g-12 ui-md-4 ui-lg-4">
-                    <video controls class="exploration-video">
-                      <source src="{{video.url}}.mp4" type="video/mp4" />
-                      <source src="{{video.url}}.ogg" type="video/ogg" /> Your browser does not support the video tag.
-                    </video>
-                  </div>
-                  <div class="ui-g-6 ui-md-4 ui-lg-4">
-                    <p>{{video.title}}</p>
-                    <p>Init: 23:10</p>
-                    <p>Fin: 24:00</p>
-                  </div>
-                  <div class="ui-g-6 ui-md-4 ui-lg-4">
-                    <div class="ui-g-12">
-                      <button pButton type="button" label="Edit" icon="fa-edit" class="ui-button-secondary" routerLink="/video/{{videos.id}}"></button>
-                    </div>
-                    <div class="ui-g-12">
-                      <button pButton type="button" label="Play" icon="fa-play" class="ui-button-secondary"></button>
-                    </div>
-                  </div>
+          </clr-dg-cell>
+          <clr-dg-cell>
+            <form>
+              <section class="form-block">
+                <div class="form-group">
+                  <label for="video-uuid">UUID</label>
+                  <input type="text" id="video-uuid" size="36" readonly value="{{video.id}}"/>
                 </div>
-              </div>
-            </p-panel>
-          </div>
-        </div>
-      </p-card>
-    </div>
-  </p-tabPanel>
-</p-tabView>
+                <div class="form-group">
+                  <label for="video-title">Title</label>
+                  <input type="text" id="video-title" size="50" readonly value="{{video.title}}"/>
+                </div>
+                <div class="form-group">
+                  <label for="video-observation">Observation</label>
+                  <textarea type="text" id="video-observation" rows="4" readonly value="{{video.observation}}"></textarea>
+                </div>
+              </section>
+              <button type="button" class="btn btn-secondary">
+                <clr-icon shape="note"></clr-icon> Edit information
+              </button>
+              <button type="button" class="btn btn-secondary" routerLink="/video/{{video.id}}">
+                <clr-icon shape="video-gallery"></clr-icon> Edit video
+              </button>
+            </form>
+          </clr-dg-cell>
+        </clr-dg-row>
+      </clr-datagrid>
+    </section>
+    <section id="panel-polyps" role="tabpanel" aria-labelledby="tab-polyps" aria-hidden="true">
+      <div class="toolbar">
+        <button pButton type="button" icon="fa-plus" label="New" class="ui-button"></button>
+      </div>
+    </section>
+  </div>
+</div>
