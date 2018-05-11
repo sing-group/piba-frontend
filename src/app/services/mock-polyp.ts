@@ -1,4 +1,4 @@
-import { Polyp } from './model/polyp';
+import { Polyp } from '../models/polyp';
 
 export const POLYPS: Polyp[] = [
     {

@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ExplorationComponent } from './exploration/exploration.component';
-import { VideoComponent } from './video/video.component';
-import { PatientComponent } from './patient/patient.component';
+import { ExplorationComponent } from './components/exploration/exploration.component';
+import { VideoComponent } from './components/video/video.component';
+import { PatientComponent } from './components/patient/patient.component';
 
 const routes: Routes = [
   {

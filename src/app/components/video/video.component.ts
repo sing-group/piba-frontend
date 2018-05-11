@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import { POLYPS } from '../mock-polyp';
-import { Polyp } from '../model/polyp';
-import { VIDEOS } from '../mock-videos';
-import { Video } from '../model/video';
+import { Polyp } from '../../models/polyp';
+import { Video } from '../../models/video';
+import { VideosService } from '../../services/videos.service';
+import { PolypsService } from '../../services/polyps.service';
 
 declare function createControls(): void;
 
@@ -13,8 +13,6 @@ declare function createControls(): void;
   styleUrls: ['./video.component.css']
 })
 export class VideoComponent implements OnInit {
-
-  polyps = POLYPS;
   selectedPolyp: Polyp;
 
   video: Video;
@@ -27,8 +25,10 @@ export class VideoComponent implements OnInit {
   newPolyp: Polyp;
 
   constructor(
+    private videosService: VideosService,
+    private polypsService: PolypsService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
   ) {
     this.display = false;
   }
@@ -36,7 +36,8 @@ export class VideoComponent implements OnInit {
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
 
-    this.video = VIDEOS.find(item => item.id === id);
+    this.videosService.getVideo(id)
+      .subscribe(video => this.video = video);
 
     createControls();
   }
@@ -53,12 +54,8 @@ export class VideoComponent implements OnInit {
     this.display = true;
   }
 
-  getVideoPolyps(id) {
-    return VIDEOS.find(item => item.id === id).polyps;
-  }
-
   addPolyp(videoId) {
-    VIDEOS.find(item => item.id === videoId).polyps.push({
+    this.videosService.addPolyp(this.video.id, {
       id: 'ee0d66af-f3fb-4d7d-85f8-456d5dc14bb5',
       name: 'Polyp 2',
       size: 11,
@@ -68,8 +65,9 @@ export class VideoComponent implements OnInit {
       lst: '1',
       paris: 'Category 0-1',
       histology: 'Histology',
-      videos: []
-    });
+      videos: [this.video]
+    })
+    .subscribe(video => this.video = video);
   }
 
 }

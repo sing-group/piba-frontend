@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Video } from '../model/video';
-import { VIDEOS } from '../mock-videos';
-import { Polyp } from '../model/polyp';
-import { POLYPS } from '../mock-polyp';
+import { Video } from '../../models/video';
+import { Polyp } from '../../models/polyp';
+import { VideosService } from '../../services/videos.service';
+import { PolypsService } from '../../services/polyps.service';
 
 interface Ambit {
   name: string;
@@ -19,8 +19,8 @@ interface Histology {
 })
 export class ExplorationComponent implements OnInit {
 
-  videos = VIDEOS;
-  polyps = POLYPS;
+  videos: Video[];
+  polyps: Polyp[];
 
   ambit: Ambit[];
   selectedAmbit: Ambit;
@@ -28,12 +28,17 @@ export class ExplorationComponent implements OnInit {
   histology: Histology[];
   selectedHistology: Histology[];
 
-  constructor() {
+  constructor(
+    private videosService: VideosService,
+    private polypsService: PolypsService
+  ) {
     this.ambit = [{ name: 'Sergas' }];
     this.histology = [{name: 'histology 1'}];
   }
 
   ngOnInit() {
+    this.videosService.getVideos().subscribe(videos => this.videos = videos);
+    this.polypsService.getPolyps().subscribe(polyps => this.polyps = polyps);
   }
 
 }

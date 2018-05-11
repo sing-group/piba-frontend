@@ -1,5 +1,5 @@
-import { Video } from './model/video';
-import { Polyp } from './model/polyp';
+import { Video } from '../models/video';
+import { Polyp } from '../models/polyp';
 
 export const VIDEOS: Video[] = [
     {
@@ -27,7 +27,7 @@ export const VIDEOS: Video[] = [
         }]
     },
     {
-        id: 'e97845af-5c6c-414d-84ed-98cd49f08eff',
+        id: 'c1921367-a9db-4289-846a-7a345194be24',
         title: 'Video 2',
         observation: 'Nothing',
         url: 'http://static.sing-group.org/polydeep/videos/sample-exploration',
