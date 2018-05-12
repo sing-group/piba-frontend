@@ -14,13 +14,12 @@ declare function createControls(): void;
 })
 export class VideoComponent implements OnInit {
   selectedPolyp: Polyp;
+  polyps: Polyp[];
 
   video: Video;
 
   initial: string;
   final: string;
-
-  display: boolean;
 
   newPolyp: Polyp;
 
@@ -29,15 +28,15 @@ export class VideoComponent implements OnInit {
     private polypsService: PolypsService,
     private route: ActivatedRoute,
     private router: Router,
-  ) {
-    this.display = false;
-  }
+  ) { }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
 
     this.videosService.getVideo(id)
       .subscribe(video => this.video = video);
+
+    this.polypsService.getPolyps().subscribe(polyps => this.polyps = polyps);
 
     createControls();
   }
@@ -48,10 +47,6 @@ export class VideoComponent implements OnInit {
 
   finalVideo() {
     this.final = document.getElementById('timer').firstChild.textContent;
-  }
-
-  showDialog() {
-    this.display = true;
   }
 
   addPolyp(videoId) {
@@ -67,7 +62,7 @@ export class VideoComponent implements OnInit {
       histology: 'Histology',
       videos: [this.video]
     })
-    .subscribe(video => this.video = video);
+      .subscribe(video => this.video = video);
   }
 
 }

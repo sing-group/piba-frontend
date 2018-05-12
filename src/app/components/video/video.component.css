@@ -4,8 +4,13 @@
 #dropdown {
   vertical-align: top !important;
 }
-.input-timer{
-  width: 60%;
+
+.input-timer {
+  width: 40%;
+}
+
+.contentNewPolyp {
+  margin-top: 1%;
 }
 
 video {
@@ -31,21 +36,18 @@ video {
   transition: 1s all;
   display: flex;
 }
+
 @media only screen and (max-width: 600px) {
   .controls{
     left:2% !important;
     bottom:5%;
     margin-left: 0px !important;
     width: 83.33%;
-  }
-  
+  } 
 } 
 @media only screen and (max-width: 768px) {
   .controls{
     left:45%;
-  }
-  .input-timer{
-    width: 40%;
   }
 } 
   
