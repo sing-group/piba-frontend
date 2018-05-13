@@ -1,19 +1,19 @@
-#polyp-list .delete-button {
-    float: right;
+.txt-strong{
+    font-weight: bold;
+}
+@media (min-width: 768px) { 
+    .delete-button {
+        float: right;
+    }    
 }
 
-:host /deep/ .histology > p-dropdown > div {
-    width:100% !important;
-}
-
-:host /deep/ p-tabPanel .toolbar {
+.toolbar {
     text-align: right;
-}
-
-:host /deep/ p-tabPanel .toolbar button {
-    margin-bottom: 5px;
 }
 
 .exploration-video{
     width: 100%;
+}
+:host /deep/ .clr-treenode-children{
+    margin-left: 0% !important;
 }

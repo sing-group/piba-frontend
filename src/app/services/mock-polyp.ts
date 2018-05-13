@@ -17,6 +17,26 @@ export const POLYPS: Polyp[] = [
             observation: 'nothing',
             url: 'http://static.sing-group.org/polydeep/videos/sample-exploration',
             polyps: []
+        }, 
+        {
+            id: '910a2323-0m3s-9v13-4567-b1243p4d5b2b',
+            title: 'Video 2',
+            observation: 'nothing',
+            url: 'http://static.sing-group.org/polydeep/videos/sample-exploration',
+            polyps: []
+        },
+        {
+            id: '74w30919-4s33-8832-v32d4b42vb2b',
+            title: 'Video 3',
+            observation: 'nothing',
+            url: 'http://static.sing-group.org/polydeep/videos/sample-exploration',
+            polyps: []
+        },{
+            id: '660m1009-3c44-7x81-5455-9s32j9o329s4',
+            title: 'Video 4',
+            observation: 'nothing',
+            url: 'http://static.sing-group.org/polydeep/videos/sample-exploration',
+            polyps: []
         }]
     },
     {
