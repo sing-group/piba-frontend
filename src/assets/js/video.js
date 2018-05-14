@@ -26,10 +26,10 @@ function createControls() {
 
 function playPauseMedia() {
     if (media.paused) {
-        play.childNodes[0].nextSibling.setAttribute('class', 'fa fa-pause');
+        play.childNodes[0].nextSibling.setAttribute('shape', 'pause');
         media.play();
     } else {
-        play.childNodes[0].nextSibling.setAttribute('class', 'fa fa-play');
+        play.childNodes[0].nextSibling.setAttribute('shape', 'play');
         media.pause();
     }
 }
@@ -37,7 +37,7 @@ function playPauseMedia() {
 function stopMedia() {
     media.pause();
     media.currentTime = 0;
-    play.childNodes[0].nextSibling.setAttribute('class', 'fa fa-play');
+    play.childNodes[0].nextSibling.setAttribute('shape', 'play');
 }
 
 function mediaBackward() {
@@ -53,7 +53,7 @@ function mediaForward() {
 }
 
 function fullScreen() {
-
+    fullscreen.childNodes[0].nextSibling.setAttribute('shape', 'resize-down');
     if (videocontainer.requestFullscreen) {
         videocontainer.requestFullscreen();
     } else if (media.mozRequestFullScreen) {
