@@ -16,7 +16,7 @@ export const VIDEOS: Video[] = [
             nice: '1',
             lst: '1',
             paris: 'Category 0-1',
-            histology: 'histology',
+            histology: 'Histology',
             videos: [{
                 id: '283e9222-f189-4d03-8382-c0942d8d5b2b',
                 title: 'Video',
@@ -36,14 +36,14 @@ export const VIDEOS: Video[] = [
     {
         id: '74w30919-4s33-8832-v32d4b42vb2b',
         title: 'Video 3',
-        observation: 'nothing',
+        observation: 'Nothing',
         url: 'http://static.sing-group.org/polydeep/videos/sample-exploration',
         polyps: []
     },
     {
         id: '660m1009-3c44-7x81-5455-9s32j9o329s4',
         title: 'Video 4',
-        observation: 'nothing',
+        observation: 'Nothing',
         url: 'http://static.sing-group.org/polydeep/videos/sample-exploration',
         polyps: []
     }

@@ -1,24 +1,26 @@
-.txt-strong{
+.txt-strong {
     font-weight: bold;
 }
-@media (min-width: 768px) { 
+
+@media (min-width: 768px) {
     .delete-button {
         float: right;
-    }    
+    }
 }
 
 .toolbar {
     text-align: right;
 }
 
-.exploration-video{
+.exploration-video {
     width: 100%;
 }
-:host /deep/ .clr-treenode-children{
+
+:host /deep/ .clr-treenode-children {
     margin-left: 0% !important;
 }
 
-.controls-overlay{
+.controls-overlay {
     width: 92%;
     height: 79%;
     padding: .5rem .75rem;
@@ -37,7 +39,7 @@
     align-items: flex-end;
 }
 
-.btn-overlay{
-    margin-bottom: 10% !important; 
+.btn-overlay {
+    margin-bottom: 10% !important;
     color: white;
-  }
+}

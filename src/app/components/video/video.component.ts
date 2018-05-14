@@ -54,7 +54,7 @@ export class VideoComponent implements OnInit {
       id: 'ee0d66af-f3fb-4d7d-85f8-456d5dc14bb5',
       name: 'Polyp 2',
       size: 11,
-      location: 'left colon',
+      location: 'Left colon',
       wasp: 'Type I',
       nice: '1',
       lst: '1',

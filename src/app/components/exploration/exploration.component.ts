@@ -36,7 +36,7 @@ export class ExplorationComponent implements OnInit {
     private polypsService: PolypsService
   ) {
     this.ambit = [{ name: 'Sergas' }];
-    this.histology = [{ name: 'histology 1' }];
+    this.histology = [{ name: 'Histology 1' }];
   }
 
   ngOnInit() {
@@ -48,14 +48,14 @@ export class ExplorationComponent implements OnInit {
     this.videoHTML = document.getElementById(id) as HTMLMediaElement;
     this.videoHTML.play();
     this.controls = document.getElementById('controls-' + id);
-    this.controls.style.display = "none";
+    this.controls.style.display = 'none';
   }
 
   pauseVideo(id) {
     this.videoHTML = document.getElementById(id) as HTMLMediaElement;
     this.videoHTML.pause();
     this.controls = document.getElementById('controls-' + id);
-    this.controls.style.display = "flex";
+    this.controls.style.display = 'flex';
   }
 
 }
