@@ -28,17 +28,34 @@ export class ExplorationComponent implements OnInit {
   histology: Histology[];
   selectedHistology: Histology[];
 
+  videoHTML: HTMLMediaElement;
+  controls: HTMLElement;
+
   constructor(
     private videosService: VideosService,
     private polypsService: PolypsService
   ) {
     this.ambit = [{ name: 'Sergas' }];
-    this.histology = [{name: 'histology 1'}];
+    this.histology = [{ name: 'histology 1' }];
   }
 
   ngOnInit() {
     this.videosService.getVideos().subscribe(videos => this.videos = videos);
     this.polypsService.getPolyps().subscribe(polyps => this.polyps = polyps);
+  }
+
+  playVideo(id) {
+    this.videoHTML = document.getElementById(id) as HTMLMediaElement;
+    this.videoHTML.play();
+    this.controls = document.getElementById('controls-' + id);
+    this.controls.style.display = "none";
+  }
+
+  pauseVideo(id) {
+    this.videoHTML = document.getElementById(id) as HTMLMediaElement;
+    this.videoHTML.pause();
+    this.controls = document.getElementById('controls-' + id);
+    this.controls.style.display = "flex";
   }
 
 }
