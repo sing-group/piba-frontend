@@ -1,30 +1,29 @@
-<div class="video">
+<div class="video row">
   <div id="videocontainer">
     <video controls>
       <source src="{{video.url}}.mp4" type="video/mp4" />
       <source src="{{video.url}}.ogg" type="video/ogg" /> Your browser does not support the video tag.
     </video>
-
-    <div class="controls">
-      <button class="play" aria-label="play pause toggle">
-        <clr-icon shape="play"></clr-icon>
-      </button>
-      <button class="stop" aria-label="stop">
-        <clr-icon shape="stop"></clr-icon>
-      </button>
-      <div class="timer">
-        <span id="timer" aria-label="timer">00:00</span>
+      <div class="controls">
+        <button class="play" aria-label="play pause toggle">
+          <clr-icon shape="play"></clr-icon>
+        </button>
+        <button class="stop" aria-label="stop">
+          <clr-icon shape="stop"></clr-icon>
+        </button>
+        <div class="timer">
+          <span id="timer" aria-label="timer">00:00</span>
+        </div>
+        <button class="backward" aria-label="backward">
+          <clr-icon shape="rewind"></clr-icon>
+        </button>
+        <button class="forward" aria-label="fast forward">
+          <clr-icon shape="fast-forward"></clr-icon>
+        </button>
+        <button class="fullscreen" aria-label="fullscreen">
+          <clr-icon shape="resize-up"></clr-icon>
+        </button>
       </div>
-      <button class="backward" aria-label="backward">
-        <clr-icon shape="rewind"></clr-icon>
-      </button>
-      <button class="forward" aria-label="fast forward">
-        <clr-icon shape="fast-forward"></clr-icon>
-      </button>
-      <button class="fullscreen" aria-label="fullscreen">
-        <clr-icon shape="resize-up"></clr-icon>
-      </button>
-    </div>
   </div>
 </div>
 
@@ -119,7 +118,7 @@
             </button>
           </div>
         </clr-modal>
-        
+
       </div>
     </clr-tab-content>
   </clr-tab>
