@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ExplorationComponent } from './components/exploration/exploration.component';
-import { VideoComponent } from './components/video/video.component';
+import { VideoEditorComponent } from './components/video-editor/video-editor.component';
 import { PatientComponent } from './components/patient/patient.component';
 
 const routes: Routes = [
@@ -12,7 +12,7 @@ const routes: Routes = [
     path: 'explorations', component: ExplorationComponent
   },
   {
-    path: 'video/:id', component: VideoComponent
+    path: 'video/:id', component: VideoEditorComponent
   },
   {
     path: '', redirectTo: 'explorations', pathMatch: 'full'

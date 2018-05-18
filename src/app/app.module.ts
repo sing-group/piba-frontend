@@ -12,13 +12,17 @@ import { VideoComponent } from './components/video/video.component';
 import { PatientComponent } from './components/patient/patient.component';
 import { PolypsService } from './services/polyps.service';
 import { VideosService } from './services/videos.service';
+import { VideoEditorComponent } from './components/video-editor/video-editor.component';
+import { TimePipe } from './pipes/time.pipe';
 
 @NgModule({
   declarations: [
     AppComponent,
     ExplorationComponent,
     VideoComponent,
-    PatientComponent
+    PatientComponent,
+    VideoEditorComponent,
+    TimePipe
   ],
   imports: [
     BrowserModule,
@@ -29,7 +33,8 @@ import { VideosService } from './services/videos.service';
   ],
   providers: [
     PolypsService,
-    VideosService
+    VideosService,
+    TimePipe
   ],
   bootstrap: [AppComponent]
 })

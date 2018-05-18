@@ -1,11 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import { Polyp } from '../../models/polyp';
-import { Video } from '../../models/video';
-import { VideosService } from '../../services/videos.service';
-import { PolypsService } from '../../services/polyps.service';
-
-declare function createControls(): void;
+import { Component, OnInit, Input, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-video',
@@ -13,56 +6,96 @@ declare function createControls(): void;
   styleUrls: ['./video.component.css']
 })
 export class VideoComponent implements OnInit {
-  selectedPolyp: Polyp;
-  polyps: Polyp[];
+  // tslint:disable-next-line:no-output-rename
+  @Output('currentTime') timeEmitter = new EventEmitter<number>();
 
-  video: Video;
+  @ViewChild('container') containerElement: ElementRef;
+  @ViewChild('video') videoElement: ElementRef;
 
-  initial: string;
-  final: string;
+  fullscreen = false;
 
-  newPolyp: Polyp;
-
-  constructor(
-    private videosService: VideosService,
-    private polypsService: PolypsService,
-    private route: ActivatedRoute,
-    private router: Router,
-  ) { }
+  constructor() { }
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
+    this.video.addEventListener('timeupdate', event => this.timeEmitter.emit(this.video.currentTime));
 
-    this.videosService.getVideo(id)
-      .subscribe(video => this.video = video);
-
-    this.polypsService.getPolyps().subscribe(polyps => this.polyps = polyps);
-
-    createControls();
+    const updateFullscreen = this.updateFullscreen.bind(this);
+    document.addEventListener('fullscreenchange', updateFullscreen);
+    document.addEventListener('mozfullscreenchange', updateFullscreen);
+    document.addEventListener('webkitfullscreenchange', updateFullscreen);
   }
 
-  startVideo() {
-    this.initial = document.getElementById('timer').firstChild.textContent;
+  private get video() {
+    return this.videoElement.nativeElement;
   }
 
-  finalVideo() {
-    this.final = document.getElementById('timer').firstChild.textContent;
+  get paused() {
+    return this.video.paused;
   }
 
-  addPolyp(videoId) {
-    this.videosService.addPolyp(this.video.id, {
-      id: 'ee0d66af-f3fb-4d7d-85f8-456d5dc14bb5',
-      name: 'Polyp 2',
-      size: 11,
-      location: 'Left colon',
-      wasp: 'Type I',
-      nice: '1',
-      lst: '1',
-      paris: 'Category 0-1',
-      histology: 'Histology',
-      videos: [this.video]
-    })
-      .subscribe(video => this.video = video);
+  get currentTime() {
+    return this.video.currentTime;
   }
 
+  playVideo() {
+    if (this.paused) {
+      this.video.play();
+    } else {
+      this.video.pause();
+    }
+  }
+
+  stopVideo() {
+    this.video.pause();
+    this.video.currentTime = 0;
+  }
+
+  forwardVideo() {
+    this.video.currentTime = Math.min(this.video.duration, this.video.currentTime + 3);
+
+    if (this.video.currentTime === this.video.duration) {
+      this.video.pause();
+    }
+  }
+
+  backwardVideo() {
+    this.video.currentTime = Math.max(0, this.video.currentTime - 3);
+  }
+
+  fullscreenVideo() {
+    const document: any = window.document;
+
+    if (this.fullscreen) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    } else {
+      const container = this.containerElement.nativeElement;
+
+      if (container.requestFullscreen) {
+        container.requestFullscreen();
+      } else if (container.mozRequestFullScreen) {
+        container.mozRequestFullScreen();
+      } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+      } else if (container.msRequestFullscreen) {
+        container.msRequestFullscreen();
+      }
+    }
+  }
+
+  private updateFullscreen() {
+    const document: any = window.document;
+
+    this.fullscreen = document.fullscreenElement
+      || document.webkitFullscreenElement
+      || document.mozFullScreenElement
+      || document.msFullscreenElement;
+  }
 }

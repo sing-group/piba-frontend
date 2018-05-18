@@ -1,131 +1,27 @@
-<div class="video row">
-  <div id="videocontainer">
-    <video controls>
-      <source src="{{video.url}}.mp4" type="video/mp4" />
-      <source src="{{video.url}}.ogg" type="video/ogg" /> Your browser does not support the video tag.
-    </video>
-    <div class="controls">
-      <button class="play" aria-label="play pause toggle">
-        <clr-icon shape="play"></clr-icon>
-      </button>
-      <button class="stop" aria-label="stop">
-        <clr-icon shape="stop"></clr-icon>
-      </button>
-      <div class="timer">
-        <span id="timer" aria-label="timer">00:00</span>
-      </div>
-      <button class="backward" aria-label="backward">
-        <clr-icon shape="rewind"></clr-icon>
-      </button>
-      <button class="forward" aria-label="fast forward">
-        <clr-icon shape="fast-forward"></clr-icon>
-      </button>
-      <button class="fullscreen" aria-label="fullscreen">
-        <clr-icon shape="resize-up"></clr-icon>
-      </button>
+<div #container class="video-container">
+  <video #video>
+    <ng-content></ng-content>
+  </video>
+  <div class="controls">
+    <button class="play" aria-label="play pause toggle" (click)="playVideo()">
+      <clr-icon *ngIf="!paused" shape="pause"></clr-icon>
+      <clr-icon *ngIf="paused" shape="play"></clr-icon>
+    </button>
+    <button class="stop" aria-label="stop" (click)="stopVideo()">
+      <clr-icon shape="stop"></clr-icon>
+    </button>
+    <div class="timer">
+      <span aria-label="timer">{{currentTime | time}}</span>
     </div>
+    <button class="backward" aria-label="backward" (click)="backwardVideo()">
+      <clr-icon shape="rewind"></clr-icon>
+    </button>
+    <button class="forward" aria-label="fast forward" (click)="forwardVideo()">
+      <clr-icon shape="fast-forward"></clr-icon>
+    </button>
+    <button class="fullscreen" aria-label="fullscreen" (click)="fullscreenVideo()">
+      <clr-icon *ngIf="!fullscreen" shape="resize-up"></clr-icon>
+      <clr-icon *ngIf="fullscreen" shape="resize-down"></clr-icon>
+    </button>
   </div>
 </div>
-
-<clr-tabs>
-  <clr-tab>
-    <button clrTabLink id="Polyps">Polyps</button>
-    <clr-tab-content *clrIfActive="true">
-      <div *ngFor="let polyp of video.polyps">
-        <div class="row">
-          <div class="col-sm-3 col-md-3">
-            <p>Polyp: {{polyp.name}}</p>
-          </div>
-          <div class="col-sm-3 col-md-3">
-            <p>INI: 00:02</p>
-          </div>
-          <div class="col-sm-3 col-md-3">
-            <p>FIN: 00:10</p>
-          </div>
-          <div class="col-sm-3 col-md-3">
-            <button type="button" class="btn btn-secondary">
-              <clr-icon shape="times"></clr-icon> Remove
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- new polyp-->
-      <div class="contentNewPolyp">
-        <form>
-          <section class="form-block">
-
-            <div class="form-group row">
-              <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">
-                <label for="polyp-name">Polyp</label>
-              </div>
-              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6">
-                <div class="select">
-                  <select id="polyp-name">
-                    <option value="" disabled selected>&lt;Polyp&gt;</option>
-                    <option *ngFor="let polyp of polyps">{{polyp.name}}</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6">
-                <button class="btn btn-icon" title="Add polyp" (click)="opened = true">
-                  <clr-icon shape="plus"></clr-icon>
-                </button>
-              </div>
-            </div>
-
-            <div class="form-group row">
-              <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
-                <label>INI:</label>
-              </div>
-              <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6">
-                <input type="text" name="initial" [(ngModel)]="initial" class="input-timer" disabled/>
-                <button (click)="startVideo()" class="btn btn-icon">
-                  <clr-icon shape="clock"></clr-icon>
-                </button>
-              </div>
-            </div>
-
-            <div class="form-group row">
-              <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
-                <label>FIN: </label>
-              </div>
-              <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6">
-                <input type="text" name="final" [(ngModel)]="final" class="input-timer" disabled />
-                <button (click)="finalVideo()" class="btn btn-icon">
-                  <clr-icon shape="clock"></clr-icon>
-                </button>
-              </div>
-            </div>
-            <button (click)="addPolyp(video.id)" type="button" class="btn btn-primary">
-              <clr-icon shape="plus"></clr-icon>Add
-            </button>
-          </section>
-        </form>
-
-        <clr-modal [(clrModalOpen)]="opened" [clrModalSize]="'sm'">
-          <h3 class="modal-title">Add polyp</h3>
-          <div class="modal-body">
-            <div class="form-group">
-              <label for="polyp-name">Name</label>
-              <input type="text" id="polyp-name" />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-primary">
-              <clr-icon shape="plus"></clr-icon> Add
-            </button>
-          </div>
-        </clr-modal>
-
-      </div>
-    </clr-tab-content>
-  </clr-tab>
-  <clr-tab>
-    <button clrTabLink>Modifications</button>
-    <clr-tab-content *clrIfActive>
-      Content modifications
-    </clr-tab-content>
-  </clr-tab>
-</clr-tabs>

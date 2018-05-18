@@ -1,79 +1,39 @@
-.input-timer {
-    width: 40%;
-}
-
-.contentNewPolyp {
-    margin-top: 1%;
+.video-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin: auto;
+    width: 100%;
+    height: 100%;
 }
 
 video {
-    border: 1px solid black;
     width: 100%;
-}
-
-.video {
-    position: relative;
-}
-
-#videocontainer {
-    display: flex;
-    justify-content: center;
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .controls {
     opacity: 0.5;
-    width: 400px;
+    width: 80%;
+    max-width: 400px;
     border-radius: 10px;
     position: absolute;
-    bottom: 20px;
-    background-color: black;
-    box-shadow: 3px 3px 5px black;
+    bottom: 5%;
     transition: 1s all;
     display: flex;
 }
 
-@media only screen and (max-width: 600px) {
-    .controls {
-        left: 2% !important;
-        bottom: 5%;
-        margin-left: 0px !important;
-        width: 83.33%;
-    }
-}
-
-@media only screen and (max-width: 768px) {
-    .controls {
-        left: 45%;
-    }
-}
-
-.video button,
-.controls {
-    background: #222;
-}
-
-.video button,
-.i {
-    color: white;
-}
-
-.video:hover .controls,
-video:focus .controls {
-    opacity: 1;
-}
-
-.video button,
+.controls,
+.controls button,
 .timer {
+    background: #222;
+    color: white;
     height: 38px;
     line-height: 19px;
     box-shadow: inset 0 -5px 25px rgba(0, 0, 0, 0.3);
     border-right: 1px solid #333;
 }
 
-.video button {
+.controls button {
     position: relative;
     border: 0;
     flex: 1;
@@ -104,11 +64,13 @@ video:focus .controls {
     left: 19px;
 }
 
-.video button:hover,
-.video button:focus {
+.controls button:hover,
+.controls button:focus {
     box-shadow: inset 1px 1px 2px black;
+    background-color: black;
 }
 
-.video button:active {
+.controls button:active {
     box-shadow: inset 3px 3px 2px black;
+    background-color: black;
 }
