@@ -49,8 +49,8 @@
             <clr-dg-row *ngFor="let video of videos">
               <clr-dg-cell>
                 <video class="exploration-video" controls>
-                  <source src="{{video.url}}.mp4" type="video/mp4" />
-                  <source src="{{video.url}}.ogg" type="video/ogg" /> Your browser does not support the video tag.
+                  <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}" />
+                  Your browser does not support the video tag.
                 </video>
               </clr-dg-cell>
               <clr-dg-cell>

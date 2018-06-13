@@ -1,7 +1,6 @@
 <div class="row video-container">
   <app-video (currentTime)="onCurrentTimeUpdate($event)">
-    <source src="{{video.url}}.ogg" type="video/ogg"/>
-    <source src="{{video.url}}.mp4" type="video/mp4"/>
+    <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}" />
     <p>Your browser does not support the video tag.</p>
   </app-video>
 </div>

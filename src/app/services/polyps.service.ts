@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 
-import { Polyp } from '../models/polyp';
+import Polyp from '../models/Polyp';
 import { POLYPS } from './mock-polyp';
 
 @Injectable()

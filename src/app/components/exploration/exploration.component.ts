@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Video } from '../../models/video';
-import { Polyp } from '../../models/polyp';
+import Video from '../../models/Video';
+import Polyp from '../../models/Polyp';
 import { VideosService } from '../../services/videos.service';
 import { PolypsService } from '../../services/polyps.service';
 

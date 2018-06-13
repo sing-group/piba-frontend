@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import { Polyp } from '../../models/polyp';
-import { Video } from '../../models/video';
+import Polyp from '../../models/Polyp';
+import Video from '../../models/Video';
 import { VideosService } from '../../services/videos.service';
 import { PolypsService } from '../../services/polyps.service';
 import { TimePipe } from '../../pipes/time.pipe';

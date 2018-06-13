@@ -1,6 +1,6 @@
-import { Video } from './video';
+import Video from './Video';
 
-export class Polyp {
+export default class Polyp {
     id: string;
     name: string;
     size: number;

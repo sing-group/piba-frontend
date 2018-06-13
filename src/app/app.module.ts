@@ -14,6 +14,7 @@ import { PolypsService } from './services/polyps.service';
 import { VideosService } from './services/videos.service';
 import { VideoEditorComponent } from './components/video-editor/video-editor.component';
 import { TimePipe } from './pipes/time.pipe';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { TimePipe } from './pipes/time.pipe';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    HttpClientModule,
     FormsModule,
     AppRoutingModule,
     ClarityModule
