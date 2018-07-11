@@ -1,11 +1,11 @@
-<div class="row video-container">
+<div class="row video-container" *ngIf="video != null">
   <app-video (currentTime)="onCurrentTimeUpdate($event)">
     <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}" />
     <p>Your browser does not support the video tag.</p>
   </app-video>
 </div>
   
-<clr-tabs>
+<clr-tabs *ngIf="video != null">
   <clr-tab>
     <button clrTabLink id="Polyps">Polyps</button>
     <clr-tab-content *clrIfActive="true">
