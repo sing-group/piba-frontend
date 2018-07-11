@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import Polyp from '../../models/Polyp';
+import Polyp, { WASP, NICE, LST, PARIS } from '../../models/Polyp';
 import Video from '../../models/Video';
 import { VideosService } from '../../services/videos.service';
 import { PolypsService } from '../../services/polyps.service';
@@ -57,10 +57,10 @@ export class VideoEditorComponent implements OnInit {
       name: 'Polyp 2',
       size: 11,
       location: 'Left colon',
-      wasp: 'Type I',
-      nice: '1',
-      lst: '1',
-      paris: 'Category 0-1',
+      wasp: WASP.ADENOMA,
+      nice: NICE.TYPE_3,
+      lst: LST.PSEUDODEPRESSED,
+      paris: PARIS.SESSILE_DEPRESSED,
       histology: 'Histology',
       videos: [this.video]
     })

@@ -1,5 +1,5 @@
 import Video from '../models/Video';
-import Polyp from '../models/Polyp';
+import Polyp, { WASP, NICE, LST, PARIS } from '../models/Polyp';
 
 export const VIDEOS: Video[] = [
     {
@@ -21,10 +21,10 @@ export const VIDEOS: Video[] = [
             name: 'Polyp 1',
             size: 11,
             location: 'Right colon',
-            wasp: 'Type I',
-            nice: '1',
-            lst: '1',
-            paris: 'Category 0-1',
+            wasp: WASP.SERRATED,
+            nice: NICE.TYPE_2,
+            lst: LST.HOMOGENOUS,
+            paris: PARIS.MIXED,
             histology: 'Histology',
             videos: [{
                 id: '283e9222-f189-4d03-8382-c0942d8d5b2b',
