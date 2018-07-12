@@ -1,15 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import {Observable} from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
 import Polyp from '../models/Polyp';
 import Video from '../models/Video';
-import { VIDEOS } from './mock-videos';
 import VideoInfo from './entities/VideoInfo';
-import VideoSource from '../models/VideoUrl';
 import { environment } from '../../environments/environment';
 
 @Injectable()

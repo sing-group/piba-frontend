@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import Polyp, { WASP, NICE, LST, PARIS } from '../../models/Polyp';
 import Video from '../../models/Video';
 import { VideosService } from '../../services/videos.service';
@@ -30,7 +30,6 @@ export class VideoEditorComponent implements OnInit {
     private videosService: VideosService,
     private polypsService: PolypsService,
     private route: ActivatedRoute,
-    private router: Router,
     private timePipe: TimePipe
   ) { }
 
