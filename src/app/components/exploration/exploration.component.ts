@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import Video from '../../models/Video';
 import Polyp from '../../models/Polyp';
+import VideoUploadInfo from '../../services/entities/VideoUploadInfo';
 import { VideosService } from '../../services/videos.service';
 import { PolypsService } from '../../services/polyps.service';
 
@@ -31,6 +32,10 @@ export class ExplorationComponent implements OnInit {
   videoHTML: HTMLMediaElement;
   controls: HTMLElement;
 
+  public newVideo: Video = new Video();
+
+  userUploadingVideo: Boolean = false;
+
   constructor(
     private videosService: VideosService,
     private polypsService: PolypsService
@@ -56,6 +61,24 @@ export class ExplorationComponent implements OnInit {
     this.videoHTML.pause();
     this.controls = document.getElementById('controls-' + id);
     this.controls.style.display = 'flex';
+  }
+
+  uploadVideo() {
+    let fileElement = document.getElementById("video-form-file")  as HTMLInputElement;
+    let file = fileElement.files[0];
+    let videoUploadInfo = this.mapVideo(this.newVideo);
+    videoUploadInfo.file = file;
+    this.videosService
+      .createVideo(videoUploadInfo).subscribe(video => this.videos = this.videos.concat(video));
+    this.userUploadingVideo = false;
+  }
+
+  private mapVideo(video: Video): VideoUploadInfo {
+    return {
+      title: video.title,
+      observations: video.observation,
+      file: null
+    }
   }
 
 }

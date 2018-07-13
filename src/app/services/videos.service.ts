@@ -7,6 +7,8 @@ import 'rxjs/add/operator/map';
 import Polyp from '../models/Polyp';
 import Video from '../models/Video';
 import VideoInfo from './entities/VideoInfo';
+import VideoUploadInfo from './entities/VideoUploadInfo';
+import VideoSource from '../models/VideoUrl';
 import { environment } from '../../environments/environment';
 
 @Injectable()
@@ -30,6 +32,14 @@ export class VideosService {
         video.polyps.push(polyp);
         return video;
       });
+  }
+
+  createVideo(video: VideoUploadInfo): Observable<Video> {
+    let formData: FormData = new FormData();
+    formData.append("title", video.title);
+    formData.append("observations", video.observations);
+    formData.append("video", video.file);
+    return this.http.post<VideoInfo>(`${environment.restApi}/video`, formData).map(this.mapVideoInfo);
   }
 
   private mapVideoInfo(videoInfo: VideoInfo): Video {

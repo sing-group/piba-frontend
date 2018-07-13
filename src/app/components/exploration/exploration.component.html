@@ -39,7 +39,7 @@
         <button clrTabLink id="tab-videos">Videos</button>
         <clr-tab-content id="content1" *clrIfActive="true">
           <div class="toolbar">
-            <button type="button" class="btn btn-icon btn-link">
+            <button type="button" class="btn btn-icon btn-link" (click)="userUploadingVideo = true">
               <clr-icon shape="upload"></clr-icon> Upload
             </button>
           </div>
@@ -216,3 +216,28 @@
 
   </div>
 </div>
+<clr-modal [(clrModalOpen)]="userUploadingVideo">
+  <h3 class="modal-title">Upload Video</h3>
+  <div class="modal-body">
+      <form enctype="multipart/form-data">
+        <section class="form-block">
+          <div class="form-group">
+            <label for="video-form-title" >Title</label>
+            <input type="text" id="video-form-title" [(ngModel)]="newVideo.title" name="title"/>
+          </div>
+          <div class="form-group">
+              <label for="video-form-observations" >Observations</label>
+            <textarea type="text" id="video-form-observations" rows="4" [(ngModel)]="newVideo.observation" name="observation"></textarea>
+          </div>
+          <div class="form-group">
+              <label for="video-form-file">File</label>
+              <input type="file" id="video-form-file" />
+          </div>
+        </section>
+      </form>
+  </div>
+  <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="userUploadingVideo = false">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="uploadVideo()">Ok</button>
+  </div>
+</clr-modal>
