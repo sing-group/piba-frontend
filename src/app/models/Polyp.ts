@@ -14,18 +14,19 @@ export default class Polyp {
 }
 
 export enum WASP {
-    HYPERPLASTIC, SERRATED, ADENOMA
+    HYPERPLASTIC = 'Hyperplastic', SERRATED = 'Serrated', ADENOMA = 'Adenoma'
 }
 
 export enum NICE {
-    TYPE_1, TYPE_2, TYPE_3
+    TYPE_1 = 'Type 1', TYPE_2 = 'Type 2', TYPE_3 = 'Type 3'
 }
 
 export enum LST {
-    HOMOGENOUS, NODULAR_MIXED, ELEVATED, PSEUDODEPRESSED
+    HOMOGENOUS = 'Homogenous', NODULAR_MIXED = 'Nodular mixed', ELEVATED = 'Elevated', PSEUDODEPRESSED = 'Pseudodepressed'
 }
 
 export enum PARIS {
-    PEDUNCULATED, SESSILE, MIXED, SLIGHTLY_ELEVATED, FLAT, SLIGHTLY_DEPRESSED, ELEVATED_DEPRESSED, DEPRESSED_ELEVATED,
-    SESSILE_DEPRESSED
+    PEDUNCULATED = 'Pendunculated', SESSILE = 'Sessile', MIXED = 'Mixed', SLIGHTLY_ELEVATED = 'Slightly elevated', FLAT = 'Flat',
+    SLIGHTLY_DEPRESSED = 'Slightly depressed', ELEVATED_DEPRESSED = 'Elevated depressed', DEPRESSED_ELEVATED = 'Depressed elevated',
+    SESSILE_DEPRESSED = 'Sessile depressed'
 }
