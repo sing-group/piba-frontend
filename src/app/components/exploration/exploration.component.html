@@ -48,10 +48,11 @@
             <clr-dg-column>Information</clr-dg-column>
             <clr-dg-row *ngFor="let video of videos">
               <clr-dg-cell>
-                <video class="exploration-video" controls>
+                <video class="exploration-video" controls *ngIf="video.isProcessing == false">
                   <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}" />
                   Your browser does not support the video tag.
                 </video>
+                <div *ngIf="video.isProcessing"><img *ngIf="video.isProcessing" src="assets/images/loading.gif"> Video is being processed</div>
               </clr-dg-cell>
               <clr-dg-cell>
                 <form>

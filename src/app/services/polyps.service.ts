@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http';
-
 import Polyp, { WASP, NICE, LST, PARIS } from '../models/Polyp';
 import { environment } from '../../environments/environment';
 import PolypInfo from './entities/PolypInfo';

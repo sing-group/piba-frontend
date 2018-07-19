@@ -3,6 +3,7 @@ export default interface VideoInfo {
   title: string;
   observations: string;
   video_sources: VideoSource[];
+  processing: boolean;
 }
 
 export interface VideoSource {

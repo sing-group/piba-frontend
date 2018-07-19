@@ -7,4 +7,5 @@ export default class Video {
     observation: string;
     sources: VideoSource[];
     polyps: Polyp[];
+    isProcessing: boolean;
 }

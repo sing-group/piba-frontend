@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/Rx';
 import 'rxjs/add/operator/map';
 
 import Polyp from '../models/Polyp';
 import Video from '../models/Video';
 import VideoInfo from './entities/VideoInfo';
 import VideoUploadInfo from './entities/VideoUploadInfo';
-import VideoSource from '../models/VideoUrl';
 import { environment } from '../../environments/environment';
 
 @Injectable()
@@ -17,13 +16,17 @@ export class VideosService {
   constructor(private http: HttpClient) { }
 
   getVideos(): Observable<Video[]> {
-    return this.http.get<VideoInfo[]>(`${environment.restApi}/video`)
-      .map(videoInfos => videoInfos.map(this.mapVideoInfo));
+      return this.http.get<VideoInfo[]>(`${environment.restApi}/video`)
+      .map(videoInfos => videoInfos.map(this.mapVideoInfo))
   }
 
-  getVideo(uuid: string): Observable<Video> {
-    return this.http.get<VideoInfo>(`${environment.restApi}/video/${uuid}`)
-      .map(this.mapVideoInfo);
+  getVideo(uuid: string, pollingInterval?: number): Observable<Video> {
+    let videoRequest: Observable<Video> = this.http.get<VideoInfo>(`${environment.restApi}/video/${uuid}`).map(this.mapVideoInfo);
+    if (pollingInterval > 0) {
+      return Observable.interval(pollingInterval).switchMap(() => videoRequest);
+    } else {
+      return videoRequest;
+    }
   }
 
   addPolyp(uuid: string, polyp: Polyp): Observable<Video> {
@@ -51,7 +54,8 @@ export class VideosService {
         mediaType: source.type,
         url: source.src
       })),
-      polyps: []
+      polyps: [],
+      isProcessing: videoInfo.processing
     };
   }
 }
