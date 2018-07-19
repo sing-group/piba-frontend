@@ -19,12 +19,12 @@
 
         <div class="form-group">
           <label for="exploration-date">Exploration date</label>
-          <input type="date" clrDate id="exploration-date" />
+          <input type="date" id="exploration-date" readonly value="{{exploration.date | date: 'yyyy-MM-dd'}}"/>
         </div>
 
         <div class="form-group">
           <label for="exploration-location">Location</label>
-          <input type="text" id="exploration-location" size="60" />
+          <input type="text" id="exploration-location" size="60" readonly value="{{exploration.location}}" />
           <clr-icon shape="map-marker"></clr-icon>
         </div>
       </section>

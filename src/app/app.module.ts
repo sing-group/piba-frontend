@@ -12,6 +12,7 @@ import { VideoComponent } from './components/video/video.component';
 import { PatientComponent } from './components/patient/patient.component';
 import { PolypsService } from './services/polyps.service';
 import { VideosService } from './services/videos.service';
+import { ExplorationsService } from './services/explorations.service';
 import { VideoEditorComponent } from './components/video-editor/video-editor.component';
 import { TimePipe } from './pipes/time.pipe';
 import { HttpClientModule } from '@angular/common/http';
@@ -36,7 +37,8 @@ import { HttpClientModule } from '@angular/common/http';
   providers: [
     PolypsService,
     VideosService,
-    TimePipe
+    TimePipe,
+    ExplorationsService
   ],
   bootstrap: [AppComponent]
 })

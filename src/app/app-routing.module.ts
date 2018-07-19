@@ -9,7 +9,7 @@ const routes: Routes = [
     path: 'patients', component: PatientComponent
   },
   {
-    path: 'explorations', component: ExplorationComponent
+    path: 'explorations/:id', component: ExplorationComponent
   },
   {
     path: 'video/:id', component: VideoEditorComponent

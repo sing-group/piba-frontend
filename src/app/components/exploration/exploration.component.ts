@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import Video from '../../models/Video';
 import Polyp from '../../models/Polyp';
+import Exploration from '../../models/Exploration';
 import VideoUploadInfo from '../../services/entities/VideoUploadInfo';
 import { VideosService } from '../../services/videos.service';
 import { PolypsService } from '../../services/polyps.service';
+import { ExplorationsService } from '../../services/explorations.service';
 
 interface Ambit {
   name: string;
@@ -22,6 +25,7 @@ export class ExplorationComponent implements OnInit {
 
   videos: Video[];
   polyps: Polyp[];
+  exploration: Exploration = new Exploration();;
 
   ambit: Ambit[];
   selectedAmbit: Ambit;
@@ -38,15 +42,20 @@ export class ExplorationComponent implements OnInit {
 
   constructor(
     private videosService: VideosService,
-    private polypsService: PolypsService
+    private polypsService: PolypsService,
+    private explorationsService: ExplorationsService,
+    private route: ActivatedRoute
   ) {
     this.ambit = [{ name: 'Sergas' }];
     this.histology = [{ name: 'Histology 1' }];
   }
 
   ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+
     this.videosService.getVideos().subscribe(videos => this.videos = videos);
     this.polypsService.getPolyps().subscribe(polyps => this.polyps = polyps);
+    this.explorationsService.getExploration(id).subscribe(exploration => this.exploration = exploration);
   }
 
   playVideo(id) {
@@ -64,7 +73,7 @@ export class ExplorationComponent implements OnInit {
   }
 
   uploadVideo() {
-    let fileElement = document.getElementById("video-form-file")  as HTMLInputElement;
+    let fileElement = document.getElementById("video-form-file") as HTMLInputElement;
     let file = fileElement.files[0];
     let videoUploadInfo = this.mapVideo(this.newVideo);
     videoUploadInfo.file = file;
@@ -80,5 +89,4 @@ export class ExplorationComponent implements OnInit {
       file: null
     }
   }
-
 }
