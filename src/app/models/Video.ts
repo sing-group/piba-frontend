@@ -8,4 +8,5 @@ export default class Video {
     sources: VideoSource[];
     polyps: Polyp[];
     isProcessing: boolean;
+    exploration_id: string;
 }

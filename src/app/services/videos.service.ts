@@ -42,6 +42,7 @@ export class VideosService {
     formData.append("title", video.title);
     formData.append("observations", video.observations);
     formData.append("video", video.file);
+    formData.append("exploration_id", video.exploration_id)
     return this.http.post<VideoInfo>(`${environment.restApi}/video`, formData).map(this.mapVideoInfo);
   }
 
@@ -55,7 +56,8 @@ export class VideosService {
         url: source.src
       })),
       polyps: [],
-      isProcessing: videoInfo.processing
+      isProcessing: videoInfo.processing,
+      exploration_id: videoInfo.exploration_id
     };
   }
 }

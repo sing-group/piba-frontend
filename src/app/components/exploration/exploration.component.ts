@@ -25,9 +25,8 @@ export class ExplorationComponent implements OnInit {
 
   readonly POLLING_INTERVAL:number = 5000;
 
-  videos: Video[] = [];
   polyps: Polyp[];
-  exploration: Exploration = new Exploration();;
+  exploration: Exploration = new Exploration();
 
   ambit: Ambit[];
   selectedAmbit: Ambit;
@@ -38,7 +37,7 @@ export class ExplorationComponent implements OnInit {
   videoHTML: HTMLMediaElement;
   controls: HTMLElement;
 
-  public newVideo: Video = new Video();
+  newVideo: Video = new Video();
 
   userUploadingVideo: Boolean = false;
 
@@ -55,19 +54,19 @@ export class ExplorationComponent implements OnInit {
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
 
-    this.videosService.getVideos().subscribe(videos => {
-      this.videos = videos
-      videos.filter((video) => video.isProcessing).forEach((processingVideo) => {
+    this.polypsService.getPolyps().subscribe(polyps => this.polyps = polyps);
+
+    this.explorationsService.getExploration(id).subscribe(exploration => {
+      this.exploration = exploration;
+      exploration.videos.filter((video) => video.isProcessing).forEach((processingVideo) => {
         this.pollProcessingVideo(processingVideo);
       });
     });
-    this.polypsService.getPolyps().subscribe(polyps => this.polyps = polyps);
-    this.explorationsService.getExploration(id).subscribe(exploration => this.exploration = exploration);
   }
 
   pollProcessingVideo(processingVideo: Video) {
       let videoPolling = this.videosService.getVideo(processingVideo.id, this.POLLING_INTERVAL).subscribe((video) => {
-        this.videos.filter((currentVideo) => currentVideo.id == video.id).forEach((currentVideo) => {
+        this.exploration.videos.filter((currentVideo) => currentVideo.id == video.id).forEach((currentVideo) => {
           Object.assign(currentVideo, video);
         });
         if (!video.isProcessing) {
@@ -93,11 +92,12 @@ export class ExplorationComponent implements OnInit {
   uploadVideo() {
     let fileElement = document.getElementById("video-form-file") as HTMLInputElement;
     let file = fileElement.files[0];
+    this.newVideo.exploration_id = this.exploration.id; 
     let videoUploadInfo = this.mapVideo(this.newVideo);
     videoUploadInfo.file = file;
     this.videosService
       .createVideo(videoUploadInfo).subscribe(video => {
-        this.videos = this.videos.concat(video);
+        this.exploration.videos = this.exploration.videos.concat(video);
         if (video.isProcessing) {
           this.pollProcessingVideo(video);
         }
@@ -109,7 +109,8 @@ export class ExplorationComponent implements OnInit {
     return {
       title: video.title,
       observations: video.observation,
-      file: null
+      file: null,
+      exploration_id: video.exploration_id
     }
   }
 }
