@@ -1,0 +1,45 @@
+<clr-datagrid [(clrDgSelected)]="selected">
+
+  <clr-dg-action-bar>
+    <div class="btn-group" style="text-align: right">
+      <button type="button" class="btn btn-icon btn-link">
+        <clr-icon shape="plus"></clr-icon> Add
+      </button>
+    </div>
+  </clr-dg-action-bar>
+
+  <clr-dg-placeholder>We couldn't find any explorations!</clr-dg-placeholder>
+
+  <clr-dg-column>ID</clr-dg-column>
+  <clr-dg-column [clrDgField]="'exploration.date'" [(clrDgSortBy)]="explorationComparator">Date</clr-dg-column>
+  <clr-dg-column>Location</clr-dg-column>
+  <clr-dg-column>Actions</clr-dg-column>
+
+  <clr-dg-row *clrDgItems="let exploration of explorations" [clrDgItem]="exploration">
+    <clr-dg-cell>{{exploration.id}}</clr-dg-cell>
+    <clr-dg-cell>{{exploration.date | date: 'yyyy-MM-dd'}}</clr-dg-cell>
+    <clr-dg-cell>{{exploration.location}}</clr-dg-cell>
+    <clr-dg-cell class="btn-cell-datagrid">
+      <div class="btn-group btn-link btn-icon">
+        <button class="btn" routerLink="/explorations/{{exploration.id}}">
+          <clr-icon shape="eye"></clr-icon>
+          <span class="clr-icon-title">View</span>
+        </button>
+        <button class="btn">
+          <clr-icon shape="cog"></clr-icon>
+          <span class="clr-icon-title">Settings</span>
+        </button>
+        <button class="btn">
+          <clr-icon shape="trash"></clr-icon>
+          <span class="clr-icon-title">Delete</span>
+        </button>
+      </div>
+    </clr-dg-cell>
+  </clr-dg-row>
+
+  <clr-dg-footer>
+    <clr-dg-pagination #pagination [clrDgPageSize]="15">
+      {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{pagination.totalItems}} explorations
+    </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>

@@ -16,6 +16,7 @@ import { ExplorationsService } from './services/explorations.service';
 import { VideoEditorComponent } from './components/video-editor/video-editor.component';
 import { TimePipe } from './pipes/time.pipe';
 import { HttpClientModule } from '@angular/common/http';
+import { ExplorationsComponent } from './components/explorations/explorations.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { HttpClientModule } from '@angular/common/http';
     VideoComponent,
     PatientComponent,
     VideoEditorComponent,
-    TimePipe
+    TimePipe,
+    ExplorationsComponent
   ],
   imports: [
     BrowserModule,

@@ -29,8 +29,12 @@ export class ExplorationsService {
     );
   }
 
-  private mapExplorationInfo(explorationInfo: ExplorationInfo, videos: Video[]): Exploration {
+  getExplorations(): Observable<Exploration[]> {
+    return this.http.get<ExplorationInfo[]>(`${environment.restApi}/exploration/`)
+      .map(explorationsInfo => explorationsInfo.map(this.mapOnlyExplorationInfo));
+  }
 
+  private mapExplorationInfo(explorationInfo: ExplorationInfo, videos: Video[]): Exploration {
     return {
       id: explorationInfo.id,
       date: explorationInfo.date,
@@ -38,4 +42,14 @@ export class ExplorationsService {
       videos: videos
     };
   }
+
+  private mapOnlyExplorationInfo(explorationInfo: ExplorationInfo): Exploration {
+    return {
+      id: explorationInfo.id,
+      date: explorationInfo.date,
+      location: explorationInfo.location,
+      videos: []
+    };
+  }
+
 }
