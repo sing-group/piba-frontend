@@ -21,17 +21,22 @@ export class ExplorationsService {
 
   getExploration(uuid: string): Observable<Exploration> {
     return this.http.get<ExplorationInfo>(`${environment.restApi}/exploration/${uuid}`).pipe(
-      concatMap((explorationInfo) => forkJoin(
-        explorationInfo.videos.map(
-          idAndUri => this.videosService.getVideo(idAndUri.id)
+      concatMap((explorationInfo) => {
+        if (explorationInfo.videos.length <= 0) {
+          return Observable.of([])
+        }
+        return forkJoin(
+          explorationInfo.videos.map(
+            idAndUri => this.videosService.getVideo(idAndUri.id)
+          )
         )
-      ), (explorationInfo, videos) => this.mapExplorationInfo(explorationInfo, videos))
+      }, (explorationInfo, videos) => this.mapExplorationInfo(explorationInfo, videos))
     );
   }
 
   getExplorations(): Observable<Exploration[]> {
     return this.http.get<ExplorationInfo[]>(`${environment.restApi}/exploration/`)
-      .map(explorationsInfo => explorationsInfo.map(this.mapOnlyExplorationInfo));
+      .map(explorationsInfo => explorationsInfo.map(this.mapOnlyExplorationInfo.bind(this)));
   }
 
   private mapExplorationInfo(explorationInfo: ExplorationInfo, videos: Video[]): Exploration {
@@ -44,12 +49,7 @@ export class ExplorationsService {
   }
 
   private mapOnlyExplorationInfo(explorationInfo: ExplorationInfo): Exploration {
-    return {
-      id: explorationInfo.id,
-      date: explorationInfo.date,
-      location: explorationInfo.location,
-      videos: []
-    };
+    return this.mapExplorationInfo(explorationInfo, []);
   }
 
 }
