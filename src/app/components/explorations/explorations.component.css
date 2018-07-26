@@ -1,3 +1,7 @@
 .btn-cell-datagrid{
     padding: 0%;
 }
+
+:host /deep/ .modal-body{
+    overflow: visible !important;
+}

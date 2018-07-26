@@ -52,4 +52,8 @@ export class ExplorationsService {
     return this.mapExplorationInfo(explorationInfo, []);
   }
 
+  createExploration(exploration: Exploration): Observable<Exploration> {
+    return this.http.post<ExplorationInfo>(`${environment.restApi}/exploration`, exploration).map(this.mapOnlyExplorationInfo.bind(this));
+  }
+
 }
