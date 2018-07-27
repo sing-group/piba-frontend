@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ClrDatagridComparatorInterface } from "@clr/angular";
 import { ExplorationsService } from '../../services/explorations.service';
 import Exploration from '../../models/Exploration';
-import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-explorations',
@@ -13,12 +12,12 @@ export class ExplorationsComponent implements OnInit {
 
   explorations: Exploration[];
 
-  showModal: Boolean = false;
   editingExploration: Boolean;
-
-  date: Date;
+  creatingExploration: Boolean;
+  date: string;
   location: string;
   newExploration: Exploration;
+  exploration: Exploration = new Exploration();
 
   constructor(private explorationsService: ExplorationsService) { }
 
@@ -27,14 +26,23 @@ export class ExplorationsComponent implements OnInit {
   }
 
   openModal(id: string) {
-    (id == null) ? this.editingExploration = false : this.editingExploration = true;
-    this.showModal = true;
+    if (id == null) {
+      this.editingExploration = false;
+      this.creatingExploration = true;
+    } else {
+      this.exploration =  this.explorations.find((exploration) => exploration.id == id);
+      this.date = new Date(this.exploration.date).toLocaleDateString();
+      this.location = this.exploration.location;
+      this.editingExploration = true;
+      this.creatingExploration = false;
+    }
   }
 
   cancelModal() {
-    this.showModal = false;
     this.date = null;
     this.location = null;
+    this.creatingExploration = false;
+    this.editingExploration = false;
   }
 
   save() {
@@ -47,6 +55,12 @@ export class ExplorationsComponent implements OnInit {
       }
       this.explorationsService.createExploration(this.newExploration)
         .subscribe(newExploration => this.explorations = this.explorations.concat(newExploration));
+    } else {
+      this.exploration.location = this.location;
+      this.exploration.date = new Date(this.date);
+      this.explorationsService.editExploration(this.exploration).subscribe(updatedExploration => {
+          Object.assign(this.explorations.find((exploration) => exploration.id == this.exploration.id), updatedExploration);
+        });
     }
     this.cancelModal();
   }

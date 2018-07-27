@@ -45,9 +45,9 @@
 </clr-datagrid>
 
 
-<clr-modal [(clrModalOpen)]="showModal" [clrModalClosable]="false">
-  <h3 class="modal-title" *ngIf="editingExploration==false">Add Exploration</h3>
-  <h3 class="modal-title" *ngIf="editingExploration==true">Edit Exploration</h3>
+<clr-modal [(clrModalOpen)]="editingExploration|| creatingExploration" [clrModalClosable]="false">
+  <h3 class="modal-title" *ngIf="creatingExploration">Add Exploration</h3>
+  <h3 class="modal-title" *ngIf="editingExploration">Edit Exploration</h3>
   <div class="modal-body">
     <form>
       <section class="form-block">
