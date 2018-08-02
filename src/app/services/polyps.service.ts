@@ -10,10 +10,6 @@ export class PolypsService {
 
   constructor(private http: HttpClient) { }
 
-  getPolyps(): Observable<Polyp[]> {
-    return this.http.get<PolypInfo[]>(`${environment.restApi}/polyp`).map(polypInfo => polypInfo.map(this.mapPolypInfo));
-  }
-
   private mapPolypInfo(polypInfo: PolypInfo): Polyp {
     return {
       id: polypInfo.id,
@@ -32,5 +28,10 @@ export class PolypsService {
 
   createPolyp(polyp:Polyp):Observable<Polyp>{
     return this.http.post<PolypInfo>(`${environment.restApi}/polyp`, polyp).map(this.mapPolypInfo.bind(this));
+  }
+
+  getPolyp(uuid: string): Observable<Polyp> {
+
+    return this.http.get<PolypInfo>(`${environment.restApi}/polyp/${uuid}`).map(this.mapPolypInfo);
   }
 }

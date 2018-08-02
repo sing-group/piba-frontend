@@ -3,7 +3,7 @@
     <clr-icon shape="plus"></clr-icon> New</button>
 </div>
 
-<div class="card" *ngFor="let polyp of polyps">
+<div class="card" *ngFor="let polyp of exploration.polyps">
   <div class="card-header">
     ID: {{polyp.id}}
     <button type="button" class="btn btn-link card-button" title="Delete polyp">

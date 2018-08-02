@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import Polyp, {WASP, NICE, LST, PARIS} from '../../models/Polyp';
 import Video from '../../models/Video';
 import { VideosService } from '../../services/videos.service';
-import { PolypsService } from '../../services/polyps.service';
 import { TimePipe } from '../../pipes/time.pipe';
 
 @Component({
@@ -28,7 +27,6 @@ export class VideoEditorComponent implements OnInit {
 
   constructor(
     private videosService: VideosService,
-    private polypsService: PolypsService,
     private route: ActivatedRoute,
     private timePipe: TimePipe
   ) { }
@@ -38,8 +36,6 @@ export class VideoEditorComponent implements OnInit {
 
     this.videosService.getVideo(id)
       .subscribe(video => this.video = video);
-
-    this.polypsService.getPolyps().subscribe(polyps => this.polyps = polyps);
   }
 
   startVideo() {

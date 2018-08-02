@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import Polyp, { WASP, NICE, LST, PARIS } from '../../models/Polyp';
 import { PolypsService } from '../../services/polyps.service';
-import Exploration from '../../models/Exploration';
 import { ActivatedRoute } from '@angular/router';
+import Exploration from '../../models/Exploration';
 
 @Component({
   selector: 'app-polyp',
@@ -10,9 +10,6 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./polyp.component.css']
 })
 export class PolypComponent implements OnInit {
-
-  polyps: Polyp[];
-  exploration: Exploration;
 
   WASP = WASP;
   WASPValues: WASP[];
@@ -31,6 +28,8 @@ export class PolypComponent implements OnInit {
 
   polyp: Polyp = new Polyp();
 
+  @Input() exploration: Exploration;
+
   constructor(private polypsService: PolypsService,
     private route: ActivatedRoute) { }
 
@@ -39,7 +38,6 @@ export class PolypComponent implements OnInit {
     this.NICEValues = this.enumKeys(NICE);
     this.LSTValues = this.enumKeys(LST);
     this.PARISValues = this.enumKeys(PARIS);
-    this.polypsService.getPolyps().subscribe(polyps => this.polyps = polyps);
   }
 
   cancel() {
@@ -47,10 +45,9 @@ export class PolypComponent implements OnInit {
     this.editingPolyp = false;
   }
   save() {
-    const id = this.route.snapshot.paramMap.get('id');
     if (!this.editingPolyp) {
       this.polyp.exploration = this.exploration.id;
-      this.polypsService.createPolyp(this.polyp).subscribe(newPolyp => this.polyps.concat(newPolyp));
+      this.polypsService.createPolyp(this.polyp).subscribe(newPolyp => this.exploration.polyps = this.exploration.polyps.concat(newPolyp));
     };
     this.cancel();
   }

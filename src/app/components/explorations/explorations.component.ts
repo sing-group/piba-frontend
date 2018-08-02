@@ -51,7 +51,8 @@ export class ExplorationsComponent implements OnInit {
         id: null,
         date: new Date(this.date),
         location: this.location,
-        videos: []
+        videos: [],
+        polyps: []
       }
       this.explorationsService.createExploration(this.newExploration)
         .subscribe(newExploration => this.explorations = this.explorations.concat(newExploration));

@@ -10,27 +10,39 @@ import { environment } from '../../environments/environment';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { concatMap } from 'rxjs/operators';
 import { VideosService } from './videos.service';
+import Polyp from '../models/Polyp';
+import { PolypsService } from './polyps.service';
 
 @Injectable()
 export class ExplorationsService {
 
   constructor(
     private http: HttpClient,
-    private videosService: VideosService
+    private videosService: VideosService,
+    private polypsService: PolypsService
   ) { }
 
   getExploration(uuid: string): Observable<Exploration> {
     return this.http.get<ExplorationInfo>(`${environment.restApi}/exploration/${uuid}`).pipe(
       concatMap((explorationInfo) => {
-        if (explorationInfo.videos.length <= 0) {
-          return Observable.of([])
-        }
         return forkJoin(
-          explorationInfo.videos.map(
-            idAndUri => this.videosService.getVideo(idAndUri.id)
-          )
+          explorationInfo.videos.length == 0 ? Observable.of([]) :
+            forkJoin(
+
+              explorationInfo.videos.map(
+                idAndUri => this.videosService.getVideo(idAndUri.id)
+              )),
+          explorationInfo.polyps.length == 0 ? Observable.of([]) :
+            forkJoin(
+              explorationInfo.polyps.map(
+                idAndUri => this.polypsService.getPolyp(idAndUri.id)
+              )
+            )
         )
-      }, (explorationInfo, videos) => this.mapExplorationInfo(explorationInfo, videos))
+      }, (explorationInfo, videosAndPolyps) => {
+        return this.mapExplorationInfo(explorationInfo, videosAndPolyps[0], videosAndPolyps[1]);
+      }
+      )
     );
   }
 
@@ -39,17 +51,18 @@ export class ExplorationsService {
       .map(explorationsInfo => explorationsInfo.map(this.mapOnlyExplorationInfo.bind(this)));
   }
 
-  private mapExplorationInfo(explorationInfo: ExplorationInfo, videos: Video[]): Exploration {
+  private mapExplorationInfo(explorationInfo: ExplorationInfo, videos: Video[], polyps: Polyp[]): Exploration {
     return {
       id: explorationInfo.id,
       date: explorationInfo.date,
       location: explorationInfo.location,
-      videos: videos
+      videos: videos,
+      polyps: polyps
     };
   }
 
   private mapOnlyExplorationInfo(explorationInfo: ExplorationInfo): Exploration {
-    return this.mapExplorationInfo(explorationInfo, []);
+    return this.mapExplorationInfo(explorationInfo, [], []);
   }
 
   createExploration(exploration: Exploration): Observable<Exploration> {

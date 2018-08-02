@@ -5,4 +5,5 @@ export default interface ExplorationInfo {
     date: Date;
     location: string;
     videos: IdAndUri[];
+    polyps: IdAndUri[];
 }
