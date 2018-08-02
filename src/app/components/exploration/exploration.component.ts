@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import Video from '../../models/Video';
-import Polyp from '../../models/Polyp';
 import Exploration from '../../models/Exploration';
 import VideoUploadInfo from '../../services/entities/VideoUploadInfo';
 import { VideosService } from '../../services/videos.service';
-import { PolypsService } from '../../services/polyps.service';
 import { ExplorationsService } from '../../services/explorations.service';
 
 interface Ambit {
@@ -23,16 +21,12 @@ interface Histology {
 })
 export class ExplorationComponent implements OnInit {
 
-  readonly POLLING_INTERVAL:number = 5000;
+  readonly POLLING_INTERVAL: number = 5000;
 
-  polyps: Polyp[];
   exploration: Exploration = new Exploration();
 
   ambit: Ambit[];
   selectedAmbit: Ambit;
-
-  histology: Histology[];
-  selectedHistology: Histology[];
 
   videoHTML: HTMLMediaElement;
   controls: HTMLElement;
@@ -43,18 +37,14 @@ export class ExplorationComponent implements OnInit {
 
   constructor(
     private videosService: VideosService,
-    private polypsService: PolypsService,
     private explorationsService: ExplorationsService,
     private route: ActivatedRoute
   ) {
     this.ambit = [{ name: 'Sergas' }];
-    this.histology = [{ name: 'Histology 1' }];
   }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-
-    this.polypsService.getPolyps().subscribe(polyps => this.polyps = polyps);
 
     this.explorationsService.getExploration(id).subscribe(exploration => {
       this.exploration = exploration;
@@ -65,13 +55,13 @@ export class ExplorationComponent implements OnInit {
   }
 
   pollProcessingVideo(processingVideo: Video) {
-      let videoPolling = this.videosService.getVideo(processingVideo.id, this.POLLING_INTERVAL).subscribe((video) => {
-        this.exploration.videos.filter((currentVideo) => currentVideo.id == video.id).forEach((currentVideo) => {
-          Object.assign(currentVideo, video);
-        });
-        if (!video.isProcessing) {
-          videoPolling.unsubscribe();
-        }
+    let videoPolling = this.videosService.getVideo(processingVideo.id, this.POLLING_INTERVAL).subscribe((video) => {
+      this.exploration.videos.filter((currentVideo) => currentVideo.id == video.id).forEach((currentVideo) => {
+        Object.assign(currentVideo, video);
+      });
+      if (!video.isProcessing) {
+        videoPolling.unsubscribe();
+      }
     });
   }
 
@@ -92,7 +82,7 @@ export class ExplorationComponent implements OnInit {
   uploadVideo() {
     let fileElement = document.getElementById("video-form-file") as HTMLInputElement;
     let file = fileElement.files[0];
-    this.newVideo.exploration_id = this.exploration.id; 
+    this.newVideo.exploration_id = this.exploration.id;
     let videoUploadInfo = this.mapVideo(this.newVideo);
     videoUploadInfo.file = file;
     this.videosService

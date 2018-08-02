@@ -2,12 +2,6 @@
     font-weight: bold;
 }
 
-@media (min-width: 768px) {
-    .delete-button {
-        float: right;
-    }
-}
-
 .toolbar {
     text-align: right;
 }

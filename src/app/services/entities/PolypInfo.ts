@@ -1,3 +1,4 @@
+
 export default interface PolypInfo {
     id: string;
     name: string;
@@ -8,4 +9,5 @@ export default interface PolypInfo {
     lst: string;
     paris: string;
     histology: string;
+    exploration: string;
 }

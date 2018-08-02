@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import Polyp, { WASP, NICE, LST, PARIS } from '../../models/Polyp';
+import Polyp, {WASP, NICE, LST, PARIS} from '../../models/Polyp';
 import Video from '../../models/Video';
 import { VideosService } from '../../services/videos.service';
 import { PolypsService } from '../../services/polyps.service';
@@ -49,7 +49,7 @@ export class VideoEditorComponent implements OnInit {
   finalVideo() {
     this.final = this.timePipe.transform(this.currentTime);
   }
-
+  
   addPolyp(videoId) {
     this.videosService.addPolyp(this.video.id, {
       id: 'ee0d66af-f3fb-4d7d-85f8-456d5dc14bb5',
@@ -61,10 +61,12 @@ export class VideoEditorComponent implements OnInit {
       lst: LST.PSEUDODEPRESSED,
       paris: PARIS.SESSILE_DEPRESSED,
       histology: 'Histology',
-      videos: [this.video]
+      videos: [this.video],
+      exploration: this.video.exploration_id
     })
       .subscribe(video => this.video = video);
   }
+  
 
   onCurrentTimeUpdate(time: number) {
     this.currentTime = time;

@@ -11,6 +11,7 @@ export default class Polyp {
     paris: PARIS;
     histology: string;
     videos: Video[];
+    exploration: string;
 }
 
 export enum WASP {

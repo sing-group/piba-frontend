@@ -25,7 +25,12 @@ export class PolypsService {
       lst: LST[polypInfo.lst],
       paris: PARIS[polypInfo.paris],
       histology: polypInfo.histology,
-      videos: []
+      videos: [],
+      exploration: polypInfo.exploration
     };
+  }
+
+  createPolyp(polyp:Polyp):Observable<Polyp>{
+    return this.http.post<PolypInfo>(`${environment.restApi}/polyp`, polyp).map(this.mapPolypInfo.bind(this));
   }
 }

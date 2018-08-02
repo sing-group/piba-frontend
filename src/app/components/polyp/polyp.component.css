@@ -1,0 +1,9 @@
+.toolbar {
+    text-align: right;
+}
+
+@media (min-width: 768px) {
+    .card-button {
+        float: right;
+    }
+}

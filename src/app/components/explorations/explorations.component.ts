@@ -30,7 +30,7 @@ export class ExplorationsComponent implements OnInit {
       this.editingExploration = false;
       this.creatingExploration = true;
     } else {
-      this.exploration =  this.explorations.find((exploration) => exploration.id == id);
+      this.exploration = this.explorations.find((exploration) => exploration.id == id);
       this.date = new Date(this.exploration.date).toLocaleDateString();
       this.location = this.exploration.location;
       this.editingExploration = true;
@@ -59,8 +59,8 @@ export class ExplorationsComponent implements OnInit {
       this.exploration.location = this.location;
       this.exploration.date = new Date(this.date);
       this.explorationsService.editExploration(this.exploration).subscribe(updatedExploration => {
-          Object.assign(this.explorations.find((exploration) => exploration.id == this.exploration.id), updatedExploration);
-        });
+        Object.assign(this.explorations.find((exploration) => exploration.id == this.exploration.id), updatedExploration);
+      });
     }
     this.cancelModal();
   }
