@@ -1,4 +1,5 @@
 import Video from './Video';
+import Exploration from './Exploration';
 
 export default class Polyp {
     id: string;
@@ -11,7 +12,7 @@ export default class Polyp {
     paris: PARIS;
     histology: string;
     videos: Video[];
-    exploration: string;
+    exploration: Exploration;
 }
 
 export enum WASP {

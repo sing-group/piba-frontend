@@ -65,12 +65,20 @@ export class ExplorationsService {
     return this.mapExplorationInfo(explorationInfo, [], []);
   }
 
+  private toExplorationInfo(exploration: Exploration): ExplorationInfo {
+    return {
+      id: exploration.id,
+      date: exploration.date,
+      location: exploration.location
+    }
+  }
   createExploration(exploration: Exploration): Observable<Exploration> {
     return this.http.post<ExplorationInfo>(`${environment.restApi}/exploration`, exploration).map(this.mapOnlyExplorationInfo.bind(this));
   }
 
   editExploration(exploration: Exploration): Observable<Exploration> {
-    return this.http.put<ExplorationInfo>(`${environment.restApi}/exploration`, exploration).map(this.mapOnlyExplorationInfo.bind(this));
+    let explorationInfo = this.toExplorationInfo(exploration);
+    return this.http.put<ExplorationInfo>(`${environment.restApi}/exploration`, explorationInfo).map(this.mapOnlyExplorationInfo.bind(this));
   }
 
 }

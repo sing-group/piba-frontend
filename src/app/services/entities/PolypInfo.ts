@@ -1,3 +1,4 @@
+import IdAndUri from "./IdAndUri";
 
 export default interface PolypInfo {
     id: string;
@@ -9,5 +10,5 @@ export default interface PolypInfo {
     lst: string;
     paris: string;
     histology: string;
-    exploration: string;
+    exploration: IdAndUri | string;
 }

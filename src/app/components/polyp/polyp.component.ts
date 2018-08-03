@@ -1,7 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import Polyp, { WASP, NICE, LST, PARIS } from '../../models/Polyp';
 import { PolypsService } from '../../services/polyps.service';
-import { ActivatedRoute } from '@angular/router';
 import Exploration from '../../models/Exploration';
 
 @Component({
@@ -30,30 +29,42 @@ export class PolypComponent implements OnInit {
 
   @Input() exploration: Exploration;
 
-  constructor(private polypsService: PolypsService,
-    private route: ActivatedRoute) { }
+  constructor(private polypsService: PolypsService) { }
 
   ngOnInit() {
-    this.WASPValues = this.enumKeys(WASP);
-    this.NICEValues = this.enumKeys(NICE);
-    this.LSTValues = this.enumKeys(LST);
-    this.PARISValues = this.enumKeys(PARIS);
+    this.WASPValues = this.enumValues(WASP);
+    this.NICEValues = this.enumValues(NICE);
+    this.LSTValues = this.enumValues(LST);
+    this.PARISValues = this.enumValues(PARIS);
   }
 
   cancel() {
     this.creatingPolyp = false;
     this.editingPolyp = false;
+    this.polyp = new Polyp();
   }
+
   save() {
     if (!this.editingPolyp) {
-      this.polyp.exploration = this.exploration.id;
+      this.polyp.exploration = this.exploration;
       this.polypsService.createPolyp(this.polyp).subscribe(newPolyp => this.exploration.polyps = this.exploration.polyps.concat(newPolyp));
-    };
+    } else {
+      this.polypsService.editPolyp(this.polyp).subscribe(updatedPolyp => {
+        Object.assign(this.exploration.polyps.find((polyp) =>
+          polyp.id == this.polyp.id
+        ), updatedPolyp)
+      });
+    }
     this.cancel();
   }
 
-  private enumKeys<T>(enumType: any): T[] {
-    return <T[]>(<any>Object.keys(enumType));
+  editPolyp(id: string) {
+    this.editingPolyp = true;
+    this.polyp = this.exploration.polyps.find(polyp => polyp.id == id);
+  }
+
+  private enumValues<T>(enumType: any): T[] {
+    return <T[]>(<any>Object.keys(enumType)).map((key:string)=>enumType[key]);
   }
 }
 

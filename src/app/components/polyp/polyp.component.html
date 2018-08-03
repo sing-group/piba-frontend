@@ -9,7 +9,7 @@
     <button type="button" class="btn btn-link card-button" title="Delete polyp">
       <clr-icon shape="trash"></clr-icon>
     </button>
-    <button type="button" class="btn btn-link card-button" title="Edit polyp" (click)="editingPolyp = true">
+    <button type="button" class="btn btn-link card-button" title="Edit polyp" (click)="editPolyp(polyp.id)">
       <clr-icon shape="cog"></clr-icon>
     </button>
   </div>
@@ -138,7 +138,7 @@
           <label for="polyp-form-wasp">WASP</label>
           <div class="select">
             <select id="polyp-form-wasp" [(ngModel)]="polyp.wasp" name="wasp">
-              <option *ngFor="let w of WASPValues" [ngValue]="w">{{WASP[w]}}</option>
+              <option *ngFor="let w of WASPValues" [ngValue]="w">{{w}}</option>
             </select>
           </div>
         </div>
@@ -146,7 +146,7 @@
           <label for="polyp-form-nice">NICE</label>
           <div class="select">
             <select id="polyp-form-nice" [(ngModel)]="polyp.nice" name="nice">
-              <option *ngFor="let n of NICEValues" [ngValue]="n">{{NICE[n]}}</option>
+              <option *ngFor="let n of NICEValues" [ngValue]="n">{{n}}</option>
             </select>
           </div>
         </div>
@@ -154,7 +154,7 @@
           <label for="polyp-form-lst">LST</label>
           <div class="select">
             <select id="polyp-form-lst" [(ngModel)]="polyp.lst" name="lst">
-              <option *ngFor="let l of LSTValues" [ngValue]="l">{{LST[l]}}</option>
+              <option *ngFor="let l of LSTValues" [ngValue]="l">{{l}}</option>
             </select>
           </div>
         </div>
@@ -162,7 +162,7 @@
           <label for="polyp-form-paris">PARIS</label>
           <div class="select">
             <select id="polyp-form-paris" [(ngModel)]="polyp.paris" name="paris">
-              <option *ngFor="let p of PARISValues" [ngValue]="p">{{PARIS[p]}}</option>
+              <option *ngFor="let p of PARISValues" [ngValue]="p">{{p}}</option>
             </select>
           </div>
         </div>

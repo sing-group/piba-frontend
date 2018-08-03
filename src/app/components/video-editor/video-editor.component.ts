@@ -46,22 +46,6 @@ export class VideoEditorComponent implements OnInit {
     this.final = this.timePipe.transform(this.currentTime);
   }
   
-  addPolyp(videoId) {
-    this.videosService.addPolyp(this.video.id, {
-      id: 'ee0d66af-f3fb-4d7d-85f8-456d5dc14bb5',
-      name: 'Polyp 2',
-      size: 11,
-      location: 'Left colon',
-      wasp: WASP.ADENOMA,
-      nice: NICE.TYPE_3,
-      lst: LST.PSEUDODEPRESSED,
-      paris: PARIS.SESSILE_DEPRESSED,
-      histology: 'Histology',
-      videos: [this.video],
-      exploration: this.video.exploration_id
-    })
-      .subscribe(video => this.video = video);
-  }
   
 
   onCurrentTimeUpdate(time: number) {

@@ -22,16 +22,44 @@ export class PolypsService {
       paris: PARIS[polypInfo.paris],
       histology: polypInfo.histology,
       videos: [],
-      exploration: polypInfo.exploration
+      exploration: null
     };
   }
 
-  createPolyp(polyp:Polyp):Observable<Polyp>{
-    return this.http.post<PolypInfo>(`${environment.restApi}/polyp`, polyp).map(this.mapPolypInfo.bind(this));
+  private toPolypInfo(polyp: Polyp): PolypInfo {
+    return {
+      id: polyp.id,
+      name: polyp.name,
+      size: polyp.size,
+      location: polyp.location,
+      wasp: this.findKeyForValue(WASP, polyp.wasp),
+      nice: this.findKeyForValue(NICE, polyp.nice),
+      lst: this.findKeyForValue(LST, polyp.lst),
+      paris: this.findKeyForValue(PARIS, polyp.paris),
+      histology: polyp.histology,
+      exploration: polyp.exploration.id
+    }
+  }
+
+  private findKeyForValue(enumType: any, value: string): string {
+    return this.enumKeys(enumType).find((key: string) => enumType[key] == value);
+  }
+  private enumKeys<T>(enumType: any): string[] {
+    return <string[]>(<any>Object.keys(enumType));
+  }
+  createPolyp(polyp: Polyp): Observable<Polyp> {
+    let polypInfo: PolypInfo = this.toPolypInfo(polyp);
+
+    return this.http.post<PolypInfo>(`${environment.restApi}/polyp`, polypInfo).map(this.mapPolypInfo.bind(this));
   }
 
   getPolyp(uuid: string): Observable<Polyp> {
-
     return this.http.get<PolypInfo>(`${environment.restApi}/polyp/${uuid}`).map(this.mapPolypInfo);
+  }
+
+  editPolyp(polyp: Polyp): Observable<Polyp> {
+    let polypInfo: PolypInfo = this.toPolypInfo(polyp);
+
+    return this.http.put<PolypInfo>(`${environment.restApi}/polyp/`, polypInfo).map(this.mapPolypInfo);
   }
 }
