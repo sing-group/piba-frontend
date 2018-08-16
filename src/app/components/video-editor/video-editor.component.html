@@ -86,12 +86,12 @@
           <h3 class="modal-title">Add polyp</h3>
           <div class="modal-body">
             <div class="form-group">
-              <label for="polyp-name">Name</label>
-              <input type="text" id="polyp-name" />
+              <label for="polyp-form-name">Name</label>
+              <input type="text" id="polyp-form-name" [(ngModel)]="newPolyp.name" name="name" />
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" (click)="addPolyp()">
               <clr-icon shape="plus"></clr-icon> Add
             </button>
           </div>
