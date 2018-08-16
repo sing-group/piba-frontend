@@ -62,4 +62,9 @@ export class PolypsService {
 
     return this.http.put<PolypInfo>(`${environment.restApi}/polyp/`, polypInfo).map(this.mapPolypInfo);
   }
+
+  getPolypsOfExploration(exploration_id: string): Observable<Polyp[]> {
+    return this.http.get<Polyp[]>(`${environment.restApi}/exploration/${exploration_id}/polyps`).map(
+      polypsInfo => polypsInfo.map(this.mapPolypInfo.bind(this)));
+  }
 }

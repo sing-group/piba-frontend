@@ -4,13 +4,13 @@ import { Observable } from 'rxjs/Observable';
 
 import Exploration from '../models/Exploration';
 import Video from '../models/Video';
+import Polyp from '../models/Polyp';
 import ExplorationInfo from './entities/ExplorationInfo';
 import { environment } from '../../environments/environment';
 
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { concatMap } from 'rxjs/operators';
 import { VideosService } from './videos.service';
-import Polyp from '../models/Polyp';
 import { PolypsService } from './polyps.service';
 
 @Injectable()
@@ -80,6 +80,10 @@ export class ExplorationsService {
   editExploration(exploration: Exploration): Observable<Exploration> {
     let explorationInfo = this.toExplorationInfo(exploration);
     return this.http.put<ExplorationInfo>(`${environment.restApi}/exploration`, explorationInfo).map(this.mapOnlyExplorationInfo.bind(this));
+  }
+
+  getPolyps(uuid: string): Observable<Polyp[]> {
+    return this.polypsService.getPolypsOfExploration(uuid);
   }
 
 }

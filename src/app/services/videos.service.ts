@@ -29,14 +29,6 @@ export class VideosService {
     }
   }
 
-  addPolyp(uuid: string, polyp: Polyp): Observable<Video> {
-    return this.getVideo(uuid)
-      .map(video => {
-        video.polyps.push(polyp);
-        return video;
-      });
-  }
-
   createVideo(video: VideoUploadInfo): Observable<Video> {
     let formData: FormData = new FormData();
     formData.append("title", video.title);

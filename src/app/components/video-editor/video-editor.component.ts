@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import Polyp, {WASP, NICE, LST, PARIS} from '../../models/Polyp';
+import Polyp from '../../models/Polyp';
 import Video from '../../models/Video';
 import { VideosService } from '../../services/videos.service';
 import { TimePipe } from '../../pipes/time.pipe';
@@ -39,7 +39,10 @@ export class VideoEditorComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
 
     this.videosService.getVideo(id)
-      .subscribe(video => this.video = video);
+      .subscribe(video => {
+        this.video = video;
+        this.explorationsService.getPolyps(this.video.exploration_id).subscribe(polyps => this.polyps = polyps);
+      });
   }
 
   startVideo() {
