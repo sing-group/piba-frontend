@@ -11,6 +11,7 @@ import Video from '../models/Video';
 import { concatMap } from 'rxjs/operator/concatMap';
 import { map } from 'rxjs/operators';
 import { forkJoin } from 'rxjs/observable/forkJoin';
+import PolypRecordingEditionInfo from './entities/PolypRecordingEditionInfo';
 
 @Injectable()
 export class PolypRecordingsService {
@@ -36,6 +37,22 @@ export class PolypRecordingsService {
       start: polypRecordingInfo.start,
       end: polypRecordingInfo.end
     }
+  }
+
+  createPolypRecording(polypRecording:PolypRecording): Observable<PolypRecording>{
+    let polypRecordingEditionInfo = this.toPolypRecordingEditionInfo(polypRecording);
+
+    return this.http.post<PolypRecordingInfo>(`${environment.restApi}/polyprecording`, polypRecordingEditionInfo)
+    .map(this.mapPolypRecordingInfo.bind(this));
+  }
+
+  private toPolypRecordingEditionInfo(polypRecording: PolypRecording): PolypRecordingEditionInfo{
+    return {
+      video: polypRecording.video.id,
+      polyp: polypRecording.polyp.id,
+      start: polypRecording.start,
+      end: polypRecording.end
+    };
   }
 
 }

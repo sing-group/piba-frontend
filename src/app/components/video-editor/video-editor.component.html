@@ -15,10 +15,10 @@
             <p>Polyp:  </p>
           </div>
           <div class="col-sm-3 col-md-3">
-            <p>INI: {{polypRecording.start}}</p>
+            <p>INI: {{polypRecording.start | time}}</p>
           </div>
           <div class="col-sm-3 col-md-3">
-            <p>FIN: {{polypRecording.end}}</p>
+            <p>FIN: {{polypRecording.end | time}}</p>
           </div>
           <div class="col-sm-3 col-md-3">
             <button type="button" class="btn btn-secondary">
@@ -38,9 +38,9 @@
               </div>
               <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6">
                 <div class="select">
-                  <select id="polyp-name">
+                  <select id="polyp-name" [(ngModel)]="selectedPolyp" name="selectedPolyp">
                     <option value="" disabled selected>&lt;Polyp&gt;</option>
-                    <option *ngFor="let polyp of polyps">{{polyp.name}}</option>
+                    <option *ngFor="let p of polyps" [ngValue]="p">{{p.name}}</option>
                   </select>
                 </div>
               </div>
@@ -57,8 +57,8 @@
                 <label>INI:</label>
               </div>
               <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6">
-                <input type="text" name="initial" [(ngModel)]="initial" class="input-timer" disabled/>
-                <button (click)="startVideo()" class="btn btn-icon">
+                <input type="text" name="start" [(ngModel)]="start" class="input-timer" disabled/>
+                <button (click)="startPolyp()" class="btn btn-icon">
                   <clr-icon shape="clock"></clr-icon>
                 </button>
               </div>
@@ -69,13 +69,13 @@
                 <label>FIN: </label>
               </div>
               <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6">
-                <input type="text" name="final" [(ngModel)]="final" class="input-timer" disabled />
-                <button (click)="finalVideo()" class="btn btn-icon">
+                <input type="text" name="end" [(ngModel)]="end" class="input-timer" disabled />
+                <button (click)="endPolyp()" class="btn btn-icon">
                   <clr-icon shape="clock"></clr-icon>
                 </button>
               </div>
             </div>
-            <button (click)="addPolyp(video.id)" type="button" class="btn btn-primary">
+            <button (click)="addPolypRecording()" type="button" class="btn btn-primary">
               <clr-icon shape="plus"></clr-icon>Add
             </button>
           </section>

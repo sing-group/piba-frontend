@@ -7,6 +7,7 @@ import { TimePipe } from '../../pipes/time.pipe';
 import { PolypsService } from '../../services/polyps.service';
 import { ExplorationsService } from '../../services/explorations.service';
 import { PolypRecordingsService } from '../../services/polyprecordings.service';
+import PolypRecording from '../../models/PolypRecording';
 
 @Component({
   selector: 'app-video-editor',
@@ -17,12 +18,14 @@ export class VideoEditorComponent implements OnInit {
 
   video: Video;
 
-  initial: String;
-  final: String;
+  start: String;
+  end: String;
 
   newPolyp: Polyp = new Polyp();
   polyps: Polyp[];
   selectedPolyp: Polyp;
+
+  newPolypRecording: PolypRecording;
 
   currentTime: number;
 
@@ -51,12 +54,12 @@ export class VideoEditorComponent implements OnInit {
       });
   }
 
-  startVideo() {
-    this.initial = this.timePipe.transform(this.currentTime);
+  startPolyp() {
+    this.start = this.timePipe.transform(this.currentTime);
   }
 
-  finalVideo() {
-    this.final = this.timePipe.transform(this.currentTime);
+  endPolyp() {
+    this.end = this.timePipe.transform(this.currentTime);
   }
 
   onCurrentTimeUpdate(time: number) {
@@ -69,5 +72,30 @@ export class VideoEditorComponent implements OnInit {
       this.polysService.createPolyp(this.newPolyp).subscribe(polyp => this.polyps.push(polyp));
     });
     this.modalOpened = false;
+  }
+
+  addPolypRecording() {
+    this.newPolypRecording = {
+      video: this.video,
+      polyp: this.selectedPolyp,
+      start: this.timeToNumber(this.start),
+      end: this.timeToNumber(this.end)
+    }
+    this.polypRecordingsService.createPolypRecording(this.newPolypRecording)
+      .subscribe(
+        newPolypRecording => {
+          this.video.polypRecording = this.video.polypRecording.concat(newPolypRecording);
+          this.start = null;
+          this.end = null;
+          this.selectedPolyp = null;
+        }
+      );
+  }
+
+  private timeToNumber(time: String): number {
+    let split = time.split(':');
+    let minutes = split[0];
+    let seconds = split[1];
+    return (parseInt(minutes) * 60 + parseInt(seconds));
   }
 }
