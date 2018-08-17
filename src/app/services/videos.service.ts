@@ -4,7 +4,6 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 import 'rxjs/add/operator/map';
 
-import Polyp from '../models/Polyp';
 import Video from '../models/Video';
 import VideoInfo from './entities/VideoInfo';
 import VideoUploadInfo from './entities/VideoUploadInfo';
@@ -47,7 +46,7 @@ export class VideosService {
         mediaType: source.type,
         url: source.src
       })),
-      polyps: [],
+      polypRecording: [],
       isProcessing: videoInfo.processing,
       exploration_id: videoInfo.exploration_id
     };

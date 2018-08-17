@@ -4,21 +4,21 @@
     <p>Your browser does not support the video tag.</p>
   </app-video>
 </div>
-  
+
 <clr-tabs *ngIf="video != null">
   <clr-tab>
     <button clrTabLink id="Polyps">Polyps</button>
     <clr-tab-content *clrIfActive="true">
-      <div *ngFor="let polyp of video.polyps">
+      <div *ngFor="let polypRecording of video.polypRecording">
         <div class="row">
           <div class="col-sm-3 col-md-3">
-            <p>Polyp: {{polyp.name}}</p>
+            <p>Polyp:  </p>
           </div>
           <div class="col-sm-3 col-md-3">
-            <p>INI: 00:02</p>
+            <p>INI: {{polypRecording.start}}</p>
           </div>
           <div class="col-sm-3 col-md-3">
-            <p>FIN: 00:10</p>
+            <p>FIN: {{polypRecording.end}}</p>
           </div>
           <div class="col-sm-3 col-md-3">
             <button type="button" class="btn btn-secondary">
@@ -28,8 +28,7 @@
         </div>
       </div>
 
-      <!-- new polyp-->
-      <div class="contentNewPolyp">
+      <div class="polypRecording-container">
         <form>
           <section class="form-block">
 

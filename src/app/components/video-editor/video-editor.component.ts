@@ -6,6 +6,7 @@ import { VideosService } from '../../services/videos.service';
 import { TimePipe } from '../../pipes/time.pipe';
 import { PolypsService } from '../../services/polyps.service';
 import { ExplorationsService } from '../../services/explorations.service';
+import { PolypRecordingsService } from '../../services/polyprecordings.service';
 
 @Component({
   selector: 'app-video-editor',
@@ -32,7 +33,8 @@ export class VideoEditorComponent implements OnInit {
     private route: ActivatedRoute,
     private timePipe: TimePipe,
     private polysService: PolypsService,
-    private explorationsService: ExplorationsService
+    private explorationsService: ExplorationsService,
+    private polypRecordingsService: PolypRecordingsService
   ) { }
 
   ngOnInit() {
@@ -42,6 +44,10 @@ export class VideoEditorComponent implements OnInit {
       .subscribe(video => {
         this.video = video;
         this.explorationsService.getPolyps(this.video.exploration_id).subscribe(polyps => this.polyps = polyps);
+        this.polypRecordingsService.getPolypRecordings(video.id).subscribe(polypRecordings => {
+          this.video.polypRecording = polypRecordings;
+        }
+        );
       });
   }
 

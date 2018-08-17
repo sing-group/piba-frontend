@@ -1,5 +1,5 @@
-import Video from './Video';
 import Exploration from './Exploration';
+import PolypRecording from './PolypRecording';
 
 export default class Polyp {
     id: string;
@@ -11,7 +11,7 @@ export default class Polyp {
     lst: LST;
     paris: PARIS;
     histology: string;
-    videos: Video[];
+    videos: PolypRecording[];
     exploration: Exploration;
 }
 
