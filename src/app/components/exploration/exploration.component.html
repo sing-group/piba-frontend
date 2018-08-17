@@ -67,7 +67,7 @@
                     </div>
                     <div class="form-group">
                       <label for="video-observation">Observation</label>
-                      <textarea type="text" id="video-observation" rows="4" readonly value="{{video.observation}}"></textarea>
+                      <textarea type="text" id="video-observation" rows="4" readonly value="{{video.observations}}"></textarea>
                     </div>
                   </section>
                   <button type="button" class="btn btn-secondary">
@@ -104,7 +104,7 @@
           </div>
           <div class="form-group">
               <label for="video-form-observations" >Observations</label>
-            <textarea type="text" id="video-form-observations" rows="4" [(ngModel)]="newVideo.observation" name="observation"></textarea>
+            <textarea type="text" id="video-form-observations" rows="4" [(ngModel)]="newVideo.observations" name="observations"></textarea>
           </div>
           <div class="form-group">
               <label for="video-form-file">File</label>

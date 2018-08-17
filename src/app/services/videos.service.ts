@@ -41,7 +41,7 @@ export class VideosService {
     return {
       id: videoInfo.id,
       title: videoInfo.title,
-      observation: videoInfo.observations,
+      observations: videoInfo.observations,
       sources: videoInfo.video_sources.map(source => ({
         mediaType: source.type,
         url: source.src

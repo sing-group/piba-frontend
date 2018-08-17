@@ -102,7 +102,7 @@ export class ExplorationComponent implements OnInit {
   private mapVideo(video: Video): VideoUploadInfo {
     return {
       title: video.title,
-      observations: video.observation,
+      observations: video.observations,
       file: null,
       exploration_id: video.exploration_id
     }

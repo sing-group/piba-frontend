@@ -4,7 +4,7 @@ import PolypRecording from './PolypRecording';
 export default class Video {
     id: string;
     title: string;
-    observation: string;
+    observations: string;
     sources: VideoSource[];
     polypRecording: PolypRecording[];
     isProcessing: boolean;
