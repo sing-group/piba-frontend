@@ -18,6 +18,9 @@ export class ExplorationsComponent implements OnInit {
   location: string;
   newExploration: Exploration;
   exploration: Exploration = new Exploration();
+  
+  //needed to sort by date in the explorations table
+  private explorationComparator = new ExplorationComparator();
 
   constructor(private explorationsService: ExplorationsService) { }
 
@@ -25,24 +28,12 @@ export class ExplorationsComponent implements OnInit {
     this.explorationsService.getExplorations().subscribe(explorations => this.explorations = explorations);
   }
 
-  openModal(id: string) {
-    if (id == null) {
-      this.editingExploration = false;
-      this.creatingExploration = true;
-    } else {
-      this.exploration = this.explorations.find((exploration) => exploration.id == id);
-      this.date = new Date(this.exploration.date).toLocaleDateString();
-      this.location = this.exploration.location;
-      this.editingExploration = true;
-      this.creatingExploration = false;
-    }
-  }
-
-  cancelModal() {
-    this.date = null;
-    this.location = null;
+  edit(id: string) {
+    this.exploration = this.explorations.find((exploration) => exploration.id == id);
+    this.date = new Date(this.exploration.date).toLocaleDateString();
+    this.location = this.exploration.location;
+    this.editingExploration = true;
     this.creatingExploration = false;
-    this.editingExploration = false;
   }
 
   save() {
@@ -63,7 +54,14 @@ export class ExplorationsComponent implements OnInit {
         Object.assign(this.explorations.find((exploration) => exploration.id == this.exploration.id), updatedExploration);
       });
     }
-    this.cancelModal();
+    this.cancel();
+  }
+
+  cancel() {
+    this.date = null;
+    this.location = null;
+    this.creatingExploration = false;
+    this.editingExploration = false;
   }
 
 }

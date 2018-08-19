@@ -2,7 +2,7 @@
 
   <clr-dg-action-bar>
     <div class="btn-group" style="text-align: right">
-      <button type="button" class="btn btn-icon btn-link" (click)="openModal(null)">
+      <button type="button" class="btn btn-icon btn-link" (click)="creatingExploration=true">
         <clr-icon shape="plus"></clr-icon> Add
       </button>
     </div>
@@ -25,7 +25,7 @@
           <clr-icon shape="eye"></clr-icon>
           <span class="clr-icon-title">View</span>
         </button>
-        <button class="btn" (click)="openModal(exploration.id)">
+        <button class="btn" (click)="edit(exploration.id)">
           <clr-icon shape="cog"></clr-icon>
           <span class="clr-icon-title">Settings</span>
         </button>
