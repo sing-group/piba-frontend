@@ -8,7 +8,7 @@ import { PolypsService } from './polyps.service';
 import { VideosService } from './videos.service';
 import Polyp from '../models/Polyp';
 import Video from '../models/Video';
-import { concatMap } from 'rxjs/operator/concatMap';
+import { concatMap } from 'rxjs/operators';
 import { map } from 'rxjs/operators';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import PolypRecordingEditionInfo from './entities/PolypRecordingEditionInfo';
@@ -24,10 +24,19 @@ export class PolypRecordingsService {
     let params = new HttpParams();
     params = params.append('id', video_id);
 
-    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording`, { params })
-      .map(polypRecordingInfo => {
-        return polypRecordingInfo.map(this.mapPolypRecordingInfo.bind(this))
-      });
+    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording`, { params }).pipe(
+      concatMap((polypRecordingInfos) =>
+        forkJoin(polypRecordingInfos.map(polypRecordingInfo =>
+          forkJoin(
+            this.videosService.getVideo(polypRecordingInfo.video.id),
+            this.polypsService.getPolyp(polypRecordingInfo.polyp.id))
+
+        ))
+        , (polypRecordingInfos, videosAndPolyps) =>
+          polypRecordingInfos.map((polypRecordingInfo, index) => 
+            this.mapPolypRecordingInfo(polypRecordingInfo, videosAndPolyps[index][0], videosAndPolyps[index][1]))
+      )
+    );
   }
 
   private mapPolypRecordingInfo(polypRecordingInfo: PolypRecordingInfo, video: Video, polyp: Polyp): PolypRecording {
@@ -39,14 +48,14 @@ export class PolypRecordingsService {
     }
   }
 
-  createPolypRecording(polypRecording:PolypRecording): Observable<PolypRecording>{
+  createPolypRecording(polypRecording: PolypRecording): Observable<PolypRecording> {
     let polypRecordingEditionInfo = this.toPolypRecordingEditionInfo(polypRecording);
 
     return this.http.post<PolypRecordingInfo>(`${environment.restApi}/polyprecording`, polypRecordingEditionInfo)
-    .map(this.mapPolypRecordingInfo.bind(this));
+      .map(this.mapPolypRecordingInfo.bind(this));
   }
 
-  private toPolypRecordingEditionInfo(polypRecording: PolypRecording): PolypRecordingEditionInfo{
+  private toPolypRecordingEditionInfo(polypRecording: PolypRecording): PolypRecordingEditionInfo {
     return {
       video: polypRecording.video.id,
       polyp: polypRecording.polyp.id,

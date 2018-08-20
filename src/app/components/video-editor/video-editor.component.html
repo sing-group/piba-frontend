@@ -12,7 +12,7 @@
       <div *ngFor="let polypRecording of video.polypRecording">
         <div class="row">
           <div class="col-sm-3 col-md-3">
-            <p>Polyp:  </p>
+            <p>Polyp: {{polypRecording.polyp.name}} </p>
           </div>
           <div class="col-sm-3 col-md-3">
             <p>INI: {{polypRecording.start | time}}</p>
