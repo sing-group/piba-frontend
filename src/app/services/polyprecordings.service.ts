@@ -33,7 +33,7 @@ export class PolypRecordingsService {
 
         ))
         , (polypRecordingInfos, videosAndPolyps) =>
-          polypRecordingInfos.map((polypRecordingInfo, index) => 
+          polypRecordingInfos.map((polypRecordingInfo, index) =>
             this.mapPolypRecordingInfo(polypRecordingInfo, videosAndPolyps[index][0], videosAndPolyps[index][1]))
       )
     );
@@ -51,8 +51,15 @@ export class PolypRecordingsService {
   createPolypRecording(polypRecording: PolypRecording): Observable<PolypRecording> {
     let polypRecordingEditionInfo = this.toPolypRecordingEditionInfo(polypRecording);
 
-    return this.http.post<PolypRecordingInfo>(`${environment.restApi}/polyprecording`, polypRecordingEditionInfo)
-      .map(this.mapPolypRecordingInfo.bind(this));
+    return this.http.post<PolypRecordingInfo>(`${environment.restApi}/polyprecording`, polypRecordingEditionInfo).pipe(
+      concatMap((polypRecordingInfo) =>
+          forkJoin(
+            this.videosService.getVideo(polypRecordingInfo.video.id),
+            this.polypsService.getPolyp(polypRecordingInfo.polyp.id))
+        , (polypRecordingInfo, videoAndPolyp) =>
+            this.mapPolypRecordingInfo(polypRecordingInfo, videoAndPolyp[0], videoAndPolyp[1])
+      )
+    );
   }
 
   private toPolypRecordingEditionInfo(polypRecording: PolypRecording): PolypRecordingEditionInfo {
