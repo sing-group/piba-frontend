@@ -110,24 +110,25 @@
   </clr-tree-node>
 
 </div>
+<form ngNativeValidate (submit)="save()">
+  <clr-modal [(clrModalOpen)]="editingPolyp|| creatingPolyp" [clrModalClosable]="false">
 
-<clr-modal [(clrModalOpen)]="editingPolyp|| creatingPolyp" [clrModalClosable]="false">
-  <h3 class="modal-title" *ngIf="creatingPolyp">Add polyp</h3>
-  <h3 class="modal-title" *ngIf="editingPolyp">Edit polyp</h3>
-  <div class="modal-body">
-    <form>
+    <h3 class="modal-title" *ngIf="creatingPolyp">Add polyp</h3>
+    <h3 class="modal-title" *ngIf="editingPolyp">Edit polyp</h3>
+    <div class="modal-body">
+
       <section class="form-block">
         <div class="form-group">
-          <label for="polyp-form-name">Name</label>
-          <input type="text" id="polyp-form-name" name="name" [(ngModel)]="polyp.name">
+          <label for="polyp-form-name" class="required">Name</label>
+          <input type="text" id="polyp-form-name" name="name" [(ngModel)]="polyp.name" required>
         </div>
         <div class="form-group">
           <label for="polyp-form-size">Size</label>
-          <input type="text" id="polyp-form-size" name="size" [(ngModel)]="polyp.size">
+          <input type="text" id="polyp-form-size" name="size" [(ngModel)]="polyp.size" pattern="[0-9]*" title="Must be a number">
         </div>
         <div class="form-group">
           <label for="polyp-form-location">Location</label>
-          <input type="text" id="polyp-form-location" name="location" [(ngModel)]="polyp.location">
+          <input type="text" id="polyp-form-location" name="location" [(ngModel)]="polyp.location" pattern="[a-zA-Z]*" title="Must be a alphabetic">
         </div>
         <div class="form-group">
           <label for="polyp-form-histology">Histology</label>
@@ -168,10 +169,12 @@
         </div>
 
       </section>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
-    <button type="button" class="btn btn-primary" (click)="save()">Ok</button>
-  </div>
-</clr-modal>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
+      <button type="submit" class="btn btn-primary">Ok</button>
+    </div>
+
+  </clr-modal>
+</form>
