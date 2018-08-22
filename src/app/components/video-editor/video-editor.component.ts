@@ -49,27 +49,45 @@ export class VideoEditorComponent implements OnInit {
         this.explorationsService.getPolyps(this.video.exploration_id).subscribe(polyps => this.polyps = polyps);
         this.polypRecordingsService.getPolypRecordings(video.id).subscribe(polypRecordings => {
           this.video.polypRecording = polypRecordings;
+          polypRecordings.map(polypRecording =>
+            this.deleteSelectedPolyp(polypRecording.polyp.name));
         }
         );
       });
   }
 
   startPolyp() {
-    this.start = this.timePipe.transform(this.currentTime);
+    if (this.currentTime == undefined) {
+      this.start = this.timePipe.transform(0);
+    } else {
+      this.start = this.timePipe.transform(this.currentTime);
+    }
   }
 
   endPolyp() {
-    this.end = this.timePipe.transform(this.currentTime);
+    if (this.currentTime == undefined) {
+      this.end = this.timePipe.transform(0);
+    } else {
+      this.end = this.timePipe.transform(this.currentTime);
+    }
   }
 
   onCurrentTimeUpdate(time: number) {
     this.currentTime = time;
   }
 
+  public timesAreCorrect(): Boolean {
+    if (this.start == undefined || this.end == undefined) return true;
+    return (this.timeToNumber(this.start) < this.timeToNumber(this.end));
+  }
+
   addPolyp() {
     this.explorationsService.getExploration(this.video.exploration_id).subscribe(exploration => {
       this.newPolyp.exploration = exploration;
-      this.polysService.createPolyp(this.newPolyp).subscribe(polyp => this.polyps.push(polyp));
+      this.polysService.createPolyp(this.newPolyp).subscribe(polyp => {
+        this.polyps.push(polyp);
+        this.newPolyp = new Polyp();
+      });
     });
     this.modalOpened = false;
   }
@@ -87,9 +105,11 @@ export class VideoEditorComponent implements OnInit {
           this.video.polypRecording = this.video.polypRecording.concat(newPolypRecording);
           this.start = null;
           this.end = null;
+          this.deleteSelectedPolyp(this.selectedPolyp.name);
           this.selectedPolyp = null;
         }
       );
+
   }
 
   private timeToNumber(time: String): number {
@@ -97,5 +117,14 @@ export class VideoEditorComponent implements OnInit {
     let minutes = split[0];
     let seconds = split[1];
     return (parseInt(minutes) * 60 + parseInt(seconds));
+  }
+
+  private deleteSelectedPolyp(namePolyp: string) {
+    let polypRemove = this.polyps.indexOf(
+      this.polyps.find((polyp) => polyp.name == namePolyp)
+    );
+    if (polypRemove > -1) {
+      this.polyps.splice(polypRemove, 1);
+    }
   }
 }

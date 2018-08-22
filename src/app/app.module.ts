@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { ClarityModule } from '@clr/angular';
 
@@ -37,7 +37,8 @@ import { PolypRecordingsService } from './services/polyprecordings.service';
     HttpClientModule,
     FormsModule,
     AppRoutingModule,
-    ClarityModule
+    ClarityModule,
+    ReactiveFormsModule
   ],
   providers: [
     PolypsService,
