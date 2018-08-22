@@ -38,6 +38,10 @@ export class PolypComponent implements OnInit {
     this.PARISValues = this.enumValues(PARIS);
   }
 
+  private enumValues<T>(enumType: any): T[] {
+    return <T[]>(<any>Object.keys(enumType)).map((key: string) => enumType[key]);
+  }
+
   cancel() {
     this.creatingPolyp = false;
     this.editingPolyp = false;
@@ -63,9 +67,17 @@ export class PolypComponent implements OnInit {
     this.polyp = this.exploration.polyps.find(polyp => polyp.id == id);
   }
 
-  private enumValues<T>(enumType: any): T[] {
-    return <T[]>(<any>Object.keys(enumType)).map((key:string)=>enumType[key]);
+  delete(id: string) {
+    this.polypsService.delete(id).subscribe(() => {
+      let index = this.exploration.polyps.indexOf(
+        this.exploration.polyps.find((polyp) => polyp.id == id
+        )
+      )
+      this.exploration.polyps.splice(index, 1);
+    }
+    );
   }
+
 }
 
 

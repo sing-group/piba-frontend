@@ -67,4 +67,8 @@ export class PolypsService {
     return this.http.get<Polyp[]>(`${environment.restApi}/exploration/${exploration_id}/polyps`).map(
       polypsInfo => polypsInfo.map(this.mapPolypInfo.bind(this)));
   }
+
+  delete(uuid:string){
+    return this.http.delete((`${environment.restApi}/polyp/` + uuid));
+  }
 }
