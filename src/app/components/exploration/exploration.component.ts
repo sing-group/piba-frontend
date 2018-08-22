@@ -5,6 +5,7 @@ import Exploration from '../../models/Exploration';
 import VideoUploadInfo from '../../services/entities/VideoUploadInfo';
 import { VideosService } from '../../services/videos.service';
 import { ExplorationsService } from '../../services/explorations.service';
+import Polyp from '../../models/Polyp';
 
 interface Ambit {
   name: string;
@@ -96,7 +97,12 @@ export class ExplorationComponent implements OnInit {
           this.pollProcessingVideo(video);
         }
       });
+    this.cancel();
+  }
+
+  cancel(){
     this.userUploadingVideo = false;
+    this.newVideo = new Video();
   }
 
   private mapVideo(video: Video): VideoUploadInfo {
