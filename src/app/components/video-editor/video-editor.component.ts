@@ -127,4 +127,13 @@ export class VideoEditorComponent implements OnInit {
       this.polyps.splice(polypRemove, 1);
     }
   }
+
+  removePolypRecording(polypRecording: PolypRecording) {
+    this.polypRecordingsService.removePolypRecording(polypRecording).subscribe(() => {
+      this.polyps.push(polypRecording.polyp);
+      let index = this.video.polypRecording.indexOf(this.video.polypRecording.find((polypRecordingFind) => polypRecordingFind == polypRecording));
+      this.video.polypRecording.splice(index, 1);
+    }
+    );
+  }
 }

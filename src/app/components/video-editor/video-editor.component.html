@@ -21,7 +21,7 @@
             <p>FIN: {{polypRecording.end | time}}</p>
           </div>
           <div class="col-sm-3 col-md-3">
-            <button type="button" class="btn btn-secondary">
+            <button type="button" class="btn btn-secondary" (click)="removePolypRecording(polypRecording)">
               <clr-icon shape="times"></clr-icon> Remove
             </button>
           </div>

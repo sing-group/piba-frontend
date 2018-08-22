@@ -71,4 +71,8 @@ export class PolypRecordingsService {
     };
   }
 
+  removePolypRecording(polypRecording: PolypRecording){
+    return this.http.delete(`${environment.restApi}/polyprecording/`+ polypRecording.video.id + '/' + polypRecording.polyp.id);
+  }
+
 }
