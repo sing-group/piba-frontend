@@ -100,9 +100,20 @@ export class ExplorationComponent implements OnInit {
     this.cancel();
   }
 
-  cancel(){
+  cancel() {
     this.userUploadingVideo = false;
     this.newVideo = new Video();
+  }
+
+  delete(id: string) {
+    this.videosService.delete(id).subscribe(() => {
+      let index = this.exploration.videos.indexOf(
+        this.exploration.videos.find((video) => video.id == id
+        )
+      )
+      this.exploration.videos.splice(index, 1);
+    }
+    );
   }
 
   private mapVideo(video: Video): VideoUploadInfo {

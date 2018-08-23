@@ -76,6 +76,9 @@
                   <button type="button" class="btn btn-secondary" routerLink="/video/{{video.id}}">
                     <clr-icon shape="video-gallery"></clr-icon> Edit video
                   </button>
+                  <button type="button" class="btn btn-secondary" (click)="delete(video.id)">
+                    <clr-icon shape="trash"></clr-icon> Remove video
+                  </button>
                 </form>
               </clr-dg-cell>
             </clr-dg-row>

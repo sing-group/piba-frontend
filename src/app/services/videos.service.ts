@@ -37,6 +37,10 @@ export class VideosService {
     return this.http.post<VideoInfo>(`${environment.restApi}/video`, formData).map(this.mapVideoInfo);
   }
 
+  delete(id: string){
+    return this.http.delete(`${environment.restApi}/video/` +  id);
+  }
+
   private mapVideoInfo(videoInfo: VideoInfo): Video {
     return {
       id: videoInfo.id,
