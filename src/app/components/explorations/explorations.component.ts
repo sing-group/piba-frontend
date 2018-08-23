@@ -64,6 +64,17 @@ export class ExplorationsComponent implements OnInit {
     this.editingExploration = false;
   }
 
+  delete(id: string) {
+    this.explorationsService.delete(id).subscribe(() => {
+      let index = this.explorations.indexOf(
+        this.explorations.find((exploration) => exploration.id == id
+        )
+      )
+      this.explorations.splice(index, 1);
+    }
+    );
+  }
+
 }
 
 class ExplorationComparator implements ClrDatagridComparatorInterface<Exploration>{

@@ -86,4 +86,8 @@ export class ExplorationsService {
     return this.polypsService.getPolypsOfExploration(uuid);
   }
 
+  delete(id: string) {
+    return this.http.delete(`${environment.restApi}/exploration/` + id);
+  }
+
 }
