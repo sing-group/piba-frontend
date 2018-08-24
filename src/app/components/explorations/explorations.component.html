@@ -44,26 +44,29 @@
   </clr-dg-footer>
 </clr-datagrid>
 
+<form ngNativeValidate #explorationForm="ngForm" (submit)="save()">
+  <clr-modal [(clrModalOpen)]="editingExploration|| creatingExploration" [clrModalClosable]="false">
+    <h3 class="modal-title" *ngIf="creatingExploration">Add Exploration</h3>
+    <h3 class="modal-title" *ngIf="editingExploration">Edit Exploration</h3>
+    <div class="modal-body">
 
-<clr-modal [(clrModalOpen)]="editingExploration|| creatingExploration" [clrModalClosable]="false">
-  <h3 class="modal-title" *ngIf="creatingExploration">Add Exploration</h3>
-  <h3 class="modal-title" *ngIf="editingExploration">Edit Exploration</h3>
-  <div class="modal-body">
-    <form>
       <section class="form-block">
         <div class="form-group">
-          <label for="exploration-form-date">Date</label>
-          <input type="date" id="exploration-form-date" name="date" [(ngModel)]="date" clrDate readonly>
+          <label for="exploration-form-date" class="required">Date</label>
+          <input type="date" id="exploration-form-date" name="date" [(ngModel)]="date" clrDate readonly required #dateExploration="ngModel"
+          />
         </div>
         <div class="form-group">
-          <label for="exploration-form-location">Location</label>
-          <input type="text" id="exploration-form-location" name="location" [(ngModel)]="location" />
+          <label for="exploration-form-location" class="required">Location</label>
+          <input type="text" id="exploration-form-location" name="location" [(ngModel)]="location" required pattern="[a-zA-Z0-9]*"
+            title="Must be a alphanumeric" #locationExploration="ngModel" />
         </div>
       </section>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-outline" (click)="cancelModal()">Cancel</button>
-    <button type="button" class="btn btn-primary" (click)="save()">Ok</button>
-  </div>
-</clr-modal>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
+      <button type="submit" class="btn btn-primary" [disabled]="dateExploration.invalid || locationExploration.invalid">Ok</button>
+    </div>
+  </clr-modal>
+</form>
