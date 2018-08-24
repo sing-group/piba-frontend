@@ -6,6 +6,7 @@ import VideoUploadInfo from '../../services/entities/VideoUploadInfo';
 import { VideosService } from '../../services/videos.service';
 import { ExplorationsService } from '../../services/explorations.service';
 import Polyp from '../../models/Polyp';
+import { Observable } from 'rxjs';
 
 interface Ambit {
   name: string;
@@ -35,6 +36,8 @@ export class ExplorationComponent implements OnInit {
   newVideo: Video = new Video();
 
   userUploadingVideo: Boolean = false;
+
+  isReadonly: Boolean = true;
 
   constructor(
     private videosService: VideosService,
@@ -87,7 +90,7 @@ export class ExplorationComponent implements OnInit {
   uploadVideo() {
     let fileElement = document.getElementById("video-form-file") as HTMLInputElement;
     let file = fileElement.files[0];
-    this.newVideo.exploration_id = this.exploration.id;
+    this.newVideo.exploration = this.exploration.id;
     let videoUploadInfo = this.mapVideo(this.newVideo);
     videoUploadInfo.file = file;
     this.videosService
@@ -116,12 +119,26 @@ export class ExplorationComponent implements OnInit {
     );
   }
 
+  editVideo(video: Video) {
+    let title = document.getElementsByClassName("title-" + video.id) as HTMLCollectionOf<HTMLInputElement>;
+    let observations = document.getElementsByClassName("observations-" + video.id) as HTMLCollectionOf<HTMLInputElement>;;
+    video.title = title[0].value;
+    video.observations = observations[0].value;
+
+    this.videosService.editVideo(video).subscribe(updatedVideo => {
+      this.isReadonly = true;
+      Object.assign(this.exploration.videos.find((v) =>
+        v.id == video.id
+      ), updatedVideo)
+    });
+  }
+
   private mapVideo(video: Video): VideoUploadInfo {
     return {
       title: video.title,
       observations: video.observations,
       file: null,
-      exploration_id: video.exploration_id
+      exploration: video.exploration
     }
   }
 }

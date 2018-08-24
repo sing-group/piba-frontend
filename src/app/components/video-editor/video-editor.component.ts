@@ -22,7 +22,7 @@ export class VideoEditorComponent implements OnInit {
   end: String;
 
   newPolyp: Polyp = new Polyp();
-  polyps: Polyp[];
+  polyps: Polyp[] = [];
   selectedPolyp: Polyp;
 
   newPolypRecording: PolypRecording;
@@ -46,7 +46,7 @@ export class VideoEditorComponent implements OnInit {
     this.videosService.getVideo(id)
       .subscribe(video => {
         this.video = video;
-        this.explorationsService.getPolyps(this.video.exploration_id).subscribe(polyps => this.polyps = polyps);
+        this.explorationsService.getPolyps(this.video.exploration).subscribe(polyps => this.polyps = polyps);
         this.polypRecordingsService.getPolypRecordings(video.id).subscribe(polypRecordings => {
           this.video.polypRecording = polypRecordings;
           polypRecordings.map(polypRecording =>
@@ -82,7 +82,7 @@ export class VideoEditorComponent implements OnInit {
   }
 
   addPolyp() {
-    this.explorationsService.getExploration(this.video.exploration_id).subscribe(exploration => {
+    this.explorationsService.getExploration(this.video.exploration).subscribe(exploration => {
       this.newPolyp.exploration = exploration;
       this.polysService.createPolyp(this.newPolyp).subscribe(polyp => {
         this.polyps.push(polyp);

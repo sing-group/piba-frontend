@@ -63,15 +63,18 @@
                     </div>
                     <div class="form-group">
                       <label for="video-title">Title</label>
-                      <input type="text" id="video-title" size="50" readonly value="{{video.title}}" />
+                      <input type="text" id="video-title" class="title-{{video.id}}" size="50" [readonly]="isReadonly ? true : null" value="{{video.title}}" />
                     </div>
                     <div class="form-group">
-                      <label for="video-observation">Observation</label>
-                      <textarea type="text" id="video-observation" rows="4" readonly value="{{video.observations}}"></textarea>
+                      <label for="video-observations">Observation</label>
+                      <textarea type="text" id="video-observations"  class="observations-{{video.id}}" rows="4" [readonly]="isReadonly ? true : null" value="{{video.observations}}"></textarea>
                     </div>
                   </section>
-                  <button type="button" class="btn btn-secondary">
+                  <button type="button" class="btn btn-secondary" *ngIf="isReadonly" (click)="isReadonly=false">
                     <clr-icon shape="note"></clr-icon> Edit information
+                  </button>
+                  <button type="button" class="btn btn-primary" *ngIf="!isReadonly" (click)="editVideo(video)">
+                    <clr-icon shape="cog"></clr-icon> Save information
                   </button>
                   <button type="button" class="btn btn-secondary" routerLink="/video/{{video.id}}">
                     <clr-icon shape="video-gallery"></clr-icon> Edit video
