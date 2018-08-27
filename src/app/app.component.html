@@ -17,15 +17,7 @@
         <nav class="sidenav" [clr-nav-level]="1">
             <section class="sidenav-content">
                 <a class="nav-link active" routerLink="/explorations" routerLinkActive="active">Explorations</a>
-                
-                <section class="nav-group">
-                    <input id="nav-patients" type="checkbox"/>
-                    <label for="nav-patients">Patients</label>
-                    <ul class="nav-list">
-                        <a class="nav-link" routerLink="/patients" routerLinkActive="active">List patients</a>
-                        <a class="nav-link" routerLink="/patients" routerLinkActive="active">+ New patient</a>
-                    </ul>
-                </section>
+                <a class="nav-link" routerLink="/patients" routerLinkActive="active">Patients</a>
             </section>
         </nav>
     </div>
