@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import Polyp, { WASP, NICE, LST, PARIS } from '../../models/Polyp';
 import { PolypsService } from '../../services/polyps.service';
 import Exploration from '../../models/Exploration';
+import { EnumUtils } from '../../utils/enum.utils';
 
 @Component({
   selector: 'app-polyp',
@@ -32,10 +33,11 @@ export class PolypComponent implements OnInit {
   constructor(private polypsService: PolypsService) { }
 
   ngOnInit() {
-    this.WASPValues = this.enumValues(WASP);
-    this.NICEValues = this.enumValues(NICE);
-    this.LSTValues = this.enumValues(LST);
-    this.PARISValues = this.enumValues(PARIS);
+    let enumUtils = new EnumUtils();
+    this.WASPValues = enumUtils.enumValues(WASP);
+    this.NICEValues = enumUtils.enumValues(NICE);
+    this.LSTValues = enumUtils.enumValues(LST);
+    this.PARISValues = enumUtils.enumValues(PARIS);
   }
 
   private enumValues<T>(enumType: any): T[] {

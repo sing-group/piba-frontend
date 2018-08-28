@@ -1,3 +1,39 @@
-<p>
-  Patient works!
-</p>
+<div class="btn-group" style="text-align: right">
+  <button type="button" class="btn btn-icon btn-link" (click)="creatingPatient = true">
+    <clr-icon shape="plus"></clr-icon> Add
+  </button>
+</div>
+
+<form ngNativeValidate #patientForm="ngForm" (submit)="save()">
+  <clr-modal [(clrModalOpen)]="creatingPatient" [clrModalClosable]="false">
+    <h3 class="modal-title">Add Patient</h3>
+    <div class="modal-body">
+
+      <section class="form-block">
+        <div class="form-group">
+          <label for="patient-form-patientID" class="required">ID Patient</label>
+          <input type="text" id="patient-form-patientID" name="patientID" [(ngModel)]="newPatient.patientID" required #patientID="ngModel"
+          />
+        </div>
+        <div class="form-group">
+          <label for="patient-form-sex" class="required">Sex</label>
+          <div class="select">
+            <select id="patient-form-sex" [(ngModel)]="newPatient.sex" name="sex" required #sexPatient="ngModel">
+              <option *ngFor="let s of SEXValues" [ngValue]="s">{{s}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="patient-form-birthdate" class="required">Birthdate</label>
+          <input type="date" id="patient-form-birthdate" name="birthdate" [(ngModel)]="newPatient.birthdate" clrDate required readonly
+            #birthdatePatient="ngModel" />
+        </div>
+      </section>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
+      <button type="submit" class="btn btn-primary" [disabled]="patientID.invalid || sexPatient.invalid || birthdatePatient.invalid">Ok</button>
+    </div>
+  </clr-modal>
+</form>

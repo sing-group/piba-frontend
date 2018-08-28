@@ -19,6 +19,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ExplorationsComponent } from './components/explorations/explorations.component';
 import { PolypComponent } from './components/polyp/polyp.component';
 import { PolypRecordingsService } from './services/polyprecordings.service';
+import { PatientsService } from './services/patients.service';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { PolypRecordingsService } from './services/polyprecordings.service';
     VideosService,
     TimePipe,
     ExplorationsService,
-    PolypRecordingsService
+    PolypRecordingsService,
+    PatientsService
   ],
   bootstrap: [AppComponent]
 })

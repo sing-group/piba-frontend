@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import Polyp, { WASP, NICE, LST, PARIS } from '../models/Polyp';
 import { environment } from '../../environments/environment';
 import PolypInfo from './entities/PolypInfo';
+import { EnumUtils } from '../utils/enum.utils';
 
 @Injectable()
 export class PolypsService {
@@ -27,26 +28,21 @@ export class PolypsService {
   }
 
   private toPolypInfo(polyp: Polyp): PolypInfo {
+    let enumUtils = new EnumUtils;
     return {
       id: polyp.id,
       name: polyp.name,
       size: polyp.size,
       location: polyp.location,
-      wasp: this.findKeyForValue(WASP, polyp.wasp),
-      nice: this.findKeyForValue(NICE, polyp.nice),
-      lst: this.findKeyForValue(LST, polyp.lst),
-      paris: this.findKeyForValue(PARIS, polyp.paris),
+      wasp: enumUtils.findKeyForValue(WASP, polyp.wasp),
+      nice: enumUtils.findKeyForValue(NICE, polyp.nice),
+      lst: enumUtils.findKeyForValue(LST, polyp.lst),
+      paris: enumUtils.findKeyForValue(PARIS, polyp.paris),
       histology: polyp.histology,
       exploration: polyp.exploration.id
     }
   }
 
-  private findKeyForValue(enumType: any, value: string): string {
-    return this.enumKeys(enumType).find((key: string) => enumType[key] == value);
-  }
-  private enumKeys<T>(enumType: any): string[] {
-    return <string[]>(<any>Object.keys(enumType));
-  }
   createPolyp(polyp: Polyp): Observable<Polyp> {
     let polypInfo: PolypInfo = this.toPolypInfo(polyp);
 
