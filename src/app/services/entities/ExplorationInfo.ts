@@ -6,4 +6,5 @@ export default interface ExplorationInfo {
     location: string;
     videos?: IdAndUri[];
     polyps?: IdAndUri[];
+    patient: string | IdAndUri;
 }

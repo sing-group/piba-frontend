@@ -61,12 +61,23 @@
           <input type="text" id="exploration-form-location" name="location" [(ngModel)]="location" required pattern="[a-zA-Z0-9]*"
             title="Must be a alphanumeric" #locationExploration="ngModel" />
         </div>
+        <div class="form-group" *ngIf="creatingExploration">
+          <label for="exploration-form-patientToSearch" class="required">ID Patient</label>
+          <div class="autocomplete">
+            <input type="text" (keyup)="filterPatient()" name="patientIdStartsWith" [(ngModel)]="patientIdStartsWith" autocomplete="off"
+            />
+            <div *ngIf="!selectedPatientId" class="autocomplete-items">
+              <input class="inputAutocomplete" value="{{patient.patientID}}" *ngFor="let patient of patientsFound" (click)="selectedPatient(patient)"
+              />
+            </div>
+          </div>
+        </div>
       </section>
 
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
-      <button type="submit" class="btn btn-primary" [disabled]="dateExploration.invalid || locationExploration.invalid">Ok</button>
+      <button type="submit" class="btn btn-primary" [disabled]="dateExploration.invalid || locationExploration.invalid || (!patientIdAreCorrect() && creatingExploration) ">Ok</button>
     </div>
   </clr-modal>
 </form>

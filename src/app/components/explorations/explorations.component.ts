@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ClrDatagridComparatorInterface } from "@clr/angular";
 import { ExplorationsService } from '../../services/explorations.service';
 import Exploration from '../../models/Exploration';
+import Patient from '../../models/Patient';
+import { PatientsService } from '../../services/patients.service';
 
 @Component({
   selector: 'app-explorations',
@@ -18,11 +20,16 @@ export class ExplorationsComponent implements OnInit {
   location: string;
   newExploration: Exploration;
   exploration: Exploration = new Exploration();
-  
+
+  patientsFound: Patient[];
+  patientIdStartsWith: string;
+  patient: Patient = new Patient();
+  selectedPatientId: Boolean = false;
+
   //needed to sort by date in the explorations table
   private explorationComparator = new ExplorationComparator();
 
-  constructor(private explorationsService: ExplorationsService) { }
+  constructor(private explorationsService: ExplorationsService, private patientsService: PatientsService) { }
 
   ngOnInit() {
     this.explorationsService.getExplorations().subscribe(explorations => this.explorations = explorations);
@@ -43,11 +50,13 @@ export class ExplorationsComponent implements OnInit {
         date: new Date(this.date),
         location: this.location,
         videos: [],
-        polyps: []
+        polyps: [],
+        patient: this.patient
       }
       this.explorationsService.createExploration(this.newExploration)
         .subscribe(newExploration => this.explorations = this.explorations.concat(newExploration));
     } else {
+
       this.exploration.location = this.location;
       this.exploration.date = new Date(this.date);
       this.explorationsService.editExploration(this.exploration).subscribe(updatedExploration => {
@@ -62,6 +71,8 @@ export class ExplorationsComponent implements OnInit {
     this.location = null;
     this.creatingExploration = false;
     this.editingExploration = false;
+    this.patientsFound = null;
+    this.patientIdStartsWith = null;
   }
 
   delete(id: string) {
@@ -73,6 +84,28 @@ export class ExplorationsComponent implements OnInit {
       this.explorations.splice(index, 1);
     }
     );
+  }
+
+  filterPatient() {
+    if (this.patientIdStartsWith.length > 3) {
+      this.patientsService.searchPatientsBy(this.patientIdStartsWith).subscribe(patients => this.patientsFound = patients);
+      this.selectedPatientId = false;
+    } else {
+      this.patientsFound = null;
+    }
+  }
+
+  selectedPatient(patient: Patient) {
+    this.patient = patient;
+    this.patientIdStartsWith = this.patient.patientID;
+    this.selectedPatientId = true;
+  }
+
+  public patientIdAreCorrect(): Boolean {
+    if (this.patientsFound != null && this.patientsFound.includes(this.patient)) {
+      return true;
+    }
+    return false;
   }
 
 }

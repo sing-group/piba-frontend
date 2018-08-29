@@ -12,6 +12,9 @@ import { forkJoin } from 'rxjs/observable/forkJoin';
 import { concatMap } from 'rxjs/operators';
 import { VideosService } from './videos.service';
 import { PolypsService } from './polyps.service';
+import { PatientsService } from './patients.service';
+import IdAndUri from './entities/IdAndUri';
+import Patient from '../models/Patient';
 
 @Injectable()
 export class ExplorationsService {
@@ -19,7 +22,8 @@ export class ExplorationsService {
   constructor(
     private http: HttpClient,
     private videosService: VideosService,
-    private polypsService: PolypsService
+    private polypsService: PolypsService,
+    private patientsService: PatientsService
   ) { }
 
   getExploration(uuid: string): Observable<Exploration> {
@@ -37,41 +41,52 @@ export class ExplorationsService {
               explorationInfo.polyps.map(
                 idAndUri => this.polypsService.getPolyp(idAndUri.id)
               )
-            )
+            ),
+          this.patientsService.getPatient((<IdAndUri>explorationInfo.patient).id)
         )
-      }, (explorationInfo, videosAndPolyps) => {
-        return this.mapExplorationInfo(explorationInfo, videosAndPolyps[0], videosAndPolyps[1]);
+      }, (explorationInfo, videosAndPolypsAndPatient) => {
+        return this.mapExplorationInfo(explorationInfo, videosAndPolypsAndPatient[0], videosAndPolypsAndPatient[1], videosAndPolypsAndPatient[2]);
       }
       )
     );
   }
 
   getExplorations(): Observable<Exploration[]> {
-    return this.http.get<ExplorationInfo[]>(`${environment.restApi}/exploration/`)
-      .map(explorationsInfo => explorationsInfo.map(this.mapOnlyExplorationInfo.bind(this)));
+    return this.http.get<ExplorationInfo[]>(`${environment.restApi}/exploration/`).pipe(
+      concatMap((explorationInfos) =>
+        forkJoin(explorationInfos.map((explorationInfo) => this.patientsService.getPatient((<IdAndUri>explorationInfo.patient).id)))
+        ,
+        (explorationInfos, patients) =>
+          explorationInfos.map((explorationInfo, index) =>
+            this.mapOnlyExplorationInfo(explorationInfo, patients[index])
+          )
+      ));
   }
 
-  private mapExplorationInfo(explorationInfo: ExplorationInfo, videos: Video[], polyps: Polyp[]): Exploration {
+  private mapExplorationInfo(explorationInfo: ExplorationInfo, videos: Video[], polyps: Polyp[], patient: Patient): Exploration {
     return {
       id: explorationInfo.id,
       date: explorationInfo.date,
       location: explorationInfo.location,
       videos: videos,
-      polyps: polyps
+      polyps: polyps,
+      patient: patient
     };
   }
 
-  private mapOnlyExplorationInfo(explorationInfo: ExplorationInfo): Exploration {
-    return this.mapExplorationInfo(explorationInfo, [], []);
+  private mapOnlyExplorationInfo(explorationInfo: ExplorationInfo, patient: Patient): Exploration {
+    return this.mapExplorationInfo(explorationInfo, [], [], patient);
   }
 
   private toExplorationInfo(exploration: Exploration): ExplorationInfo {
     return {
       id: exploration.id,
       date: exploration.date,
-      location: exploration.location
+      location: exploration.location,
+      patient: exploration.patient.id
     }
   }
+
   createExploration(exploration: Exploration): Observable<Exploration> {
     let explorationInfo = this.toExplorationInfo(exploration);
     return this.http.post<ExplorationInfo>(`${environment.restApi}/exploration`, explorationInfo).map(this.mapOnlyExplorationInfo.bind(this));
