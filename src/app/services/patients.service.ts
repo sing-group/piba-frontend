@@ -25,8 +25,7 @@ export class PatientsService {
       id: patient.id,
       patientID: patient.patientID,
       sex: enumUtils.findKeyForValue(SEX, patient.sex),
-      birthdate: new Date(patient.birthdate),
-      explorations: null
+      birthdate: new Date(patient.birthdate)
     }
   }
 
@@ -35,8 +34,7 @@ export class PatientsService {
       id: patientInfo.id,
       patientID: patientInfo.patientID,
       sex: SEX[patientInfo.sex],
-      birthdate: patientInfo.birthdate,
-      explorations: null
+      birthdate: patientInfo.birthdate
     }
   }
 }

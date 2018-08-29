@@ -5,5 +5,4 @@ export default interface PatientInfo {
     patientID: string;
     sex: string;
     birthdate: Date;
-    explorations: IdAndUri[];
 }

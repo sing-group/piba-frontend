@@ -5,7 +5,6 @@ export default class Patient {
     patientID: string;
     sex: SEX;
     birthdate: Date;
-    explorations: Exploration[];
 }
 
 export enum SEX {
