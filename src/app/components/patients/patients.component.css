@@ -1,3 +1,9 @@
 :host /deep/ .modal-body{
     overflow: visible !important;
 }
+.btn-sm{
+    margin-top: .25rem !important;
+}
+.btn-cell-datagrid{
+    padding: 0%;
+}

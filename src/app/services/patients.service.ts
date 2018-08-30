@@ -23,6 +23,10 @@ export class PatientsService {
     return this.http.get<PatientInfo>(`${environment.restApi}/patient/${id}`).map(this.mapPatientInfo.bind(this));
   }
 
+  getPatientID(patientID: String): Observable<Patient> {
+    return this.http.get<PatientInfo>(`${environment.restApi}/patient/patientID/${patientID}`).map(this.mapPatientInfo.bind(this));
+  }
+
   private toPatientInfo(patient: Patient): PatientInfo {
     let enumUtils = new EnumUtils;
     return {

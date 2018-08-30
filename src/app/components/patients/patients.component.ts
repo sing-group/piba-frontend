@@ -18,6 +18,10 @@ export class PatientsComponent implements OnInit {
   SEX = SEX;
   SEXValues: SEX[];
 
+  patientIDText: String;
+  patient: Patient;
+  error: String;
+
   constructor(private patientsService: PatientsService) { }
 
   ngOnInit() {
@@ -35,6 +39,13 @@ export class PatientsComponent implements OnInit {
   cancel() {
     this.newPatient = new Patient();
     this.creatingPatient = false;
+  }
+
+  findPatientID() {
+    this.patientsService.getPatientID(this.patientIDText).subscribe(
+      patient => { this.patient = patient; this.patientIDText = null; this.error = null; },
+      error => { this.error = error.error; this.patient = null; }
+    );
   }
 
 }

@@ -37,3 +37,46 @@
     </div>
   </clr-modal>
 </form>
+
+<form ngNativeValidate #patientSearch="ngForm" (submit)="findPatientID()">
+  <section>
+    <div class="form-group">
+      <label class="required">ID Patient</label>
+      <input type="text" id="patient-form-search-patientID" name="patientIDText" [(ngModel)]="patientIDText" required #patientIDFind="ngModel">
+      <button type="submit" class="btn btn-primary btn-sm" [disabled]="patientIDFind.invalid">
+        <clr-icon shape="search"></clr-icon>
+      </button>
+    </div>
+    <clr-datagrid *ngIf="patient">
+      <clr-dg-column>ID</clr-dg-column>
+      <clr-dg-column>ID Patient</clr-dg-column>
+      <clr-dg-column>Actions</clr-dg-column>
+
+      <clr-dg-row>
+        <clr-dg-cell>{{patient.id}}</clr-dg-cell>
+        <clr-dg-cell>{{patient.patientID}}</clr-dg-cell>
+        <clr-dg-cell class="btn-cell-datagrid">
+          <div class="btn-group btn-link btn-icon">
+            <button class="btn">
+              <clr-icon shape="cog"></clr-icon>
+              <span class="clr-icon-title">Settings</span>
+            </button>
+            <button class="btn">
+              <clr-icon shape="trash"></clr-icon>
+              <span class="clr-icon-title">Delete</span>
+            </button>
+          </div>
+        </clr-dg-cell>
+      </clr-dg-row>
+
+    </clr-datagrid>
+    <div *ngIf="error" class="alert alert-danger">
+      <div class="alert-item static">
+        <div class="alert-icon-wrapper">
+          <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+        </div>
+        <span class="alert-text">{{error}}</span>
+      </div>
+    </div>
+  </section>
+</form>
