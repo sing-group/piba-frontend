@@ -28,7 +28,7 @@ export class PolypsService {
   }
 
   private toPolypInfo(polyp: Polyp): PolypInfo {
-    let enumUtils = new EnumUtils;
+    const enumUtils = new EnumUtils;
     return {
       id: polyp.id,
       name: polyp.name,
@@ -40,11 +40,11 @@ export class PolypsService {
       paris: enumUtils.findKeyForValue(PARIS, polyp.paris),
       histology: polyp.histology,
       exploration: polyp.exploration.id
-    }
+    };
   }
 
   createPolyp(polyp: Polyp): Observable<Polyp> {
-    let polypInfo: PolypInfo = this.toPolypInfo(polyp);
+    const polypInfo: PolypInfo = this.toPolypInfo(polyp);
 
     return this.http.post<PolypInfo>(`${environment.restApi}/polyp`, polypInfo).map(this.mapPolypInfo.bind(this));
   }
@@ -54,7 +54,7 @@ export class PolypsService {
   }
 
   editPolyp(polyp: Polyp): Observable<Polyp> {
-    let polypInfo: PolypInfo = this.toPolypInfo(polyp);
+    const polypInfo: PolypInfo = this.toPolypInfo(polyp);
 
     return this.http.put<PolypInfo>(`${environment.restApi}/polyp/`, polypInfo).map(this.mapPolypInfo);
   }
@@ -64,7 +64,7 @@ export class PolypsService {
       polypsInfo => polypsInfo.map(this.mapPolypInfo.bind(this)));
   }
 
-  delete(uuid:string){
+  delete(uuid: string) {
     return this.http.delete((`${environment.restApi}/polyp/` + uuid));
   }
 }

@@ -1,4 +1,4 @@
-import IdAndUri from "./IdAndUri";
+import IdAndUri from './IdAndUri';
 
 export default interface ExplorationInfo {
     id: string;

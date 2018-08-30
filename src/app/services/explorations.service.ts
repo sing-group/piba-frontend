@@ -8,6 +8,7 @@ import Polyp from '../models/Polyp';
 import ExplorationInfo from './entities/ExplorationInfo';
 import { environment } from '../../environments/environment';
 
+import 'rxjs/add/observable/of';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { concatMap } from 'rxjs/operators';
 import { VideosService } from './videos.service';
@@ -30,22 +31,25 @@ export class ExplorationsService {
     return this.http.get<ExplorationInfo>(`${environment.restApi}/exploration/${uuid}`).pipe(
       concatMap((explorationInfo) => {
         return forkJoin(
-          explorationInfo.videos.length == 0 ? Observable.of([]) :
+          explorationInfo.videos.length === 0 ? Observable.of([]) :
             forkJoin(
 
               explorationInfo.videos.map(
                 idAndUri => this.videosService.getVideo(idAndUri.id)
               )),
-          explorationInfo.polyps.length == 0 ? Observable.of([]) :
+          explorationInfo.polyps.length === 0 ? Observable.of([]) :
             forkJoin(
               explorationInfo.polyps.map(
                 idAndUri => this.polypsService.getPolyp(idAndUri.id)
               )
             ),
           this.patientsService.getPatient((<IdAndUri>explorationInfo.patient).id)
-        )
+        );
       }, (explorationInfo, videosAndPolypsAndPatient) => {
-        return this.mapExplorationInfo(explorationInfo, videosAndPolypsAndPatient[0], videosAndPolypsAndPatient[1], videosAndPolypsAndPatient[2]);
+        return this.mapExplorationInfo(explorationInfo,
+          videosAndPolypsAndPatient[0],
+          videosAndPolypsAndPatient[1],
+          videosAndPolypsAndPatient[2]);
       }
       )
     );
@@ -84,17 +88,19 @@ export class ExplorationsService {
       date: exploration.date,
       location: exploration.location,
       patient: exploration.patient.id
-    }
+    };
   }
 
   createExploration(exploration: Exploration): Observable<Exploration> {
-    let explorationInfo = this.toExplorationInfo(exploration);
-    return this.http.post<ExplorationInfo>(`${environment.restApi}/exploration`, explorationInfo).map(this.mapOnlyExplorationInfo.bind(this));
+    const explorationInfo = this.toExplorationInfo(exploration);
+    return this.http.post<ExplorationInfo>(`${environment.restApi}/exploration`, explorationInfo)
+      .map(this.mapOnlyExplorationInfo.bind(this));
   }
 
   editExploration(exploration: Exploration): Observable<Exploration> {
-    let explorationInfo = this.toExplorationInfo(exploration);
-    return this.http.put<ExplorationInfo>(`${environment.restApi}/exploration`, explorationInfo).map(this.mapOnlyExplorationInfo.bind(this));
+    const explorationInfo = this.toExplorationInfo(exploration);
+    return this.http.put<ExplorationInfo>(`${environment.restApi}/exploration`, explorationInfo)
+      .map(this.mapOnlyExplorationInfo.bind(this));
   }
 
   getPolyps(uuid: string): Observable<Polyp[]> {

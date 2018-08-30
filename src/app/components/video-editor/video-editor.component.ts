@@ -57,7 +57,7 @@ export class VideoEditorComponent implements OnInit {
   }
 
   startPolyp() {
-    if (this.currentTime == undefined) {
+    if (this.currentTime === undefined) {
       this.start = this.timePipe.transform(0);
     } else {
       this.start = this.timePipe.transform(this.currentTime);
@@ -65,7 +65,7 @@ export class VideoEditorComponent implements OnInit {
   }
 
   endPolyp() {
-    if (this.currentTime == undefined) {
+    if (this.currentTime === undefined) {
       this.end = this.timePipe.transform(0);
     } else {
       this.end = this.timePipe.transform(this.currentTime);
@@ -77,7 +77,7 @@ export class VideoEditorComponent implements OnInit {
   }
 
   public timesAreCorrect(): Boolean {
-    if (this.start == undefined || this.end == undefined) return true;
+    if (this.start === undefined || this.end === undefined) { return true; }
     return (this.timeToNumber(this.start) < this.timeToNumber(this.end));
   }
 
@@ -98,7 +98,7 @@ export class VideoEditorComponent implements OnInit {
       polyp: this.selectedPolyp,
       start: this.timeToNumber(this.start),
       end: this.timeToNumber(this.end)
-    }
+    };
     this.polypRecordingsService.createPolypRecording(this.newPolypRecording)
       .subscribe(
         newPolypRecording => {
@@ -113,15 +113,15 @@ export class VideoEditorComponent implements OnInit {
   }
 
   private timeToNumber(time: String): number {
-    let split = time.split(':');
-    let minutes = split[0];
-    let seconds = split[1];
-    return (parseInt(minutes) * 60 + parseInt(seconds));
+    const split = time.split(':');
+    const minutes = split[0];
+    const seconds = split[1];
+    return (parseInt(minutes, 10) * 60 + parseInt(seconds, 10));
   }
 
   private deleteSelectedPolyp(namePolyp: string) {
-    let polypRemove = this.polyps.indexOf(
-      this.polyps.find((polyp) => polyp.name == namePolyp)
+    const polypRemove = this.polyps.indexOf(
+      this.polyps.find((polyp) => polyp.name === namePolyp)
     );
     if (polypRemove > -1) {
       this.polyps.splice(polypRemove, 1);
@@ -131,7 +131,9 @@ export class VideoEditorComponent implements OnInit {
   removePolypRecording(polypRecording: PolypRecording) {
     this.polypRecordingsService.removePolypRecording(polypRecording).subscribe(() => {
       this.polyps.push(polypRecording.polyp);
-      let index = this.video.polypRecording.indexOf(this.video.polypRecording.find((polypRecordingFind) => polypRecordingFind == polypRecording));
+      const index = this.video.polypRecording.indexOf(
+        this.video.polypRecording.find(
+          (polypRecordingFind) => polypRecordingFind === polypRecording));
       this.video.polypRecording.splice(index, 1);
     }
     );

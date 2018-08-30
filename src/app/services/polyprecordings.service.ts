@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 import PolypRecording from '../models/PolypRecording';
 import PolypRecordingInfo from './entities/PolypRecordingInfo';
 import { environment } from '../../environments/environment';
@@ -9,7 +9,6 @@ import { VideosService } from './videos.service';
 import Polyp from '../models/Polyp';
 import Video from '../models/Video';
 import { concatMap } from 'rxjs/operators';
-import { map } from 'rxjs/operators';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import PolypRecordingEditionInfo from './entities/PolypRecordingEditionInfo';
 
@@ -45,19 +44,19 @@ export class PolypRecordingsService {
       polyp: polyp,
       start: polypRecordingInfo.start,
       end: polypRecordingInfo.end
-    }
+    };
   }
 
   createPolypRecording(polypRecording: PolypRecording): Observable<PolypRecording> {
-    let polypRecordingEditionInfo = this.toPolypRecordingEditionInfo(polypRecording);
+    const polypRecordingEditionInfo = this.toPolypRecordingEditionInfo(polypRecording);
 
     return this.http.post<PolypRecordingInfo>(`${environment.restApi}/polyprecording`, polypRecordingEditionInfo).pipe(
       concatMap((polypRecordingInfo) =>
-          forkJoin(
-            this.videosService.getVideo(polypRecordingInfo.video.id),
-            this.polypsService.getPolyp(polypRecordingInfo.polyp.id))
+        forkJoin(
+          this.videosService.getVideo(polypRecordingInfo.video.id),
+          this.polypsService.getPolyp(polypRecordingInfo.polyp.id))
         , (polypRecordingInfo, videoAndPolyp) =>
-            this.mapPolypRecordingInfo(polypRecordingInfo, videoAndPolyp[0], videoAndPolyp[1])
+          this.mapPolypRecordingInfo(polypRecordingInfo, videoAndPolyp[0], videoAndPolyp[1])
       )
     );
   }
@@ -71,8 +70,8 @@ export class PolypRecordingsService {
     };
   }
 
-  removePolypRecording(polypRecording: PolypRecording){
-    return this.http.delete(`${environment.restApi}/polyprecording/`+ polypRecording.video.id + '/' + polypRecording.polyp.id);
+  removePolypRecording(polypRecording: PolypRecording) {
+    return this.http.delete(`${environment.restApi}/polyprecording/` + polypRecording.video.id + '/' + polypRecording.polyp.id);
   }
 
 }

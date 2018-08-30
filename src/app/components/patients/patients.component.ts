@@ -30,7 +30,7 @@ export class PatientsComponent implements OnInit {
   constructor(private patientsService: PatientsService) { }
 
   ngOnInit() {
-    let enumUtils = new EnumUtils();
+    const enumUtils = new EnumUtils();
     this.SEXValues = enumUtils.enumValues(SEX);
   }
 
@@ -41,7 +41,7 @@ export class PatientsComponent implements OnInit {
         patientID: this.patientID,
         birthdate: new Date(this.birthdate),
         sex: this.sex
-      }
+      };
       this.patientsService.createPatient(this.newPatient).subscribe(newPatient =>
         this.patients = this.patients.concat(newPatient)
       );

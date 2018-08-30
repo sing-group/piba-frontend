@@ -5,8 +5,6 @@ import Exploration from '../../models/Exploration';
 import VideoUploadInfo from '../../services/entities/VideoUploadInfo';
 import { VideosService } from '../../services/videos.service';
 import { ExplorationsService } from '../../services/explorations.service';
-import Polyp from '../../models/Polyp';
-import { Observable } from 'rxjs';
 
 interface Ambit {
   name: string;
@@ -63,8 +61,8 @@ export class ExplorationComponent implements OnInit {
   }
 
   pollProcessingVideo(processingVideo: Video) {
-    let videoPolling = this.videosService.getVideo(processingVideo.id, this.POLLING_INTERVAL).subscribe((video) => {
-      this.exploration.videos.filter((currentVideo) => currentVideo.id == video.id).forEach((currentVideo) => {
+    const videoPolling = this.videosService.getVideo(processingVideo.id, this.POLLING_INTERVAL).subscribe((video) => {
+      this.exploration.videos.filter((currentVideo) => currentVideo.id === video.id).forEach((currentVideo) => {
         Object.assign(currentVideo, video);
       });
       if (!video.isProcessing) {
@@ -88,10 +86,10 @@ export class ExplorationComponent implements OnInit {
   }
 
   uploadVideo() {
-    let fileElement = document.getElementById("video-form-file") as HTMLInputElement;
-    let file = fileElement.files[0];
+    const fileElement = document.getElementById('video-form-file') as HTMLInputElement;
+    const file = fileElement.files[0];
     this.newVideo.exploration = this.exploration.id;
-    let videoUploadInfo = this.mapVideo(this.newVideo);
+    const videoUploadInfo = this.mapVideo(this.newVideo);
     videoUploadInfo.file = file;
     this.videosService
       .createVideo(videoUploadInfo).subscribe(video => {
@@ -110,26 +108,26 @@ export class ExplorationComponent implements OnInit {
 
   delete(id: string) {
     this.videosService.delete(id).subscribe(() => {
-      let index = this.exploration.videos.indexOf(
-        this.exploration.videos.find((video) => video.id == id
+      const index = this.exploration.videos.indexOf(
+        this.exploration.videos.find((video) => video.id === id
         )
-      )
+      );
       this.exploration.videos.splice(index, 1);
     }
     );
   }
 
   editVideo(video: Video) {
-    let title = document.getElementsByClassName("title-" + video.id) as HTMLCollectionOf<HTMLInputElement>;
-    let observations = document.getElementsByClassName("observations-" + video.id) as HTMLCollectionOf<HTMLInputElement>;;
+    const title = document.getElementsByClassName('title-' + video.id) as HTMLCollectionOf<HTMLInputElement>;
+    const observations = document.getElementsByClassName('observations-' + video.id) as HTMLCollectionOf<HTMLInputElement>;
     video.title = title[0].value;
     video.observations = observations[0].value;
 
     this.videosService.editVideo(video).subscribe(updatedVideo => {
       this.isReadonly = true;
       Object.assign(this.exploration.videos.find((v) =>
-        v.id == video.id
-      ), updatedVideo)
+        v.id === video.id
+      ), updatedVideo);
     });
   }
 
@@ -139,6 +137,6 @@ export class ExplorationComponent implements OnInit {
       observations: video.observations,
       file: null,
       exploration: video.exploration
-    }
+    };
   }
 }

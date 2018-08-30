@@ -33,15 +33,11 @@ export class PolypComponent implements OnInit {
   constructor(private polypsService: PolypsService) { }
 
   ngOnInit() {
-    let enumUtils = new EnumUtils();
+    const enumUtils = new EnumUtils();
     this.WASPValues = enumUtils.enumValues(WASP);
     this.NICEValues = enumUtils.enumValues(NICE);
     this.LSTValues = enumUtils.enumValues(LST);
     this.PARISValues = enumUtils.enumValues(PARIS);
-  }
-
-  private enumValues<T>(enumType: any): T[] {
-    return <T[]>(<any>Object.keys(enumType)).map((key: string) => enumType[key]);
   }
 
   cancel() {
@@ -57,8 +53,8 @@ export class PolypComponent implements OnInit {
     } else {
       this.polypsService.editPolyp(this.polyp).subscribe(updatedPolyp => {
         Object.assign(this.exploration.polyps.find((polyp) =>
-          polyp.id == this.polyp.id
-        ), updatedPolyp)
+          polyp.id === this.polyp.id
+        ), updatedPolyp);
       });
     }
     this.cancel();
@@ -66,15 +62,15 @@ export class PolypComponent implements OnInit {
 
   editPolyp(id: string) {
     this.editingPolyp = true;
-    this.polyp = this.exploration.polyps.find(polyp => polyp.id == id);
+    this.polyp = this.exploration.polyps.find(polyp => polyp.id === id);
   }
 
   delete(id: string) {
     this.polypsService.delete(id).subscribe(() => {
-      let index = this.exploration.polyps.indexOf(
-        this.exploration.polyps.find((polyp) => polyp.id == id
+      const index = this.exploration.polyps.indexOf(
+        this.exploration.polyps.find((polyp) => polyp.id === id
         )
-      )
+      );
       this.exploration.polyps.splice(index, 1);
     }
     );

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/Rx';
+import 'rxjs/add/observable/interval';
+import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/map';
 
 import Video from '../models/Video';
@@ -17,11 +18,11 @@ export class VideosService {
 
   getVideos(): Observable<Video[]> {
     return this.http.get<VideoInfo[]>(`${environment.restApi}/video`)
-      .map(videoInfos => videoInfos.map(this.mapVideoInfo))
+      .map(videoInfos => videoInfos.map(this.mapVideoInfo));
   }
 
   getVideo(uuid: string, pollingInterval?: number): Observable<Video> {
-    let videoRequest: Observable<Video> =
+    const videoRequest: Observable<Video> =
       this.http.get<VideoInfo>(`${environment.restApi}/video/${uuid}`)
         .map(this.mapVideoInfo);
 
@@ -33,11 +34,11 @@ export class VideosService {
   }
 
   createVideo(video: VideoUploadInfo): Observable<Video> {
-    let formData: FormData = new FormData();
-    formData.append("title", video.title);
-    formData.append("observations", video.observations);
-    formData.append("video", video.file);
-    formData.append("exploration_id", video.exploration)
+    const formData: FormData = new FormData();
+    formData.append('title', video.title);
+    formData.append('observations', video.observations);
+    formData.append('video', video.file);
+    formData.append('exploration_id', video.exploration);
     return this.http.post<VideoInfo>(`${environment.restApi}/video`, formData).map(this.mapVideoInfo);
   }
 
@@ -46,7 +47,7 @@ export class VideosService {
   }
 
   editVideo(video: Video): Observable<Video> {
-    let videoInfo: VideoInfo = this.toVideoInfo(video);
+    const videoInfo: VideoInfo = this.toVideoInfo(video);
 
     return this.http.put<VideoInfo>(`${environment.restApi}/video`, videoInfo).map(this.mapVideoInfo);
   }
@@ -77,6 +78,6 @@ export class VideosService {
       })),
       processing: video.isProcessing,
       exploration: video.exploration
-    }
+    };
   }
 }

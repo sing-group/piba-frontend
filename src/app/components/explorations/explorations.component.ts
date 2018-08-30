@@ -1,15 +1,22 @@
 import { Component, OnInit } from '@angular/core';
-import { ClrDatagridComparatorInterface } from "@clr/angular";
+import { ClrDatagridComparatorInterface } from '@clr/angular';
 import { ExplorationsService } from '../../services/explorations.service';
 import Exploration from '../../models/Exploration';
 import Patient from '../../models/Patient';
 import { PatientsService } from '../../services/patients.service';
+
+class ExplorationComparator implements ClrDatagridComparatorInterface<Exploration> {
+  compare(exploration1: Exploration, exploration2: Exploration) {
+    return new Date(exploration1.date).getTime() - new Date(exploration2.date).getTime();
+  }
+}
 
 @Component({
   selector: 'app-explorations',
   templateUrl: './explorations.component.html',
   styleUrls: ['./explorations.component.css']
 })
+
 export class ExplorationsComponent implements OnInit {
 
   explorations: Exploration[];
@@ -26,7 +33,7 @@ export class ExplorationsComponent implements OnInit {
   patient: Patient = new Patient();
   selectedPatientId: Boolean = false;
 
-  //needed to sort by date in the explorations table
+  // needed to sort by date in the explorations table
   private explorationComparator = new ExplorationComparator();
 
   constructor(private explorationsService: ExplorationsService, private patientsService: PatientsService) { }
@@ -36,7 +43,7 @@ export class ExplorationsComponent implements OnInit {
   }
 
   edit(id: string) {
-    this.exploration = this.explorations.find((exploration) => exploration.id == id);
+    this.exploration = this.explorations.find((exploration) => exploration.id === id);
     this.date = new Date(this.exploration.date).toLocaleDateString();
     this.location = this.exploration.location;
     this.editingExploration = true;
@@ -52,7 +59,7 @@ export class ExplorationsComponent implements OnInit {
         videos: [],
         polyps: [],
         patient: this.patient
-      }
+      };
       this.explorationsService.createExploration(this.newExploration)
         .subscribe(newExploration => this.explorations = this.explorations.concat(newExploration));
     } else {
@@ -60,7 +67,7 @@ export class ExplorationsComponent implements OnInit {
       this.exploration.location = this.location;
       this.exploration.date = new Date(this.date);
       this.explorationsService.editExploration(this.exploration).subscribe(updatedExploration => {
-        Object.assign(this.explorations.find((exploration) => exploration.id == this.exploration.id), updatedExploration);
+        Object.assign(this.explorations.find((exploration) => exploration.id === this.exploration.id), updatedExploration);
       });
     }
     this.cancel();
@@ -77,10 +84,10 @@ export class ExplorationsComponent implements OnInit {
 
   delete(id: string) {
     this.explorationsService.delete(id).subscribe(() => {
-      let index = this.explorations.indexOf(
-        this.explorations.find((exploration) => exploration.id == id
+      const index = this.explorations.indexOf(
+        this.explorations.find((exploration) => exploration.id === id
         )
-      )
+      );
       this.explorations.splice(index, 1);
     }
     );
@@ -110,8 +117,3 @@ export class ExplorationsComponent implements OnInit {
 
 }
 
-class ExplorationComparator implements ClrDatagridComparatorInterface<Exploration>{
-  compare(exploration1: Exploration, exploration2: Exploration) {
-    return new Date(exploration1.date).getTime() - new Date(exploration2.date).getTime();
-  }
-}

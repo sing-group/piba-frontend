@@ -1,5 +1,3 @@
-import Exploration from "./Exploration";
-
 export default class Patient {
     id: string;
     patientID: string;
