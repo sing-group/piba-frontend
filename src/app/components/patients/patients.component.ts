@@ -80,4 +80,8 @@ export class PatientsComponent implements OnInit {
     this.patientID = this.patient.patientID;
   }
 
+  delete() {
+    this.patientsService.deletePatient(this.patient.id).subscribe(() => this.patient = null);
+  }
+
 }

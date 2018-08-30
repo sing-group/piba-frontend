@@ -52,10 +52,14 @@ export class PatientsService {
     return this.http.get<PatientInfo[]>(`${environment.restApi}/patient`, { params }).map(patientsInfo => patientsInfo.map(this.mapPatientInfo));
   }
 
-  editPatient(patient: Patient): Observable<Patient>{
+  editPatient(patient: Patient): Observable<Patient> {
     let patientInfo = this.toPatientInfo(patient);
 
     return this.http.put<PatientInfo>(`${environment.restApi}/patient`, patientInfo).map(this.mapPatientInfo.bind(this));
+  }
+
+  deletePatient(id: string) {
+    return this.http.delete(`${environment.restApi}/patient/${id}`);
   }
 }
 
