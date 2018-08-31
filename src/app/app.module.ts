@@ -20,6 +20,7 @@ import { ExplorationsComponent } from './components/explorations/explorations.co
 import { PolypComponent } from './components/polyp/polyp.component';
 import { PolypRecordingsService } from './services/polyprecordings.service';
 import { PatientsService } from './services/patients.service';
+import { IdSpacesService } from './services/idspaces.service';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import { PatientsService } from './services/patients.service';
     TimePipe,
     ExplorationsService,
     PolypRecordingsService,
-    PatientsService
+    PatientsService,
+    IdSpacesService
   ],
   bootstrap: [AppComponent]
 })
