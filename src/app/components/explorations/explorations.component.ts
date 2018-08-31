@@ -19,7 +19,7 @@ class ExplorationComparator implements ClrDatagridComparatorInterface<Exploratio
 
 export class ExplorationsComponent implements OnInit {
 
-  explorations: Exploration[];
+  explorations: Exploration[] = [];
 
   editingExploration: Boolean;
   creatingExploration: Boolean;
