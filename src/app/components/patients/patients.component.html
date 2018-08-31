@@ -25,17 +25,26 @@
           </div>
         </div>
         <div class="form-group">
+          <label for="patient-form-idspace" class="required">ID Space</label>
+          <div class="select">
+            <select id="patient-form-idspace" [(ngModel)]="idSpace" name="idSpace" required #idSpacePatient="ngModel">
+              <option *ngFor="let i of idSpaces" [ngValue]="i">{{i.name}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
           <label for="patient-form-birthdate" class="required">Birthdate</label>
-          <input type="date" id="patient-form-birthdate" name="birthdate" [(ngModel)]="birthdate" clrDate required readonly
-            #birthdatePatient="ngModel" />
+          <input type="date" id="patient-form-birthdate" name="birthdate" [(ngModel)]="birthdate" clrDate required readonly #birthdatePatient="ngModel"
+          />
         </div>
       </section>
 
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
-      <button type="submit" class="btn btn-primary" [disabled]="patientIDPatient.invalid || sexPatient.invalid || birthdatePatient.invalid">Ok</button>
+      <button type="submit" class="btn btn-primary" [disabled]="patientIDPatient.invalid || sexPatient.invalid || birthdatePatient.invalid || idSpacePatient.invalid">Ok</button>
     </div>
+
   </clr-modal>
 </form>
 
@@ -51,11 +60,13 @@
     <clr-datagrid *ngIf="patient">
       <clr-dg-column>ID</clr-dg-column>
       <clr-dg-column>ID Patient</clr-dg-column>
+      <clr-dg-column>ID Space</clr-dg-column>
       <clr-dg-column>Actions</clr-dg-column>
 
       <clr-dg-row>
         <clr-dg-cell>{{patient.id}}</clr-dg-cell>
         <clr-dg-cell>{{patient.patientID}}</clr-dg-cell>
+        <clr-dg-cell>{{patient.idSpace.name}}</clr-dg-cell>
         <clr-dg-cell class="btn-cell-datagrid">
           <div class="btn-group btn-link btn-icon">
             <button class="btn" (click)="edit()">

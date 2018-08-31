@@ -7,43 +7,27 @@ import PatientInfo from './entities/PatientInfo';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { EnumUtils } from '../utils/enum.utils';
+import { concatMap } from 'rxjs/operators';
+import { IdSpacesService } from './idspaces.service';
+import IdAndUri from './entities/IdAndUri';
 
 @Injectable()
 export class PatientsService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private idSpacesService: IdSpacesService) { }
 
   createPatient(patient: Patient): Observable<Patient> {
     const patientInfo = this.toPatientInfo(patient);
 
-    return this.http.post<PatientInfo>(`${environment.restApi}/patient`, patientInfo).map(this.mapPatientInfo.bind(this));
+    return this.withIdSpace(this.http.post<PatientInfo>(`${environment.restApi}/patient`, patientInfo));
   }
 
   getPatient(id: String): Observable<Patient> {
-    return this.http.get<PatientInfo>(`${environment.restApi}/patient/${id}`).map(this.mapPatientInfo.bind(this));
+    return this.withIdSpace(this.http.get<PatientInfo>(`${environment.restApi}/patient/${id}`));
   }
 
   getPatientID(patientID: String): Observable<Patient> {
-    return this.http.get<PatientInfo>(`${environment.restApi}/patient/patientID/${patientID}`).map(this.mapPatientInfo.bind(this));
-  }
-
-  private toPatientInfo(patient: Patient): PatientInfo {
-    const enumUtils = new EnumUtils;
-    return {
-      id: patient.id,
-      patientID: patient.patientID,
-      sex: enumUtils.findKeyForValue(SEX, patient.sex),
-      birthdate: new Date(patient.birthdate)
-    };
-  }
-
-  private mapPatientInfo(patientInfo: PatientInfo): Patient {
-    return {
-      id: patientInfo.id,
-      patientID: patientInfo.patientID,
-      sex: SEX[patientInfo.sex],
-      birthdate: patientInfo.birthdate
-    };
+    return this.withIdSpace(this.http.get<PatientInfo>(`${environment.restApi}/patient/patientID/${patientID}`));
   }
 
   searchPatientsBy(patientIdStartsWith: string): Observable<Patient[]> {
@@ -56,11 +40,42 @@ export class PatientsService {
   editPatient(patient: Patient): Observable<Patient> {
     const patientInfo = this.toPatientInfo(patient);
 
-    return this.http.put<PatientInfo>(`${environment.restApi}/patient`, patientInfo).map(this.mapPatientInfo.bind(this));
+    return this.withIdSpace(this.http.put<PatientInfo>(`${environment.restApi}/patient`, patientInfo));
   }
 
   deletePatient(id: string) {
     return this.http.delete(`${environment.restApi}/patient/${id}`);
+  }
+
+  private toPatientInfo(patient: Patient): PatientInfo {
+    const enumUtils = new EnumUtils;
+    return {
+      id: patient.id,
+      patientID: patient.patientID,
+      sex: enumUtils.findKeyForValue(SEX, patient.sex),
+      birthdate: new Date(patient.birthdate),
+      idSpace: patient.idSpace.id
+    };
+  }
+
+  private mapPatientInfo(patientInfo: PatientInfo): Patient {
+    return {
+      id: patientInfo.id,
+      patientID: patientInfo.patientID,
+      sex: SEX[patientInfo.sex],
+      birthdate: patientInfo.birthdate,
+      idSpace: null
+    };
+  }
+
+  private withIdSpace(patientInfoObservable: Observable<PatientInfo>): Observable<Patient> {
+    return patientInfoObservable.pipe(concatMap((patientInfo) => this.idSpacesService.getIdSpace((<IdAndUri>patientInfo.idSpace).id),
+      (patientInfo, idspace) => {
+        const patient = this.mapPatientInfo(patientInfo);
+        patient.idSpace = idspace;
+        return patient;
+      }
+    ));
   }
 }
 
