@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { VideoEditorComponent } from './video-editor.component';
+import {VideoEditorComponent} from './video-editor.component';
 
 describe('VideoEditorComponent', () => {
   let component: VideoEditorComponent;

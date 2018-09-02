@@ -1,6 +1,6 @@
-import { TestBed, inject } from '@angular/core/testing';
+import {inject, TestBed} from '@angular/core/testing';
 
-import { PolyprecordingsService } from './polyprecordings.service';
+import {PolyprecordingsService} from './polyprecordings.service';
 
 describe('PolyprecordingsService', () => {
   beforeEach(() => {

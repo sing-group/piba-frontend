@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 import Video from '../../models/Video';
 import Exploration from '../../models/Exploration';
 import VideoUploadInfo from '../../services/entities/VideoUploadInfo';
-import { VideosService } from '../../services/videos.service';
-import { ExplorationsService } from '../../services/explorations.service';
+import {VideosService} from '../../services/videos.service';
+import {ExplorationsService} from '../../services/explorations.service';
 
 interface Ambit {
   name: string;

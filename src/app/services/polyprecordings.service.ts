@@ -1,15 +1,14 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {forkJoin, Observable} from 'rxjs';
 import PolypRecording from '../models/PolypRecording';
 import PolypRecordingInfo from './entities/PolypRecordingInfo';
-import { environment } from '../../environments/environment';
-import { PolypsService } from './polyps.service';
-import { VideosService } from './videos.service';
+import {environment} from '../../environments/environment';
+import {PolypsService} from './polyps.service';
+import {VideosService} from './videos.service';
 import Polyp from '../models/Polyp';
 import Video from '../models/Video';
-import { concatMap } from 'rxjs/operators';
-import { forkJoin } from 'rxjs/observable/forkJoin';
+import {concatMap, map} from 'rxjs/operators';
 import PolypRecordingEditionInfo from './entities/PolypRecordingEditionInfo';
 
 @Injectable()
@@ -23,17 +22,20 @@ export class PolypRecordingsService {
     let params = new HttpParams();
     params = params.append('id', video_id);
 
-    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording`, { params }).pipe(
-      concatMap((polypRecordingInfos) =>
-        forkJoin(polypRecordingInfos.map(polypRecordingInfo =>
-          forkJoin(
-            this.videosService.getVideo(polypRecordingInfo.video.id),
-            this.polypsService.getPolyp(polypRecordingInfo.polyp.id))
+    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording`, { params })
+      .pipe(
+        concatMap(polypRecordingInfos =>
+          forkJoin(polypRecordingInfos.map(polypRecordingInfo =>
+            forkJoin(
+              this.videosService.getVideo(polypRecordingInfo.video.id),
+              this.polypsService.getPolyp(polypRecordingInfo.polyp.id))
 
-        ))
-        , (polypRecordingInfos, videosAndPolyps) =>
-          polypRecordingInfos.map((polypRecordingInfo, index) =>
-            this.mapPolypRecordingInfo(polypRecordingInfo, videosAndPolyps[index][0], videosAndPolyps[index][1]))
+          )).pipe(
+            map(videosAndPolyps =>
+              polypRecordingInfos.map((polypRecordingInfo, index) =>
+                this.mapPolypRecordingInfo(polypRecordingInfo, videosAndPolyps[index][0], videosAndPolyps[index][1]))
+            )
+          )
       )
     );
   }
@@ -50,13 +52,18 @@ export class PolypRecordingsService {
   createPolypRecording(polypRecording: PolypRecording): Observable<PolypRecording> {
     const polypRecordingEditionInfo = this.toPolypRecordingEditionInfo(polypRecording);
 
-    return this.http.post<PolypRecordingInfo>(`${environment.restApi}/polyprecording`, polypRecordingEditionInfo).pipe(
-      concatMap((polypRecordingInfo) =>
-        forkJoin(
-          this.videosService.getVideo(polypRecordingInfo.video.id),
-          this.polypsService.getPolyp(polypRecordingInfo.polyp.id))
-        , (polypRecordingInfo, videoAndPolyp) =>
-          this.mapPolypRecordingInfo(polypRecordingInfo, videoAndPolyp[0], videoAndPolyp[1])
+    return this.http.post<PolypRecordingInfo>(`${environment.restApi}/polyprecording`, polypRecordingEditionInfo)
+      .pipe(
+        concatMap((polypRecordingInfo) =>
+          forkJoin(
+            this.videosService.getVideo(polypRecordingInfo.video.id),
+            this.polypsService.getPolyp(polypRecordingInfo.polyp.id)
+          ).pipe(
+            map(videoAndPolyp =>
+              this.mapPolypRecordingInfo(polypRecordingInfo, videoAndPolyp[0], videoAndPolyp[1]
+            )
+          )
+        )
       )
     );
   }

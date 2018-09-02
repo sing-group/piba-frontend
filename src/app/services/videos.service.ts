@@ -1,15 +1,14 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/interval';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/map';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
 
 import Video from '../models/Video';
 import VideoInfo from './entities/VideoInfo';
 import VideoUploadInfo from './entities/VideoUploadInfo';
-import { environment } from '../../environments/environment';
+import {environment} from '../../environments/environment';
 import IdAndUri from './entities/IdAndUri';
+import {interval} from 'rxjs/internal/observable/interval';
+import {map, switchMap} from 'rxjs/operators';
 
 @Injectable()
 export class VideosService {
@@ -18,16 +17,22 @@ export class VideosService {
 
   getVideos(): Observable<Video[]> {
     return this.http.get<VideoInfo[]>(`${environment.restApi}/video`)
-      .map(videoInfos => videoInfos.map(this.mapVideoInfo));
+      .pipe(
+        map(videoInfos => videoInfos.map(this.mapVideoInfo))
+      );
   }
 
   getVideo(uuid: string, pollingInterval?: number): Observable<Video> {
     const videoRequest: Observable<Video> =
       this.http.get<VideoInfo>(`${environment.restApi}/video/${uuid}`)
-        .map(this.mapVideoInfo);
+        .pipe(
+          map(this.mapVideoInfo)
+        );
 
     if (pollingInterval > 0) {
-      return Observable.interval(pollingInterval).switchMap(() => videoRequest);
+      return interval(pollingInterval).pipe(
+        switchMap(() => videoRequest)
+      );
     } else {
       return videoRequest;
     }
@@ -39,7 +44,10 @@ export class VideosService {
     formData.append('observations', video.observations);
     formData.append('video', video.file);
     formData.append('exploration_id', video.exploration);
-    return this.http.post<VideoInfo>(`${environment.restApi}/video`, formData).map(this.mapVideoInfo);
+    return this.http.post<VideoInfo>(`${environment.restApi}/video`, formData)
+      .pipe(
+        map(this.mapVideoInfo)
+      );
   }
 
   delete(id: string) {
@@ -49,7 +57,10 @@ export class VideosService {
   editVideo(video: Video): Observable<Video> {
     const videoInfo: VideoInfo = this.toVideoInfo(video);
 
-    return this.http.put<VideoInfo>(`${environment.restApi}/video`, videoInfo).map(this.mapVideoInfo);
+    return this.http.put<VideoInfo>(`${environment.restApi}/video`, videoInfo)
+      .pipe(
+        map(this.mapVideoInfo)
+      );
   }
 
   private mapVideoInfo(videoInfo: VideoInfo): Video {

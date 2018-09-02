@@ -1,6 +1,6 @@
-import { TestBed, inject } from '@angular/core/testing';
+import {inject, TestBed} from '@angular/core/testing';
 
-import { IdSpacesService } from './idspaces.service';
+import {IdSpacesService} from './idspaces.service';
 
 describe('IdspacesService', () => {
   beforeEach(() => {

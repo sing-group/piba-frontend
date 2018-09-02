@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 import Polyp from '../../models/Polyp';
 import Video from '../../models/Video';
-import { VideosService } from '../../services/videos.service';
-import { TimePipe } from '../../pipes/time.pipe';
-import { PolypsService } from '../../services/polyps.service';
-import { ExplorationsService } from '../../services/explorations.service';
-import { PolypRecordingsService } from '../../services/polyprecordings.service';
+import {VideosService} from '../../services/videos.service';
+import {TimePipe} from '../../pipes/time.pipe';
+import {PolypsService} from '../../services/polyps.service';
+import {ExplorationsService} from '../../services/explorations.service';
+import {PolypRecordingsService} from '../../services/polyprecordings.service';
 import PolypRecording from '../../models/PolypRecording';
 
 @Component({
@@ -38,7 +38,8 @@ export class VideoEditorComponent implements OnInit {
     private polysService: PolypsService,
     private explorationsService: ExplorationsService,
     private polypRecordingsService: PolypRecordingsService
-  ) { }
+  ) {
+  }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -48,10 +49,10 @@ export class VideoEditorComponent implements OnInit {
         this.video = video;
         this.explorationsService.getPolyps(this.video.exploration).subscribe(polyps => this.polyps = polyps);
         this.polypRecordingsService.getPolypRecordings(video.id).subscribe(polypRecordings => {
-          this.video.polypRecording = polypRecordings;
-          polypRecordings.map(polypRecording =>
-            this.deleteSelectedPolyp(polypRecording.polyp.name));
-        }
+            this.video.polypRecording = polypRecordings;
+            polypRecordings.map(polypRecording =>
+              this.deleteSelectedPolyp(polypRecording.polyp.name));
+          }
         );
       });
   }
@@ -77,7 +78,9 @@ export class VideoEditorComponent implements OnInit {
   }
 
   public timesAreCorrect(): Boolean {
-    if (this.start === undefined || this.end === undefined) { return true; }
+    if (this.start === undefined || this.start === null || this.end === undefined || this.end === null) {
+      return true;
+    }
     return (this.timeToNumber(this.start) < this.timeToNumber(this.end));
   }
 
@@ -130,12 +133,12 @@ export class VideoEditorComponent implements OnInit {
 
   removePolypRecording(polypRecording: PolypRecording) {
     this.polypRecordingsService.removePolypRecording(polypRecording).subscribe(() => {
-      this.polyps.push(polypRecording.polyp);
-      const index = this.video.polypRecording.indexOf(
-        this.video.polypRecording.find(
-          (polypRecordingFind) => polypRecordingFind === polypRecording));
-      this.video.polypRecording.splice(index, 1);
-    }
+        this.polyps.push(polypRecording.polyp);
+        const index = this.video.polypRecording.indexOf(
+          this.video.polypRecording.find(
+            (polypRecordingFind) => polypRecordingFind === polypRecording));
+        this.video.polypRecording.splice(index, 1);
+      }
     );
   }
 }

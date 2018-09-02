@@ -1,4 +1,4 @@
-<clr-datagrid [(clrDgSelected)]="selected">
+<clr-datagrid [(clrDgSelected)]="selectedPatientId">
 
   <clr-dg-action-bar>
     <div class="btn-group" style="text-align: right">
@@ -11,7 +11,7 @@
   <clr-dg-placeholder>We couldn't find any explorations!</clr-dg-placeholder>
 
   <clr-dg-column>ID</clr-dg-column>
-  <clr-dg-column [clrDgField]="'exploration.date'" [(clrDgSortBy)]="explorationComparator">Date</clr-dg-column>
+  <clr-dg-column [clrDgField]="'exploration.date'" [clrDgSortBy]="explorationComparator">Date</clr-dg-column>
   <clr-dg-column>Location</clr-dg-column>
   <clr-dg-column>Actions</clr-dg-column>
 

@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { ClrDatagridComparatorInterface } from '@clr/angular';
-import { ExplorationsService } from '../../services/explorations.service';
+import {Component, OnInit} from '@angular/core';
+import {ClrDatagridComparatorInterface} from '@clr/angular';
+import {ExplorationsService} from '../../services/explorations.service';
 import Exploration from '../../models/Exploration';
 import Patient from '../../models/Patient';
-import { PatientsService } from '../../services/patients.service';
+import {PatientsService} from '../../services/patients.service';
 
 class ExplorationComparator implements ClrDatagridComparatorInterface<Exploration> {
   compare(exploration1: Exploration, exploration2: Exploration) {
@@ -34,7 +34,7 @@ export class ExplorationsComponent implements OnInit {
   selectedPatientId: Boolean = false;
 
   // needed to sort by date in the explorations table
-  private explorationComparator = new ExplorationComparator();
+  readonly explorationComparator = new ExplorationComparator();
 
   constructor(private explorationsService: ExplorationsService, private patientsService: PatientsService) { }
 
@@ -109,10 +109,7 @@ export class ExplorationsComponent implements OnInit {
   }
 
   public patientIdAreCorrect(): Boolean {
-    if (this.patientsFound != null && this.patientsFound.includes(this.patient)) {
-      return true;
-    }
-    return false;
+    return this.patientsFound != null && this.patientsFound.includes(this.patient);
   }
 
 }

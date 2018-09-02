@@ -1,8 +1,8 @@
-import { Component, OnInit, Input } from '@angular/core';
-import Polyp, { WASP, NICE, LST, PARIS } from '../../models/Polyp';
-import { PolypsService } from '../../services/polyps.service';
+import {Component, Input, OnInit} from '@angular/core';
+import Polyp, {LST, NICE, PARIS, WASP} from '../../models/Polyp';
+import {PolypsService} from '../../services/polyps.service';
 import Exploration from '../../models/Exploration';
-import { EnumUtils } from '../../utils/enum.utils';
+import {EnumUtils} from '../../utils/enum.utils';
 
 @Component({
   selector: 'app-polyp',

@@ -1,10 +1,11 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { HttpClient } from '@angular/common/http';
-import Polyp, { WASP, NICE, LST, PARIS } from '../models/Polyp';
-import { environment } from '../../environments/environment';
+import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import Polyp, {LST, NICE, PARIS, WASP} from '../models/Polyp';
+import {environment} from '../../environments/environment';
 import PolypInfo from './entities/PolypInfo';
-import { EnumUtils } from '../utils/enum.utils';
+import {EnumUtils} from '../utils/enum.utils';
+import {map} from 'rxjs/operators';
 
 @Injectable()
 export class PolypsService {
@@ -46,22 +47,33 @@ export class PolypsService {
   createPolyp(polyp: Polyp): Observable<Polyp> {
     const polypInfo: PolypInfo = this.toPolypInfo(polyp);
 
-    return this.http.post<PolypInfo>(`${environment.restApi}/polyp`, polypInfo).map(this.mapPolypInfo.bind(this));
+    return this.http.post<PolypInfo>(`${environment.restApi}/polyp`, polypInfo)
+      .pipe(
+        map(this.mapPolypInfo.bind(this))
+      );
   }
 
   getPolyp(uuid: string): Observable<Polyp> {
-    return this.http.get<PolypInfo>(`${environment.restApi}/polyp/${uuid}`).map(this.mapPolypInfo);
+    return this.http.get<PolypInfo>(`${environment.restApi}/polyp/${uuid}`)
+      .pipe(
+        map(this.mapPolypInfo)
+      );
   }
 
   editPolyp(polyp: Polyp): Observable<Polyp> {
     const polypInfo: PolypInfo = this.toPolypInfo(polyp);
 
-    return this.http.put<PolypInfo>(`${environment.restApi}/polyp/`, polypInfo).map(this.mapPolypInfo);
+    return this.http.put<PolypInfo>(`${environment.restApi}/polyp/`, polypInfo)
+      .pipe(
+        map(this.mapPolypInfo)
+      );
   }
 
   getPolypsOfExploration(exploration_id: string): Observable<Polyp[]> {
-    return this.http.get<Polyp[]>(`${environment.restApi}/exploration/${exploration_id}/polyps`).map(
-      polypsInfo => polypsInfo.map(this.mapPolypInfo.bind(this)));
+    return this.http.get<Polyp[]>(`${environment.restApi}/exploration/${exploration_id}/polyps`)
+      .pipe(
+        map(polypsInfo => polypsInfo.map(this.mapPolypInfo.bind(this)))
+      );
   }
 
   delete(uuid: string) {

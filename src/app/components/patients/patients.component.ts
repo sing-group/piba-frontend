@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import Patient, { SEX } from '../../models/Patient';
-import { PatientsService } from '../../services/patients.service';
-import { EnumUtils } from '../../utils/enum.utils';
-import { IdSpace } from '../../models/IdSpace';
-import { IdSpacesService } from '../../services/idspaces.service';
+import {Component, OnInit} from '@angular/core';
+import Patient, {SEX} from '../../models/Patient';
+import {PatientsService} from '../../services/patients.service';
+import {EnumUtils} from '../../utils/enum.utils';
+import {IdSpace} from '../../models/IdSpace';
+import {IdSpacesService} from '../../services/idspaces.service';
 
 @Component({
   selector: 'app-patient',

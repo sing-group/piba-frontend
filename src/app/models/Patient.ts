@@ -1,4 +1,4 @@
-import { IdSpace } from './IdSpace';
+import {IdSpace} from './IdSpace';
 
 export default class Patient {
     id: string;
