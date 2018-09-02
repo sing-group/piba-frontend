@@ -30,7 +30,8 @@ export class PolypComponent implements OnInit {
 
   @Input() exploration: Exploration;
 
-  constructor(private polypsService: PolypsService) { }
+  constructor(private polypsService: PolypsService) {
+  }
 
   ngOnInit() {
     const enumUtils = new EnumUtils();
@@ -67,12 +68,12 @@ export class PolypComponent implements OnInit {
 
   delete(id: string) {
     this.polypsService.delete(id).subscribe(() => {
-      const index = this.exploration.polyps.indexOf(
-        this.exploration.polyps.find((polyp) => polyp.id === id
-        )
-      );
-      this.exploration.polyps.splice(index, 1);
-    }
+        const index = this.exploration.polyps.indexOf(
+          this.exploration.polyps.find((polyp) => polyp.id === id
+          )
+        );
+        this.exploration.polyps.splice(index, 1);
+      }
     );
   }
 

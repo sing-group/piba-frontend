@@ -3,7 +3,8 @@
   <clr-dg-action-bar>
     <div class="btn-group" style="text-align: right">
       <button type="button" class="btn btn-icon btn-link" (click)="creatingExploration=true">
-        <clr-icon shape="plus"></clr-icon> Add
+        <clr-icon shape="plus"></clr-icon>
+        Add
       </button>
     </div>
   </clr-dg-action-bar>
@@ -53,21 +54,25 @@
       <section class="form-block">
         <div class="form-group">
           <label for="exploration-form-date" class="required">Date</label>
-          <input type="date" id="exploration-form-date" name="date" [(ngModel)]="date" clrDate readonly required #dateExploration="ngModel"
+          <input type="date" id="exploration-form-date" name="date" [(ngModel)]="date" clrDate readonly required
+                 #dateExploration="ngModel"
           />
         </div>
         <div class="form-group">
           <label for="exploration-form-location" class="required">Location</label>
-          <input type="text" id="exploration-form-location" name="location" [(ngModel)]="location" required pattern="[a-zA-Z0-9]*"
-            title="Must be a alphanumeric" #locationExploration="ngModel" />
+          <input type="text" id="exploration-form-location" name="location" [(ngModel)]="location" required
+                 pattern="[a-zA-Z0-9]*"
+                 title="Must be a alphanumeric" #locationExploration="ngModel"/>
         </div>
         <div class="form-group" *ngIf="creatingExploration">
           <label for="exploration-form-patientToSearch" class="required">ID Patient</label>
           <div class="autocomplete">
-            <input type="text" (keyup)="filterPatient()" name="patientIdStartsWith" [(ngModel)]="patientIdStartsWith" autocomplete="off"
+            <input type="text" (keyup)="filterPatient()" name="patientIdStartsWith" [(ngModel)]="patientIdStartsWith"
+                   autocomplete="off"
             />
             <div *ngIf="!selectedPatientId" class="autocomplete-items">
-              <input class="inputAutocomplete" value="{{patient.patientID}}" *ngFor="let patient of patientsFound" (click)="selectedPatient(patient)"
+              <input class="inputAutocomplete" value="{{patient.patientID}}" *ngFor="let patient of patientsFound"
+                     (click)="selectedPatient(patient)"
               />
             </div>
           </div>
@@ -77,7 +82,10 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
-      <button type="submit" class="btn btn-primary" [disabled]="dateExploration.invalid || locationExploration.invalid || (!patientIdAreCorrect() && creatingExploration) ">Ok</button>
+      <button type="submit" class="btn btn-primary"
+              [disabled]="dateExploration.invalid || locationExploration.invalid || (!patientIdAreCorrect() && creatingExploration) ">
+        Ok
+      </button>
     </div>
   </clr-modal>
 </form>

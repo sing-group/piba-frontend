@@ -9,7 +9,8 @@ import {map} from 'rxjs/operators';
 @Injectable()
 export class IdSpacesService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
   getIdSpaces(): Observable<IdSpace[]> {
     return this.http.get<IdSpaceInfo[]>(`${environment.restApi}/idspace/`)

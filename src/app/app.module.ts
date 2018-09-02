@@ -53,4 +53,5 @@ import {IdSpacesService} from './services/idspaces.service';
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

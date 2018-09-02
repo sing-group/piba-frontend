@@ -22,31 +22,32 @@ export class ExplorationsService {
     private videosService: VideosService,
     private polypsService: PolypsService,
     private patientsService: PatientsService
-  ) { }
+  ) {
+  }
 
   getExploration(uuid: string): Observable<Exploration> {
     return this.http.get<ExplorationInfo>(`${environment.restApi}/exploration/${uuid}`)
       .pipe(
         concatMap(explorationInfo => forkJoin(
-            explorationInfo.videos.length === 0 ? of([]) :
-              forkJoin(
-                explorationInfo.videos.map(
-                  idAndUri => this.videosService.getVideo(idAndUri.id)
-                )),
-            explorationInfo.polyps.length === 0 ? of([]) :
-              forkJoin(
-                explorationInfo.polyps.map(
-                  idAndUri => this.polypsService.getPolyp(idAndUri.id)
-                )
-              ),
-            this.patientsService.getPatient((<IdAndUri>explorationInfo.patient).id)
+          explorationInfo.videos.length === 0 ? of([]) :
+            forkJoin(
+              explorationInfo.videos.map(
+                idAndUri => this.videosService.getVideo(idAndUri.id)
+              )),
+          explorationInfo.polyps.length === 0 ? of([]) :
+            forkJoin(
+              explorationInfo.polyps.map(
+                idAndUri => this.polypsService.getPolyp(idAndUri.id)
+              )
+            ),
+          this.patientsService.getPatient((<IdAndUri>explorationInfo.patient).id)
           ).pipe(
-            map(videosAndPolypsAndPatient => this.mapExplorationInfo(
-              explorationInfo,
-              videosAndPolypsAndPatient[0],
-              videosAndPolypsAndPatient[1],
-              videosAndPolypsAndPatient[2]
-            ))
+          map(videosAndPolypsAndPatient => this.mapExplorationInfo(
+            explorationInfo,
+            videosAndPolypsAndPatient[0],
+            videosAndPolypsAndPatient[1],
+            videosAndPolypsAndPatient[2]
+          ))
           )
         )
       );
@@ -67,30 +68,6 @@ export class ExplorationsService {
           )
         )
       );
-  }
-
-  private mapExplorationInfo(explorationInfo: ExplorationInfo, videos: Video[], polyps: Polyp[], patient: Patient): Exploration {
-    return {
-      id: explorationInfo.id,
-      date: explorationInfo.date,
-      location: explorationInfo.location,
-      videos: videos,
-      polyps: polyps,
-      patient: patient
-    };
-  }
-
-  private mapOnlyExplorationInfo(explorationInfo: ExplorationInfo, patient: Patient): Exploration {
-    return this.mapExplorationInfo(explorationInfo, [], [], patient);
-  }
-
-  private toExplorationInfo(exploration: Exploration): ExplorationInfo {
-    return {
-      id: exploration.id,
-      date: exploration.date,
-      location: exploration.location,
-      patient: exploration.patient.id
-    };
   }
 
   createExploration(exploration: Exploration): Observable<Exploration> {
@@ -115,6 +92,30 @@ export class ExplorationsService {
 
   delete(id: string) {
     return this.http.delete(`${environment.restApi}/exploration/` + id);
+  }
+
+  private mapExplorationInfo(explorationInfo: ExplorationInfo, videos: Video[], polyps: Polyp[], patient: Patient): Exploration {
+    return {
+      id: explorationInfo.id,
+      date: explorationInfo.date,
+      location: explorationInfo.location,
+      videos: videos,
+      polyps: polyps,
+      patient: patient
+    };
+  }
+
+  private mapOnlyExplorationInfo(explorationInfo: ExplorationInfo, patient: Patient): Exploration {
+    return this.mapExplorationInfo(explorationInfo, [], [], patient);
+  }
+
+  private toExplorationInfo(exploration: Exploration): ExplorationInfo {
+    return {
+      id: exploration.id,
+      date: exploration.date,
+      location: exploration.location,
+      patient: exploration.patient.id
+    };
   }
 
 }

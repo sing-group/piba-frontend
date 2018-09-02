@@ -8,9 +8,9 @@ describe('PolypComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PolypComponent ]
+      declarations: [PolypComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

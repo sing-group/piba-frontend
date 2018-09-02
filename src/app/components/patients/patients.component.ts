@@ -33,7 +33,8 @@ export class PatientsComponent implements OnInit {
   idSpace: IdSpace;
 
   constructor(private patientsService: PatientsService,
-    private idSpacesService: IdSpacesService) { }
+              private idSpacesService: IdSpacesService) {
+  }
 
   ngOnInit() {
     const enumUtils = new EnumUtils();
@@ -76,8 +77,14 @@ export class PatientsComponent implements OnInit {
 
   findPatientID() {
     this.patientsService.getPatientID(this.patientIDText).subscribe(
-      patient => { this.patient = patient; this.error = null; },
-      error => { this.error = error.error; this.patient = null; }
+      patient => {
+        this.patient = patient;
+        this.error = null;
+      },
+      error => {
+        this.error = error.error;
+        this.patient = null;
+      }
     );
   }
 

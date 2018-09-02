@@ -10,38 +10,7 @@ import {map} from 'rxjs/operators';
 @Injectable()
 export class PolypsService {
 
-  constructor(private http: HttpClient) { }
-
-  private mapPolypInfo(polypInfo: PolypInfo): Polyp {
-    return {
-      id: polypInfo.id,
-      name: polypInfo.name,
-      size: polypInfo.size,
-      location: polypInfo.location,
-      wasp: WASP[polypInfo.wasp],
-      nice: NICE[polypInfo.nice],
-      lst: LST[polypInfo.lst],
-      paris: PARIS[polypInfo.paris],
-      histology: polypInfo.histology,
-      videos: [],
-      exploration: null
-    };
-  }
-
-  private toPolypInfo(polyp: Polyp): PolypInfo {
-    const enumUtils = new EnumUtils;
-    return {
-      id: polyp.id,
-      name: polyp.name,
-      size: polyp.size,
-      location: polyp.location,
-      wasp: enumUtils.findKeyForValue(WASP, polyp.wasp),
-      nice: enumUtils.findKeyForValue(NICE, polyp.nice),
-      lst: enumUtils.findKeyForValue(LST, polyp.lst),
-      paris: enumUtils.findKeyForValue(PARIS, polyp.paris),
-      histology: polyp.histology,
-      exploration: polyp.exploration.id
-    };
+  constructor(private http: HttpClient) {
   }
 
   createPolyp(polyp: Polyp): Observable<Polyp> {
@@ -78,5 +47,37 @@ export class PolypsService {
 
   delete(uuid: string) {
     return this.http.delete((`${environment.restApi}/polyp/` + uuid));
+  }
+
+  private mapPolypInfo(polypInfo: PolypInfo): Polyp {
+    return {
+      id: polypInfo.id,
+      name: polypInfo.name,
+      size: polypInfo.size,
+      location: polypInfo.location,
+      wasp: WASP[polypInfo.wasp],
+      nice: NICE[polypInfo.nice],
+      lst: LST[polypInfo.lst],
+      paris: PARIS[polypInfo.paris],
+      histology: polypInfo.histology,
+      videos: [],
+      exploration: null
+    };
+  }
+
+  private toPolypInfo(polyp: Polyp): PolypInfo {
+    const enumUtils = new EnumUtils;
+    return {
+      id: polyp.id,
+      name: polyp.name,
+      size: polyp.size,
+      location: polyp.location,
+      wasp: enumUtils.findKeyForValue(WASP, polyp.wasp),
+      nice: enumUtils.findKeyForValue(NICE, polyp.nice),
+      lst: enumUtils.findKeyForValue(LST, polyp.lst),
+      paris: enumUtils.findKeyForValue(PARIS, polyp.paris),
+      histology: polyp.histology,
+      exploration: polyp.exploration.id
+    };
   }
 }

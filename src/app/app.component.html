@@ -1,24 +1,24 @@
 <clr-main-container>
-    <clr-header>
-        <div class="branding">
-            <div class="title">PIBA</div>
-        </div>
-        <div class="header-actions">
-            <a href="javascript://" class="nav-link nav-icon">
-                <clr-icon shape="cog"></clr-icon>
-            </a>
-        </div>
-    </clr-header>
-
-    <div class="content-container">
-        <div class="content-area">
-            <router-outlet></router-outlet>
-        </div>
-        <nav class="sidenav" [clr-nav-level]="1">
-            <section class="sidenav-content">
-                <a class="nav-link active" routerLink="/explorations" routerLinkActive="active">Explorations</a>
-                <a class="nav-link" routerLink="/patients" routerLinkActive="active">Patients</a>
-            </section>
-        </nav>
+  <clr-header>
+    <div class="branding">
+      <div class="title">PIBA</div>
     </div>
+    <div class="header-actions">
+      <a href="javascript://" class="nav-link nav-icon">
+        <clr-icon shape="cog"></clr-icon>
+      </a>
+    </div>
+  </clr-header>
+
+  <div class="content-container">
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+    <nav class="sidenav" [clr-nav-level]="1">
+      <section class="sidenav-content">
+        <a class="nav-link active" routerLink="/explorations" routerLinkActive="active">Explorations</a>
+        <a class="nav-link" routerLink="/patients" routerLinkActive="active">Patients</a>
+      </section>
+    </nav>
+  </div>
 </clr-main-container>

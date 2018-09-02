@@ -1,6 +1,6 @@
 <div class="row video-container" *ngIf="video != null">
   <app-video (currentTime)="onCurrentTimeUpdate($event)">
-    <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}" />
+    <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}"/>
     <p>Your browser does not support the video tag.</p>
   </app-video>
 </div>
@@ -22,7 +22,8 @@
           </div>
           <div class="col-sm-3 col-md-3">
             <button type="button" class="btn btn-secondary" (click)="removePolypRecording(polypRecording)">
-              <clr-icon shape="times"></clr-icon> Remove
+              <clr-icon shape="times"></clr-icon>
+              Remove
             </button>
           </div>
         </div>
@@ -57,7 +58,8 @@
                 <label for="polyp-start" class="required">INI:</label>
               </div>
               <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6">
-                <input type="text" name="start" [(ngModel)]="start" class="input-timer" readonly required #startP="ngModel" />
+                <input type="text" name="start" [(ngModel)]="start" class="input-timer" readonly required
+                       #startP="ngModel"/>
                 <button type="button" (click)="startPolyp()" class="btn btn-icon">
                   <clr-icon shape="clock"></clr-icon>
                 </button>
@@ -69,16 +71,18 @@
                 <label for="polyp-end" class="required">FIN: </label>
               </div>
               <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6">
-                <input type="text" name="end" [(ngModel)]="end" class="input-timer" readonly required #endP="ngModel" />
+                <input type="text" name="end" [(ngModel)]="end" class="input-timer" readonly required #endP="ngModel"/>
                 <button type="button" (click)="endPolyp()" class="btn btn-icon">
                   <clr-icon shape="clock"></clr-icon>
                 </button>
               </div>
             </div>
 
-            <button type="submit" class="btn btn-primary" [disabled]="!timesAreCorrect() || polyp.invalid || startP.invalid || endP.invalid"
-              (click)="addPolypRecording()">
-              <clr-icon shape="plus"></clr-icon>Add
+            <button type="submit" class="btn btn-primary"
+                    [disabled]="!timesAreCorrect() || polyp.invalid || startP.invalid || endP.invalid"
+                    (click)="addPolypRecording()">
+              <clr-icon shape="plus"></clr-icon>
+              Add
             </button>
           </section>
         </form>
@@ -88,13 +92,15 @@
             <div class="modal-body">
               <div class="form-control">
                 <label for="polyp-form-name" class="required">Name</label>
-                <input type="text" id="polyp-form-name" [(ngModel)]="newPolyp.name" name="name" required pattern="[a-zA-Z0-9]*" title="Must be a alphanumeric"
+                <input type="text" id="polyp-form-name" [(ngModel)]="newPolyp.name" name="name" required
+                       pattern="[a-zA-Z0-9]*" title="Must be a alphanumeric"
                 />
               </div>
             </div>
             <div class="modal-footer">
               <button class="btn btn-primary" type="submit">
-                <clr-icon shape="plus"></clr-icon> Add
+                <clr-icon shape="plus"></clr-icon>
+                Add
               </button>
             </div>
           </clr-modal>

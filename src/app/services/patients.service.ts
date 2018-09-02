@@ -13,7 +13,8 @@ import {IdSpacesService} from './idspaces.service';
 @Injectable()
 export class PatientsService {
 
-  constructor(private http: HttpClient, private idSpacesService: IdSpacesService) { }
+  constructor(private http: HttpClient, private idSpacesService: IdSpacesService) {
+  }
 
   createPatient(patient: Patient): Observable<Patient> {
     const patientInfo = this.toPatientInfo(patient);
@@ -32,7 +33,7 @@ export class PatientsService {
   searchPatientsBy(patientIdStartsWith: string): Observable<Patient[]> {
     let params = new HttpParams();
     params = params.append('patientIdStartsWith', patientIdStartsWith);
-    return this.http.get<PatientInfo[]>(`${environment.restApi}/patient`, { params })
+    return this.http.get<PatientInfo[]>(`${environment.restApi}/patient`, {params})
       .pipe(
         map(patientsInfo => patientsInfo.map(this.mapPatientInfo))
       );
@@ -72,19 +73,19 @@ export class PatientsService {
   private withIdSpace(patientInfoObservable: Observable<PatientInfo>): Observable<Patient> {
     return patientInfoObservable.pipe(
       concatMap(patientInfo => {
-        if (typeof patientInfo.idSpace === 'string') {
-          throw new TypeError('patientInfo.idSpace must be an IdAndUri');
+          if (typeof patientInfo.idSpace === 'string') {
+            throw new TypeError('patientInfo.idSpace must be an IdAndUri');
+          }
+          return this.idSpacesService.getIdSpace(patientInfo.idSpace.id)
+            .pipe(
+              map(idspace => {
+                const patient = this.mapPatientInfo(patientInfo);
+                patient.idSpace = idspace;
+                return patient;
+              })
+            );
         }
-        return this.idSpacesService.getIdSpace(patientInfo.idSpace.id)
-          .pipe(
-            map(idspace => {
-              const patient = this.mapPatientInfo(patientInfo);
-              patient.idSpace = idspace;
-              return patient;
-            })
-          );
-      }
-    ));
+      ));
   }
 }
 

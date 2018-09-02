@@ -13,7 +13,8 @@ import {map, switchMap} from 'rxjs/operators';
 @Injectable()
 export class VideosService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
   getVideos(): Observable<Video[]> {
     return this.http.get<VideoInfo[]>(`${environment.restApi}/video`)

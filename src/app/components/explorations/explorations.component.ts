@@ -36,7 +36,8 @@ export class ExplorationsComponent implements OnInit {
   // needed to sort by date in the explorations table
   readonly explorationComparator = new ExplorationComparator();
 
-  constructor(private explorationsService: ExplorationsService, private patientsService: PatientsService) { }
+  constructor(private explorationsService: ExplorationsService, private patientsService: PatientsService) {
+  }
 
   ngOnInit() {
     this.explorationsService.getExplorations().subscribe(explorations => this.explorations = explorations);
@@ -84,12 +85,12 @@ export class ExplorationsComponent implements OnInit {
 
   delete(id: string) {
     this.explorationsService.delete(id).subscribe(() => {
-      const index = this.explorations.indexOf(
-        this.explorations.find((exploration) => exploration.id === id
-        )
-      );
-      this.explorations.splice(index, 1);
-    }
+        const index = this.explorations.indexOf(
+          this.explorations.find((exploration) => exploration.id === id
+          )
+        );
+        this.explorations.splice(index, 1);
+      }
     );
   }
 

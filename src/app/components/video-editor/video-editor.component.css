@@ -1,14 +1,14 @@
 .video-container {
-    display: flex;
-    justify-content: center;
-    margin-left: auto;
-    margin-right: auto;
+  display: flex;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .input-timer {
-    width: 40%;
+  width: 40%;
 }
 
 .polypRecording-container {
-    margin-top: 1%;
+  margin-top: 1%;
 }

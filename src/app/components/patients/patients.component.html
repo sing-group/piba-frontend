@@ -1,6 +1,7 @@
 <div class="btn-group" style="text-align: right">
   <button type="button" class="btn btn-icon btn-link" (click)="creatingPatient = true">
-    <clr-icon shape="plus"></clr-icon> Add
+    <clr-icon shape="plus"></clr-icon>
+    Add
   </button>
 </div>
 
@@ -13,7 +14,8 @@
       <section class="form-block">
         <div class="form-group">
           <label for="patient-form-patientID" class="required">ID Patient</label>
-          <input type="text" id="patient-form-patientID" name="patientID" [(ngModel)]="patientID" required #patientIDPatient="ngModel"
+          <input type="text" id="patient-form-patientID" name="patientID" [(ngModel)]="patientID" required
+                 #patientIDPatient="ngModel"
           />
         </div>
         <div class="form-group">
@@ -34,7 +36,8 @@
         </div>
         <div class="form-group">
           <label for="patient-form-birthdate" class="required">Birthdate</label>
-          <input type="date" id="patient-form-birthdate" name="birthdate" [(ngModel)]="birthdate" clrDate required readonly #birthdatePatient="ngModel"
+          <input type="date" id="patient-form-birthdate" name="birthdate" [(ngModel)]="birthdate" clrDate required
+                 readonly #birthdatePatient="ngModel"
           />
         </div>
       </section>
@@ -42,7 +45,10 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
-      <button type="submit" class="btn btn-primary" [disabled]="patientIDPatient.invalid || sexPatient.invalid || birthdatePatient.invalid || idSpacePatient.invalid">Ok</button>
+      <button type="submit" class="btn btn-primary"
+              [disabled]="patientIDPatient.invalid || sexPatient.invalid || birthdatePatient.invalid || idSpacePatient.invalid">
+        Ok
+      </button>
     </div>
 
   </clr-modal>
@@ -52,7 +58,8 @@
   <section>
     <div class="form-group">
       <label class="required">ID Patient</label>
-      <input type="text" id="patient-form-search-patientID" name="patientIDText" [(ngModel)]="patientIDText" required #patientIDFind="ngModel">
+      <input type="text" id="patient-form-search-patientID" name="patientIDText" [(ngModel)]="patientIDText" required
+             #patientIDFind="ngModel">
       <button type="submit" class="btn btn-primary btn-sm" [disabled]="patientIDFind.invalid">
         <clr-icon shape="search"></clr-icon>
       </button>
