@@ -31,5 +31,8 @@
 
 .inputAutocomplete:hover {
   background-color: #e3e3e3;
+}
 
+.content-select {
+  width: 55%;
 }

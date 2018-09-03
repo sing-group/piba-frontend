@@ -30,9 +30,10 @@ export class PatientsService {
     return this.withIdSpace(this.http.get<PatientInfo>(`${environment.restApi}/patient/patientID/${patientID}`));
   }
 
-  searchPatientsBy(patientIdStartsWith: string): Observable<Patient[]> {
+  searchPatientsBy(patientIdStartsWith: string, idSpace: string): Observable<Patient[]> {
     let params = new HttpParams();
-    params = params.append('patientIdStartsWith', patientIdStartsWith);
+    params = params.append('patientIdStartsWith', patientIdStartsWith).append('idSpace', idSpace);
+
     return this.http.get<PatientInfo[]>(`${environment.restApi}/patient`, {params})
       .pipe(
         map(patientsInfo => patientsInfo.map(this.mapPatientInfo))

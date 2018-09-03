@@ -1,4 +1,4 @@
-<clr-datagrid [(clrDgSelected)]="selectedPatientId">
+<clr-datagrid>
 
   <clr-dg-action-bar>
     <div class="btn-group" style="text-align: right">
@@ -64,6 +64,25 @@
                  pattern="[a-zA-Z0-9]*"
                  title="Must be a alphanumeric" #locationExploration="ngModel"/>
         </div>
+
+        <div class="form-group" *ngIf="creatingExploration">
+            <label for="exploration-form-idspace" class="required">ID Space</label>
+            <div class="content-select select">
+              <select id="exploration-form-idspace" [(ngModel)]="idSpace" name="idSpace" required #idSpaceExploration="ngModel" (change)="selectedIdSpace()">
+                <option *ngFor="let i of idSpaces" [ngValue]="i">{{i.name}}</option>
+              </select>
+              <div *ngIf="idSpaceError && creatingExploration" class="alert alert-danger">
+                  <div class="alert-item static">
+                      <div class="alert-icon-wrapper">
+                        <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+                      </div>
+                    <span class="alert-text">{{idSpaceError}}</span>
+                  </div>
+                </div>
+            </div>
+
+        </div>
+
         <div class="form-group" *ngIf="creatingExploration">
           <label for="exploration-form-patientToSearch" class="required">ID Patient</label>
           <div class="autocomplete">

@@ -4,6 +4,8 @@ import {ExplorationsService} from '../../services/explorations.service';
 import Exploration from '../../models/Exploration';
 import Patient from '../../models/Patient';
 import {PatientsService} from '../../services/patients.service';
+import {IdSpacesService} from '../../services/idspaces.service';
+import {IdSpace} from '../../models/IdSpace';
 
 class ExplorationComparator implements ClrDatagridComparatorInterface<Exploration> {
   compare(exploration1: Exploration, exploration2: Exploration) {
@@ -33,14 +35,20 @@ export class ExplorationsComponent implements OnInit {
   patient: Patient = new Patient();
   selectedPatientId: Boolean = false;
 
+  idSpaces: IdSpace[];
+  idSpace: IdSpace;
+  idSpaceError: string;
+
   // needed to sort by date in the explorations table
   readonly explorationComparator = new ExplorationComparator();
 
-  constructor(private explorationsService: ExplorationsService, private patientsService: PatientsService) {
+  constructor(private explorationsService: ExplorationsService, private patientsService: PatientsService,
+      private idSpacesService: IdSpacesService) {
   }
 
   ngOnInit() {
     this.explorationsService.getExplorations().subscribe(explorations => this.explorations = explorations);
+    this.idSpacesService.getIdSpaces().subscribe(idSpaces => this.idSpaces = idSpaces);
   }
 
   edit(id: string) {
@@ -81,6 +89,8 @@ export class ExplorationsComponent implements OnInit {
     this.editingExploration = false;
     this.patientsFound = null;
     this.patientIdStartsWith = null;
+    this.idSpaceError = null;
+    this.idSpace = null;
   }
 
   delete(id: string) {
@@ -95,11 +105,16 @@ export class ExplorationsComponent implements OnInit {
   }
 
   filterPatient() {
-    if (this.patientIdStartsWith.length > 3) {
-      this.patientsService.searchPatientsBy(this.patientIdStartsWith).subscribe(patients => this.patientsFound = patients);
-      this.selectedPatientId = false;
+    if (this.idSpace === undefined || this.idSpace === null) {
+      this.idSpaceError = 'Select one';
     } else {
-      this.patientsFound = null;
+      if (this.patientIdStartsWith !== undefined && this.patientIdStartsWith.length > 3) {
+        this.patientsService.searchPatientsBy(this.patientIdStartsWith, this.idSpace.id)
+          .subscribe(patients => this.patientsFound = patients);
+        this.selectedPatientId = false;
+      } else {
+        this.patientsFound = null;
+      }
     }
   }
 
@@ -111,6 +126,11 @@ export class ExplorationsComponent implements OnInit {
 
   public patientIdAreCorrect(): Boolean {
     return this.patientsFound != null && this.patientsFound.includes(this.patient);
+  }
+
+  selectedIdSpace () {
+    this.idSpaceError = null;
+    this.filterPatient();
   }
 
 }
