@@ -57,12 +57,13 @@
 <form ngNativeValidate #patientSearch="ngForm" (submit)="findPatientID()">
   <section>
     <div class="form-group">
-        <label for="patient-form-search-idspace" class="required">ID Space</label>
-        <div class="select">
-            <select id="patient-form-search-idspace" [(ngModel)]="idSpaceToFind" name="idSpaceToFind" required #idSpaceFind="ngModel">
-              <option *ngFor="let i of idSpaces" [ngValue]="i">{{i.name}}</option>
-            </select>
-        </div>
+      <label for="patient-form-search-idspace" class="required">ID Space</label>
+      <div class="select">
+        <select id="patient-form-search-idspace" [(ngModel)]="idSpaceToFind" name="idSpaceToFind" required
+                #idSpaceFind="ngModel">
+          <option *ngFor="let i of idSpaces" [ngValue]="i">{{i.name}}</option>
+        </select>
+      </div>
     </div>
 
     <div class="form-group">

@@ -43,7 +43,7 @@ export class ExplorationsComponent implements OnInit {
   readonly explorationComparator = new ExplorationComparator();
 
   constructor(private explorationsService: ExplorationsService, private patientsService: PatientsService,
-      private idSpacesService: IdSpacesService) {
+              private idSpacesService: IdSpacesService) {
   }
 
   ngOnInit() {
@@ -128,7 +128,7 @@ export class ExplorationsComponent implements OnInit {
     return this.patientsFound != null && this.patientsFound.includes(this.patient);
   }
 
-  selectedIdSpace () {
+  selectedIdSpace() {
     this.idSpaceError = null;
     this.filterPatient();
   }

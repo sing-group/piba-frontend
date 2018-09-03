@@ -1,43 +1,43 @@
 .txt-strong {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .toolbar {
-    text-align: right;
+  text-align: right;
 }
 
 .exploration-video {
-    width: 100%;
+  width: 100%;
 }
 
 :host /deep/ .clr-treenode-children {
-    margin-left: 0% !important;
+  margin-left: 0% !important;
 }
 
 .controls-overlay {
-    width: 92%;
-    height: 79%;
-    padding: .5rem .75rem;
-    position: absolute;
-    left: 0%;
-    right: 0%;
-    top: 0%;
-    bottom: 15%;
-    margin: auto;
-    background-size: contain;
-    background-position: center;
-    background-color: black;
-    opacity: 0.6;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
+  width: 92%;
+  height: 79%;
+  padding: .5rem .75rem;
+  position: absolute;
+  left: 0%;
+  right: 0%;
+  top: 0%;
+  bottom: 15%;
+  margin: auto;
+  background-size: contain;
+  background-position: center;
+  background-color: black;
+  opacity: 0.6;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
 }
 
 .btn-overlay {
-    margin-bottom: 10% !important;
-    color: white;
+  margin-bottom: 10% !important;
+  color: white;
 }
 
-.table{
+.table {
   border-color: white;
 }

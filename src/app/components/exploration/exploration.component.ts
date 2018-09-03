@@ -30,7 +30,8 @@ export class ExplorationComponent implements OnInit {
     private videosService: VideosService,
     private explorationsService: ExplorationsService,
     private route: ActivatedRoute
-  ) {  }
+  ) {
+  }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -80,11 +81,11 @@ export class ExplorationComponent implements OnInit {
     videoUploadInfo.file = file;
     this.videosService
       .createVideo(videoUploadInfo).subscribe(video => {
-        this.exploration.videos = this.exploration.videos.concat(video);
-        if (video.isProcessing) {
-          this.pollProcessingVideo(video);
-        }
-      });
+      this.exploration.videos = this.exploration.videos.concat(video);
+      if (video.isProcessing) {
+        this.pollProcessingVideo(video);
+      }
+    });
     this.cancel();
   }
 
@@ -95,12 +96,12 @@ export class ExplorationComponent implements OnInit {
 
   delete(id: string) {
     this.videosService.delete(id).subscribe(() => {
-      const index = this.exploration.videos.indexOf(
-        this.exploration.videos.find((video) => video.id === id
-        )
-      );
-      this.exploration.videos.splice(index, 1);
-    }
+        const index = this.exploration.videos.indexOf(
+          this.exploration.videos.find((video) => video.id === id
+          )
+        );
+        this.exploration.videos.splice(index, 1);
+      }
     );
   }
 

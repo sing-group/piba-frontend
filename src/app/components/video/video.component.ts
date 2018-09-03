@@ -14,7 +14,8 @@ export class VideoComponent implements OnInit {
 
   fullscreen = false;
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
     this.video.addEventListener('timeupdate', event => this.timeEmitter.emit(this.video.currentTime));
