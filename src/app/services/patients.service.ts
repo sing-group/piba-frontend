@@ -26,8 +26,8 @@ export class PatientsService {
     return this.withIdSpace(this.http.get<PatientInfo>(`${environment.restApi}/patient/${id}`));
   }
 
-  getPatientID(patientID: String): Observable<Patient> {
-    return this.withIdSpace(this.http.get<PatientInfo>(`${environment.restApi}/patient/patientID/${patientID}`));
+  getPatientID(patientID: string, idSpace: string): Observable<Patient> {
+    return this.withIdSpace(this.http.get<PatientInfo>(`${environment.restApi}/patient/${patientID}/${idSpace}`));
   }
 
   searchPatientsBy(patientIdStartsWith: string, idSpace: string): Observable<Patient[]> {

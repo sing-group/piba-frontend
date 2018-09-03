@@ -31,6 +31,7 @@ export class PatientsComponent implements OnInit {
 
   idSpaces: IdSpace[];
   idSpace: IdSpace;
+  idSpaceToFind: IdSpace;
 
   constructor(private patientsService: PatientsService,
               private idSpacesService: IdSpacesService) {
@@ -76,7 +77,7 @@ export class PatientsComponent implements OnInit {
   }
 
   findPatientID() {
-    this.patientsService.getPatientID(this.patientIDText).subscribe(
+    this.patientsService.getPatientID(this.patientIDText, this.idSpaceToFind.id).subscribe(
       patient => {
         this.patient = patient;
         this.error = null;
