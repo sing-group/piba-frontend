@@ -6,14 +6,6 @@ import VideoUploadInfo from '../../services/entities/VideoUploadInfo';
 import {VideosService} from '../../services/videos.service';
 import {ExplorationsService} from '../../services/explorations.service';
 
-interface Ambit {
-  name: string;
-}
-
-interface Histology {
-  name: string;
-}
-
 @Component({
   selector: 'app-exploration',
   templateUrl: './exploration.component.html',
@@ -24,9 +16,6 @@ export class ExplorationComponent implements OnInit {
   readonly POLLING_INTERVAL: number = 5000;
 
   exploration: Exploration = new Exploration();
-
-  ambit: Ambit[];
-  selectedAmbit: Ambit;
 
   videoHTML: HTMLMediaElement;
   controls: HTMLElement;
@@ -41,9 +30,7 @@ export class ExplorationComponent implements OnInit {
     private videosService: VideosService,
     private explorationsService: ExplorationsService,
     private route: ActivatedRoute
-  ) {
-    this.ambit = [{ name: 'Sergas' }];
-  }
+  ) {  }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -53,7 +40,7 @@ export class ExplorationComponent implements OnInit {
       exploration.videos.filter((video) => video.isProcessing).forEach((processingVideo) => {
         this.pollProcessingVideo(processingVideo);
       });
-
+      console.log(this.exploration);
       this.exploration.polyps.forEach((polyp) => {
         polyp.exploration = exploration;
       });

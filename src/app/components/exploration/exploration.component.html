@@ -3,32 +3,24 @@
     Exploration data
   </div>
   <div class="card-block">
-    <form>
-      <section class="form-block">
-
-        <div class="form-group">
-          <label for="patient-id">Patient</label>
-          <div class="select">
-            <select id="patient-realm">
-              <option value="" disabled selected>&lt;Realm&gt;</option>
-              <option *ngFor="let aAmbit of ambit">{{aAmbit.name}}</option>
-            </select>
-          </div>
-          <input type="text" id="patient-id" size="50" placeholder="Patient identifier" />
-        </div>
-
-        <div class="form-group">
-          <label for="exploration-date">Exploration date</label>
-          <input type="date" id="exploration-date" readonly value="{{exploration.date | date: 'yyyy-MM-dd'}}" />
-        </div>
-
-        <div class="form-group">
-          <label for="exploration-location">Location</label>
-          <input type="text" id="exploration-location" size="60" readonly value="{{exploration.location}}" />
-          <clr-icon shape="map-marker"></clr-icon>
-        </div>
-      </section>
-    </form>
+     <section class="form-block">
+      <table class="table">
+          <tbody>
+              <tr>
+                  <td class="left">Patient</td>
+                  <td class="left">{{exploration.patient.patientID}}</td>
+              </tr>
+              <tr>
+                  <td class="left">Exploration date</td>
+                  <td class="left">{{exploration.date | date: 'yyyy-MM-dd'}}</td>
+              </tr>
+              <tr>
+                  <td class="left">Location</td>
+                  <td class="left">{{exploration.location}}</td>
+              </tr>
+          </tbody>
+      </table>
+    </section>
   </div>
 </div>
 
