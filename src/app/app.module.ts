@@ -21,6 +21,7 @@ import {PolypComponent} from './components/polyp/polyp.component';
 import {PolypRecordingsService} from './services/polyprecordings.service';
 import {PatientsService} from './services/patients.service';
 import {IdSpacesService} from './services/idspaces.service';
+import {ModifiersService} from './services/modifiers.service';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import {IdSpacesService} from './services/idspaces.service';
     ExplorationsService,
     PolypRecordingsService,
     PatientsService,
-    IdSpacesService
+    IdSpacesService,
+    ModifiersService
   ],
   bootstrap: [AppComponent]
 })

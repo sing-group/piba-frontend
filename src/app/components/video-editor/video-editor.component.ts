@@ -8,6 +8,8 @@ import {PolypsService} from '../../services/polyps.service';
 import {ExplorationsService} from '../../services/explorations.service';
 import {PolypRecordingsService} from '../../services/polyprecordings.service';
 import PolypRecording from '../../models/PolypRecording';
+import {Modifier} from '../../models/Modifier';
+import {ModifiersService} from '../../services/modifiers.service';
 
 @Component({
   selector: 'app-video-editor',
@@ -31,13 +33,16 @@ export class VideoEditorComponent implements OnInit {
 
   modalOpened = false;
 
+  modifiers: Modifier[];
+
   constructor(
     private videosService: VideosService,
     private route: ActivatedRoute,
     private timePipe: TimePipe,
     private polysService: PolypsService,
     private explorationsService: ExplorationsService,
-    private polypRecordingsService: PolypRecordingsService
+    private polypRecordingsService: PolypRecordingsService,
+    private modifiersService: ModifiersService
   ) {
   }
 
@@ -54,6 +59,7 @@ export class VideoEditorComponent implements OnInit {
               this.deleteSelectedPolyp(polypRecording.polyp.name));
           }
         );
+        this.modifiersService.getModifiers().subscribe(modifiers => this.modifiers = modifiers);
       });
   }
 
