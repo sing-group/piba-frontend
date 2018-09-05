@@ -9,7 +9,7 @@ import {VideosService} from './videos.service';
 import Polyp from '../models/Polyp';
 import Video from '../models/Video';
 import {concatMap, map} from 'rxjs/operators';
-import PolypRecordingEditionInfo from './entities/PolypRecordingEditionInfo';
+import IdAndUri from './entities/IdAndUri';
 
 @Injectable()
 export class PolypRecordingsService {
@@ -28,8 +28,8 @@ export class PolypRecordingsService {
         concatMap(polypRecordingInfos =>
           forkJoin(polypRecordingInfos.map(polypRecordingInfo =>
             forkJoin(
-              this.videosService.getVideo(polypRecordingInfo.video.id),
-              this.polypsService.getPolyp(polypRecordingInfo.polyp.id))
+              this.videosService.getVideo((<IdAndUri>polypRecordingInfo.video).id),
+              this.polypsService.getPolyp((<IdAndUri>polypRecordingInfo.polyp).id))
           )).pipe(
             map(videosAndPolyps =>
               polypRecordingInfos.map((polypRecordingInfo, index) =>
@@ -41,14 +41,14 @@ export class PolypRecordingsService {
   }
 
   createPolypRecording(polypRecording: PolypRecording): Observable<PolypRecording> {
-    const polypRecordingEditionInfo = this.toPolypRecordingEditionInfo(polypRecording);
+    const newPolypRecordingInfo = this.toPolypRecordingInfo(polypRecording);
 
-    return this.http.post<PolypRecordingInfo>(`${environment.restApi}/polyprecording`, polypRecordingEditionInfo)
+    return this.http.post<PolypRecordingInfo>(`${environment.restApi}/polyprecording`, newPolypRecordingInfo)
       .pipe(
         concatMap((polypRecordingInfo) =>
           forkJoin(
-            this.videosService.getVideo(polypRecordingInfo.video.id),
-            this.polypsService.getPolyp(polypRecordingInfo.polyp.id)
+            this.videosService.getVideo((<IdAndUri>polypRecordingInfo.video).id),
+            this.polypsService.getPolyp((<IdAndUri>polypRecordingInfo.polyp).id)
           ).pipe(
             map(videoAndPolyp =>
               this.mapPolypRecordingInfo(polypRecordingInfo, videoAndPolyp[0], videoAndPolyp[1]
@@ -72,7 +72,7 @@ export class PolypRecordingsService {
     };
   }
 
-  private toPolypRecordingEditionInfo(polypRecording: PolypRecording): PolypRecordingEditionInfo {
+  private toPolypRecordingInfo(polypRecording: PolypRecording): PolypRecordingInfo {
     return {
       video: polypRecording.video.id,
       polyp: polypRecording.polyp.id,
