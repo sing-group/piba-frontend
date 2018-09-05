@@ -41,7 +41,6 @@ export class ExplorationComponent implements OnInit {
       exploration.videos.filter((video) => video.isProcessing).forEach((processingVideo) => {
         this.pollProcessingVideo(processingVideo);
       });
-      console.log(this.exploration);
       this.exploration.polyps.forEach((polyp) => {
         polyp.exploration = exploration;
       });
