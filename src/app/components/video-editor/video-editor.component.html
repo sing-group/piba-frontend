@@ -79,7 +79,6 @@
                 </button>
               </div>
             </div>
-
             <button type="submit" class="btn btn-primary"
                     [disabled]="!timesAreCorrect() || polyp.invalid || startP.invalid || endP.invalid"
                     (click)="addPolypRecording()">
@@ -88,7 +87,7 @@
             </button>
           </section>
         </form>
-        <form ngNativeValidate (submit)="addPolyp()">
+        <form (submit)="addPolyp()" ngNativeValidate>
           <clr-modal [(clrModalOpen)]="modalOpened" [clrModalSize]="'sm'">
             <h3 class="modal-title">Add polyp</h3>
             <div class="modal-body">
@@ -115,28 +114,9 @@
     <clr-tab-content *clrIfActive>
 
       <div class="tab-container">
-        <form #modifierVideoForm="ngForm" ngNativeValidate>
-          <section class="form-block">
-
-            <div class="form-group row">
-              <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">
-                <label for="modifier-name" class="required">Modifier</label>
-              </div>
-              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6">
-                <div class="select">
-                  <select id="modifier-name" [(ngModel)]="selectedModifier" name="selectedModifier" required
-                          #modifier="ngModel">
-                    <option value="" selected>&lt;Modifier&gt;</option>
-                    <option *ngFor="let m of modifiers" [ngValue]="m">{{m.name}}</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-          </section>
-        </form>
+        <app-video-modification [video]="video" [currentTime]="currentTime"
+                                [timesAreCorrect]="timesAreCorrect"></app-video-modification>
       </div>
-
 
     </clr-tab-content>
   </clr-tab>

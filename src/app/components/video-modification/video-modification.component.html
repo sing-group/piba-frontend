@@ -1,0 +1,53 @@
+<section class="form-block">
+  <form #modifierVideoForm="ngForm" ngNativeValidate (submit)="addVideoModification()">
+    <div class="form-group row">
+      <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">
+        <label for="modifier-name" class="required">Modifier</label>
+      </div>
+      <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6">
+        <div class="select">
+          <select id="modifier-name" [(ngModel)]="selectedModifier" name="selectedModifier" required
+                  #modifier="ngModel">
+            <option value="" selected>&lt;Modifier&gt;</option>
+            <option *ngFor="let m of modifiers" [ngValue]="m">{{m.name}}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
+        <label for="modifierVideo-start" class="required">INI:</label>
+      </div>
+      <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6">
+        <input id="modifierVideo-start" type="text" name="start" [(ngModel)]="start" class="input-timer"
+               readonly required
+               #startModifierForm="ngModel"/>
+        <button type="button" (click)="startModifier()" class="btn btn-icon">
+          <clr-icon shape="clock"></clr-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
+        <label for="modifierVideo-end" class="required">FIN: </label>
+      </div>
+      <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6">
+        <input id="modifierVideo-end" type="text" name="end" [(ngModel)]="end" class="input-timer" readonly
+               required #endModifierForm="ngModel"/>
+        <button type="button" (click)="endModifier()" class="btn btn-icon">
+          <clr-icon shape="clock"></clr-icon>
+        </button>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary"
+            [disabled]="!timesAreCorrect() || modifier.invalid || startModifierForm.invalid || endModifierForm.invalid"
+    >
+      <clr-icon shape="plus"></clr-icon>
+      Add
+    </button>
+  </form>
+</section>
+

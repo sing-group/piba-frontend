@@ -22,6 +22,9 @@ import {PolypRecordingsService} from './services/polyprecordings.service';
 import {PatientsService} from './services/patients.service';
 import {IdSpacesService} from './services/idspaces.service';
 import {ModifiersService} from './services/modifiers.service';
+import {VideomodificationsService} from './services/videomodifications.service';
+import {TimeToNumberPipe} from './pipes/time-to-number.pipe';
+import { VideoModificationComponent } from './components/video-modification/video-modification.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +35,9 @@ import {ModifiersService} from './services/modifiers.service';
     VideoEditorComponent,
     TimePipe,
     ExplorationsComponent,
-    PolypComponent
+    PolypComponent,
+    TimeToNumberPipe,
+    VideoModificationComponent
   ],
   imports: [
     BrowserModule,
@@ -51,7 +56,9 @@ import {ModifiersService} from './services/modifiers.service';
     PolypRecordingsService,
     PatientsService,
     IdSpacesService,
-    ModifiersService
+    ModifiersService,
+    VideomodificationsService,
+    TimeToNumberPipe
   ],
   bootstrap: [AppComponent]
 })

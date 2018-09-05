@@ -21,6 +21,13 @@ export class ModifiersService {
       );
   }
 
+  getModifier(id: string): Observable<Modifier> {
+    return this.http.get<ModifierInfo>(`${environment.restApi}/modifier/${id}`)
+      .pipe(
+        map(this.mapModifierInfo)
+      );
+  }
+
   private mapModifierInfo(modifierInfo: ModifierInfo): Modifier {
     return {
       id: modifierInfo.id,

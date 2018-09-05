@@ -8,8 +8,7 @@ import {PolypsService} from '../../services/polyps.service';
 import {ExplorationsService} from '../../services/explorations.service';
 import {PolypRecordingsService} from '../../services/polyprecordings.service';
 import PolypRecording from '../../models/PolypRecording';
-import {Modifier} from '../../models/Modifier';
-import {ModifiersService} from '../../services/modifiers.service';
+import {TimeToNumberPipe} from '../../pipes/time-to-number.pipe';
 
 @Component({
   selector: 'app-video-editor',
@@ -33,8 +32,6 @@ export class VideoEditorComponent implements OnInit {
 
   modalOpened = false;
 
-  modifiers: Modifier[];
-
   constructor(
     private videosService: VideosService,
     private route: ActivatedRoute,
@@ -42,7 +39,7 @@ export class VideoEditorComponent implements OnInit {
     private polysService: PolypsService,
     private explorationsService: ExplorationsService,
     private polypRecordingsService: PolypRecordingsService,
-    private modifiersService: ModifiersService
+    private timeToNumber: TimeToNumberPipe
   ) {
   }
 
@@ -59,7 +56,7 @@ export class VideoEditorComponent implements OnInit {
               this.deleteSelectedPolyp(polypRecording.polyp.name));
           }
         );
-        this.modifiersService.getModifiers().subscribe(modifiers => this.modifiers = modifiers);
+
       });
   }
 
@@ -87,7 +84,7 @@ export class VideoEditorComponent implements OnInit {
     if (this.start === undefined || this.start === null || this.end === undefined || this.end === null) {
       return true;
     }
-    return (this.timeToNumber(this.start) < this.timeToNumber(this.end));
+    return (this.timeToNumber.transform(this.start) < this.timeToNumber.transform(this.end));
   }
 
   addPolyp() {
@@ -105,8 +102,8 @@ export class VideoEditorComponent implements OnInit {
     this.newPolypRecording = {
       video: this.video,
       polyp: this.selectedPolyp,
-      start: this.timeToNumber(this.start),
-      end: this.timeToNumber(this.end)
+      start: this.timeToNumber.transform(this.start),
+      end: this.timeToNumber.transform(this.end)
     };
     this.polypRecordingsService.createPolypRecording(this.newPolypRecording)
       .subscribe(
@@ -118,14 +115,6 @@ export class VideoEditorComponent implements OnInit {
           this.selectedPolyp = null;
         }
       );
-
-  }
-
-  private timeToNumber(time: String): number {
-    const split = time.split(':');
-    const minutes = split[0];
-    const seconds = split[1];
-    return (parseInt(minutes, 10) * 60 + parseInt(seconds, 10));
   }
 
   private deleteSelectedPolyp(namePolyp: string) {
@@ -147,4 +136,5 @@ export class VideoEditorComponent implements OnInit {
       }
     );
   }
+
 }
