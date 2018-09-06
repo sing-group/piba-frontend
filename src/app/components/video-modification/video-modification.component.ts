@@ -58,6 +58,7 @@ export class VideoModificationComponent implements OnInit {
 
   addVideoModification() {
     this.newVideoModification = {
+      id: null,
       video: this.video,
       modifier: this.selectedModifier,
       start: this.timeToNumber.transform(this.start),
@@ -69,7 +70,7 @@ export class VideoModificationComponent implements OnInit {
   }
 
   remove(videoModification: VideoModification) {
-    this.videoModificationsService.removeVideoModification(videoModification).subscribe(
+    this.videoModificationsService.removeVideoModification(videoModification.id).subscribe(
       () => {
         const index = this.videoModifications.indexOf(
           this.videoModifications.find((toFind) => toFind === videoModification

@@ -59,14 +59,13 @@ export class VideomodificationsService {
       );
   }
 
-  removeVideoModification(videoModification: VideoModification) {
-    const videoModificationInfo = this.toVideoModificationInfo(videoModification);
-    return this.http.delete(`${environment.restApi}/videomodification/` +
-      videoModificationInfo.video + '/' + videoModificationInfo.modifier);
+  removeVideoModification(id: number) {
+    return this.http.delete(`${environment.restApi}/videomodification/${id}`);
   }
 
   private toVideoModificationInfo(videoModification: VideoModification): VideoModificationInfo {
     return {
+      id: videoModification.id,
       video: videoModification.video.id,
       modifier: videoModification.modifier.id,
       start: videoModification.start,
@@ -76,6 +75,7 @@ export class VideomodificationsService {
 
   private mapVideoModificationInfo(videoModificationInfo: VideoModificationInfo, video: Video, modifier: Modifier): VideoModification {
     return {
+      id: videoModificationInfo.id,
       video: video,
       modifier: modifier,
       start: videoModificationInfo.start,
