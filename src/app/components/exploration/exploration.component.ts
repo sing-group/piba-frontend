@@ -15,7 +15,7 @@ export class ExplorationComponent implements OnInit {
 
   readonly POLLING_INTERVAL: number = 5000;
 
-  exploration: Exploration = new Exploration();
+  exploration: Exploration = null;
 
   videoHTML: HTMLMediaElement;
   controls: HTMLElement;
