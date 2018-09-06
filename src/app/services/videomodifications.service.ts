@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {VideoModification} from '../models/VideoModification';
 import {forkJoin, Observable} from 'rxjs';
 import {VideoModificationInfo} from './entities/VideoModificationInfo';
@@ -32,6 +32,27 @@ export class VideomodificationsService {
             map(videoAndModifier =>
               this.mapVideoModificationInfo(videoModificationInfo, videoAndModifier[0], videoAndModifier[1]
               )
+            )
+          )
+        )
+      );
+  }
+
+  getVideoModifications(video_id: string): Observable<VideoModification[]> {
+    let params = new HttpParams();
+    params = params.append('id', video_id);
+
+    return this.http.get<VideoModificationInfo[]>(`${environment.restApi}/videomodification`, {params})
+      .pipe(
+        concatMap(videoModificationInfos =>
+          forkJoin(videoModificationInfos.map(videoModificationInfo =>
+            forkJoin(
+              this.videosService.getVideo((<IdAndUri>videoModificationInfo.video).id),
+              this.modifiersService.getModifier((<IdAndUri>videoModificationInfo.modifier).id))
+          )).pipe(
+            map(videosAndModifiers =>
+              videoModificationInfos.map((videoModificationInfo, index) =>
+                this.mapVideoModificationInfo(videoModificationInfo, videosAndModifiers[index][0], videosAndModifiers[index][1]))
             )
           )
         )

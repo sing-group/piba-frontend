@@ -1,3 +1,23 @@
+<div *ngFor="let videoModification of videoModifications">
+  <div class="row">
+    <div class="col-sm-3 col-md-3">
+      <p>Modifier: {{videoModification.modifier.name}} </p>
+    </div>
+    <div class="col-sm-3 col-md-3">
+      <p>INI: {{videoModification.start | time}}</p>
+    </div>
+    <div class="col-sm-3 col-md-3">
+      <p>FIN: {{videoModification.end | time}}</p>
+    </div>
+    <div class="col-sm-3 col-md-3">
+      <button type="button" class="btn btn-secondary">
+        <clr-icon shape="times"></clr-icon>
+        Remove
+      </button>
+    </div>
+  </div>
+</div>
+
 <section class="form-block">
   <form #modifierVideoForm="ngForm" ngNativeValidate (submit)="addVideoModification()">
     <div class="form-group row">

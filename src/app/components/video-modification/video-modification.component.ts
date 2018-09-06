@@ -36,6 +36,8 @@ export class VideoModificationComponent implements OnInit {
 
   ngOnInit() {
     this.modifiersService.getModifiers().subscribe((modifiers) => this.modifiers = modifiers);
+    this.videoModificationsService.getVideoModifications(this.video.id)
+      .subscribe(videoModifications => this.videoModifications = videoModifications);
   }
 
   startModifier() {
