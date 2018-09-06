@@ -59,6 +59,12 @@ export class VideomodificationsService {
       );
   }
 
+  removeVideoModification(videoModification: VideoModification) {
+    const videoModificationInfo = this.toVideoModificationInfo(videoModification);
+    return this.http.delete(`${environment.restApi}/videomodification/` +
+      videoModificationInfo.video + '/' + videoModificationInfo.modifier);
+  }
+
   private toVideoModificationInfo(videoModification: VideoModification): VideoModificationInfo {
     return {
       video: videoModification.video.id,

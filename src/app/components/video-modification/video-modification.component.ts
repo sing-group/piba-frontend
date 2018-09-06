@@ -68,4 +68,16 @@ export class VideoModificationComponent implements OnInit {
     );
   }
 
+  remove(videoModification: VideoModification) {
+    this.videoModificationsService.removeVideoModification(videoModification).subscribe(
+      () => {
+        const index = this.videoModifications.indexOf(
+          this.videoModifications.find((toFind) => toFind === videoModification
+          )
+        );
+        this.videoModifications.splice(index, 1);
+      }
+    );
+  }
+
 }
