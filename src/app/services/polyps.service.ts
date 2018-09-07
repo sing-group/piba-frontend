@@ -60,7 +60,7 @@ export class PolypsService {
       lst: LST[polypInfo.lst],
       paris: PARIS[polypInfo.paris],
       histology: polypInfo.histology,
-      videos: [],
+      polypRecordings: [],
       exploration: null
     };
   }

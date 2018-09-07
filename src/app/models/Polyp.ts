@@ -11,7 +11,7 @@ export default class Polyp {
   lst: LST;
   paris: PARIS;
   histology: string;
-  videos: PolypRecording[];
+  polypRecordings: PolypRecording[];
   exploration: Exploration;
 }
 
