@@ -17,9 +17,6 @@ export class ExplorationComponent implements OnInit {
 
   exploration: Exploration = null;
 
-  videoHTML: HTMLMediaElement;
-  controls: HTMLElement;
-
   newVideo: Video = new Video();
 
   userUploadingVideo: Boolean = false;
@@ -56,20 +53,6 @@ export class ExplorationComponent implements OnInit {
         videoPolling.unsubscribe();
       }
     });
-  }
-
-  playVideo(id) {
-    this.videoHTML = document.getElementById(id) as HTMLMediaElement;
-    this.videoHTML.play();
-    this.controls = document.getElementById('controls-' + id);
-    this.controls.style.display = 'none';
-  }
-
-  pauseVideo(id) {
-    this.videoHTML = document.getElementById(id) as HTMLMediaElement;
-    this.videoHTML.pause();
-    this.controls = document.getElementById('controls-' + id);
-    this.controls.style.display = 'flex';
   }
 
   uploadVideo() {

@@ -3,6 +3,7 @@ import Polyp, {LST, NICE, PARIS, WASP} from '../../models/Polyp';
 import {PolypsService} from '../../services/polyps.service';
 import Exploration from '../../models/Exploration';
 import {EnumUtils} from '../../utils/enum.utils';
+import {PolypRecordingsService} from '../../services/polyprecordings.service';
 
 @Component({
   selector: 'app-polyp',
@@ -27,10 +28,17 @@ export class PolypComponent implements OnInit {
   editingPolyp: Boolean = false;
 
   polyp: Polyp = new Polyp();
+  currentTime: number;
+  videoHTML: HTMLMediaElement;
+  controls: HTMLElement;
+
+  pauseWatcher: any;
 
   @Input() exploration: Exploration;
+  polyps: Polyp[];
 
-  constructor(private polypsService: PolypsService) {
+  constructor(private polypsService: PolypsService,
+              private  polypRecordingsService: PolypRecordingsService) {
   }
 
   ngOnInit() {
@@ -39,6 +47,13 @@ export class PolypComponent implements OnInit {
     this.NICEValues = enumUtils.enumValues(NICE);
     this.LSTValues = enumUtils.enumValues(LST);
     this.PARISValues = enumUtils.enumValues(PARIS);
+    this.polyps = this.exploration.polyps;
+    this.polyps.map((polyp) => {
+      this.polypRecordingsService.getPolypRecordingsByPolyp(polyp.id)
+        .subscribe((polypRecordings) => polyp.polypRecordings = polypRecordings);
+    });
+
+
   }
 
   cancel() {
@@ -76,6 +91,42 @@ export class PolypComponent implements OnInit {
       }
     );
   }
+
+  playVideo(videoId: string, polypId: string) {
+    const indexPolyp = this.polyps.indexOf(this.polyps.find((polyp) => polyp.id === polypId));
+    const indexVideo = this.polyps[indexPolyp].polypRecordings.indexOf(
+      this.polyps[indexPolyp].polypRecordings.find(polypRecording => polypRecording.video.id === videoId)
+    );
+
+    this.videoHTML = document.getElementById(videoId + '-' + polypId) as HTMLMediaElement;
+    this.pauseWatcher = setInterval(() =>{
+
+        if (this.videoHTML.currentTime >= this.polyps[indexPolyp].polypRecordings[indexVideo].end) {
+
+          this.videoHTML.currentTime = this.polyps[indexPolyp].polypRecordings[indexVideo].end;
+          this.pauseVideo(videoId, polypId);
+        }
+      }, 500);
+
+
+    this.videoHTML.currentTime = this.polyps[indexPolyp].polypRecordings[indexVideo].start;
+    this.videoHTML.play();
+
+    this.controls = document.getElementById('controls-' + videoId + '-' + polypId);
+    this.controls.style.display = 'none';
+
+  }
+
+  pauseVideo(videoId: string, polypId: string) {
+    this.videoHTML = document.getElementById(videoId + '-' + polypId) as HTMLMediaElement;
+    this.videoHTML.pause();
+    this.controls = document.getElementById('controls-' + videoId + '-' + polypId);
+    this.controls.style.display = 'flex';
+    if (this.pauseWatcher != null) {
+      clearInterval(this.pauseWatcher);
+    }
+  }
+
 
 }
 

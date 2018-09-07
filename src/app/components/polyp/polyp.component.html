@@ -83,28 +83,30 @@
     <ng-template [clrIfExpanded]>
       <clr-tree-node>
         <div class="row">
-          <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12" *ngFor="let video of polyp.videos ">
+          <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12" *ngFor="let polypRecording of polyp.polypRecordings ">
             <div class="card">
               <div class="card-block">
-                <video id="{{video.id}}" class="exploration-video" (click)="pauseVideo(video.id)">
-                  <source src="{{video.url}}.mp4" type="video/mp4"/>
-                  <source src="{{video.url}}.ogg" type="video/ogg"/>
-                  Your browser does not support the video tag.
+                <video id="{{polypRecording.video.id}}-{{polypRecording.polyp.id}}" class="exploration-video"
+                       (click)="pauseVideo(polypRecording.video.id, polypRecording.polyp.id)">
+                  <source *ngFor="let source of polypRecording.video.sources"
+                          src="{{source.url}}"
+                          type="{{source.mediaType}}"/>
+                  <p>Your browser does not support the video tag.</p>
                 </video>
-                <div id="controls-{{video.id}}" class="controls-overlay">
+                <div id="controls-{{polypRecording.video.id}}-{{polypRecording.polyp.id}}" class="controls-overlay">
                   <button id="playVideo" title="play video" class="btn btn-link btn-overlay"
-                          (click)="playVideo(video.id)">
+                          (click)="playVideo(polypRecording.video.id, polypRecording.polyp.id)">
                     <clr-icon shape="play" size="30"></clr-icon>
                     Play
                   </button>
                   <button type="button" title="edit video" class="btn btn-link btn-overlay"
-                          routerLink="/video/{{video.id}}">
+                          routerLink="/video/{{polypRecording.video.id}}">
                     <clr-icon shape="video-gallery" size="30"></clr-icon>
                     Edit
                   </button>
                 </div>
                 <div class="card-text">
-                  <p>Title: {{video.title}}</p>
+                  <p>Title: {{polypRecording.video.title}}</p>
                 </div>
               </div>
             </div>

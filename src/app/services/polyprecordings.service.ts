@@ -19,11 +19,26 @@ export class PolypRecordingsService {
               private videosService: VideosService) {
   }
 
-  getPolypRecordings(video_id: string): Observable<PolypRecording[]> {
-    let params = new HttpParams();
-    params = params.append('id', video_id);
+  getPolypRecordingsByVideo(video_id: string): Observable<PolypRecording[]> {
+    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording/video/${video_id}`)
+      .pipe(
+        concatMap(polypRecordingInfos =>
+          forkJoin(polypRecordingInfos.map(polypRecordingInfo =>
+            forkJoin(
+              this.videosService.getVideo((<IdAndUri>polypRecordingInfo.video).id),
+              this.polypsService.getPolyp((<IdAndUri>polypRecordingInfo.polyp).id))
+          )).pipe(
+            map(videosAndPolyps =>
+              polypRecordingInfos.map((polypRecordingInfo, index) =>
+                this.mapPolypRecordingInfo(polypRecordingInfo, videosAndPolyps[index][0], videosAndPolyps[index][1]))
+            )
+          )
+        )
+      );
+  }
 
-    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording`, {params})
+  getPolypRecordingsByPolyp(polyp_id: string): Observable<PolypRecording[]> {
+    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording/polyp/${polyp_id}`)
       .pipe(
         concatMap(polypRecordingInfos =>
           forkJoin(polypRecordingInfos.map(polypRecordingInfo =>

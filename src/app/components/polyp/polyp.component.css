@@ -2,8 +2,50 @@
   text-align: right;
 }
 
+.txt-strong {
+  font-weight: bold;
+}
+
+.exploration-video {
+  width: 100%;
+}
+
+:host /deep/ .clr-treenode-children {
+  margin-left: 0% !important;
+}
+
+.controls-overlay {
+  width: 92%;
+  height: 79%;
+  padding: .5rem .75rem;
+  position: absolute;
+  left: 0%;
+  right: 0%;
+  top: 0%;
+  bottom: 15%;
+  margin: auto;
+  background-size: contain;
+  background-position: center;
+  background-color: black;
+  opacity: 0.6;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  mix-blend-mode: screen;
+}
+
+.btn-overlay {
+  margin-bottom: 10% !important;
+  color: white;
+}
+
+.btn-link:hover {
+  opacity:0.8;
+  color:white;
+}
 @media (min-width: 768px) {
   .card-button {
     float: right;
   }
 }
+

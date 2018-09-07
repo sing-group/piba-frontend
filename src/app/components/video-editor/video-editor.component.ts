@@ -50,7 +50,7 @@ export class VideoEditorComponent implements OnInit {
       .subscribe(video => {
         this.video = video;
         this.explorationsService.getPolyps(this.video.exploration).subscribe(polyps => this.polyps = polyps);
-        this.polypRecordingsService.getPolypRecordings(video.id).subscribe(polypRecordings => {
+        this.polypRecordingsService.getPolypRecordingsByVideo(video.id).subscribe(polypRecordings => {
             this.video.polypRecording = polypRecordings;
             polypRecordings.map(polypRecording =>
               this.deleteSelectedPolyp(polypRecording.polyp.name));
