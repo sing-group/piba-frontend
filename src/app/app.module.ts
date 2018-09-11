@@ -1,4 +1,4 @@
-import {NgModule} from '@angular/core';
+import {ErrorHandler, NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -24,7 +24,10 @@ import {IdSpacesService} from './services/idspaces.service';
 import {ModifiersService} from './services/modifiers.service';
 import {VideomodificationsService} from './services/videomodifications.service';
 import {TimeToNumberPipe} from './pipes/time-to-number.pipe';
-import { VideoModificationComponent } from './components/video-modification/video-modification.component';
+import {VideoModificationComponent} from './components/video-modification/video-modification.component';
+import {NotificationModule} from './modules/notification/notification.module';
+import {ErrorNotificationHandler} from './modules/notification/handlers/error-notification.handler';
+import {ToastrModule} from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -46,7 +49,12 @@ import { VideoModificationComponent } from './components/video-modification/vide
     FormsModule,
     AppRoutingModule,
     ClarityModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ToastrModule.forRoot({
+      positionClass: 'toast-bottom-right',
+      preventDuplicates: true
+    }),
+    NotificationModule.forRoot()
   ],
   providers: [
     PolypsService,
@@ -58,7 +66,11 @@ import { VideoModificationComponent } from './components/video-modification/vide
     IdSpacesService,
     ModifiersService,
     VideomodificationsService,
-    TimeToNumberPipe
+    TimeToNumberPipe,
+    {
+      provide: ErrorHandler,
+      useClass: ErrorNotificationHandler
+    }
   ],
   bootstrap: [AppComponent]
 })

@@ -5,10 +5,11 @@ import {Observable} from 'rxjs';
 import PatientInfo from './entities/PatientInfo';
 
 import {environment} from '../../environments/environment';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {EnumUtils} from '../utils/enum.utils';
 import {concatMap, map} from 'rxjs/operators';
 import {IdSpacesService} from './idspaces.service';
+import {PibaError} from '../modules/notification/entities';
 
 @Injectable()
 export class PatientsService {
@@ -76,7 +77,12 @@ export class PatientsService {
               })
             );
         }
-      ));
+      ),
+      PibaError.throwOnError(
+        'Error retrieving id space',
+        'It was not possible to retrieve patient\'s id space.'
+      )
+    );
   }
 }
 
