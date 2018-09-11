@@ -1,13 +1,10 @@
+<div class="row">
+  <button type="button" class="btn-add btn btn-primary" (click)="creatingExploration=true">
+    <clr-icon shape="plus"></clr-icon>
+    Add exploration
+  </button>
+</div>
 <clr-datagrid>
-
-  <clr-dg-action-bar>
-    <div class="btn-group" style="text-align: right">
-      <button type="button" class="btn btn-icon btn-link" (click)="creatingExploration=true">
-        <clr-icon shape="plus"></clr-icon>
-        Add
-      </button>
-    </div>
-  </clr-dg-action-bar>
 
   <clr-dg-placeholder>We couldn't find any explorations!</clr-dg-placeholder>
 
@@ -90,11 +87,10 @@
           </div>
         </div>
 
-
       </section>
 
     </div>
-    <div class=" modal-footer">
+    <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
       <button type="submit" class="btn btn-primary"
               [disabled]="dateExploration.invalid || locationExploration.invalid || !IdSpaceAreCorrect() || !patientIdAreCorrect()">

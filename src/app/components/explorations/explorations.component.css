@@ -9,3 +9,12 @@
 .content-select {
   width: 55%;
 }
+
+.btn-add {
+  margin-right: 1.75%;
+  margin-left: auto;
+}
+
+.alert {
+  padding: 1%;
+}

@@ -1,10 +1,9 @@
-<div class="btn-group" style="text-align: right">
-  <button type="button" class="btn btn-icon btn-link" (click)="creatingPatient = true">
+<div class="row">
+  <button type="button" class="btn-add btn btn-primary" (click)="creatingPatient = true">
     <clr-icon shape="plus"></clr-icon>
-    Add
+    Add patient
   </button>
 </div>
-
 <form ngNativeValidate #patientForm="ngForm" (submit)="save()">
   <clr-modal [(clrModalOpen)]="creatingPatient || editingPatient" [clrModalClosable]="false">
     <h3 class="modal-title" *ngIf="creatingPatient">Add Patient</h3>
@@ -50,62 +49,90 @@
         Ok
       </button>
     </div>
-
   </clr-modal>
 </form>
 
-<form ngNativeValidate #patientSearch="ngForm" (submit)="findPatientID()">
-  <section>
-    <div class="form-group">
-      <label for="patient-form-search-idspace" class="required">ID Space</label>
-      <div class="select">
-        <select id="patient-form-search-idspace" [(ngModel)]="idSpaceToFind" name="idSpaceToFind" required
-                #idSpaceFind="ngModel">
-          <option *ngFor="let i of idSpaces" [ngValue]="i">{{i.name}}</option>
-        </select>
+
+<section>
+  <form ngNativeValidate #patientSearch="ngForm" (submit)="findPatientID()" class="compact">
+    <div class="card">
+      <div class="card-header">Search a patient</div>
+      <div class="card-block">
+        <section class="form-block">
+          <table class="table">
+            <tbody>
+            <tr>
+              <td class="left"><label for="patient-form-search-idspace" class="required">ID Space</label></td>
+              <td class="left">
+                <div class="select">
+                  <select id="patient-form-search-idspace" [(ngModel)]="idSpaceToFind" name="idSpaceToFind"
+                          required
+                          #idSpaceFind="ngModel">
+                    <option *ngFor="let i of idSpaces" [ngValue]="i">{{i.name}}</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="left"><label class="required" for="patient-form-search-patientID">ID Patient</label></td>
+              <td class="left">
+                <input type="text" id="patient-form-search-patientID" name="patientIDText" [(ngModel)]="patientIDText"
+                       required
+                       #patientIDFind="ngModel" class="complete-space">
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <button type="submit" class="btn btn-primary btn-sm"
+                  [disabled]="patientIDFind.invalid || idSpaceFind.invalid">
+            <clr-icon shape="search"></clr-icon>
+          </button>
+        </section>
       </div>
     </div>
+  </form>
+</section>
 
-    <div class="form-group">
-      <label class="required">ID Patient</label>
-      <input type="text" id="patient-form-search-patientID" name="patientIDText" [(ngModel)]="patientIDText" required
-             #patientIDFind="ngModel">
-      <button type="submit" class="btn btn-primary btn-sm" [disabled]="patientIDFind.invalid || idSpaceFind.invalid">
-        <clr-icon shape="search"></clr-icon>
-      </button>
-    </div>
-    <clr-datagrid *ngIf="patient">
-      <clr-dg-column>ID</clr-dg-column>
-      <clr-dg-column>ID Patient</clr-dg-column>
-      <clr-dg-column>ID Space</clr-dg-column>
-      <clr-dg-column>Actions</clr-dg-column>
-
-      <clr-dg-row>
-        <clr-dg-cell>{{patient.id}}</clr-dg-cell>
-        <clr-dg-cell>{{patient.patientID}}</clr-dg-cell>
-        <clr-dg-cell>{{patient.idSpace.name}}</clr-dg-cell>
-        <clr-dg-cell class="btn-cell-datagrid">
-          <div class="btn-group btn-link btn-icon">
-            <button class="btn" (click)="edit()">
-              <clr-icon shape="cog"></clr-icon>
-              <span class="clr-icon-title">Settings</span>
-            </button>
-            <button class="btn" (click)="delete()">
-              <clr-icon shape="trash"></clr-icon>
-              <span class="clr-icon-title">Delete</span>
-            </button>
-          </div>
-        </clr-dg-cell>
-      </clr-dg-row>
-
-    </clr-datagrid>
-    <div *ngIf="error" class="alert alert-danger">
-      <div class="alert-item static">
-        <div class="alert-icon-wrapper">
-          <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+<div *ngIf="patient">
+  <table class="table table-vertical">
+    <tbody>
+    <tr>
+      <th>ID</th>
+      <td>{{patient.id}}</td>
+    </tr>
+    <tr>
+      <th>ID Paciente</th>
+      <td>{{patient.patientID}}</td>
+    </tr>
+    <tr>
+      <th>ID Space</th>
+      <td>{{patient.idSpace.name}}</td>
+    </tr>
+    <tr>
+      <th>Actions</th>
+      <td class="btn-td-table">
+        <div class="btn-group btn-link btn-icon">
+          <button class="btn" (click)="edit()">
+            <clr-icon shape="cog"></clr-icon>
+            <span class="clr-icon-title">Settings</span>
+          </button>
+          <button class="btn" (click)="delete()">
+            <clr-icon shape="trash"></clr-icon>
+            <span class="clr-icon-title">Delete</span>
+          </button>
         </div>
-        <span class="alert-text">{{error}}</span>
-      </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<div *ngIf="error" class="alert alert-danger">
+  <div class="alert-item static">
+    <div class="alert-icon-wrapper">
+      <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
     </div>
-  </section>
-</form>
+    <span class="alert-text">{{error}}</span>
+  </div>
+</div>

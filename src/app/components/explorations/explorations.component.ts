@@ -94,6 +94,7 @@ export class ExplorationsComponent implements OnInit {
     this.editingExploration = false;
     this.patientId = null;
     this.idSpace = null;
+    this.patientError = null;
   }
 
   delete(id: string) {

@@ -4,8 +4,27 @@
 
 .btn-sm {
   margin-top: .25rem !important;
+  float: right;
+  margin-right: 0px;
 }
 
-.btn-cell-datagrid {
-  padding: 0%;
+.btn-add {
+  margin-right: 1.75%;
+  margin-left: auto;
+}
+
+.btn-td-table {
+  padding: 0px;
+}
+
+.complete-space {
+  width: 100%;
+}
+
+.card {
+  margin-top: 0rem !important;
+}
+
+.alert {
+  padding: 1%;
 }
