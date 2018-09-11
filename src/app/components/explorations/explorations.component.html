@@ -64,46 +64,40 @@
                  pattern="[a-zA-Z0-9]*"
                  title="Must be a alphanumeric" #locationExploration="ngModel"/>
         </div>
+        <div *ngIf="creatingExploration">
+          <div class="form-group">
+            <label for="exploration-form-idspace" class="required">ID Space</label>
+            <div class="content-select select">
+              <select id="exploration-form-idspace" [(ngModel)]="idSpace" name="idSpace" required
+                      #idSpaceExploration="ngModel">
+                <option *ngFor="let i of idSpaces" [ngValue]="i">{{i.name}}</option>
+              </select>
+            </div>
+          </div>
 
-        <div class="form-group" *ngIf="creatingExploration">
-          <label for="exploration-form-idspace" class="required">ID Space</label>
-          <div class="content-select select">
-            <select id="exploration-form-idspace" [(ngModel)]="idSpace" name="idSpace" required
-                    #idSpaceExploration="ngModel" (change)="selectedIdSpace()">
-              <option *ngFor="let i of idSpaces" [ngValue]="i">{{i.name}}</option>
-            </select>
-            <div *ngIf="idSpaceError && creatingExploration" class="alert alert-danger">
-              <div class="alert-item static">
-                <div class="alert-icon-wrapper">
-                  <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
-                </div>
-                <span class="alert-text">{{idSpaceError}}</span>
+          <div class="form-group">
+            <label for="exploration-form-patientToSearch" class="required">ID Patient</label>
+            <input id="exploration-form-patientToSearch" type="text" name="patientId" [(ngModel)]="patientId" required
+                   #patientIdExploration="ngModel"/>
+          </div>
+          <div *ngIf="patientError" class="alert alert-danger">
+            <div class="alert-item static">
+              <div class="alert-icon-wrapper">
+                <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
               </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="form-group" *ngIf="creatingExploration">
-          <label for="exploration-form-patientToSearch" class="required">ID Patient</label>
-          <div class="autocomplete">
-            <input id="exploration-form-patientToSearch" type="text" (keyup)="filterPatient()" name="patientIdStartsWith" [(ngModel)]="patientIdStartsWith"
-                   autocomplete="off"
-            />
-            <div *ngIf="!selectedPatientId" class="autocomplete-items">
-              <input class="inputAutocomplete" value="{{patient.patientID}}" *ngFor="let patient of patientsFound"
-                     (click)="selectedPatient(patient)"
-              />
+              <span class="alert-text">{{patientError}}</span>
             </div>
           </div>
         </div>
+
+
       </section>
 
     </div>
-    <div class="modal-footer">
+    <div class=" modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
       <button type="submit" class="btn btn-primary"
-              [disabled]="dateExploration.invalid || locationExploration.invalid || (!patientIdAreCorrect() && creatingExploration) ">
+              [disabled]="dateExploration.invalid || locationExploration.invalid || !IdSpaceAreCorrect() || !patientIdAreCorrect()">
         Ok
       </button>
     </div>

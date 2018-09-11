@@ -30,14 +30,11 @@ export class ExplorationsComponent implements OnInit {
   newExploration: Exploration;
   exploration: Exploration = new Exploration();
 
-  patientsFound: Patient[];
-  patientIdStartsWith: string;
-  patient: Patient = new Patient();
-  selectedPatientId: Boolean = false;
+  patientId: string;
+  patientError: string;
 
   idSpaces: IdSpace[];
   idSpace: IdSpace;
-  idSpaceError: string;
 
   // needed to sort by date in the explorations table
   readonly explorationComparator = new ExplorationComparator();
@@ -61,25 +58,33 @@ export class ExplorationsComponent implements OnInit {
 
   save() {
     if (!this.editingExploration) {
-      this.newExploration = {
-        id: null,
-        date: new Date(this.date),
-        location: this.location,
-        videos: [],
-        polyps: [],
-        patient: this.patient
-      };
-      this.explorationsService.createExploration(this.newExploration)
-        .subscribe(newExploration => this.explorations = this.explorations.concat(newExploration));
+      this.patientsService.getPatientID(this.patientId, this.idSpace.id).subscribe(patient => {
+          this.newExploration = {
+            id: null,
+            date: new Date(this.date),
+            location: this.location,
+            videos: [],
+            polyps: [],
+            patient: patient
+          };
+          this.explorationsService.createExploration(this.newExploration)
+            .subscribe(newExploration => {
+              this.explorations = this.explorations.concat(newExploration);
+              this.patientError = null;
+              this.cancel();
+            });
+        }, error => {
+          this.patientError = error.error;
+        }
+      );
     } else {
-
       this.exploration.location = this.location;
       this.exploration.date = new Date(this.date);
       this.explorationsService.editExploration(this.exploration).subscribe(updatedExploration => {
         Object.assign(this.explorations.find((exploration) => exploration.id === this.exploration.id), updatedExploration);
+        this.cancel();
       });
     }
-    this.cancel();
   }
 
   cancel() {
@@ -87,9 +92,7 @@ export class ExplorationsComponent implements OnInit {
     this.location = null;
     this.creatingExploration = false;
     this.editingExploration = false;
-    this.patientsFound = null;
-    this.patientIdStartsWith = null;
-    this.idSpaceError = null;
+    this.patientId = null;
     this.idSpace = null;
   }
 
@@ -104,34 +107,18 @@ export class ExplorationsComponent implements OnInit {
     );
   }
 
-  filterPatient() {
-    if (this.idSpace === undefined || this.idSpace === null) {
-      this.idSpaceError = 'Select one';
-    } else {
-      if (this.patientIdStartsWith !== undefined && this.patientIdStartsWith.length > 3) {
-        this.patientsService.searchPatientsBy(this.patientIdStartsWith, this.idSpace.id)
-          .subscribe(patients => this.patientsFound = patients);
-        this.selectedPatientId = false;
-      } else {
-        this.patientsFound = null;
-      }
-    }
-  }
-
-  selectedPatient(patient: Patient) {
-    this.patient = patient;
-    this.patientIdStartsWith = this.patient.patientID;
-    this.selectedPatientId = true;
-  }
-
   public patientIdAreCorrect(): Boolean {
-    return this.patientsFound != null && this.patientsFound.includes(this.patient);
+    if (this.editingExploration || (this.patientId != null || this.patientId !== undefined)) {
+      return true;
+    }
+    return false;
   }
 
-  selectedIdSpace() {
-    this.idSpaceError = null;
-    this.filterPatient();
+  public IdSpaceAreCorrect(): Boolean {
+    if (this.editingExploration || this.idSpace != null || this.idSpace !== undefined) {
+      return true;
+    }
+    return false;
   }
-
 }
 
