@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {NotificationService} from './modules/notification/services/notification.service';
 import {Severity} from './modules/notification/entities';
 import {ToastrService} from 'ngx-toastr';
+import {AuthenticationService} from './services/authentication.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +17,9 @@ export class AppComponent implements OnInit {
 
   constructor(
     private notification: NotificationService,
-    private toastService: ToastrService
+    private toastService: ToastrService,
+    public authenticationService: AuthenticationService,
+    private router: Router
   ) {
   }
 
@@ -38,6 +42,11 @@ export class AppComponent implements OnInit {
         }
       }
     );
+  }
+
+  logOut() {
+    this.authenticationService.logOut();
+    this.router.navigateByUrl('/login');
   }
 }
 

@@ -4,8 +4,9 @@
       <div class="title">PIBA</div>
     </div>
     <div class="header-actions">
-      <a href="javascript://" class="nav-link nav-icon">
-        <clr-icon shape="cog"></clr-icon>
+
+      <a *ngIf="authenticationService.getUser().authenticated == true" class="nav-link nav-icon" (click)="logOut()">
+        <clr-icon shape="logout"></clr-icon>
       </a>
     </div>
   </clr-header>
@@ -14,10 +15,11 @@
     <div class="content-area">
       <router-outlet></router-outlet>
     </div>
-    <nav class="sidenav" [clr-nav-level]="1">
+
+    <nav class="sidenav" [clr-nav-level]="1" *ngIf="authenticationService.getUser().authenticated == true">
       <section class="sidenav-content">
-        <a class="nav-link active" routerLink="/explorations" routerLinkActive="active">Explorations</a>
-        <a class="nav-link" routerLink="/patients" routerLinkActive="active">Patients</a>
+        <a class="nav-link " routerLink="/explorations">Explorations</a>
+        <a class="nav-link" routerLink="/patients">Patients</a>
       </section>
     </nav>
   </div>

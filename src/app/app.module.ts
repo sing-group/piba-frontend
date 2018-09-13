@@ -15,7 +15,7 @@ import {VideosService} from './services/videos.service';
 import {ExplorationsService} from './services/explorations.service';
 import {VideoEditorComponent} from './components/video-editor/video-editor.component';
 import {TimePipe} from './pipes/time.pipe';
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {ExplorationsComponent} from './components/explorations/explorations.component';
 import {PolypComponent} from './components/polyp/polyp.component';
 import {PolypRecordingsService} from './services/polyprecordings.service';
@@ -28,6 +28,8 @@ import {VideoModificationComponent} from './components/video-modification/video-
 import {NotificationModule} from './modules/notification/notification.module';
 import {ErrorNotificationHandler} from './modules/notification/handlers/error-notification.handler';
 import {ToastrModule} from 'ngx-toastr';
+import {LoginComponent} from './components/login/login.component';
+import {AuthenticationInterceptor} from './helpers/authentication.interceptor';
 
 @NgModule({
   declarations: [
@@ -40,7 +42,8 @@ import {ToastrModule} from 'ngx-toastr';
     ExplorationsComponent,
     PolypComponent,
     TimeToNumberPipe,
-    VideoModificationComponent
+    VideoModificationComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -70,6 +73,10 @@ import {ToastrModule} from 'ngx-toastr';
     {
       provide: ErrorHandler,
       useClass: ErrorNotificationHandler
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthenticationInterceptor, multi: true
     }
   ],
   bootstrap: [AppComponent]
