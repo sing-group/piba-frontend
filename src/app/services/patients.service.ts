@@ -79,8 +79,8 @@ export class PatientsService {
         }
       ),
       PibaError.throwOnError(
-        'Error retrieving id space',
-        'It was not possible to retrieve patient\'s id space.'
+        'Error retrieving the patient',
+        'It was not possible to recover the patient.'
       )
     );
   }

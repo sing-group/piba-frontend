@@ -4,6 +4,7 @@ import {PatientsService} from '../../services/patients.service';
 import {EnumUtils} from '../../utils/enum.utils';
 import {IdSpace} from '../../models/IdSpace';
 import {IdSpacesService} from '../../services/idspaces.service';
+import {NotificationService} from '../../modules/notification/services/notification.service';
 
 @Component({
   selector: 'app-patient',
@@ -23,7 +24,6 @@ export class PatientsComponent implements OnInit {
 
   patientIDText: string;
   patient: Patient;
-  error: string;
 
   patientID: string;
   birthdate: string;
@@ -34,7 +34,8 @@ export class PatientsComponent implements OnInit {
   idSpaceToFind: IdSpace;
 
   constructor(private patientsService: PatientsService,
-              private idSpacesService: IdSpacesService) {
+              private idSpacesService: IdSpacesService,
+              private notificationService: NotificationService) {
   }
 
   ngOnInit() {
@@ -52,16 +53,20 @@ export class PatientsComponent implements OnInit {
         sex: this.sex,
         idSpace: this.idSpace
       };
-      this.patientsService.createPatient(this.newPatient).subscribe(newPatient =>
-        this.patients = this.patients.concat(newPatient)
+      this.patientsService.createPatient(this.newPatient).subscribe(newPatient => {
+          this.patients = this.patients.concat(newPatient);
+          this.notificationService.success('Patient registered.', 'Patient registered successfully.');
+        }
       );
     } else {
       this.patient.birthdate = new Date(this.birthdate);
       this.patient.sex = this.sex;
       this.patient.patientID = this.patientID;
       this.patient.idSpace = this.idSpace;
-      this.patientsService.editPatient(this.patient).subscribe(updatedPatient =>
-        Object.assign(this.patient, updatedPatient));
+      this.patientsService.editPatient(this.patient).subscribe(updatedPatient => {
+        Object.assign(this.patient, updatedPatient);
+        this.notificationService.success('Patient edited.', 'Patient edited successfully.');
+      });
     }
     this.cancel();
   }
@@ -80,11 +85,6 @@ export class PatientsComponent implements OnInit {
     this.patientsService.getPatientID(this.patientIDText, this.idSpaceToFind.id).subscribe(
       patient => {
         this.patient = patient;
-        this.error = null;
-      },
-      error => {
-        this.error = error.error;
-        this.patient = null;
       }
     );
   }
@@ -98,7 +98,10 @@ export class PatientsComponent implements OnInit {
   }
 
   delete() {
-    this.patientsService.deletePatient(this.patient.id).subscribe(() => this.patient = null);
+    this.patientsService.deletePatient(this.patient.id).subscribe(() => {
+      this.patient = null;
+      this.notificationService.success('Patient removed.', 'Patient removed successfully.');
+    });
   }
 
 }
