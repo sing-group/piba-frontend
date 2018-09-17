@@ -30,6 +30,7 @@ import {ErrorNotificationHandler} from './modules/notification/handlers/error-no
 import {ToastrModule} from 'ngx-toastr';
 import {LoginComponent} from './components/login/login.component';
 import {AuthenticationInterceptor} from './helpers/authentication.interceptor';
+import {AgePipe} from './pipes/age.pipe';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import {AuthenticationInterceptor} from './helpers/authentication.interceptor';
     PolypComponent,
     TimeToNumberPipe,
     VideoModificationComponent,
-    LoginComponent
+    LoginComponent,
+    AgePipe
   ],
   imports: [
     BrowserModule,

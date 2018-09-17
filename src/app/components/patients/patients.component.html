@@ -97,16 +97,20 @@
   <table class="table table-vertical">
     <tbody>
     <tr>
-      <th>ID</th>
-      <td>{{patient.id}}</td>
+      <th>ID Space</th>
+      <td>{{patient.idSpace.name}}</td>
     </tr>
     <tr>
       <th>ID Paciente</th>
       <td>{{patient.patientID}}</td>
     </tr>
     <tr>
-      <th>ID Space</th>
-      <td>{{patient.idSpace.name}}</td>
+      <th>Sex</th>
+      <td>{{patient.sex}}</td>
+    </tr>
+    <tr>
+      <th>Age</th>
+      <td>{{patient.birthdate | age}}</td>
     </tr>
     <tr>
       <th>Actions</th>

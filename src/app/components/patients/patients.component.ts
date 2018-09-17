@@ -16,7 +16,6 @@ export class PatientsComponent implements OnInit {
   creatingPatient: Boolean = false;
   editingPatient: Boolean = false;
 
-  patients: Patient[] = [];
   newPatient: Patient = new Patient();
 
   SEX = SEX;
@@ -53,20 +52,17 @@ export class PatientsComponent implements OnInit {
         sex: this.sex,
         idSpace: this.idSpace
       };
-      this.patientsService.createPatient(this.newPatient).subscribe(newPatient => {
-          this.patients = this.patients.concat(newPatient);
-          this.notificationService.success('Patient registered.', 'Patient registered successfully.');
-        }
+      this.patientsService.createPatient(this.newPatient).subscribe(() =>
+        this.notificationService.success('Patient registered.', 'Patient registered successfully.')
       );
     } else {
       this.patient.birthdate = new Date(this.birthdate);
       this.patient.sex = this.sex;
       this.patient.patientID = this.patientID;
       this.patient.idSpace = this.idSpace;
-      this.patientsService.editPatient(this.patient).subscribe(updatedPatient => {
-        Object.assign(this.patient, updatedPatient);
-        this.notificationService.success('Patient edited.', 'Patient edited successfully.');
-      });
+      this.patientsService.editPatient(this.patient).subscribe(() =>
+        this.notificationService.success('Patient edited.', 'Patient edited successfully.')
+      );
     }
     this.cancel();
   }
@@ -85,6 +81,7 @@ export class PatientsComponent implements OnInit {
     this.patientsService.getPatientID(this.patientIDText, this.idSpaceToFind.id).subscribe(
       patient => {
         this.patient = patient;
+        this.patient.patientID = this.patientIDText;
       }
     );
   }
