@@ -27,10 +27,10 @@ import {TimeToNumberPipe} from './pipes/time-to-number.pipe';
 import {VideoModificationComponent} from './components/video-modification/video-modification.component';
 import {NotificationModule} from './modules/notification/notification.module';
 import {ErrorNotificationHandler} from './modules/notification/handlers/error-notification.handler';
-import {ToastrModule} from 'ngx-toastr';
 import {LoginComponent} from './components/login/login.component';
 import {AuthenticationInterceptor} from './helpers/authentication.interceptor';
 import {AgePipe} from './pipes/age.pipe';
+import {SimpleNotificationsModule} from 'angular2-notifications';
 
 @NgModule({
   declarations: [
@@ -55,8 +55,8 @@ import {AgePipe} from './pipes/age.pipe';
     AppRoutingModule,
     ClarityModule,
     ReactiveFormsModule,
-    ToastrModule.forRoot({
-      positionClass: 'toast-bottom-right',
+    SimpleNotificationsModule.forRoot({
+      timeOut: 5000,
       preventDuplicates: true
     }),
     NotificationModule.forRoot()
