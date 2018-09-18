@@ -7,15 +7,16 @@
 
 
 <form ngNativeValidate #idSpaceForm="ngForm" (submit)="save()">
-  <clr-modal [(clrModalOpen)]="creatingIdSpace" [clrModalClosable]="false">
+  <clr-modal [(clrModalOpen)]="creatingIdSpace ||  editingIdSpace" [clrModalClosable]="false">
     <h3 class="modal-title" *ngIf="creatingExploration">Add ID Space</h3>
+    <h3 class="modal-title" *ngIf="editingIdSpace">Edit ID Space</h3>
     <div class="modal-body">
 
       <section class="form-block">
         <div class="form-group">
           <label for="exploration-form-name" class="required">Name</label>
           <input type="text" id="exploration-form-name" name="name" [(ngModel)]="idSpace.name" required
-                 pattern="[a-zA-Z0-9\s]+" title="Must be a alphanumeric" #nameIdSpace="ngModel"
+                 pattern="[a-zA-ZñÑ0-9\s]+" title="Must be a alphanumeric" #nameIdSpace="ngModel"
           />
         </div>
       </section>
@@ -44,7 +45,7 @@
     <clr-dg-cell>{{idSpace.name}}</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-link btn-icon">
-        <button class="btn">
+        <button class="btn" (click)="edit(idSpace.id)">
           <clr-icon shape="cog"></clr-icon>
           <span class="clr-icon-title">Settings</span>
         </button>

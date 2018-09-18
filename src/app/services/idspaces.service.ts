@@ -36,6 +36,14 @@ export class IdSpacesService {
       );
   }
 
+  editIdSpace(idSpace: IdSpace): Observable<IdSpace> {
+    const idSpaceInfo = this.toIdSpaceInfo(idSpace);
+    return this.http.put<IdSpaceInfo>(`${environment.restApi}/idspace`, idSpaceInfo)
+      .pipe(
+        map(this.mapIdSpaceInfo.bind(this))
+      );
+  }
+
   private mapIdSpaceInfo(idSpaceInfo: IdSpaceInfo): IdSpace {
     return {
       id: idSpaceInfo.id,

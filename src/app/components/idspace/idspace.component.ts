@@ -11,6 +11,7 @@ import {NotificationService} from '../../modules/notification/services/notificat
 export class IdspaceComponent implements OnInit {
 
   creatingIdSpace: Boolean = false;
+  editingIdSpace: Boolean = false;
   idSpace: IdSpace = new IdSpace();
 
   idSpaces: IdSpace[] = [];
@@ -28,15 +29,28 @@ export class IdspaceComponent implements OnInit {
         (newIDSpace) => {
           this.idSpaces = this.idSpaces.concat(newIDSpace);
           this.notificationService.success('ID Space registered.', 'Id Space registered successfully.');
-        })
-      ;
+          this.cancel();
+        });
+    } else {
+      this.idSpacesService.editIdSpace(this.idSpace).subscribe(updated => {
+          Object.assign(this.idSpaces.find((idSpace) => idSpace.id === this.idSpace.id), updated);
+          this.notificationService.success('ID Space edited.', 'ID Space edited successfully.');
+          this.cancel();
+        }
+      );
     }
-    this.cancel();
+
+  }
+
+  edit(id: string) {
+    this.editingIdSpace = true;
+    this.idSpace = this.idSpaces.find((idSpace) => idSpace.id === id);
   }
 
   cancel() {
     this.idSpace = new IdSpace();
     this.creatingIdSpace = false;
+    this.editingIdSpace = false;
   }
 
 }
