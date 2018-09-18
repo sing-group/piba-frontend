@@ -6,6 +6,7 @@ import Patient from '../../models/Patient';
 import {PatientsService} from '../../services/patients.service';
 import {IdSpacesService} from '../../services/idspaces.service';
 import {IdSpace} from '../../models/IdSpace';
+import {NotificationService} from '../../modules/notification/services/notification.service';
 
 class ExplorationComparator implements ClrDatagridComparatorInterface<Exploration> {
   compare(exploration1: Exploration, exploration2: Exploration) {
@@ -40,7 +41,7 @@ export class ExplorationsComponent implements OnInit {
   readonly explorationComparator = new ExplorationComparator();
 
   constructor(private explorationsService: ExplorationsService, private patientsService: PatientsService,
-              private idSpacesService: IdSpacesService) {
+              private idSpacesService: IdSpacesService, private notificationService: NotificationService) {
   }
 
   ngOnInit() {
@@ -71,10 +72,11 @@ export class ExplorationsComponent implements OnInit {
             .subscribe(newExploration => {
               this.explorations = this.explorations.concat(newExploration);
               this.patientError = null;
+              this.notificationService.success('Exploration registered.', 'Exploration registered successfully.');
               this.cancel();
             });
         }, error => {
-          this.patientError = error.error;
+          this.patientError = error;
         }
       );
     } else {
@@ -82,6 +84,7 @@ export class ExplorationsComponent implements OnInit {
       this.exploration.date = new Date(this.date);
       this.explorationsService.editExploration(this.exploration).subscribe(updatedExploration => {
         Object.assign(this.explorations.find((exploration) => exploration.id === this.exploration.id), updatedExploration);
+        this.notificationService.success('Exploration edited.', 'Exploration edited successfully.');
         this.cancel();
       });
     }
@@ -104,6 +107,7 @@ export class ExplorationsComponent implements OnInit {
           )
         );
         this.explorations.splice(index, 1);
+        this.notificationService.success('Exploration removed.', 'Exploration removed successfully.');
       }
     );
   }
