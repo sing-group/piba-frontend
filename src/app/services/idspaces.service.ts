@@ -5,8 +5,6 @@ import {environment} from '../../environments/environment';
 import {IdSpace} from '../models/IdSpace';
 import {IdSpaceInfo} from './entities/IdSpaceInfo';
 import {map} from 'rxjs/operators';
-import ExplorationInfo from './entities/ExplorationInfo';
-import {PibaError} from '../modules/notification/entities';
 
 @Injectable()
 export class IdSpacesService {
@@ -45,9 +43,7 @@ export class IdSpacesService {
   }
 
   delete(id: string) {
-    return this.http.delete(`${environment.restApi}/idspace/${id}`).pipe(
-      PibaError.throwOnError('Not removed space', 'The space with id ' + id + ' could not be removed.')
-    );
+    return this.http.delete(`${environment.restApi}/idspace/${id}`);
   }
 
   private mapIdSpaceInfo(idSpaceInfo: IdSpaceInfo): IdSpace {
