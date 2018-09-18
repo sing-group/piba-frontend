@@ -13,7 +13,10 @@ export class IdspaceComponent implements OnInit {
   creatingIdSpace: Boolean = false;
   idSpace: IdSpace = new IdSpace();
 
+  idSpaces: IdSpace[] = [];
+
   constructor(private idSpacesService: IdSpacesService, private notificationService: NotificationService) {
+    this.idSpacesService.getIdSpaces().subscribe((idSpaces) => this.idSpaces = idSpaces);
   }
 
   ngOnInit() {
@@ -22,9 +25,11 @@ export class IdspaceComponent implements OnInit {
   save() {
     if (this.creatingIdSpace) {
       this.idSpacesService.createIdSpace(this.idSpace).subscribe(
-        () =>
-          this.notificationService.success('ID Space registered.', 'Id Space registered successfully.')
-      );
+        (newIDSpace) => {
+          this.idSpaces = this.idSpaces.concat(newIDSpace);
+          this.notificationService.success('ID Space registered.', 'Id Space registered successfully.');
+        })
+      ;
     }
     this.cancel();
   }
