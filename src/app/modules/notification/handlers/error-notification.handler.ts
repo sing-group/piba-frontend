@@ -19,7 +19,7 @@ export class ErrorNotificationHandler implements ErrorHandler {
       console.log('CAUSE', error.cause);
       this.notificationService.error(error.detail, error.summary);
     } else if (error instanceof HttpErrorResponse) {
-      this.notificationService.error(error.statusText, error.message);
+      this.notificationService.error(error.error, error.statusText);
     }
   }
 }
