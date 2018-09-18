@@ -44,6 +44,12 @@ export class IdSpacesService {
       );
   }
 
+  delete(id: string) {
+    return this.http.delete(`${environment.restApi}/idspace/${id}`).pipe(
+      PibaError.throwOnError('Not removed space', 'The space with id ' + id + ' could not be removed.')
+    );
+  }
+
   private mapIdSpaceInfo(idSpaceInfo: IdSpaceInfo): IdSpace {
     return {
       id: idSpaceInfo.id,

@@ -47,6 +47,16 @@ export class IdspaceComponent implements OnInit {
     this.idSpace = this.idSpaces.find((idSpace) => idSpace.id === id);
   }
 
+  delete(id: string) {
+    this.idSpacesService.delete(id).subscribe(() => {
+      const index = this.idSpaces.indexOf(
+        this.idSpaces.find((idSpace) => idSpace.id === id)
+      );
+      this.idSpaces.splice(index, 1);
+      this.notificationService.success('ID Space removed.', 'ID Space removed successfully.');
+    });
+  }
+
   cancel() {
     this.idSpace = new IdSpace();
     this.creatingIdSpace = false;
