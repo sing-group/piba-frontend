@@ -58,7 +58,7 @@
         <div class="form-group">
           <label for="exploration-form-location" class="required">Location</label>
           <input type="text" id="exploration-form-location" name="location" [(ngModel)]="location" required
-                 pattern="[a-zA-Z0-9]*"
+                 pattern="[a-zA-ZñÑ0-9\s]+"
                  title="Must be a alphanumeric" #locationExploration="ngModel"/>
         </div>
         <div *ngIf="creatingExploration">
