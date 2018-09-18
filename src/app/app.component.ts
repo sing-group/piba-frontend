@@ -4,6 +4,7 @@ import {Severity} from './modules/notification/entities';
 import {AuthenticationService} from './services/authentication.service';
 import {Router} from '@angular/router';
 import {NotificationsService} from 'angular2-notifications';
+import {Role} from './models/User';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,8 @@ import {NotificationsService} from 'angular2-notifications';
 })
 export class AppComponent implements OnInit {
   title = 'PIBA';
+
+  role = Role;
 
   constructor(
     private notificationService: NotificationService,

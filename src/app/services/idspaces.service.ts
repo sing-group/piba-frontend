@@ -5,6 +5,8 @@ import {environment} from '../../environments/environment';
 import {IdSpace} from '../models/IdSpace';
 import {IdSpaceInfo} from './entities/IdSpaceInfo';
 import {map} from 'rxjs/operators';
+import ExplorationInfo from './entities/ExplorationInfo';
+import {PibaError} from '../modules/notification/entities';
 
 @Injectable()
 export class IdSpacesService {
@@ -26,10 +28,25 @@ export class IdSpacesService {
       );
   }
 
+  createIdSpace(idSpace: IdSpace): Observable<IdSpace> {
+    const idSpaceInfo = this.toIdSpaceInfo(idSpace);
+    return this.http.post<IdSpaceInfo>(`${environment.restApi}/idspace`, idSpaceInfo)
+      .pipe(
+        map(this.mapIdSpaceInfo.bind(this))
+      );
+  }
+
   private mapIdSpaceInfo(idSpaceInfo: IdSpaceInfo): IdSpace {
     return {
       id: idSpaceInfo.id,
       name: idSpaceInfo.name
+    };
+  }
+
+  private toIdSpaceInfo(idSpace: IdSpace): IdSpaceInfo {
+    return {
+      id: idSpace.id,
+      name: idSpace.name
     };
   }
 

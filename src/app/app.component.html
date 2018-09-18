@@ -20,6 +20,8 @@
       <section class="sidenav-content">
         <a class="nav-link " routerLink="/explorations">Explorations</a>
         <a class="nav-link" routerLink="/patients">Patients</a>
+        <a class="nav-link " routerLink="/idspace" *ngIf="authenticationService.getRole() == role.ADMIN">ID
+          Space</a>
       </section>
     </nav>
   </div>

@@ -46,6 +46,10 @@ export class AuthenticationService {
     return this.user;
   }
 
+  public getRole(): Role {
+    return this.user.role;
+  }
+
   public isGuest(): boolean {
     return !this.user.authenticated;
   }

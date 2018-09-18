@@ -6,8 +6,12 @@ import {PatientsComponent} from './components/patients/patients.component';
 import {ExplorationsComponent} from './components/explorations/explorations.component';
 import {LoginComponent} from './components/login/login.component';
 import {AuthGuard} from './guards/authGuard';
+import {IdspaceComponent} from './components/idspace/idspace.component';
 
 const routes: Routes = [
+  {
+    path: 'idspace', component: IdspaceComponent, canActivate: [AuthGuard]
+  },
   {
     path: 'patients', component: PatientsComponent, canActivate: [AuthGuard]
   },

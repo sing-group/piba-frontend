@@ -31,6 +31,7 @@ import {LoginComponent} from './components/login/login.component';
 import {AuthenticationInterceptor} from './helpers/authentication.interceptor';
 import {AgePipe} from './pipes/age.pipe';
 import {SimpleNotificationsModule} from 'angular2-notifications';
+import { IdspaceComponent } from './components/idspace/idspace.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import {SimpleNotificationsModule} from 'angular2-notifications';
     TimeToNumberPipe,
     VideoModificationComponent,
     LoginComponent,
-    AgePipe
+    AgePipe,
+    IdspaceComponent
   ],
   imports: [
     BrowserModule,
