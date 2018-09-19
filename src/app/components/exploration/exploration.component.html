@@ -8,8 +8,12 @@
         <table class="table">
           <tbody>
           <tr>
-            <td class="left">Patient</td>
-            <td class="left">{{exploration.patient.patientID}}</td>
+            <td class="left">Sex</td>
+            <td class="left">{{exploration.patient.sex}}</td>
+          </tr>
+          <tr>
+            <td class="left">Age</td>
+            <td class="left">{{exploration.patient.birthdate | age}}</td>
           </tr>
           <tr>
             <td class="left">Exploration date</td>
