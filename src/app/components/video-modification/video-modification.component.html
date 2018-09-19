@@ -4,10 +4,10 @@
       <p>Modifier: {{videoModification.modifier.name}} </p>
     </div>
     <div class="col-sm-3 col-md-3">
-      <p>INI: {{videoModification.start | time}}</p>
+      <p>Start: {{videoModification.start | time}}</p>
     </div>
     <div class="col-sm-3 col-md-3">
-      <p>FIN: {{videoModification.end | time}}</p>
+      <p>Stop: {{videoModification.end | time}}</p>
     </div>
     <div class="col-sm-3 col-md-3">
       <button type="button" class="btn btn-secondary" (click) ="remove(videoModification)">
@@ -37,7 +37,7 @@
 
     <div class="form-group row">
       <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
-        <label for="modifierVideo-start" class="required">INI:</label>
+        <label for="modifierVideo-start" class="required">Start:</label>
       </div>
       <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6">
         <input id="modifierVideo-start" type="text" name="start" [(ngModel)]="start" class="input-timer"
@@ -51,7 +51,7 @@
 
     <div class="form-group row">
       <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
-        <label for="modifierVideo-end" class="required">FIN: </label>
+        <label for="modifierVideo-end" class="required">Stop: </label>
       </div>
       <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6">
         <input id="modifierVideo-end" type="text" name="end" [(ngModel)]="end" class="input-timer" readonly

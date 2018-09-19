@@ -9,84 +9,72 @@
   <clr-tab>
     <button clrTabLink id="Polyps">Polyps</button>
     <clr-tab-content *clrIfActive="true">
-      <div *ngFor="let polypRecording of video.polypRecording">
-        <div class="row">
-          <div class="col-sm-3 col-md-3">
-            <p>Polyp: {{polypRecording.polyp.name}} </p>
-          </div>
-          <div class="col-sm-3 col-md-3">
-            <p>INI: {{polypRecording.start | time}}</p>
-          </div>
-          <div class="col-sm-3 col-md-3">
-            <p>FIN: {{polypRecording.end | time}}</p>
-          </div>
-          <div class="col-sm-3 col-md-3">
-            <button type="button" class="btn btn-secondary" (click)="removePolypRecording(polypRecording)">
-              <clr-icon shape="times"></clr-icon>
-              Remove
-            </button>
-          </div>
-        </div>
-      </div>
 
       <div class="tab-container">
         <form #polypRecordingForm="ngForm" ngNativeValidate>
-          <section class="form-block">
 
-            <div class="form-group row">
-              <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">
-                <label for="polyp-name" class="required">Polyp</label>
-              </div>
-              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6">
-                <div class="select">
-                  <select id="polyp-name" [(ngModel)]="selectedPolyp" name="selectedPolyp" required #polyp="ngModel">
-                    <option value="" selected>&lt;Polyp&gt;</option>
-                    <option *ngFor="let p of polyps" [ngValue]="p">{{p.name}}</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6">
-                <button type="button" class="btn btn-icon" title="Add polyp" (click)="modalOpened = true">
-                  <clr-icon shape="plus"></clr-icon>
-                </button>
+          <div class="form-group row">
+            <div class="col-lg-2 col-md-4 col-sm-5 col-xs-5">
+              <label for="polyp-name" class="required">Polyp</label>
+            </div>
+            <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
+              <div class="select">
+                <select id="polyp-name" [(ngModel)]="selectedPolyp" name="selectedPolyp" required #polyp="ngModel">
+                  <option value="" selected>&lt;Polyp&gt;</option>
+                  <option *ngFor="let p of polyps" [ngValue]="p">{{p.name}}</option>
+                </select>
               </div>
             </div>
 
-            <div class="form-group row">
-              <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
-                <label for="polyp-start" class="required">INI:</label>
-              </div>
-              <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6">
-                <input id="polyp-start" type="text" name="start" [(ngModel)]="start" class="input-timer" readonly
-                       required
-                       #startP="ngModel"/>
-                <button type="button" (click)="startPolyp()" class="btn btn-icon">
-                  <clr-icon shape="clock"></clr-icon>
-                </button>
-              </div>
-            </div>
+            <div class="col-lg-2 col-md-2 col-sm-1 col-xs-2">
+              <button type="button" class="btn btn-icon" title="Add polyp" (click)="modalOpened = true">
+                <clr-icon shape="plus"></clr-icon>
+              </button>
 
-            <div class="form-group row">
-              <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
-                <label for="polyp-end" class="required">FIN: </label>
-              </div>
-              <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6">
-                <input id="polyp-end" type="text" name="end" [(ngModel)]="end" class="input-timer" readonly required
-                       #endP="ngModel"/>
-                <button type="button" (click)="endPolyp()" class="btn btn-icon">
-                  <clr-icon shape="clock"></clr-icon>
-                </button>
-              </div>
             </div>
-            <button type="submit" class="btn btn-primary"
-                    [disabled]="!timesAreCorrect() || polyp.invalid || startP.invalid || endP.invalid"
-                    (click)="addPolypRecording()">
-              <clr-icon shape="plus"></clr-icon>
-              Add
-            </button>
-          </section>
+          </div>
+
+          <div class="form-group row">
+            <div class="col-lg-2 col-md-4 col-sm-5 col-xs-5">
+              <label for="polyp-start" class="required">Start:</label>
+            </div>
+            <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
+              <input id="polyp-start" type="text" name="start" [(ngModel)]="start" class="input-timer" readonly
+                     required
+                     #startP="ngModel"/>
+
+            </div>
+            <div class="col-xs-2 col-sm-1 col-md-2">
+              <button type="button" (click)="startPolyp()" class="btn btn-icon">
+                <clr-icon shape="clock"></clr-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <div class="col-lg-2 col-md-4 col-sm-5 col-xs-5">
+              <label for="polyp-end" class="required">Stop: </label>
+            </div>
+            <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
+              <input id="polyp-end" type="text" name="end" [(ngModel)]="end" class="input-timer" readonly required
+                     #endP="ngModel"/>
+
+            </div>
+            <div class="col-xs-2 col-sm-1 col-md-2">
+              <button type="button" (click)="endPolyp()" class="btn btn-icon">
+                <clr-icon shape="clock"></clr-icon>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary"
+                  [disabled]="!timesAreCorrect() || polyp.invalid || startP.invalid || endP.invalid"
+                  (click)="addPolypRecording()">
+            <clr-icon shape="plus"></clr-icon>
+            Add
+          </button>
         </form>
+
         <form (submit)="addPolyp()" ngNativeValidate>
           <clr-modal [(clrModalOpen)]="modalOpened" [clrModalSize]="'sm'">
             <h3 class="modal-title">Add polyp</h3>
@@ -106,7 +94,34 @@
             </div>
           </clr-modal>
         </form>
+
+        <clr-datagrid>
+          <clr-dg-column>Polyp</clr-dg-column>
+          <clr-dg-column>Start</clr-dg-column>
+          <clr-dg-column>Stop</clr-dg-column>
+          <clr-dg-column>Actions</clr-dg-column>
+
+          <clr-dg-row *ngFor="let polypRecording of video.polypRecording">
+            <clr-dg-cell>{{polypRecording.polyp.name}}</clr-dg-cell>
+            <clr-dg-cell>{{polypRecording.start | time}}</clr-dg-cell>
+            <clr-dg-cell>{{polypRecording.end | time}}</clr-dg-cell>
+            <clr-dg-cell style="padding: 0px;">
+              <button type="button" class="btn btn-secondary" (click)="removePolypRecording(polypRecording)">
+                <clr-icon shape="times"></clr-icon>
+                Remove
+              </button>
+              <button type="button" class="btn btn-secondary">
+                <clr-icon shape="play"></clr-icon>
+                Play
+              </button>
+            </clr-dg-cell>
+          </clr-dg-row>
+
+          <clr-dg-footer>{{video.polypRecording.length}} polyp recording</clr-dg-footer>
+        </clr-datagrid>
+
       </div>
+
     </clr-tab-content>
   </clr-tab>
   <clr-tab>
