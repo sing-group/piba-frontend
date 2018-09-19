@@ -7,8 +7,12 @@ import {ExplorationsComponent} from './components/explorations/explorations.comp
 import {LoginComponent} from './components/login/login.component';
 import {AuthGuard} from './guards/authGuard';
 import {IdspaceComponent} from './components/idspace/idspace.component';
+import {UserComponent} from './components/user/user.component';
 
 const routes: Routes = [
+  {
+    path: 'users', component: UserComponent, canActivate: [AuthGuard]
+  },
   {
     path: 'idspace', component: IdspaceComponent, canActivate: [AuthGuard]
   },

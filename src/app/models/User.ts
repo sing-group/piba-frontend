@@ -15,7 +15,7 @@ export class User {
       this._authHeader = user._authHeader;
     } else {
       this._authenticated = false;
-      this._role = Role.GUEST;
+      this._role = null;
     }
   }
 
@@ -71,6 +71,5 @@ export class User {
 
 export enum Role {
   ADMIN = 'ADMIN',
-  USER = 'USER',
-  GUEST = 'GUEST'
+  USER = 'USER'
 }

@@ -1,0 +1,59 @@
+<div class="row">
+  <button type="button" class="btn-add btn btn-primary" (click)="creatingUser=true">
+    <clr-icon shape="plus"></clr-icon>
+    Add User
+  </button>
+</div>
+
+
+<form ngNativeValidate #userForm="ngForm" (submit)="save()">
+  <clr-modal [(clrModalOpen)]="creatingUser" [clrModalClosable]="false">
+    <h3 class="modal-title" *ngIf="creatingUser">Add User</h3>
+    <div class="modal-body">
+
+      <section class="form-block">
+        <div class="form-group">
+          <label for="user-form-name" class="required">Login</label>
+          <input type="text" id="user-form-name" id="login" name="login" [(ngModel)]="user.login" required
+                 pattern="[a-zA-ZñÑ0-9_]{1,100}" title="Must be a alphanumeric" #loginUser="ngModel"
+          />
+
+          <div *ngIf="userForm.submitted && loginUser.invalid" class="alert alert-danger">
+            <div *ngIf="loginUser.errors.required">Username is required.</div>
+            <div *ngIf="loginUser.errors.pattern">Username can only contain letters, numbers or underscore and should
+              have a length between 1 and 100.
+            </div>
+          </div>
+
+        </div>
+        <div class="form-group">
+          <label for="user-form-password" class="required">Password</label>
+          <input type="password" id="user-form-password" name="password" [(ngModel)]="user.password" required
+                 minlength="6" #passwordUser="ngModel"
+          />
+          <div *ngIf="userForm.submitted && passwordUser.invalid" class="alert alert-danger">
+            <div *ngIf="passwordUser.errors.required">Password is required.</div>
+            <div *ngIf="passwordUser.errors.minlength">Password can't be shorter than 6 characters.</div>
+          </div>
+
+        </div>
+        <div class="form-group">
+          <label for="user-form-role" class="required">Role</label>
+          <div class="select">
+            <select id="user-form-role" [(ngModel)]="user.role" name="role" required
+                    #roleUser="ngModel">
+              <option *ngFor="let role of keys(roles)" [ngValue]="role">{{role}}</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
+      <button type="submit" class="btn btn-primary">
+        Ok
+      </button>
+    </div>
+  </clr-modal>
+</form>
