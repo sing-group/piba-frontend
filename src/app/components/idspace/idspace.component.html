@@ -8,14 +8,14 @@
 
 <form ngNativeValidate #idSpaceForm="ngForm" (submit)="save()">
   <clr-modal [(clrModalOpen)]="creatingIdSpace ||  editingIdSpace" [clrModalClosable]="false">
-    <h3 class="modal-title" *ngIf="creatingExploration">Add ID Space</h3>
+    <h3 class="modal-title" *ngIf="creatingIdSpace">Add ID Space</h3>
     <h3 class="modal-title" *ngIf="editingIdSpace">Edit ID Space</h3>
     <div class="modal-body">
 
       <section class="form-block">
         <div class="form-group">
-          <label for="exploration-form-name" class="required">Name</label>
-          <input type="text" id="exploration-form-name" name="name" [(ngModel)]="idSpace.name" required
+          <label for="idspace-form-name" class="required">Name</label>
+          <input type="text" id="idspace-form-name" name="name" [(ngModel)]="idSpace.name" required
                  pattern="[a-zA-ZñÑ0-9\s]+" title="Must be a alphanumeric" #nameIdSpace="ngModel"
           />
         </div>
