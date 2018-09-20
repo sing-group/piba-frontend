@@ -29,8 +29,11 @@ export class VideoEditorComponent implements OnInit {
   newPolypRecording: PolypRecording;
 
   currentTime: number;
+  videoHTML: HTMLMediaElement;
 
   modalOpened = false;
+
+  pauseWatcher: any;
 
   constructor(
     private videosService: VideosService,
@@ -53,7 +56,7 @@ export class VideoEditorComponent implements OnInit {
         this.polypRecordingsService.getPolypRecordingsByVideo(video.id).subscribe(polypRecordings => {
             this.video.polypRecording = polypRecordings;
             polypRecordings.map(polypRecording =>
-              this.deleteSelectedPolyp(polypRecording.polyp.name));
+              this.cleanAlreadySelectedPolyps(polypRecording.polyp.name));
           }
         );
 
@@ -111,13 +114,13 @@ export class VideoEditorComponent implements OnInit {
           this.video.polypRecording = this.video.polypRecording.concat(newPolypRecording);
           this.start = null;
           this.end = null;
-          this.deleteSelectedPolyp(this.selectedPolyp.name);
+          this.cleanAlreadySelectedPolyps(this.selectedPolyp.name);
           this.selectedPolyp = null;
         }
       );
   }
 
-  private deleteSelectedPolyp(namePolyp: string) {
+  private cleanAlreadySelectedPolyps(namePolyp: string) {
     const polypRemove = this.polyps.indexOf(
       this.polyps.find((polyp) => polyp.name === namePolyp)
     );
@@ -135,6 +138,19 @@ export class VideoEditorComponent implements OnInit {
         this.video.polypRecording.splice(index, 1);
       }
     );
+  }
+
+  playPolypRecording(polypRecording: PolypRecording) {
+    this.videoHTML = document.getElementById('video-exploration') as HTMLMediaElement;
+    this.videoHTML.currentTime = polypRecording.start;
+    this.videoHTML.play();
+    this.pauseWatcher = setInterval(() => {
+      if (this.videoHTML.currentTime >= polypRecording.end) {
+        this.videoHTML.pause();
+        clearInterval(this.pauseWatcher);
+      }
+    }, 500);
+
   }
 
 }
