@@ -140,12 +140,12 @@ export class VideoEditorComponent implements OnInit {
     );
   }
 
-  playPolypRecording(polypRecording: PolypRecording) {
+  playInterval(start: number, end: number) {
     this.videoHTML = document.getElementById('video-exploration') as HTMLMediaElement;
-    this.videoHTML.currentTime = polypRecording.start;
+    this.videoHTML.currentTime = start;
     this.videoHTML.play();
     this.pauseWatcher = setInterval(() => {
-      if (this.videoHTML.currentTime >= polypRecording.end) {
+      if (this.videoHTML.currentTime >= end) {
         this.videoHTML.pause();
         clearInterval(this.pauseWatcher);
       }

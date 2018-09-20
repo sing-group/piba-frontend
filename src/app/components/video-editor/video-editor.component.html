@@ -110,7 +110,8 @@
                 <clr-icon shape="times"></clr-icon>
                 Remove
               </button>
-              <button type="button" class="btn btn-secondary" (click)="playPolypRecording(polypRecording)">
+              <button type="button" class="btn btn-secondary"
+                      (click)="playInterval(polypRecording.start, polypRecording.end)">
                 <clr-icon shape="play"></clr-icon>
                 Play
               </button>
@@ -130,7 +131,8 @@
 
       <div class="tab-container">
         <app-video-modification [video]="video" [currentTime]="currentTime"
-                                [timesAreCorrect]="timesAreCorrect"></app-video-modification>
+                                [timesAreCorrect]="timesAreCorrect"
+                                [playInterval]="playInterval"></app-video-modification>
       </div>
 
     </clr-tab-content>

@@ -1,73 +1,80 @@
-<div *ngFor="let videoModification of videoModifications">
-  <div class="row">
-    <div class="col-sm-3 col-md-3">
-      <p>Modifier: {{videoModification.modifier.name}} </p>
+<form #modifierVideoForm="ngForm" ngNativeValidate (submit)="addVideoModification()">
+  <div class="form-group row">
+    <div class="col-lg-2 col-md-4 col-sm-5 col-xs-5">
+      <label for="modifier-name" class="required">Modifier</label>
     </div>
-    <div class="col-sm-3 col-md-3">
-      <p>Start: {{videoModification.start | time}}</p>
+    <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
+      <div class="select">
+        <select id="modifier-name" [(ngModel)]="selectedModifier" name="selectedModifier" required
+                #modifier="ngModel">
+          <option value="" selected>&lt;Modifier&gt;</option>
+          <option *ngFor="let m of modifiers" [ngValue]="m">{{m.name}}</option>
+        </select>
+      </div>
     </div>
-    <div class="col-sm-3 col-md-3">
-      <p>Stop: {{videoModification.end | time}}</p>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-lg-2 col-md-4 col-sm-5 col-xs-5">
+      <label for="modifierVideo-start" class="required">Start:</label>
     </div>
-    <div class="col-sm-3 col-md-3">
-      <button type="button" class="btn btn-secondary" (click) ="remove(videoModification)">
-        <clr-icon shape="times"></clr-icon>
-        Remove
+    <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
+      <input id="modifierVideo-start" type="text" name="start" [(ngModel)]="start" class="input-timer"
+             readonly required
+             #startModifierForm="ngModel"/>
+    </div>
+    <div class="col-xs-2 col-sm-1 col-md-2">
+      <button type="button" (click)="startModifier()" class="btn btn-icon">
+        <clr-icon shape="clock"></clr-icon>
       </button>
     </div>
   </div>
-</div>
 
-<section class="form-block">
-  <form #modifierVideoForm="ngForm" ngNativeValidate (submit)="addVideoModification()">
-    <div class="form-group row">
-      <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">
-        <label for="modifier-name" class="required">Modifier</label>
-      </div>
-      <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6">
-        <div class="select">
-          <select id="modifier-name" [(ngModel)]="selectedModifier" name="selectedModifier" required
-                  #modifier="ngModel">
-            <option value="" selected>&lt;Modifier&gt;</option>
-            <option *ngFor="let m of modifiers" [ngValue]="m">{{m.name}}</option>
-          </select>
-        </div>
-      </div>
+  <div class="form-group row">
+    <div class="col-lg-2 col-md-4 col-sm-5 col-xs-5">
+      <label for="modifierVideo-end" class="required">Stop: </label>
     </div>
-
-    <div class="form-group row">
-      <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
-        <label for="modifierVideo-start" class="required">Start:</label>
-      </div>
-      <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6">
-        <input id="modifierVideo-start" type="text" name="start" [(ngModel)]="start" class="input-timer"
-               readonly required
-               #startModifierForm="ngModel"/>
-        <button type="button" (click)="startModifier()" class="btn btn-icon">
-          <clr-icon shape="clock"></clr-icon>
-        </button>
-      </div>
+    <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
+      <input id="modifierVideo-end" type="text" name="end" [(ngModel)]="end" class="input-timer" readonly
+             required #endModifierForm="ngModel"/>
     </div>
-
-    <div class="form-group row">
-      <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">
-        <label for="modifierVideo-end" class="required">Stop: </label>
-      </div>
-      <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6">
-        <input id="modifierVideo-end" type="text" name="end" [(ngModel)]="end" class="input-timer" readonly
-               required #endModifierForm="ngModel"/>
-        <button type="button" (click)="endModifier()" class="btn btn-icon">
-          <clr-icon shape="clock"></clr-icon>
-        </button>
-      </div>
+    <div class="col-xs-2 col-sm-1 col-md-2">
+      <button type="button" (click)="endModifier()" class="btn btn-icon">
+        <clr-icon shape="clock"></clr-icon>
+      </button>
     </div>
+  </div>
 
-    <button type="submit" class="btn btn-primary"
-            [disabled]="!timesAreCorrect() || modifier.invalid || startModifierForm.invalid || endModifierForm.invalid"
-    >
-      <clr-icon shape="plus"></clr-icon>
-      Add
-    </button>
-  </form>
-</section>
+  <button type="submit" class="btn btn-primary"
+          [disabled]="!timesAreCorrect() || modifier.invalid || startModifierForm.invalid || endModifierForm.invalid"
+  >
+    <clr-icon shape="plus"></clr-icon>
+    Add
+  </button>
+</form>
 
+<clr-datagrid>
+  <clr-dg-column>Modifier</clr-dg-column>
+  <clr-dg-column>Start</clr-dg-column>
+  <clr-dg-column>Stop</clr-dg-column>
+  <clr-dg-column>Actions</clr-dg-column>
+
+  <clr-dg-row *ngFor="let videoModification of videoModifications">
+    <clr-dg-cell>{{videoModification.modifier.name}}</clr-dg-cell>
+    <clr-dg-cell>{{videoModification.start | time}}</clr-dg-cell>
+    <clr-dg-cell>{{videoModification.end | time}}</clr-dg-cell>
+    <clr-dg-cell style="padding: 0px;">
+      <button type="button" class="btn btn-secondary" (click)="removeVideoModification(videoModification)">
+        <clr-icon shape="times"></clr-icon>
+        Remove
+      </button>
+      <button type="button" class="btn btn-secondary"
+              (click)="playInterval(videoModification.start, videoModification.end)">
+        <clr-icon shape="play"></clr-icon>
+        Play
+      </button>
+    </clr-dg-cell>
+  </clr-dg-row>
+
+  <clr-dg-footer>{{videoModifications.length}} modifiers</clr-dg-footer>
+</clr-datagrid>

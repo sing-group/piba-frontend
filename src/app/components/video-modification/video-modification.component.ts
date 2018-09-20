@@ -17,6 +17,7 @@ export class VideoModificationComponent implements OnInit {
   @Input() video: Video;
   @Input() currentTime: number;
   @Input() timesAreCorrect: Function;
+  @Input() playInterval: Function;
 
   start: String;
   end: String;
@@ -69,7 +70,7 @@ export class VideoModificationComponent implements OnInit {
     );
   }
 
-  remove(videoModification: VideoModification) {
+  removeVideoModification(videoModification: VideoModification) {
     this.videoModificationsService.removeVideoModification(videoModification.id).subscribe(
       () => {
         const index = this.videoModifications.indexOf(
