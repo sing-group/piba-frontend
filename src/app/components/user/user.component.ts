@@ -18,11 +18,14 @@ export class UserComponent implements OnInit {
   // to show the value of the enum
   keys = Object.keys;
 
+  users: Users[] = [];
+
   constructor(private usersServices: UsersService,
               private notificationService: NotificationService) {
   }
 
   ngOnInit() {
+    this.usersServices.getUsers().subscribe(users => this.users = users);
   }
 
   save() {
