@@ -144,6 +144,9 @@ export class VideoEditorComponent implements OnInit {
     this.videoHTML = document.getElementById('video-exploration') as HTMLMediaElement;
     this.videoHTML.currentTime = start;
     this.videoHTML.play();
+    if (this.pauseWatcher !== undefined && this.pauseWatcher != null) {
+      clearInterval(this.pauseWatcher);
+    }
     this.pauseWatcher = setInterval(() => {
       if (this.videoHTML.currentTime >= end) {
         this.videoHTML.pause();
