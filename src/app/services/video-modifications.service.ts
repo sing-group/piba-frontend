@@ -14,7 +14,7 @@ import {Video} from '../models/Video';
 @Injectable({
   providedIn: 'root'
 })
-export class VideomodificationsService {
+export class VideoModificationsService {
 
   constructor(private http: HttpClient, private modifiersService: ModifiersService, private videosService: VideosService) {
   }

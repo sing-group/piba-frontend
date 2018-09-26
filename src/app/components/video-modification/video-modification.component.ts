@@ -3,7 +3,7 @@ import {Video} from '../../models/Video';
 import {Modifier} from '../../models/Modifier';
 import {VideoModification} from '../../models/VideoModification';
 import {TimeToNumberPipe} from '../../pipes/time-to-number.pipe';
-import {VideomodificationsService} from '../../services/videomodifications.service';
+import {VideoModificationsService} from '../../services/video-modifications.service';
 import {TimePipe} from '../../pipes/time.pipe';
 import {ModifiersService} from '../../services/modifiers.service';
 
@@ -30,7 +30,7 @@ export class VideoModificationComponent implements OnInit {
 
   constructor(
     private modifiersService: ModifiersService,
-    private videoModificationsService: VideomodificationsService,
+    private videoModificationsService: VideoModificationsService,
     private timePipe: TimePipe,
     private timeToNumber: TimeToNumberPipe) {
   }

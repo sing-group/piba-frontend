@@ -22,7 +22,7 @@ import {PolypRecordingsService} from './services/polyprecordings.service';
 import {PatientsService} from './services/patients.service';
 import {IdSpacesService} from './services/idspaces.service';
 import {ModifiersService} from './services/modifiers.service';
-import {VideomodificationsService} from './services/videomodifications.service';
+import {VideoModificationsService} from './services/video-modifications.service';
 import {TimeToNumberPipe} from './pipes/time-to-number.pipe';
 import {VideoModificationComponent} from './components/video-modification/video-modification.component';
 import {NotificationModule} from './modules/notification/notification.module';
@@ -74,7 +74,7 @@ import {UserComponent} from './components/user/user.component';
     PatientsService,
     IdSpacesService,
     ModifiersService,
-    VideomodificationsService,
+    VideoModificationsService,
     TimeToNumberPipe,
     {
       provide: ErrorHandler,
