@@ -6,6 +6,7 @@ import {TimeToNumberPipe} from '../../pipes/time-to-number.pipe';
 import {VideoModificationsService} from '../../services/video-modifications.service';
 import {TimePipe} from '../../pipes/time.pipe';
 import {ModifiersService} from '../../services/modifiers.service';
+import {NotificationService} from '../../modules/notification/services/notification.service';
 
 @Component({
   selector: 'app-video-modification',
@@ -32,7 +33,8 @@ export class VideoModificationComponent implements OnInit {
     private modifiersService: ModifiersService,
     private videoModificationsService: VideoModificationsService,
     private timePipe: TimePipe,
-    private timeToNumber: TimeToNumberPipe) {
+    private timeToNumber: TimeToNumberPipe,
+    private notificationService: NotificationService) {
   }
 
   ngOnInit() {
@@ -65,8 +67,10 @@ export class VideoModificationComponent implements OnInit {
       start: this.timeToNumber.transform(this.start),
       end: this.timeToNumber.transform(this.end)
     };
-    this.videoModificationsService.createVideoModification(this.newVideoModification).subscribe(newVideoModification =>
-      this.videoModifications = this.videoModifications.concat(newVideoModification)
+    this.videoModificationsService.createVideoModification(this.newVideoModification).subscribe(newVideoModification => {
+        this.videoModifications = this.videoModifications.concat(newVideoModification);
+        this.notificationService.success('Video modifier registered successfully.', 'Video modifier registered.');
+      }
     );
   }
 
@@ -78,6 +82,7 @@ export class VideoModificationComponent implements OnInit {
           )
         );
         this.videoModifications.splice(index, 1);
+        this.notificationService.success('Video modifier removed successfully.', 'Video modifier removed');
       }
     );
   }

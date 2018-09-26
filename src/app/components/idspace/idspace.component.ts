@@ -28,13 +28,13 @@ export class IdspaceComponent implements OnInit {
       this.idSpacesService.createIdSpace(this.idSpace).subscribe(
         (newIDSpace) => {
           this.idSpaces = this.idSpaces.concat(newIDSpace);
-          this.notificationService.success('ID Space registered.', 'Id Space registered successfully.');
+          this.notificationService.success('ID Space registered successfully.', 'ID Space registered.');
           this.cancel();
         });
     } else {
       this.idSpacesService.editIdSpace(this.idSpace).subscribe(updated => {
           Object.assign(this.idSpaces.find((idSpace) => idSpace.id === this.idSpace.id), updated);
-          this.notificationService.success('ID Space edited.', 'ID Space edited successfully.');
+          this.notificationService.success('ID Space edited successfully.', 'ID Space edited.');
           this.cancel();
         }
       );
@@ -53,7 +53,7 @@ export class IdspaceComponent implements OnInit {
         this.idSpaces.find((idSpace) => idSpace.id === id)
       );
       this.idSpaces.splice(index, 1);
-      this.notificationService.success('ID Space removed.', 'ID Space removed successfully.');
+      this.notificationService.success('ID Space removed successfully.', 'ID Space removed.');
     });
   }
 

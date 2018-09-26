@@ -5,6 +5,7 @@ import {Exploration} from '../../models/Exploration';
 import {VideoUploadInfo} from '../../services/entities/VideoUploadInfo';
 import {VideosService} from '../../services/videos.service';
 import {ExplorationsService} from '../../services/explorations.service';
+import {NotificationService} from '../../modules/notification/services/notification.service';
 
 
 @Component({
@@ -27,8 +28,8 @@ export class ExplorationComponent implements OnInit {
   constructor(
     private videosService: VideosService,
     private explorationsService: ExplorationsService,
-    private route: ActivatedRoute
-
+    private route: ActivatedRoute,
+    private notificationService: NotificationService
   ) {
   }
 
@@ -66,6 +67,7 @@ export class ExplorationComponent implements OnInit {
     this.videosService
       .createVideo(videoUploadInfo).subscribe(video => {
       this.exploration.videos = this.exploration.videos.concat(video);
+      this.notificationService.success('Video is being processed..', 'Video uploaded');
       if (video.isProcessing) {
         this.pollProcessingVideo(video);
       }
@@ -85,6 +87,7 @@ export class ExplorationComponent implements OnInit {
           )
         );
         this.exploration.videos.splice(index, 1);
+        this.notificationService.success('Video removed successfully.', 'Video removed.');
       }
     );
   }
@@ -100,6 +103,7 @@ export class ExplorationComponent implements OnInit {
       Object.assign(this.exploration.videos.find((v) =>
         v.id === video.id
       ), updatedVideo);
+      this.notificationService.success('Video edited successfully.', 'Video edited.');
     });
   }
 

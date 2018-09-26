@@ -9,6 +9,7 @@ import {ExplorationsService} from '../../services/explorations.service';
 import {PolypRecordingsService} from '../../services/polyprecordings.service';
 import {PolypRecording} from '../../models/PolypRecording';
 import {TimeToNumberPipe} from '../../pipes/time-to-number.pipe';
+import {NotificationService} from '../../modules/notification/services/notification.service';
 
 @Component({
   selector: 'app-video-editor',
@@ -42,7 +43,8 @@ export class VideoEditorComponent implements OnInit {
     private polysService: PolypsService,
     private explorationsService: ExplorationsService,
     private polypRecordingsService: PolypRecordingsService,
-    private timeToNumber: TimeToNumberPipe
+    private timeToNumber: TimeToNumberPipe,
+    private notificationService: NotificationService
   ) {
   }
 
@@ -96,6 +98,7 @@ export class VideoEditorComponent implements OnInit {
       this.polysService.createPolyp(this.newPolyp).subscribe(polyp => {
         this.polyps.push(polyp);
         this.newPolyp = new Polyp();
+        this.notificationService.success('Polyp registed successfully.', 'Polyp registered.');
       });
     });
     this.modalOpened = false;
@@ -116,6 +119,7 @@ export class VideoEditorComponent implements OnInit {
           this.end = null;
           this.cleanAlreadySelectedPolyps(this.selectedPolyp.name);
           this.selectedPolyp = null;
+          this.notificationService.success('Polyp recording registered successfully.', 'Polyp recording registered');
         }
       );
   }
@@ -136,6 +140,7 @@ export class VideoEditorComponent implements OnInit {
           this.video.polypRecording.find(
             (polypRecordingFind) => polypRecordingFind === polypRecording));
         this.video.polypRecording.splice(index, 1);
+        this.notificationService.success('Polyp recording removed successfully.', 'Polyp recording removed.');
       }
     );
   }
@@ -153,7 +158,6 @@ export class VideoEditorComponent implements OnInit {
         clearInterval(this.pauseWatcher);
       }
     }, 500);
-
   }
 
 }

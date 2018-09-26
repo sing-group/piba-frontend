@@ -71,7 +71,7 @@ export class ExplorationsComponent implements OnInit {
             .subscribe(newExploration => {
               this.explorations = this.explorations.concat(newExploration);
               this.patientError = null;
-              this.notificationService.success('Exploration registered.', 'Exploration registered successfully.');
+              this.notificationService.success('Exploration registered successfully.', 'Exploration registered.');
               this.cancel();
             });
         }, error => {
@@ -83,7 +83,7 @@ export class ExplorationsComponent implements OnInit {
       this.exploration.date = new Date(this.date);
       this.explorationsService.editExploration(this.exploration).subscribe(updatedExploration => {
         Object.assign(this.explorations.find((exploration) => exploration.id === this.exploration.id), updatedExploration);
-        this.notificationService.success('Exploration edited.', 'Exploration edited successfully.');
+        this.notificationService.success('Exploration edited successfully.', 'Exploration edited.');
         this.cancel();
       });
     }
@@ -106,7 +106,7 @@ export class ExplorationsComponent implements OnInit {
           )
         );
         this.explorations.splice(index, 1);
-        this.notificationService.success('Exploration removed.', 'Exploration removed successfully.');
+        this.notificationService.success('Exploration removed successfully.', 'Exploration removed.');
       }
     );
   }

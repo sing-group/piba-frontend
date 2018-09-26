@@ -30,7 +30,7 @@ export class UserComponent implements OnInit {
 
   save() {
     this.usersServices.create(this.user).subscribe(() => {
-      this.notificationService.success('User registered.', 'User registered successfully.');
+      this.notificationService.success('User registered successfully.', 'User registered.');
       this.cancel();
     });
   }

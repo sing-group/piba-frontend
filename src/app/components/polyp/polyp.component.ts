@@ -4,6 +4,7 @@ import {PolypsService} from '../../services/polyps.service';
 import {Exploration} from '../../models/Exploration';
 import {EnumUtils} from '../../utils/enum.utils';
 import {PolypRecordingsService} from '../../services/polyprecordings.service';
+import {NotificationService} from '../../modules/notification/services/notification.service';
 
 @Component({
   selector: 'app-polyp',
@@ -34,7 +35,8 @@ export class PolypComponent implements OnInit {
   polyps: Polyp[];
 
   constructor(private polypsService: PolypsService,
-              private  polypRecordingsService: PolypRecordingsService) {
+              private  polypRecordingsService: PolypRecordingsService,
+              private notificationService: NotificationService) {
   }
 
   ngOnInit() {
@@ -47,8 +49,6 @@ export class PolypComponent implements OnInit {
       this.polypRecordingsService.getPolypRecordingsByPolyp(polyp.id)
         .subscribe((polypRecordings) => polyp.polypRecordings = polypRecordings);
     });
-
-
   }
 
   cancel() {
@@ -60,12 +60,17 @@ export class PolypComponent implements OnInit {
   save() {
     if (!this.editingPolyp) {
       this.polyp.exploration = this.exploration;
-      this.polypsService.createPolyp(this.polyp).subscribe(newPolyp => this.exploration.polyps = this.exploration.polyps.concat(newPolyp));
+      this.polypsService.createPolyp(this.polyp).subscribe(newPolyp => {
+          this.exploration.polyps = this.exploration.polyps.concat(newPolyp);
+          this.notificationService.success('Polyp registered successfully.', 'Polyp registered.');
+        }
+      );
     } else {
       this.polypsService.editPolyp(this.polyp).subscribe(updatedPolyp => {
         Object.assign(this.exploration.polyps.find((polyp) =>
           polyp.id === this.polyp.id
         ), updatedPolyp);
+        this.notificationService.success('Polyp edited successfully.', 'Polyp edited.');
       });
     }
     this.cancel();
@@ -83,6 +88,7 @@ export class PolypComponent implements OnInit {
           )
         );
         this.exploration.polyps.splice(index, 1);
+        this.notificationService.success('Polyp removed successfully.', 'Polyp removed.');
       }
     );
   }

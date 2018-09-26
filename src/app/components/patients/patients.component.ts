@@ -51,7 +51,7 @@ export class PatientsComponent implements OnInit {
         idSpace: this.idSpace
       };
       this.patientsService.createPatient(this.newPatient).subscribe(() =>
-        this.notificationService.success('Patient registered.', 'Patient registered successfully.')
+        this.notificationService.success('Patient registered successfully.', 'Patient registered.')
       );
     } else {
       this.patient.birthdate = new Date(this.birthdate);
@@ -59,7 +59,7 @@ export class PatientsComponent implements OnInit {
       this.patient.patientID = this.patientID;
       this.patient.idSpace = this.idSpace;
       this.patientsService.editPatient(this.patient).subscribe(() =>
-        this.notificationService.success('Patient edited.', 'Patient edited successfully.')
+        this.notificationService.success('Patient edited successfully.', 'Patient edited.')
       );
     }
     this.cancel();
@@ -95,7 +95,7 @@ export class PatientsComponent implements OnInit {
   delete() {
     this.patientsService.deletePatient(this.patient.id).subscribe(() => {
       this.patient = null;
-      this.notificationService.success('Patient removed.', 'Patient removed successfully.');
+      this.notificationService.success('Patient removed successfully.', 'Patient removed.');
     });
   }
 
