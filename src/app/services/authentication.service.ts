@@ -20,7 +20,7 @@ export class AuthenticationService {
     this.user.password = password;
     return this.http.get<Role>(`${environment.restApi}/user/${login}/role`)
       .pipe(
-        PibaError.throwOnError('Error checking credentials', `Error checking user '${login}'.`)
+        PibaError.throwOnError('Failed to login', `User or password incorrect. Please try again.`)
       );
   }
 
