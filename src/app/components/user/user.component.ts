@@ -29,7 +29,8 @@ export class UserComponent implements OnInit {
   }
 
   save() {
-    this.usersServices.create(this.user).subscribe(() => {
+    this.usersServices.create(this.user).subscribe((newUser) => {
+      this.users = this.users.concat(newUser);
       this.notificationService.success('User registered successfully.', 'User registered.');
       this.cancel();
     });
