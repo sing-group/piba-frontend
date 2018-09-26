@@ -1,15 +1,15 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {forkJoin, Observable} from 'rxjs';
-import PolypRecording from '../models/PolypRecording';
-import PolypRecordingInfo from './entities/PolypRecordingInfo';
+import {PolypRecording} from '../models/PolypRecording';
+import {PolypRecordingInfo} from './entities/PolypRecordingInfo';
 import {environment} from '../../environments/environment';
 import {PolypsService} from './polyps.service';
 import {VideosService} from './videos.service';
-import Polyp from '../models/Polyp';
-import Video from '../models/Video';
+import {Polyp} from '../models/Polyp';
+import {Video} from '../models/Video';
 import {concatMap, map} from 'rxjs/operators';
-import IdAndUri from './entities/IdAndUri';
+import {IdAndUri} from './entities/IdAndUri';
 
 @Injectable()
 export class PolypRecordingsService {

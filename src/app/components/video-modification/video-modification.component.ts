@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import Video from '../../models/Video';
+import {Video} from '../../models/Video';
 import {Modifier} from '../../models/Modifier';
 import {VideoModification} from '../../models/VideoModification';
 import {TimeToNumberPipe} from '../../pipes/time-to-number.pipe';

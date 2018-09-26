@@ -1,13 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import Polyp from '../../models/Polyp';
-import Video from '../../models/Video';
+import {Polyp} from '../../models/Polyp';
+import {Video} from '../../models/Video';
 import {VideosService} from '../../services/videos.service';
 import {TimePipe} from '../../pipes/time.pipe';
 import {PolypsService} from '../../services/polyps.service';
 import {ExplorationsService} from '../../services/explorations.service';
 import {PolypRecordingsService} from '../../services/polyprecordings.service';
-import PolypRecording from '../../models/PolypRecording';
+import {PolypRecording} from '../../models/PolypRecording';
 import {TimeToNumberPipe} from '../../pipes/time-to-number.pipe';
 
 @Component({

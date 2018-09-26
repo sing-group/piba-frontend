@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 
-import Patient, {SEX} from '../models/Patient';
+import {Patient, SEX} from '../models/Patient';
 import {Observable} from 'rxjs';
-import PatientInfo from './entities/PatientInfo';
+import {PatientInfo} from './entities/PatientInfo';
 
 import {environment} from '../../environments/environment';
 import {HttpClient} from '@angular/common/http';

@@ -1,7 +1,7 @@
-import VideoSource from './VideoUrl';
-import PolypRecording from './PolypRecording';
+import {VideoSource} from './VideoUrl';
+import {PolypRecording} from './PolypRecording';
 
-export default class Video {
+export class Video {
   id: string;
   title: string;
   observations: string;

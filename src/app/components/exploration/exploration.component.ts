@@ -1,10 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import Video from '../../models/Video';
-import Exploration from '../../models/Exploration';
-import VideoUploadInfo from '../../services/entities/VideoUploadInfo';
+import {Video} from '../../models/Video';
+import {Exploration} from '../../models/Exploration';
+import {VideoUploadInfo} from '../../services/entities/VideoUploadInfo';
 import {VideosService} from '../../services/videos.service';
 import {ExplorationsService} from '../../services/explorations.service';
+
 
 @Component({
   selector: 'app-exploration',
@@ -27,6 +28,7 @@ export class ExplorationComponent implements OnInit {
     private videosService: VideosService,
     private explorationsService: ExplorationsService,
     private route: ActivatedRoute
+
   ) {
   }
 

@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import Polyp, {LST, NICE, PARIS, WASP} from '../../models/Polyp';
+import {Polyp, LST, NICE, PARIS, WASP} from '../../models/Polyp';
 import {PolypsService} from '../../services/polyps.service';
-import Exploration from '../../models/Exploration';
+import {Exploration} from '../../models/Exploration';
 import {EnumUtils} from '../../utils/enum.utils';
 import {PolypRecordingsService} from '../../services/polyprecordings.service';
 
@@ -99,14 +99,14 @@ export class PolypComponent implements OnInit {
     );
 
     this.videoHTML = document.getElementById(videoId + '-' + polypId) as HTMLMediaElement;
-    this.pauseWatcher = setInterval(() =>{
+    this.pauseWatcher = setInterval(() => {
 
-        if (this.videoHTML.currentTime >= this.polyps[indexPolyp].polypRecordings[indexVideo].end) {
+      if (this.videoHTML.currentTime >= this.polyps[indexPolyp].polypRecordings[indexVideo].end) {
 
-          this.videoHTML.currentTime = this.polyps[indexPolyp].polypRecordings[indexVideo].end;
-          this.pauseVideo(videoId, polypId);
-        }
-      }, 500);
+        this.videoHTML.currentTime = this.polyps[indexPolyp].polypRecordings[indexVideo].end;
+        this.pauseVideo(videoId, polypId);
+      }
+    }, 500);
 
 
     this.videoHTML.currentTime = this.polyps[indexPolyp].polypRecordings[indexVideo].start;

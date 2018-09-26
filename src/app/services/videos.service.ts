@@ -2,11 +2,11 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
-import Video from '../models/Video';
-import VideoInfo from './entities/VideoInfo';
-import VideoUploadInfo from './entities/VideoUploadInfo';
+import {Video} from '../models/Video';
+import {VideoInfo} from './entities/VideoInfo';
+import {VideoUploadInfo} from './entities/VideoUploadInfo';
 import {environment} from '../../environments/environment';
-import IdAndUri from './entities/IdAndUri';
+import {IdAndUri} from './entities/IdAndUri';
 import {interval} from 'rxjs/internal/observable/interval';
 import {map, switchMap} from 'rxjs/operators';
 

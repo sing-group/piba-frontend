@@ -2,17 +2,17 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {forkJoin, Observable, of} from 'rxjs';
 
-import Exploration from '../models/Exploration';
-import Video from '../models/Video';
-import Polyp from '../models/Polyp';
-import ExplorationInfo from './entities/ExplorationInfo';
+import {Exploration} from '../models/Exploration';
+import {Video} from '../models/Video';
+import {Polyp} from '../models/Polyp';
+import {ExplorationInfo} from './entities/ExplorationInfo';
 import {environment} from '../../environments/environment';
 import {concatMap, map} from 'rxjs/operators';
 import {VideosService} from './videos.service';
 import {PolypsService} from './polyps.service';
 import {PatientsService} from './patients.service';
-import IdAndUri from './entities/IdAndUri';
-import Patient from '../models/Patient';
+import {IdAndUri} from './entities/IdAndUri';
+import {Patient} from '../models/Patient';
 
 @Injectable()
 export class ExplorationsService {

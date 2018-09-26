@@ -1,8 +1,8 @@
-import Video from './Video';
-import Polyp from './Polyp';
-import Patient from './Patient';
+import {Video} from './Video';
+import {Polyp} from './Polyp';
+import {Patient} from './Patient';
 
-export default class Exploration {
+export class Exploration {
   id: string;
   date: Date;
   location: string;

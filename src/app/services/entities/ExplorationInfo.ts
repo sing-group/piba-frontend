@@ -1,6 +1,6 @@
-import IdAndUri from './IdAndUri';
+import {IdAndUri} from './IdAndUri';
 
-export default interface ExplorationInfo {
+export interface ExplorationInfo {
   id: string;
   date: Date;
   location: string;

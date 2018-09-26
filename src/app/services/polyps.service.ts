@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import Polyp, {LST, NICE, PARIS, WASP} from '../models/Polyp';
+import {Polyp, LST, NICE, PARIS, WASP} from '../models/Polyp';
 import {environment} from '../../environments/environment';
-import PolypInfo from './entities/PolypInfo';
+import {PolypInfo} from './entities/PolypInfo';
 import {EnumUtils} from '../utils/enum.utils';
 import {map} from 'rxjs/operators';
 

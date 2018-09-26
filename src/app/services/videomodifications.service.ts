@@ -7,9 +7,9 @@ import {environment} from '../../environments/environment';
 import {concatMap, map} from 'rxjs/operators';
 import {ModifiersService} from './modifiers.service';
 import {VideosService} from './videos.service';
-import IdAndUri from './entities/IdAndUri';
+import {IdAndUri} from './entities/IdAndUri';
 import {Modifier} from '../models/Modifier';
-import Video from '../models/Video';
+import {Video} from '../models/Video';
 
 @Injectable({
   providedIn: 'root'

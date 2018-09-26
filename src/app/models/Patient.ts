@@ -1,6 +1,6 @@
 import {IdSpace} from './IdSpace';
 
-export default class Patient {
+export class Patient {
   id: string;
   patientID: string;
   sex: SEX;

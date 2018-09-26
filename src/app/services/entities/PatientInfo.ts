@@ -1,6 +1,6 @@
-import IdAndUri from './IdAndUri';
+import {IdAndUri} from './IdAndUri';
 
-export default interface PatientInfo {
+export interface PatientInfo {
   id: string;
   patientID: string;
   sex: string;

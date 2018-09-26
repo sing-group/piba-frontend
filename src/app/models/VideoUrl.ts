@@ -1,4 +1,4 @@
-export default class VideoSource {
+export class VideoSource {
   mediaType: string;
   url: string;
 }

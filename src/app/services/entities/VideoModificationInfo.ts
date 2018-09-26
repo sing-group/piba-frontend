@@ -1,4 +1,4 @@
-import IdAndUri from './IdAndUri';
+import {IdAndUri} from './IdAndUri';
 
 export class VideoModificationInfo {
   id: number;

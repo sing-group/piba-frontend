@@ -1,4 +1,4 @@
-export default interface IdAndUri {
+export interface IdAndUri {
   id: string;
   uri: string;
 }

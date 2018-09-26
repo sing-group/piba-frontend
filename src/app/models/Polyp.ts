@@ -1,7 +1,7 @@
-import Exploration from './Exploration';
-import PolypRecording from './PolypRecording';
+import {Exploration} from './Exploration';
+import {PolypRecording} from './PolypRecording';
 
-export default class Polyp {
+export class Polyp {
   id: string;
   name: string;
   size: number;

@@ -1,8 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ClrDatagridComparatorInterface} from '@clr/angular';
 import {ExplorationsService} from '../../services/explorations.service';
-import Exploration from '../../models/Exploration';
-import Patient from '../../models/Patient';
+import {Exploration} from '../../models/Exploration';
 import {PatientsService} from '../../services/patients.service';
 import {IdSpacesService} from '../../services/idspaces.service';
 import {IdSpace} from '../../models/IdSpace';

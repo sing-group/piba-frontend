@@ -1,6 +1,6 @@
-import IdAndUri from './IdAndUri';
+import {IdAndUri} from './IdAndUri';
 
-export default interface VideoInfo {
+export interface VideoInfo {
   id: string;
   title: string;
   observations: string;

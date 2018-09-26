@@ -1,6 +1,6 @@
-import IdAndUri from './IdAndUri';
+import {IdAndUri} from './IdAndUri';
 
-export default interface PolypInfo {
+export interface PolypInfo {
   id: string;
   name: string;
   size: number;

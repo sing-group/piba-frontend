@@ -1,6 +1,6 @@
-import IdAndUri from './IdAndUri';
+import {IdAndUri} from './IdAndUri';
 
-export default interface PolypRecordingInfo {
+export interface PolypRecordingInfo {
   video: IdAndUri | string;
   polyp: IdAndUri | string;
   start: number;
