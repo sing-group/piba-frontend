@@ -54,40 +54,53 @@
                     <img *ngIf="video.isProcessing" src="assets/images/loading.gif"> Video is being processed
                   </div>
                 </clr-dg-cell>
-                <clr-dg-cell>
+                <clr-dg-cell class="not-scroll">
                   <form>
-                    <section class="form-block">
-                      <div class="form-group">
+                    <div class="form-group row ">
+                      <div class="col-md-12 col-lg-4">
                         <label for="video-uuid">UUID</label>
+                      </div>
+                      <div class="col-md-12 col-lg-8">
                         <input type="text" id="video-uuid" size="36" readonly value="{{video.id}}"/>
                       </div>
-                      <div class="form-group">
+                    </div>
+                    <div class="form-group row ">
+                      <div class="col-md-12 col-lg-4">
                         <label for="video-title">Title</label>
+                      </div>
+                      <div class="col-md-12 col-lg-8">
                         <input type="text" id="video-title" class="title-{{video.id}}" size="50"
                                [readonly]="isReadonly ? true : null" value="{{video.title}}"/>
                       </div>
-                      <div class="form-group">
+                    </div>
+                    <div class="form-group row">
+                      <div class="col-md-12 col-lg-4">
                         <label for="video-observations">Observation</label>
+                      </div>
+                      <div class="col-md-12 col-lg-8">
                         <textarea type="text" id="video-observations" class="observations-{{video.id}}" rows="4"
                                   [readonly]="isReadonly ? true : null" value="{{video.observations}}"></textarea>
                       </div>
-                    </section>
-                    <button type="button" class="btn btn-secondary" *ngIf="isReadonly" (click)="isReadonly=false">
-                      <clr-icon shape="note"></clr-icon>
-                      Edit information
-                    </button>
-                    <button type="button" class="btn btn-primary" *ngIf="!isReadonly" (click)="editVideo(video)">
-                      <clr-icon shape="cog"></clr-icon>
-                      Save information
-                    </button>
-                    <button type="button" class="btn btn-secondary" routerLink="/video/{{video.id}}">
-                      <clr-icon shape="video-gallery"></clr-icon>
-                      Edit video
-                    </button>
-                    <button type="button" class="btn btn-secondary" (click)="delete(video.id)">
-                      <clr-icon shape="trash"></clr-icon>
-                      Remove video
-                    </button>
+                    </div>
+                    <div class="form-group row">
+                      <button type="button" class="btn btn-secondary" *ngIf="isReadonly" (click)="isReadonly=false">
+                        <clr-icon shape="note"></clr-icon>
+                        Edit information
+                      </button>
+                      <button type="button" class="btn btn-primary" *ngIf="!isReadonly" (click)="editVideo(video)">
+                        <clr-icon shape="cog"></clr-icon>
+                        Save information
+                      </button>
+                      <button type="button" class="btn btn-secondary" routerLink="/video/{{video.id}}">
+                        <clr-icon shape="video-gallery"></clr-icon>
+                        Edit video
+                      </button>
+                      <button type="button" class="btn btn-secondary" (click)="delete(video.id)">
+                        <clr-icon shape="trash"></clr-icon>
+                        Remove video
+                      </button>
+                    </div>
+
                   </form>
                 </clr-dg-cell>
               </clr-dg-row>

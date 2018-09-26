@@ -9,3 +9,13 @@
 .table {
   border-color: white;
 }
+
+:host /deep/ .datagrid {
+  width: 100%;
+}
+
+@media (min-width: 600px) {
+  .not-scroll {
+    overflow-x: hidden;
+  }
+}
