@@ -1,4 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
+import {AgeFromDate} from 'age-calculator/built/age-calculator';
 
 @Pipe({
   name: 'age'
@@ -6,8 +7,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 export class AgePipe implements PipeTransform {
 
   transform(birthdate: Date): number {
-    const timeDiff: number = Math.abs(new Date().getTime() - new Date(birthdate).getTime());
-    return Math.floor((timeDiff / (1000 * 3600 * 24)) / 365);
+    return new AgeFromDate(new Date(birthdate)).age;
   }
 
 }
