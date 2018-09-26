@@ -34,7 +34,7 @@ export class PatientsService {
   editPatient(patient: Patient): Observable<Patient> {
     const patientInfo = this.toPatientInfo(patient);
 
-    return this.withIdSpace(this.http.put<PatientInfo>(`${environment.restApi}/patient`, patientInfo));
+    return this.withIdSpace(this.http.put<PatientInfo>(`${environment.restApi}/patient/${patientInfo.id}`, patientInfo));
   }
 
   deletePatient(id: string) {

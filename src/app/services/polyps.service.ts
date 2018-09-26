@@ -32,7 +32,7 @@ export class PolypsService {
   editPolyp(polyp: Polyp): Observable<Polyp> {
     const polypInfo: PolypInfo = this.toPolypInfo(polyp);
 
-    return this.http.put<PolypInfo>(`${environment.restApi}/polyp/`, polypInfo)
+    return this.http.put<PolypInfo>(`${environment.restApi}/polyp/${polypInfo.id}`, polypInfo)
       .pipe(
         map(this.mapPolypInfo)
       );

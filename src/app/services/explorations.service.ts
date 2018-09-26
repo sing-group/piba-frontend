@@ -80,7 +80,7 @@ export class ExplorationsService {
 
   editExploration(exploration: Exploration): Observable<Exploration> {
     const explorationInfo = this.toExplorationInfo(exploration);
-    return this.http.put<ExplorationInfo>(`${environment.restApi}/exploration`, explorationInfo)
+    return this.http.put<ExplorationInfo>(`${environment.restApi}/exploration/${explorationInfo.id}`, explorationInfo)
       .pipe(
         map(this.mapOnlyExplorationInfo.bind(this))
       );

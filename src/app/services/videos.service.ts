@@ -58,7 +58,7 @@ export class VideosService {
   editVideo(video: Video): Observable<Video> {
     const videoInfo: VideoInfo = this.toVideoInfo(video);
 
-    return this.http.put<VideoInfo>(`${environment.restApi}/video`, videoInfo)
+    return this.http.put<VideoInfo>(`${environment.restApi}/video/${videoInfo.id}`, videoInfo)
       .pipe(
         map(this.mapVideoInfo)
       );
