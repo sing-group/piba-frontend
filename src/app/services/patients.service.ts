@@ -42,11 +42,10 @@ export class PatientsService {
   }
 
   private toPatientInfo(patient: Patient): PatientInfo {
-    const enumUtils = new EnumUtils;
     return {
       id: patient.id,
       patientID: patient.patientID,
-      sex: enumUtils.findKeyForValue(SEX, patient.sex),
+      sex: EnumUtils.findKeyForValue(SEX, patient.sex),
       birthdate: new Date(patient.birthdate),
       idSpace: patient.idSpace.id
     };

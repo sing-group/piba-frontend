@@ -12,16 +12,12 @@ import {PolypRecordingsService} from '../../services/polyprecordings.service';
 })
 export class PolypComponent implements OnInit {
 
-  WASP = WASP;
   WASPValues: WASP[];
 
-  NICE = NICE;
   NICEValues: NICE[];
 
-  LST = LST;
   LSTValues: LST[];
 
-  PARIS = PARIS;
   PARISValues: PARIS[];
 
   creatingPolyp: Boolean = false;
@@ -42,11 +38,10 @@ export class PolypComponent implements OnInit {
   }
 
   ngOnInit() {
-    const enumUtils = new EnumUtils();
-    this.WASPValues = enumUtils.enumValues(WASP);
-    this.NICEValues = enumUtils.enumValues(NICE);
-    this.LSTValues = enumUtils.enumValues(LST);
-    this.PARISValues = enumUtils.enumValues(PARIS);
+    this.WASPValues = EnumUtils.enumValues(WASP);
+    this.NICEValues = EnumUtils.enumValues(NICE);
+    this.LSTValues = EnumUtils.enumValues(LST);
+    this.PARISValues = EnumUtils.enumValues(PARIS);
     this.polyps = this.exploration.polyps;
     this.polyps.map((polyp) => {
       this.polypRecordingsService.getPolypRecordingsByPolyp(polyp.id)

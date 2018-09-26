@@ -66,16 +66,15 @@ export class PolypsService {
   }
 
   private toPolypInfo(polyp: Polyp): PolypInfo {
-    const enumUtils = new EnumUtils;
     return {
       id: polyp.id,
       name: polyp.name,
       size: polyp.size,
       location: polyp.location,
-      wasp: enumUtils.findKeyForValue(WASP, polyp.wasp),
-      nice: enumUtils.findKeyForValue(NICE, polyp.nice),
-      lst: enumUtils.findKeyForValue(LST, polyp.lst),
-      paris: enumUtils.findKeyForValue(PARIS, polyp.paris),
+      wasp: EnumUtils.findKeyForValue(WASP, polyp.wasp),
+      nice: EnumUtils.findKeyForValue(NICE, polyp.nice),
+      lst: EnumUtils.findKeyForValue(LST, polyp.lst),
+      paris: EnumUtils.findKeyForValue(PARIS, polyp.paris),
       histology: polyp.histology,
       exploration: polyp.exploration.id
     };

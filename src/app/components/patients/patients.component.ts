@@ -18,7 +18,6 @@ export class PatientsComponent implements OnInit {
 
   newPatient: Patient = new Patient();
 
-  SEX = SEX;
   SEXValues: SEX[];
 
   patientIDText: string;
@@ -38,8 +37,7 @@ export class PatientsComponent implements OnInit {
   }
 
   ngOnInit() {
-    const enumUtils = new EnumUtils();
-    this.SEXValues = enumUtils.enumValues(SEX);
+    this.SEXValues = EnumUtils.enumValues(SEX);
     this.idSpacesService.getIdSpaces().subscribe((idSpaces) => this.idSpaces = idSpaces);
   }
 
