@@ -1,3 +1,19 @@
-.login-wrapper{
+.login-wrapper {
   box-sizing: content-box;
+  margin: -1rem;
+}
+
+.login-wrapper .login{
+  min-height: 92vh !important;
+}
+
+@media (min-width: 1024px) {
+
+  .login-wrapper {
+    background-position: 31rem 0;
+  }
+
+  .login-wrapper .login {
+    width: 26rem;
+  }
 }
