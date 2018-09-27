@@ -94,32 +94,34 @@
             </div>
           </clr-modal>
         </form>
+        <div class="polyprecordings-container">
+          <clr-datagrid>
+            <clr-dg-column>Polyp</clr-dg-column>
+            <clr-dg-column>Start</clr-dg-column>
+            <clr-dg-column>Stop</clr-dg-column>
+            <clr-dg-column>Actions</clr-dg-column>
 
-        <clr-datagrid>
-          <clr-dg-column>Polyp</clr-dg-column>
-          <clr-dg-column>Start</clr-dg-column>
-          <clr-dg-column>Stop</clr-dg-column>
-          <clr-dg-column>Actions</clr-dg-column>
+            <clr-dg-row *ngFor="let polypRecording of video.polypRecording">
+              <clr-dg-cell>{{polypRecording.polyp.name}}</clr-dg-cell>
+              <clr-dg-cell>{{polypRecording.start | time}}</clr-dg-cell>
+              <clr-dg-cell>{{polypRecording.end | time}}</clr-dg-cell>
+              <clr-dg-cell style="padding: 0px;">
+                <button type="button" class="btn btn-secondary" (click)="removePolypRecording(polypRecording)">
+                  <clr-icon shape="times"></clr-icon>
+                  Remove
+                </button>
+                <button type="button" class="btn btn-secondary"
+                        (click)="playInterval(polypRecording.start, polypRecording.end)">
+                  <clr-icon shape="play"></clr-icon>
+                  Play
+                </button>
+              </clr-dg-cell>
+            </clr-dg-row>
 
-          <clr-dg-row *ngFor="let polypRecording of video.polypRecording">
-            <clr-dg-cell>{{polypRecording.polyp.name}}</clr-dg-cell>
-            <clr-dg-cell>{{polypRecording.start | time}}</clr-dg-cell>
-            <clr-dg-cell>{{polypRecording.end | time}}</clr-dg-cell>
-            <clr-dg-cell style="padding: 0px;">
-              <button type="button" class="btn btn-secondary" (click)="removePolypRecording(polypRecording)">
-                <clr-icon shape="times"></clr-icon>
-                Remove
-              </button>
-              <button type="button" class="btn btn-secondary"
-                      (click)="playInterval(polypRecording.start, polypRecording.end)">
-                <clr-icon shape="play"></clr-icon>
-                Play
-              </button>
-            </clr-dg-cell>
-          </clr-dg-row>
+            <clr-dg-footer>{{video.polypRecording.length}} polyp recording</clr-dg-footer>
+          </clr-datagrid>
 
-          <clr-dg-footer>{{video.polypRecording.length}} polyp recording</clr-dg-footer>
-        </clr-datagrid>
+        </div>
 
       </div>
 
