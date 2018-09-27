@@ -18,13 +18,13 @@
 }
 
 .complete-space {
-  width: 100%;
+  width: 90%;
 }
 
 .card {
   margin-top: 0rem !important;
 }
 
-.alert {
-  padding: 1%;
+.table {
+  border-spacing: 2px;
 }

@@ -12,31 +12,31 @@
 
       <section class="form-block">
         <div class="form-group">
-          <label for="patient-form-patientID" class="required">ID Patient</label>
-          <input type="text" id="patient-form-patientID" name="patientID" [(ngModel)]="patientID" required
-                 #patientIDPatient="ngModel"
-          />
-        </div>
-        <div class="form-group">
-          <label for="patient-form-sex" class="required">Sex</label>
-          <div class="select">
-            <select id="patient-form-sex" [(ngModel)]="sex" name="sex" required #sexPatient="ngModel">
-              <option *ngFor="let s of SEXValues" [ngValue]="s">{{s}}</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
           <label for="patient-form-idspace" class="required">ID Space</label>
-          <div class="select">
+          <div class="select complete-space">
             <select id="patient-form-idspace" [(ngModel)]="idSpace" name="idSpace" required #idSpacePatient="ngModel">
               <option *ngFor="let i of idSpaces" [ngValue]="i">{{i.name}}</option>
             </select>
           </div>
         </div>
         <div class="form-group">
+          <label for="patient-form-patientID" class="required">ID Patient</label>
+          <input type="text" id="patient-form-patientID" name="patientID" [(ngModel)]="patientID" required
+                 #patientIDPatient="ngModel" class="complete-space"
+          />
+        </div>
+        <div class="form-group">
+          <label for="patient-form-sex" class="required">Sex</label>
+          <div class="select complete-space">
+            <select id="patient-form-sex" [(ngModel)]="sex" name="sex" required #sexPatient="ngModel">
+              <option *ngFor="let s of SEXValues" [ngValue]="s">{{s}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
           <label for="patient-form-birthdate" class="required">Birthdate</label>
           <input type="date" id="patient-form-birthdate" name="birthdate" [(ngModel)]="birthdate" clrDate required
-                 readonly #birthdatePatient="ngModel"
+                 readonly #birthdatePatient="ngModel" class="complete-space"
           />
         </div>
       </section>
@@ -64,7 +64,7 @@
             <tr>
               <td class="left"><label for="patient-form-search-idspace" class="required">ID Space</label></td>
               <td class="left">
-                <div class="select">
+                <div class="select complete-space">
                   <select id="patient-form-search-idspace" [(ngModel)]="idSpaceToFind" name="idSpaceToFind"
                           required
                           #idSpaceFind="ngModel">
