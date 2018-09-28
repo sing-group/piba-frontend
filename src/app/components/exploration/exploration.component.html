@@ -91,11 +91,11 @@
                         <clr-icon shape="cog"></clr-icon>
                         Save information
                       </button>
-                      <button type="button" class="btn btn-secondary" routerLink="/video/{{video.id}}">
+                      <button type="button" class="btn btn-secondary" routerLink="/video/{{video.id}}" [disabled]="video.isProcessing" >
                         <clr-icon shape="video-gallery"></clr-icon>
                         Edit video
                       </button>
-                      <button type="button" class="btn btn-secondary" (click)="delete(video.id)">
+                      <button type="button" class="btn btn-secondary" (click)="delete(video.id)" [disabled]="video.isProcessing" >
                         <clr-icon shape="trash"></clr-icon>
                         Remove video
                       </button>

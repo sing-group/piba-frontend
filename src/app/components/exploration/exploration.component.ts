@@ -108,6 +108,9 @@ export class ExplorationComponent implements OnInit {
   }
 
   private mapVideo(video: Video): VideoUploadInfo {
+    if(video.observations === undefined){
+      video.observations = '';
+    }
     return {
       title: video.title,
       observations: video.observations,

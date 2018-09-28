@@ -21,7 +21,7 @@
         <a class="nav-link " routerLink="/explorations">Explorations</a>
         <a class="nav-link" routerLink="/patients">Patients</a>
         <a class="nav-link " routerLink="/idspace" *ngIf="authenticationService.getRole() == role.ADMIN">ID
-          Space</a>
+          Spaces</a>
         <a class="nav-link " routerLink="/users" *ngIf="authenticationService.getRole() == role.ADMIN">Users</a>
       </section>
     </nav>

@@ -20,7 +20,6 @@
             <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
               <div class="select">
                 <select id="polyp-name" [(ngModel)]="selectedPolyp" name="selectedPolyp" required #polyp="ngModel">
-                  <option value="" selected>&lt;Polyp&gt;</option>
                   <option *ngFor="let p of polyps" [ngValue]="p">{{p.name}}</option>
                 </select>
               </div>
