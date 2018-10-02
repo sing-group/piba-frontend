@@ -38,6 +38,7 @@ export class ExplorationComponent implements OnInit {
 
     this.explorationsService.getExploration(id).subscribe(exploration => {
       this.exploration = exploration;
+      this.assignVideoName();
       exploration.videos.filter((video) => video.isProcessing).forEach((processingVideo) => {
         this.pollProcessingVideo(processingVideo);
       });
@@ -67,6 +68,7 @@ export class ExplorationComponent implements OnInit {
     this.videosService
       .createVideo(videoUploadInfo).subscribe(video => {
       this.exploration.videos = this.exploration.videos.concat(video);
+      this.assignVideoName();
       this.notificationService.success('Video is being processed..', 'Video uploaded');
       if (video.isProcessing) {
         this.pollProcessingVideo(video);
@@ -78,6 +80,7 @@ export class ExplorationComponent implements OnInit {
   cancel() {
     this.userUploadingVideo = false;
     this.newVideo = new Video();
+    this.assignVideoName();
   }
 
   delete(id: string) {
@@ -87,6 +90,7 @@ export class ExplorationComponent implements OnInit {
           )
         );
         this.exploration.videos.splice(index, 1);
+        this.assignVideoName();
         this.notificationService.success('Video removed successfully.', 'Video removed.');
       }
     );
@@ -108,7 +112,7 @@ export class ExplorationComponent implements OnInit {
   }
 
   private mapVideo(video: Video): VideoUploadInfo {
-    if(video.observations === undefined){
+    if (video.observations === undefined) {
       video.observations = '';
     }
     return {
@@ -117,5 +121,9 @@ export class ExplorationComponent implements OnInit {
       file: null,
       exploration: video.exploration
     };
+  }
+
+  private assignVideoName(){
+    this.newVideo.title = 'Video ' + (this.exploration.videos.length + 1);
   }
 }
