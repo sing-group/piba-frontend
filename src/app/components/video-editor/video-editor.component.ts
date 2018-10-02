@@ -99,6 +99,7 @@ export class VideoEditorComponent implements OnInit {
         this.polyps.push(polyp);
         this.newPolyp = new Polyp();
         this.notificationService.success('Polyp registed successfully.', 'Polyp registered.');
+        this.selectedPolyp = polyp;
       });
     });
     this.modalOpened = false;
