@@ -5,7 +5,7 @@ export class Polyp {
   id: string;
   name: string;
   size: number;
-  location: string;
+  location: LOCATION;
   wasp: WASP;
   nice: NICE;
   lst: LST;
@@ -32,4 +32,9 @@ export enum PARIS {
   PEDUNCULATED = 'Pendunculated', SESSILE = 'Sessile', MIXED = 'Mixed', SLIGHTLY_ELEVATED = 'Slightly elevated', FLAT = 'Flat',
   SLIGHTLY_DEPRESSED = 'Slightly depressed', ELEVATED_DEPRESSED = 'Elevated depressed', DEPRESSED_ELEVATED = 'Depressed elevated',
   SESSILE_DEPRESSED = 'Sessile depressed'
+}
+
+export enum LOCATION {
+  CECUM = 'Cecum', ASCENDING_COLON = 'Ascending color', HEPATIC_FLEXURE = 'Hepatic flexure', TRANSVERSE_COLON = 'Transverse color',
+  SPLENIC_FLEXURE = 'Splenic flexure', DESCENDING_COLON = 'Descending color', SIGMOID = 'Sigmoid', RECTUM = 'Rectum'
 }

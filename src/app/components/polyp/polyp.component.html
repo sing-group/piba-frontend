@@ -145,10 +145,11 @@
         </div>
         <div class="form-group">
           <label for="polyp-form-location">Location</label>
-          <input type="text" class="complete-space" id="polyp-form-location" name="location"
-                 [(ngModel)]="polyp.location"
-                 pattern="[a-zA-ZñÑ\s]+"
-                 title="Must be a alphabetic">
+          <div class="select complete-space">
+            <select id="polyp-form-location" [(ngModel)]="polyp.location" name="location">
+              <option *ngFor="let l of LOCATIONValues" [ngValue]="l">{{l}}</option>
+            </select>
+          </div>
         </div>
         <div class="form-group">
           <label for="polyp-form-histology">Histology</label>

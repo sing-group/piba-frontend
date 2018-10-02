@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import {Polyp, LST, NICE, PARIS, WASP} from '../models/Polyp';
+import {Polyp, LST, NICE, PARIS, WASP, LOCATION} from '../models/Polyp';
 import {environment} from '../../environments/environment';
 import {PolypInfo} from './entities/PolypInfo';
 import {EnumUtils} from '../utils/enum.utils';
@@ -50,11 +50,11 @@ export class PolypsService {
   }
 
   private mapPolypInfo(polypInfo: PolypInfo): Polyp {
-    return {
+   return {
       id: polypInfo.id,
       name: polypInfo.name,
       size: polypInfo.size,
-      location: polypInfo.location,
+      location: LOCATION[polypInfo.location],
       wasp: WASP[polypInfo.wasp],
       nice: NICE[polypInfo.nice],
       lst: LST[polypInfo.lst],
@@ -71,7 +71,7 @@ export class PolypsService {
       id: polyp.id,
       name: polyp.name,
       size: polyp.size,
-      location: polyp.location,
+      location: EnumUtils.findKeyForValue(LOCATION, polyp.location),
       wasp: EnumUtils.findKeyForValue(WASP, polyp.wasp),
       nice: EnumUtils.findKeyForValue(NICE, polyp.nice),
       lst: EnumUtils.findKeyForValue(LST, polyp.lst),

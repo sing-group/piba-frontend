@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Polyp, LST, NICE, PARIS, WASP} from '../../models/Polyp';
+import {Polyp, LST, NICE, PARIS, WASP, LOCATION} from '../../models/Polyp';
 import {PolypsService} from '../../services/polyps.service';
 import {Exploration} from '../../models/Exploration';
 import {EnumUtils} from '../../utils/enum.utils';
@@ -20,6 +20,8 @@ export class PolypComponent implements OnInit {
   LSTValues: LST[];
 
   PARISValues: PARIS[];
+
+  LOCATIONValues: LOCATION[];
 
   creatingPolyp: Boolean = false;
   editingPolyp: Boolean = false;
@@ -44,6 +46,7 @@ export class PolypComponent implements OnInit {
     this.NICEValues = EnumUtils.enumValues(NICE);
     this.LSTValues = EnumUtils.enumValues(LST);
     this.PARISValues = EnumUtils.enumValues(PARIS);
+    this.LOCATIONValues = EnumUtils.enumValues(LOCATION);
     this.polyps = this.exploration.polyps;
     this.assignPolypName();
     this.polyps.map((polyp) => {
@@ -60,8 +63,8 @@ export class PolypComponent implements OnInit {
   }
 
   save() {
+    this.polyp.exploration = this.exploration;
     if (!this.editingPolyp) {
-      this.polyp.exploration = this.exploration;
       this.polypsService.createPolyp(this.polyp).subscribe(newPolyp => {
           this.exploration.polyps = this.exploration.polyps.concat(newPolyp);
           this.assignPolypName();
