@@ -97,6 +97,7 @@ export class ExplorationsService {
   private mapExplorationInfo(explorationInfo: ExplorationInfo, videos: Video[], polyps: Polyp[], patient: Patient): Exploration {
     return {
       id: explorationInfo.id,
+      title: explorationInfo.title,
       date: explorationInfo.date,
       location: explorationInfo.location,
       videos: videos,
@@ -112,6 +113,7 @@ export class ExplorationsService {
   private toExplorationInfo(exploration: Exploration): ExplorationInfo {
     return {
       id: exploration.id,
+      title: exploration.title,
       date: exploration.date,
       location: exploration.location,
       patient: exploration.patient.id

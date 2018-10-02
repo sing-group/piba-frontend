@@ -4,6 +4,7 @@ import {Patient} from './Patient';
 
 export class Exploration {
   id: string;
+  title: string;
   date: Date;
   location: string;
   videos: Video[];

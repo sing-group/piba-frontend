@@ -27,6 +27,7 @@ export class ExplorationsComponent implements OnInit {
   creatingExploration: Boolean;
   date: string;
   location: string;
+  title: string;
   newExploration: Exploration;
   exploration: Exploration = new Exploration();
 
@@ -52,6 +53,7 @@ export class ExplorationsComponent implements OnInit {
     this.exploration = this.explorations.find((exploration) => exploration.id === id);
     this.date = new Date(this.exploration.date).toLocaleDateString();
     this.location = this.exploration.location;
+    this.title = this.exploration.title;
     this.editingExploration = true;
     this.creatingExploration = false;
   }
@@ -61,6 +63,7 @@ export class ExplorationsComponent implements OnInit {
       this.patientsService.getPatientID(this.patientId, this.idSpace.id).subscribe(patient => {
           this.newExploration = {
             id: null,
+            title: this.title,
             date: new Date(this.date),
             location: this.location,
             videos: [],
@@ -79,6 +82,7 @@ export class ExplorationsComponent implements OnInit {
         }
       );
     } else {
+      this.exploration.title = this.title;
       this.exploration.location = this.location;
       this.exploration.date = new Date(this.date);
       this.explorationsService.editExploration(this.exploration).subscribe(updatedExploration => {
@@ -92,6 +96,7 @@ export class ExplorationsComponent implements OnInit {
   cancel() {
     this.date = null;
     this.location = null;
+    this.title = null;
     this.creatingExploration = false;
     this.editingExploration = false;
     this.patientId = null;

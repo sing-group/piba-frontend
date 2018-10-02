@@ -8,13 +8,13 @@
 
   <clr-dg-placeholder>We couldn't find any explorations!</clr-dg-placeholder>
 
-  <clr-dg-column>ID</clr-dg-column>
+  <clr-dg-column>Title</clr-dg-column>
   <clr-dg-column [clrDgField]="'exploration.date'" [clrDgSortBy]="explorationComparator">Date</clr-dg-column>
   <clr-dg-column>Location</clr-dg-column>
   <clr-dg-column>Actions</clr-dg-column>
 
   <clr-dg-row *clrDgItems="let exploration of explorations" [clrDgItem]="exploration">
-    <clr-dg-cell>{{exploration.id}}</clr-dg-cell>
+    <clr-dg-cell>{{exploration.title}}</clr-dg-cell>
     <clr-dg-cell>{{exploration.date | date: 'yyyy-MM-dd'}}</clr-dg-cell>
     <clr-dg-cell>{{exploration.location}}</clr-dg-cell>
     <clr-dg-cell class="btn-cell-datagrid">
@@ -49,6 +49,12 @@
     <div class="modal-body">
 
       <section class="form-block">
+        <div class="form-group">
+          <label for="exploration-form-title" class="required">Title</label>
+          <input type="text" id="exploration-form-title" name="title" [(ngModel)]="title" required
+                 pattern="[a-zA-ZñÑ0-9\s]+"
+                 title="Must be a alphanumeric" #titleExploration="ngModel"/>
+        </div>
         <div class="form-group">
           <label for="exploration-form-date" class="required">Date</label>
           <input type="date" id="exploration-form-date" name="date" [(ngModel)]="date" clrDate readonly required
@@ -93,7 +99,8 @@
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
       <button type="submit" class="btn btn-primary"
-              [disabled]="dateExploration.invalid || locationExploration.invalid || !IdSpaceAreCorrect() || !patientIdAreCorrect()">
+              [disabled]="titleExploration.invalid || dateExploration.invalid ||
+              locationExploration.invalid || !IdSpaceAreCorrect() || !patientIdAreCorrect()">
         Ok
       </button>
     </div>
