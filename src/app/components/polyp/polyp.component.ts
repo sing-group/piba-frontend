@@ -45,6 +45,7 @@ export class PolypComponent implements OnInit {
     this.LSTValues = EnumUtils.enumValues(LST);
     this.PARISValues = EnumUtils.enumValues(PARIS);
     this.polyps = this.exploration.polyps;
+    this.assignPolypName();
     this.polyps.map((polyp) => {
       this.polypRecordingsService.getPolypRecordingsByPolyp(polyp.id)
         .subscribe((polypRecordings) => polyp.polypRecordings = polypRecordings);
@@ -55,6 +56,7 @@ export class PolypComponent implements OnInit {
     this.creatingPolyp = false;
     this.editingPolyp = false;
     this.polyp = new Polyp();
+    this.assignPolypName();
   }
 
   save() {
@@ -62,6 +64,7 @@ export class PolypComponent implements OnInit {
       this.polyp.exploration = this.exploration;
       this.polypsService.createPolyp(this.polyp).subscribe(newPolyp => {
           this.exploration.polyps = this.exploration.polyps.concat(newPolyp);
+          this.assignPolypName();
           this.notificationService.success('Polyp registered successfully.', 'Polyp registered.');
         }
       );
@@ -88,6 +91,7 @@ export class PolypComponent implements OnInit {
           )
         );
         this.exploration.polyps.splice(index, 1);
+        this.assignPolypName();
         this.notificationService.success('Polyp removed successfully.', 'Polyp removed.');
       }
     );
@@ -126,6 +130,10 @@ export class PolypComponent implements OnInit {
     if (this.pauseWatcher != null) {
       clearInterval(this.pauseWatcher);
     }
+  }
+
+  private assignPolypName() {
+    this.polyp.name = 'Polyp ' + (this.exploration.polyps.length + 1);
   }
 
 
