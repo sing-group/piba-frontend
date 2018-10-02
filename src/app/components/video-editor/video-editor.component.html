@@ -1,3 +1,9 @@
+<div class="row">
+  <button type="button" class="btn-back btn btn-primary" (click)="back()">
+    Back
+  </button>
+</div>
+
 <div class="row video-container" *ngIf="video != null">
   <app-video (currentTime)="onCurrentTimeUpdate($event)">
     <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}"/>
