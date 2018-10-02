@@ -30,12 +30,10 @@
                 </select>
               </div>
             </div>
-
             <div class="col-lg-2 col-md-2 col-sm-1 col-xs-2">
               <button type="button" class="btn btn-icon" title="Add polyp" (click)="modalOpened = true">
                 <clr-icon shape="plus"></clr-icon>
               </button>
-
             </div>
           </div>
 
@@ -44,10 +42,8 @@
               <label for="polyp-start" class="required">Start</label>
             </div>
             <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
-              <input id="polyp-start" type="text" name="start" [(ngModel)]="start" class="input-timer" readonly
-                     required
-                     #startP="ngModel"/>
-
+              <input id="polyp-start" type="text" name="start" [(ngModel)]="start" class="input-timer"
+                     required #startP="ngModel"/>
             </div>
             <div class="col-xs-2 col-sm-1 col-md-2">
               <button type="button" (click)="startPolyp()" class="btn btn-icon">
@@ -61,7 +57,7 @@
               <label for="polyp-end" class="required">Stop</label>
             </div>
             <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
-              <input id="polyp-end" type="text" name="end" [(ngModel)]="end" class="input-timer" readonly required
+              <input id="polyp-end" type="text" name="end" [(ngModel)]="end" class="input-timer" required
                      #endP="ngModel"/>
 
             </div>

@@ -19,8 +19,7 @@
     </div>
     <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
       <input id="modifierVideo-start" type="text" name="start" [(ngModel)]="start" class="input-timer"
-             readonly required
-             #startModifierForm="ngModel"/>
+             required #startModifierForm="ngModel"/>
     </div>
     <div class="col-xs-2 col-sm-1 col-md-2">
       <button type="button" (click)="startModifier()" class="btn btn-icon">
@@ -34,7 +33,7 @@
       <label for="modifierVideo-end" class="required">Stop</label>
     </div>
     <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
-      <input id="modifierVideo-end" type="text" name="end" [(ngModel)]="end" class="input-timer" readonly
+      <input id="modifierVideo-end" type="text" name="end" [(ngModel)]="end" class="input-timer"
              required #endModifierForm="ngModel"/>
     </div>
     <div class="col-xs-2 col-sm-1 col-md-2">

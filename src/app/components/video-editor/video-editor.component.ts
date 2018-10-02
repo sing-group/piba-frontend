@@ -59,11 +59,10 @@ export class VideoEditorComponent implements OnInit {
         this.explorationsService.getPolyps(this.video.exploration).subscribe(polyps => this.polyps = polyps);
         this.polypRecordingsService.getPolypRecordingsByVideo(video.id).subscribe(polypRecordings => {
             this.video.polypRecording = polypRecordings;
-            polypRecordings.map(polypRecording =>
-              this.cleanAlreadySelectedPolyps(polypRecording.polyp.name));
+            polypRecordings.map(polypRecording => this.cleanAlreadySelectedPolyps(polypRecording.polyp.name));
+            this.selectedPolyp = this.polyps[0];
           }
         );
-
       });
   }
 
@@ -89,7 +88,12 @@ export class VideoEditorComponent implements OnInit {
 
   public timesAreCorrect(): Boolean {
     if (this.start === undefined || this.start === null || this.end === undefined || this.end === null) {
-      return true;
+      return false;
+    }
+    this.videoHTML = document.getElementById('video-exploration') as HTMLMediaElement;
+    if (this.videoHTML.duration === undefined && this.timeToNumber.transform(this.start) > this.videoHTML.duration ||
+      this.timeToNumber.transform(this.end) > this.videoHTML.duration) {
+      return false;
     }
     return (this.timeToNumber.transform(this.start) < this.timeToNumber.transform(this.end));
   }
@@ -121,7 +125,7 @@ export class VideoEditorComponent implements OnInit {
           this.start = null;
           this.end = null;
           this.cleanAlreadySelectedPolyps(this.selectedPolyp.name);
-          this.selectedPolyp = null;
+          this.selectedPolyp = this.polyps[0];
           this.notificationService.success('Polyp recording registered successfully.', 'Polyp recording registered');
         }
       );
