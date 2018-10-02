@@ -8,12 +8,8 @@
         <table class="table">
           <tbody>
           <tr>
-            <td class="left">Sex</td>
-            <td class="left">{{exploration.patient.sex}}</td>
-          </tr>
-          <tr>
-            <td class="left">Age</td>
-            <td class="left">{{exploration.patient.birthdate | age}}</td>
+            <td class="left">Title</td>
+            <td class="left">{{exploration.title}}</td>
           </tr>
           <tr>
             <td class="left">Exploration date</td>
@@ -22,6 +18,14 @@
           <tr>
             <td class="left">Location</td>
             <td class="left">{{exploration.location}}</td>
+          </tr>
+          <tr>
+            <td class="left">Sex</td>
+            <td class="left">{{exploration.patient.sex}}</td>
+          </tr>
+          <tr>
+            <td class="left">Age</td>
+            <td class="left">{{exploration.patient.birthdate | age}}</td>
           </tr>
           </tbody>
         </table>
