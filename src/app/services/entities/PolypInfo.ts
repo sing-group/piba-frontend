@@ -10,5 +10,6 @@ export interface PolypInfo {
   lst: string;
   paris: string;
   histology: string;
+  observation: string;
   exploration: IdAndUri | string;
 }

@@ -40,9 +40,14 @@
 }
 
 .btn-link:hover {
-  opacity:0.8;
-  color:white;
+  opacity: 0.8;
+  color: white;
 }
+
+.complete-space {
+  width: 100%;
+}
+
 @media (min-width: 768px) {
   .card-button {
     float: right;

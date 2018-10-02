@@ -60,6 +60,7 @@ export class PolypsService {
       lst: LST[polypInfo.lst],
       paris: PARIS[polypInfo.paris],
       histology: polypInfo.histology,
+      observation: polypInfo.observation,
       polypRecordings: [],
       exploration: null
     };
@@ -76,6 +77,7 @@ export class PolypsService {
       lst: EnumUtils.findKeyForValue(LST, polyp.lst),
       paris: EnumUtils.findKeyForValue(PARIS, polyp.paris),
       histology: polyp.histology,
+      observation: polyp.observation,
       exploration: polyp.exploration.id
     };
   }

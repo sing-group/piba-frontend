@@ -11,6 +11,7 @@ export class Polyp {
   lst: LST;
   paris: PARIS;
   histology: string;
+  observation: string;
   polypRecordings: PolypRecording[];
   exploration: Exploration;
 }

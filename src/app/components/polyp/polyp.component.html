@@ -22,56 +22,64 @@
 
           <div class="form-group row">
             <div class="col-lg-2 col-sm-3 col-xs-4">
-              <label class="txt-strong" for="video-name">Name</label>
+              <label class="txt-strong" for="polyp-name">Name</label>
             </div>
             <div class="col-lg-4 col-sm-3 col-xs-8">
-              <input type="text" id="video-name" readonly value="{{polyp.name}}"/>
+              <input type="text" id="polyp-name" readonly value="{{polyp.name}}"/>
             </div>
             <div class="col-lg-2 col-sm-3 col-xs-4">
-              <label class="txt-strong" for="video-size">Size</label>
+              <label class="txt-strong" for="polyp-size">Size (mm)</label>
             </div>
             <div class="col-lg-4 col-sm-3 col-xs-8">
-              <input type="text" id="video-size" readonly value="{{polyp.size}}"/>
+              <input type="text" id="polyp-size" readonly value="{{polyp.size}}"/>
             </div>
 
             <div class="col-lg-2 col-sm-3 col-xs-4">
-              <label class="txt-strong" for="video-location">Location</label>
+              <label class="txt-strong" for="polyp-location">Location</label>
             </div>
             <div class="col-lg-4 col-sm-3 col-xs-8">
-              <input type="text" id="video-location" readonly value="{{polyp.location}}"/>
+              <input type="text" id="polyp-location" readonly value="{{polyp.location}}"/>
             </div>
             <div class="col-lg-2 col-sm-3 col-xs-4">
-              <label class="txt-strong" for="video-histology">Histology</label>
+              <label class="txt-strong" for="polyp-histology">Histology</label>
             </div>
             <div class="col-lg-4 col-sm-3 col-xs-8">
-              <input type="text" id="video-histology" readonly value="{{polyp.histology}}"/>
+              <input type="text" id="polyp-histology" readonly value="{{polyp.histology}}"/>
             </div>
 
             <div class="col-lg-2 col-sm-3 col-xs-4">
-              <label class="txt-strong" for="video-nice">NICE</label>
+              <label class="txt-strong" for="polyp-nice">NICE</label>
             </div>
             <div class="col-lg-4 col-sm-3 col-xs-8">
-              <input type="text" id="video-nice" readonly value="{{polyp.nice}}"/>
+              <input type="text" id="polyp-nice" readonly value="{{polyp.nice}}"/>
             </div>
             <div class="col-lg-2 col-sm-3 col-xs-4">
-              <label class="txt-strong" for="video-wasp">WASP</label>
+              <label class="txt-strong" for="polyp-wasp">WASP</label>
             </div>
             <div class="col-lg-4 col-sm-3 col-xs-8">
-              <input type="text" id="video-wasp" readonly value="{{polyp.wasp}}"/>
+              <input type="text" id="polyp-wasp" readonly value="{{polyp.wasp}}"/>
             </div>
 
             <div class="col-lg-2 col-sm-3 col-xs-4">
-              <label class="txt-strong" for="video-lst">LST</label>
+              <label class="txt-strong" for="polyp-lst">LST</label>
             </div>
             <div class="col-lg-4 col-sm-3 col-xs-8">
-              <input type="text" id="video-lst" readonly value="{{polyp.lst}}"/>
+              <input type="text" id="polyp-lst" readonly value="{{polyp.lst}}"/>
             </div>
             <div class="col-lg-2 col-sm-3 col-xs-4">
-              <label class="txt-strong" for="video-paris">PARIS</label>
+              <label class="txt-strong" for="polyp-paris">PARIS</label>
             </div>
             <div class="col-lg-4 col-sm-3 col-xs-8">
-              <input type="text" id="video-paris" readonly value="{{polyp.paris}}"/>
+              <input type="text" id="polyp-paris" readonly value="{{polyp.paris}}"/>
             </div>
+
+            <div class="col-xs-12">
+              <label class="txt-strong" for="polyp-observation">Observation</label>
+            </div>
+            <div class="col-xs-12">
+              <textarea type="text" id="polyp-observation" rows="2" readonly value="{{polyp.observation}}"></textarea>
+            </div>
+
           </div>
         </section>
       </form>
@@ -127,26 +135,30 @@
       <section class="form-block">
         <div class="form-group">
           <label for="polyp-form-name" class="required">Name</label>
-          <input type="text" id="polyp-form-name" name="name" [(ngModel)]="polyp.name" required>
+          <input type="text" class="complete-space" id="polyp-form-name" name="name" [(ngModel)]="polyp.name" required>
         </div>
         <div class="form-group">
-          <label for="polyp-form-size">Size</label>
-          <input type="text" id="polyp-form-size" name="size" [(ngModel)]="polyp.size" pattern="[0-9]*"
+          <label for="polyp-form-size">Size (mm)</label>
+          <input type="text" class="complete-space" id="polyp-form-size" name="size" [(ngModel)]="polyp.size"
+                 pattern="[0-9]*"
                  title="Must be a number">
         </div>
         <div class="form-group">
           <label for="polyp-form-location">Location</label>
-          <input type="text" id="polyp-form-location" name="location" [(ngModel)]="polyp.location" pattern="[a-zA-ZñÑ\s]+"
+          <input type="text" class="complete-space" id="polyp-form-location" name="location"
+                 [(ngModel)]="polyp.location"
+                 pattern="[a-zA-ZñÑ\s]+"
                  title="Must be a alphabetic">
         </div>
         <div class="form-group">
           <label for="polyp-form-histology">Histology</label>
-          <input type="text" id="polyp-form-histology" name="histology" [(ngModel)]="polyp.histology">
+          <input type="text" class="complete-space" id="polyp-form-histology" name="histology"
+                 [(ngModel)]="polyp.histology">
         </div>
 
         <div class="form-group">
           <label for="polyp-form-wasp">WASP</label>
-          <div class="select">
+          <div class="select complete-space">
             <select id="polyp-form-wasp" [(ngModel)]="polyp.wasp" name="wasp">
               <option *ngFor="let w of WASPValues" [ngValue]="w">{{w}}</option>
             </select>
@@ -154,7 +166,7 @@
         </div>
         <div class="form-group">
           <label for="polyp-form-nice">NICE</label>
-          <div class="select">
+          <div class="select complete-space">
             <select id="polyp-form-nice" [(ngModel)]="polyp.nice" name="nice">
               <option *ngFor="let n of NICEValues" [ngValue]="n">{{n}}</option>
             </select>
@@ -162,7 +174,7 @@
         </div>
         <div class="form-group">
           <label for="polyp-form-lst">LST</label>
-          <div class="select">
+          <div class="select complete-space">
             <select id="polyp-form-lst" [(ngModel)]="polyp.lst" name="lst">
               <option *ngFor="let l of LSTValues" [ngValue]="l">{{l}}</option>
             </select>
@@ -170,11 +182,16 @@
         </div>
         <div class="form-group">
           <label for="polyp-form-paris">PARIS</label>
-          <div class="select">
+          <div class="select complete-space">
             <select id="polyp-form-paris" [(ngModel)]="polyp.paris" name="paris">
               <option *ngFor="let p of PARISValues" [ngValue]="p">{{p}}</option>
             </select>
           </div>
+        </div>
+        <div class="form-group">
+          <label for="polyp-form-observation">Observation</label>
+          <textarea type="text" id="polyp-form-observation" name="observation"
+                    [(ngModel)]="polyp.observation"></textarea>
         </div>
 
       </section>
