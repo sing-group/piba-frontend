@@ -37,6 +37,8 @@ export class ExplorationsComponent implements OnInit {
   idSpaces: IdSpace[];
   idSpace: IdSpace;
 
+  findPatient = '';
+
   // needed to sort by date in the explorations table
   readonly explorationComparator = new ExplorationComparator();
 
@@ -128,6 +130,13 @@ export class ExplorationsComponent implements OnInit {
       return true;
     }
     return false;
+  }
+
+  searchPatient() {
+    this.explorationsService.getExplorationsBy(this.findPatient).subscribe(explorations => {
+      this.explorations = explorations;
+      this.findPatient = '';
+    });
   }
 }
 

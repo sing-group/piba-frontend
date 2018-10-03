@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {forkJoin, Observable, of} from 'rxjs';
 
 import {Exploration} from '../models/Exploration';
@@ -13,6 +13,7 @@ import {PolypsService} from './polyps.service';
 import {PatientsService} from './patients.service';
 import {IdAndUri} from './entities/IdAndUri';
 import {Patient} from '../models/Patient';
+import {PibaError} from '../modules/notification/entities';
 
 @Injectable()
 export class ExplorationsService {
@@ -54,20 +55,35 @@ export class ExplorationsService {
   }
 
   getExplorations(): Observable<Exploration[]> {
-    return this.http.get<ExplorationInfo[]>(`${environment.restApi}/exploration/`)
+    return this.withPatient(this.http.get<ExplorationInfo[]>(`${environment.restApi}/exploration/`));
+  }
+
+  getExplorationsBy(patientID: string): Observable<Exploration[]> {
+    let params = new HttpParams();
+    params = params.append('patient', patientID);
+    return this.withPatient(this.http.get<ExplorationInfo[]>(`${environment.restApi}/exploration`, {params}))
       .pipe(
-        concatMap((explorationInfos) =>
-          forkJoin(
-            explorationInfos.map(explorationInfo => this.patientsService.getPatient((<IdAndUri>explorationInfo.patient).id))
-          ).pipe(
-            map(patients =>
-              explorationInfos.map((explorationInfo, index) =>
-                this.mapOnlyExplorationInfo(explorationInfo, patients[index])
-              )
+        PibaError.throwOnError(
+          'Error retrieving explorations',
+          `No explorations are found for that patient.`
+        )
+      );
+  }
+
+  private withPatient(explorationInfoObservable: Observable<ExplorationInfo[]>): Observable<Exploration[]> {
+    return explorationInfoObservable.pipe(
+      concatMap((explorationInfos) =>
+        forkJoin(
+          explorationInfos.map(explorationInfo => this.patientsService.getPatient((<IdAndUri>explorationInfo.patient).id))
+        ).pipe(
+          map(patients =>
+            explorationInfos.map((explorationInfo, index) =>
+              this.mapOnlyExplorationInfo(explorationInfo, patients[index])
             )
           )
         )
-      );
+      )
+    );
   }
 
   createExploration(exploration: Exploration): Observable<Exploration> {

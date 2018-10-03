@@ -7,7 +7,7 @@
 }
 
 .content-select {
-  width: 55%;
+  width: 60%;
 }
 
 .btn-add {
@@ -17,4 +17,16 @@
 
 .alert {
   padding: 1%;
+}
+
+form > .content-search {
+  margin-top: -0.5rem;
+}
+
+.content-search {
+  margin-left: 0.75rem;
+}
+
+.content-search .btn {
+  margin-left: 0.5rem;
 }

@@ -1,4 +1,15 @@
 <div class="row">
+  <form ngNativeValidate #searchPatientForm="ngForm" (submit)="searchPatient()">
+    <div class="content-search">
+      <input type="text" id="search-patient" placeholder="Search by patient" [(ngModel)]="findPatient"
+             name="findPatient"
+             pattern="[a-zA-ZñÑ0-9\s]+" title="Must be a alphanumeric" #findPatientExploration="ngModel">
+      <button class="btn btn-primary btn-icon">
+        <clr-icon shape="search"></clr-icon>
+      </button>
+    </div>
+  </form>
+
   <button type="button" class="btn-add btn btn-primary" (click)="creatingExploration=true">
     <clr-icon shape="plus"></clr-icon>
     Add exploration
