@@ -25,13 +25,15 @@ export enum NICE {
 }
 
 export enum LST {
-  HOMOGENOUS = 'Homogenous', NODULAR_MIXED = 'Nodular mixed', ELEVATED = 'Elevated', PSEUDODEPRESSED = 'Pseudodepressed'
+  HOMOGENOUS = '(IIa) Homogenous', NODULAR_MIXED = '(IIa + Is) Nodular mixed', ELEVATED = '(IIa) Elevated',
+  PSEUDODEPRESSED = '(IIc + IIa) Pseudodepressed'
 }
 
 export enum PARIS {
-  PEDUNCULATED = 'Pendunculated', SESSILE = 'Sessile', MIXED = 'Mixed', SLIGHTLY_ELEVATED = 'Slightly elevated', FLAT = 'Flat',
-  SLIGHTLY_DEPRESSED = 'Slightly depressed', ELEVATED_DEPRESSED = 'Elevated depressed', DEPRESSED_ELEVATED = 'Depressed elevated',
-  SESSILE_DEPRESSED = 'Sessile depressed'
+  PEDUNCULATED = '(0-1p) Pendunculated', SESSILE = '(0-1s) Sessile', MIXED = '(0-1sp) Mixed',
+  SLIGHTLY_ELEVATED = '(0-IIa) Slightly elevated', FLAT = '(0-IIb) Flat', SLIGHTLY_DEPRESSED = '(0-IIc) Slightly depressed',
+  ELEVATED_DEPRESSED = '(0-IIa + IIc)  Elevated depressed', DEPRESSED_ELEVATED = '(0-IIc + IIa) Depressed elevated',
+  SESSILE_DEPRESSED = '(0-1s + IIc) Sessile depressed'
 }
 
 export enum LOCATION {
