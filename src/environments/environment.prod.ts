@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  restApi: 'to-be-defined'
+  restApi: 'https://sing-group.org/piba-backend/rest/api'
 };
