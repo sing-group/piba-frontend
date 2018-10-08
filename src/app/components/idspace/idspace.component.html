@@ -16,7 +16,7 @@
         <div class="form-group">
           <label for="idspace-form-name" class="required">Name</label>
           <input type="text" id="idspace-form-name" name="name" [(ngModel)]="idSpace.name" required
-                 pattern="[a-zA-ZñÑ0-9\s]+" title="Must be a alphanumeric" #nameIdSpace="ngModel"
+                 pattern="[a-zA-ZñÑ0-9_\s]+" title="Must be a alphanumeric" #nameIdSpace="ngModel"
           />
         </div>
       </section>
