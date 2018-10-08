@@ -35,7 +35,7 @@ export class ExplorationsComponent implements OnInit {
   patientError: string;
 
   idSpaces: IdSpace[];
-  idSpace: IdSpace;
+  idSpace: IdSpace = new IdSpace();
 
   findPatient = '';
 
@@ -133,10 +133,22 @@ export class ExplorationsComponent implements OnInit {
   }
 
   searchPatient() {
-    this.explorationsService.getExplorationsBy(this.findPatient).subscribe(explorations => {
+    if (this.idSpace.id !== undefined && this.findPatient === '') {
+      this.notificationService.error('Selected and patient', 'Not possible to do the search');
+      return;
+    }
+    if (this.idSpace.id === undefined && this.findPatient !== '') {
+      this.notificationService.error('Selected an ID Space', 'Not possible to do the search');
+      return;
+    }
+    this.explorationsService.getExplorationsBy(this.findPatient, this.idSpace).subscribe(explorations => {
       this.explorations = explorations;
-      this.findPatient = '';
     });
+  }
+
+  clear() {
+    this.findPatient = '';
+    this.idSpace = new IdSpace();
   }
 }
 

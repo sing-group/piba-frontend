@@ -14,6 +14,7 @@ import {PatientsService} from './patients.service';
 import {IdAndUri} from './entities/IdAndUri';
 import {Patient} from '../models/Patient';
 import {PibaError} from '../modules/notification/entities';
+import {IdSpace} from '../models/IdSpace';
 
 @Injectable()
 export class ExplorationsService {
@@ -58,9 +59,9 @@ export class ExplorationsService {
     return this.withPatient(this.http.get<ExplorationInfo[]>(`${environment.restApi}/exploration/`));
   }
 
-  getExplorationsBy(patientID: string): Observable<Exploration[]> {
+  getExplorationsBy(patientID: string, idSpace: IdSpace): Observable<Exploration[]> {
     let params = new HttpParams();
-    params = params.append('patient', patientID);
+    params = params.append('patient', patientID).append('idspace', idSpace.id);
     return this.withPatient(this.http.get<ExplorationInfo[]>(`${environment.restApi}/exploration`, {params}))
       .pipe(
         PibaError.throwOnError(
@@ -73,15 +74,16 @@ export class ExplorationsService {
   private withPatient(explorationInfoObservable: Observable<ExplorationInfo[]>): Observable<Exploration[]> {
     return explorationInfoObservable.pipe(
       concatMap((explorationInfos) =>
-        forkJoin(
-          explorationInfos.map(explorationInfo => this.patientsService.getPatient((<IdAndUri>explorationInfo.patient).id))
-        ).pipe(
-          map(patients =>
-            explorationInfos.map((explorationInfo, index) =>
-              this.mapOnlyExplorationInfo(explorationInfo, patients[index])
+        explorationInfos.length === 0 ? of([]) :
+          forkJoin(
+            explorationInfos.map(explorationInfo => this.patientsService.getPatient((<IdAndUri>explorationInfo.patient).id))
+          ).pipe(
+            map(patients =>
+              explorationInfos.map((explorationInfo, index) =>
+                this.mapOnlyExplorationInfo(explorationInfo, patients[index])
+              )
             )
           )
-        )
       )
     );
   }

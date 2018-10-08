@@ -11,6 +11,7 @@
 }
 
 .btn-add {
+  float: right;
   margin-right: 1.75%;
   margin-left: auto;
 }
@@ -23,10 +24,19 @@ form > .content-search {
   margin-top: -0.5rem;
 }
 
-.content-search {
-  margin-left: 0.75rem;
+.content-search h4 {
+  margin-bottom: 0.5rem;
 }
 
 .content-search .btn {
   margin-left: 0.5rem;
+}
+
+.complete-space {
+  width: 100%;
+}
+
+.btn-search {
+  margin-left: 0rem !important;
+  margin-top: -0.5rem;
 }
