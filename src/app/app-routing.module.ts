@@ -23,6 +23,9 @@ const routes: Routes = [
     path: 'explorations/:id', component: ExplorationComponent, canActivate: [AuthGuard]
   },
   {
+    path: 'explorations/:patientId/:id', component: ExplorationsComponent, canActivate: [AuthGuard]
+  },
+  {
     path: 'explorations', component: ExplorationsComponent, canActivate: [AuthGuard]
   },
   {

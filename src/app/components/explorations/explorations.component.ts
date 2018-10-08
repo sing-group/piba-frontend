@@ -6,6 +6,7 @@ import {PatientsService} from '../../services/patients.service';
 import {IdSpacesService} from '../../services/idspaces.service';
 import {IdSpace} from '../../models/IdSpace';
 import {NotificationService} from '../../modules/notification/services/notification.service';
+import {ActivatedRoute} from '@angular/router';
 
 class ExplorationComparator implements ClrDatagridComparatorInterface<Exploration> {
   compare(exploration1: Exploration, exploration2: Exploration) {
@@ -43,11 +44,22 @@ export class ExplorationsComponent implements OnInit {
   readonly explorationComparator = new ExplorationComparator();
 
   constructor(private explorationsService: ExplorationsService, private patientsService: PatientsService,
-              private idSpacesService: IdSpacesService, private notificationService: NotificationService) {
+              private idSpacesService: IdSpacesService, private notificationService: NotificationService,
+              private route: ActivatedRoute) {
   }
 
   ngOnInit() {
-    this.explorationsService.getExplorations().subscribe(explorations => this.explorations = explorations);
+    const patient = this.route.snapshot.paramMap.get('id');
+    const publicPatient = this.route.snapshot.paramMap.get('patientId');
+    if (patient != null) {
+      this.patientsService.getPatient(patient).subscribe(patientFound => {
+        this.idSpace = patientFound.idSpace;
+        this.findPatient = publicPatient;
+        this.searchPatient();
+      });
+    } else {
+      this.explorationsService.getExplorations().subscribe(explorations => this.explorations = explorations);
+    }
     this.idSpacesService.getIdSpaces().subscribe(idSpaces => this.idSpaces = idSpaces);
   }
 
