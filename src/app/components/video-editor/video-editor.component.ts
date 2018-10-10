@@ -21,8 +21,8 @@ export class VideoEditorComponent implements OnInit {
 
   video: Video;
 
-  start: String;
-  end: String;
+  start: string;
+  end: string;
 
   newPolyp: Polyp = new Polyp();
   polyps: Polyp[] = [];

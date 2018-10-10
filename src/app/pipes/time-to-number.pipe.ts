@@ -5,7 +5,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class TimeToNumberPipe implements PipeTransform {
 
-  transform(time: String): number {
+  transform(time: string): number {
     const split = time.split(':');
     const minutes = split[0];
     const seconds = split[1];

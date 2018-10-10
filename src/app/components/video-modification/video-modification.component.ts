@@ -20,8 +20,8 @@ export class VideoModificationComponent implements OnInit {
   @Input() timesAreCorrect: Function;
   @Input() playInterval: Function;
 
-  start: String;
-  end: String;
+  start: string;
+  end: string;
 
   modifiers: Modifier[];
   selectedModifier: Modifier;

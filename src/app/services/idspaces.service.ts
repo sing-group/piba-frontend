@@ -19,7 +19,7 @@ export class IdSpacesService {
       );
   }
 
-  getIdSpace(id: String): Observable<IdSpace> {
+  getIdSpace(id: string): Observable<IdSpace> {
     return this.http.get<IdSpaceInfo>(`${environment.restApi}/idspace/${id}`)
       .pipe(
         map(this.mapIdSpaceInfo.bind(this))

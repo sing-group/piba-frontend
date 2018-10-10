@@ -23,7 +23,7 @@ export class PatientsService {
     return this.withIdSpace(this.http.post<PatientInfo>(`${environment.restApi}/patient`, patientInfo));
   }
 
-  getPatient(id: String): Observable<Patient> {
+  getPatient(id: string): Observable<Patient> {
     return this.withIdSpace(this.http.get<PatientInfo>(`${environment.restApi}/patient/${id}`));
   }
 
