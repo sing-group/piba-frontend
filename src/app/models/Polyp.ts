@@ -9,7 +9,8 @@ export class Polyp {
   wasp: WASP;
   nice: NICE;
   lst: LST;
-  paris: PARIS;
+  parisPrimary: PARIS;
+  parisSecondary: PARIS;
   histology: string;
   observation: string;
   polypRecordings: PolypRecording[];
@@ -30,10 +31,9 @@ export enum LST {
 }
 
 export enum PARIS {
-  PEDUNCULATED = '(0-1p) Pendunculated', SESSILE = '(0-1s) Sessile', MIXED = '(0-1sp) Mixed',
-  SLIGHTLY_ELEVATED = '(0-IIa) Slightly elevated', FLAT = '(0-IIb) Flat', SLIGHTLY_DEPRESSED = '(0-IIc) Slightly depressed',
-  ELEVATED_DEPRESSED = '(0-IIa + IIc)  Elevated depressed', DEPRESSED_ELEVATED = '(0-IIc + IIa) Depressed elevated',
-  SESSILE_DEPRESSED = '(0-1s + IIc) Sessile depressed'
+  PEDUNCULATED = '(0-Ip) Pendunculated', SESSILE = '(0-Is) Sessile',
+  SLIGHTLY_ELEVATED = '(0-IIa) Slightly elevated', FLAT = '(0-IIb) Flat', DEPRESSED = '(0-IIc) depressed',
+  ULCERATED = '(0-III) Excavated/Ulcerated'
 }
 
 export enum LOCATION {

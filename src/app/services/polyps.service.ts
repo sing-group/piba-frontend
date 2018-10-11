@@ -50,7 +50,7 @@ export class PolypsService {
   }
 
   private mapPolypInfo(polypInfo: PolypInfo): Polyp {
-   return {
+    return {
       id: polypInfo.id,
       name: polypInfo.name,
       size: polypInfo.size,
@@ -58,7 +58,8 @@ export class PolypsService {
       wasp: WASP[polypInfo.wasp],
       nice: NICE[polypInfo.nice],
       lst: LST[polypInfo.lst],
-      paris: PARIS[polypInfo.paris],
+      parisPrimary: PARIS[polypInfo.parisPrimary],
+      parisSecondary: PARIS[polypInfo.parisSecondary],
       histology: polypInfo.histology,
       observation: polypInfo.observation,
       polypRecordings: [],
@@ -75,7 +76,8 @@ export class PolypsService {
       wasp: EnumUtils.findKeyForValue(WASP, polyp.wasp),
       nice: EnumUtils.findKeyForValue(NICE, polyp.nice),
       lst: EnumUtils.findKeyForValue(LST, polyp.lst),
-      paris: EnumUtils.findKeyForValue(PARIS, polyp.paris),
+      parisPrimary: EnumUtils.findKeyForValue(PARIS, polyp.parisPrimary),
+      parisSecondary: EnumUtils.findKeyForValue(PARIS, polyp.parisSecondary),
       histology: polyp.histology,
       observation: polyp.observation,
       exploration: polyp.exploration.id

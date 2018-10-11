@@ -67,10 +67,16 @@
               <input type="text" id="polyp-lst" readonly value="{{polyp.lst}}"/>
             </div>
             <div class="col-lg-2 col-sm-3 col-xs-4">
-              <label class="txt-strong" for="polyp-paris">PARIS</label>
+              <label class="txt-strong" for="polyp-parisPrimary">PARIS</label>
             </div>
             <div class="col-lg-4 col-sm-3 col-xs-8">
-              <input type="text" id="polyp-paris" readonly value="{{polyp.paris}}"/>
+              <input type="text" id="polyp-parisPrimary" readonly value="{{polyp.parisPrimary}}"/>
+            </div>
+            <div class="col-lg-2 col-sm-3 col-xs-4" *ngIf="polyp.parisSecondary !== undefined">
+              <label class="txt-strong" for="polyp-parisSecondary">PARIS Secondary</label>
+            </div>
+            <div class="col-lg-4 col-sm-3 col-xs-8" *ngIf="polyp.parisSecondary !== undefined">
+              <input type="text" id="polyp-parisSecondary" readonly value="{{polyp.parisSecondary}}"/>
             </div>
 
             <div class="col-xs-12">
@@ -182,9 +188,17 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="polyp-form-paris">PARIS</label>
+          <label for="polyp-form-parisPrimary">PARIS</label>
           <div class="select complete-space">
-            <select id="polyp-form-paris" [(ngModel)]="polyp.paris" name="paris">
+            <select id="polyp-form-parisPrimary" [(ngModel)]="polyp.parisPrimary" name="parisPrimary">
+              <option *ngFor="let p of PARISValues" [ngValue]="p">{{p}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" *ngIf="polyp.parisPrimary !== undefined">
+          <label for="polyp-form-parisSecondary">PARIS Secondary</label>
+          <div class="select complete-space">
+            <select id="polyp-form-parisSecondary" [(ngModel)]="polyp.parisSecondary" name="parisSecondary">
               <option *ngFor="let p of PARISValues" [ngValue]="p">{{p}}</option>
             </select>
           </div>

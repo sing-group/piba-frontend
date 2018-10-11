@@ -8,7 +8,8 @@ export interface PolypInfo {
   wasp: string;
   nice: string;
   lst: string;
-  paris: string;
+  parisPrimary: string;
+  parisSecondary: string;
   histology: string;
   observation: string;
   exploration: IdAndUri | string;
