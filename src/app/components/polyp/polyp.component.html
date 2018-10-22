@@ -39,12 +39,6 @@
             <div class="col-lg-4 col-sm-3 col-xs-8">
               <input type="text" id="polyp-location" readonly value="{{polyp.location}}"/>
             </div>
-            <div class="col-lg-2 col-sm-3 col-xs-4">
-              <label class="txt-strong" for="polyp-histology">Histology</label>
-            </div>
-            <div class="col-lg-4 col-sm-3 col-xs-8">
-              <input type="text" id="polyp-histology" readonly value="{{polyp.histology}}"/>
-            </div>
 
             <div class="col-lg-2 col-sm-3 col-xs-4">
               <label class="txt-strong" for="polyp-nice">NICE</label>
@@ -83,6 +77,41 @@
             </div>
             <div class="col-xs-12">
               <textarea type="text" id="polyp-observation" rows="2" readonly value="{{polyp.observation}}"></textarea>
+            </div>
+
+            <div class="col-lg-2 col-sm-4 col-xs-4">
+              <label class="txt-strong" for="polyp-histology">Histology</label>
+            </div>
+            <div class="col-lg-4 col-sm-8 col-xs-8">
+              <input type="text" id="polyp-histology" readonly value="{{polyp.histology.polypType}}"/>
+            </div>
+
+            <div class="col-lg-2 col-sm-4 col-xs-4" *ngIf="isAdenoma(polyp.histology)">
+              <label class="txt-strong" for="polyp-adenomaType">Type</label>
+            </div>
+            <div class="col-lg-4 col-sm-8 col-xs-8" *ngIf="isAdenoma(polyp.histology)">
+              <input type="text" id="polyp-adenomaType" readonly value="{{asAdenoma(polyp.histology).type}}"/>
+            </div>
+            <div class="col-lg-2 col-sm-4 col-xs-4" *ngIf="isAdenoma(polyp.histology)">
+              <label class="txt-strong" for="polyp-adenomaDysplasing">Grade of dysplasia adenoma</label>
+            </div>
+            <div class="col-lg-4 col-sm-8 col-xs-8" *ngIf="isAdenoma(polyp.histology)">
+              <input type="text" id="polyp-adenomaDysplasing" readonly
+                     value="{{asAdenoma(polyp.histology).dysplasingGrade}}"/>
+            </div>
+
+            <div class="col-lg-2 col-sm-4 col-xs-4" *ngIf="isSSA(polyp.histology)">
+              <label class="txt-strong" for="polyp-ssa">Grade of dysplasia ssa</label>
+            </div>
+            <div class="col-lg-4 col-sm-8 col-xs-8" *ngIf="isSSA(polyp.histology)">
+              <input type="text" id="polyp-ssa" readonly value="{{asSSA(polyp.histology).dysplasingGrade}}"/>
+            </div>
+
+            <div class="col-lg-2 col-sm-4 col-xs-4" *ngIf="isTSA(polyp.histology)">
+              <label class="txt-strong" for="polyp-tsa">Grade of dysplasia tsa</label>
+            </div>
+            <div class="col-lg-4 col-sm-8 col-xs-8" *ngIf="isTSA(polyp.histology)">
+              <input type="text" id="polyp-tsa" readonly value="{{asTSA(polyp.histology).dysplasingGrade}}"/>
             </div>
 
           </div>
@@ -152,15 +181,11 @@
           <label for="polyp-form-location">Location</label>
           <div class="select complete-space">
             <select id="polyp-form-location" [(ngModel)]="polyp.location" name="location">
-              <option *ngFor="let l of LOCATIONValues" [ngValue]="l">{{l}}</option>
+              <option *ngFor="let loc of LOCATIONValues" [ngValue]="loc">{{loc}}</option>
             </select>
           </div>
         </div>
-        <div class="form-group">
-          <label for="polyp-form-histology">Histology</label>
-          <input type="text" class="complete-space" id="polyp-form-histology" name="histology"
-                 [(ngModel)]="polyp.histology">
-        </div>
+
 
         <div class="form-group">
           <label for="polyp-form-wasp">WASP</label>
@@ -198,7 +223,7 @@
           <label for="polyp-form-parisSecondary">PARIS Secondary</label>
           <div class="select complete-space">
             <select id="polyp-form-parisSecondary" [(ngModel)]="polyp.parisSecondary" name="parisSecondary">
-              <option *ngFor="let p of PARISValues" [ngValue]="p">{{p}}</option>
+              <option *ngFor="let p2 of PARISValues" [ngValue]="p2">{{p2}}</option>
             </select>
           </div>
         </div>
@@ -206,6 +231,57 @@
           <label for="polyp-form-observation">Observation</label>
           <textarea type="text" id="polyp-form-observation" name="observation"
                     [(ngModel)]="polyp.observation"></textarea>
+        </div>
+
+        <h6 class="txt-strong">Histology</h6>
+        <div class="form-group">
+          <label for="polyp-form-polyptype">Polyp Type</label>
+          <div class="select complete-space">
+            <select id="polyp-form-polyptype" [(ngModel)]="polypType" name="polyptype"
+                    (ngModelChange)="onPolypTypeChange($event)">
+              <option *ngFor="let pt of POLYPTYPEValues" [ngValue]="pt">{{pt}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="isAdenoma(polyp.histology)">
+          <label for="polyp-form-adenomaType" class="required">Adenoma Type</label>
+          <div class="select complete-space">
+            <select id="polyp-form-adenomaType" [(ngModel)]="asAdenoma(polyp.histology).type" name="adenomaType"
+                    required>
+              <option *ngFor="let a of ADENOMAValues" [ngValue]="a">{{a}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="isAdenoma(polyp.histology)">
+          <label for="polyp-form-adenomaDysplasing" class="required">Grade of dysplasia</label>
+          <div class="select complete-space">
+            <select id="polyp-form-adenomaDysplasing" [(ngModel)]="asAdenoma(polyp.histology).dysplasingGrade"
+                    name="adenomaDysplasing" required>
+              <option *ngFor="let adv of ADENOMADYSPLASINGValues" [ngValue]="adv">{{adv}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="isSSA(polyp.histology)">
+          <label for="polyp-form-ssa" class="required">Grade of dysplasia</label>
+          <div class="select complete-space">
+            <select id="polyp-form-ssa" [(ngModel)]="asSSA(polyp.histology).dysplasingGrade" name="ssaDysplasing"
+                    required>
+              <option *ngFor="let s of SSADYSPLASINGGRADEValues" [ngValue]="s">{{s}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="isTSA(polyp.histology)">
+          <label for="polyp-form-tsa" class="required">Grade of dysplasia</label>
+          <div class="select complete-space">
+            <select id="polyp-form-tsa" [(ngModel)]="asTSA(polyp.histology).dysplasingGrade" name="tsaDysplasing"
+                    required>
+              <option *ngFor="let t of TSADYSPLASINGGRADEValues" [ngValue]="t">{{t}}</option>
+            </select>
+          </div>
         </div>
 
       </section>

@@ -1,5 +1,6 @@
 import {Exploration} from './Exploration';
 import {PolypRecording} from './PolypRecording';
+import {PolypHistology} from './PolypHistology';
 
 export class Polyp {
   id: string;
@@ -11,7 +12,7 @@ export class Polyp {
   lst: LST;
   parisPrimary: PARIS;
   parisSecondary: PARIS;
-  histology: string;
+  histology: PolypHistology;
   observation: string;
   polypRecordings: PolypRecording[];
   exploration: Exploration;

@@ -1,10 +1,24 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Polyp, LST, NICE, PARIS, WASP, LOCATION} from '../../models/Polyp';
+import {LOCATION, LST, NICE, PARIS, Polyp, WASP} from '../../models/Polyp';
 import {PolypsService} from '../../services/polyps.service';
 import {Exploration} from '../../models/Exploration';
 import {EnumUtils} from '../../utils/enum.utils';
 import {PolypRecordingsService} from '../../services/polyprecordings.service';
 import {NotificationService} from '../../modules/notification/services/notification.service';
+import {
+  Adenoma,
+  AdenomaDysplasingGrade,
+  AdenomaType,
+  Hyperplastic,
+  Invasive, isAdenoma, isSSA, isTSA,
+  PolypHistology,
+  PolypType,
+  SSA,
+  SsaDysplasingGrade,
+  TSA,
+  TsaDysplasingGrade
+} from '../../models/PolypHistology';
+import {logger} from 'codelyzer/util/logger';
 
 @Component({
   selector: 'app-polyp',
@@ -23,10 +37,18 @@ export class PolypComponent implements OnInit {
 
   LOCATIONValues: LOCATION[];
 
-  creatingPolyp: Boolean = false;
-  editingPolyp: Boolean = false;
+  POLYPTYPEValues: PolypType[];
+  ADENOMAValues: AdenomaType[];
+  ADENOMADYSPLASINGValues: AdenomaDysplasingGrade[];
+  SSADYSPLASINGGRADEValues: SsaDysplasingGrade[];
+  TSADYSPLASINGGRADEValues: TsaDysplasingGrade[];
+
+  creatingPolyp = false;
+  editingPolyp = false;
 
   polyp: Polyp = new Polyp();
+  polypType: PolypType = null;
+
   currentTime: number;
   videoHTML: HTMLMediaElement;
   controls: HTMLElement;
@@ -47,6 +69,11 @@ export class PolypComponent implements OnInit {
     this.LSTValues = EnumUtils.enumValues(LST);
     this.PARISValues = EnumUtils.enumValues(PARIS);
     this.LOCATIONValues = EnumUtils.enumValues(LOCATION);
+    this.POLYPTYPEValues = EnumUtils.enumValues(PolypType);
+    this.ADENOMAValues = EnumUtils.enumValues(AdenomaType);
+    this.ADENOMADYSPLASINGValues = EnumUtils.enumValues(AdenomaDysplasingGrade);
+    this.SSADYSPLASINGGRADEValues = EnumUtils.enumValues(SsaDysplasingGrade);
+    this.TSADYSPLASINGGRADEValues = EnumUtils.enumValues(TsaDysplasingGrade);
     this.polyps = this.exploration.polyps;
     this.assignPolypName();
     this.polyps.map((polyp) => {
@@ -55,16 +82,67 @@ export class PolypComponent implements OnInit {
     });
   }
 
+  public onPolypTypeChange(polypType: PolypType) {
+    switch (polypType) {
+      case PolypType.ADENOMA:
+        this.polyp.histology = new Adenoma(null, null);
+        break;
+      case PolypType.INVASIVE:
+        this.polyp.histology = new Invasive();
+        break;
+      case PolypType.HYPERPLASTIC:
+        this.polyp.histology = new Hyperplastic();
+        break;
+      case PolypType.SESSILE_SERRATED_ADENOMA:
+        this.polyp.histology = new SSA(null);
+        break;
+      case PolypType.TRADITIONAL_SERRATED_ADENOMA:
+        this.polyp.histology = new TSA(null);
+        break;
+    }
+  }
+
+  public isAdenoma(histology: PolypHistology): histology is Adenoma {
+    return isAdenoma(histology);
+  }
+
+  public asAdenoma(histology: PolypHistology): Adenoma {
+    if (isAdenoma(histology)) {
+      return histology;
+    }
+  }
+
+  public isSSA(histology: PolypHistology): histology is SSA {
+    return isSSA(histology);
+  }
+
+  public asSSA(histology: PolypHistology): SSA {
+    if (isSSA(histology)) {
+      return histology;
+    }
+  }
+
+  public isTSA(histology: PolypHistology): histology is TSA {
+    return isTSA(histology);
+  }
+
+  public asTSA(histology: PolypHistology): TSA {
+    if (isTSA(histology)) {
+      return histology;
+    }
+  }
+
   cancel() {
     this.creatingPolyp = false;
     this.editingPolyp = false;
     this.polyp = new Polyp();
+    this.polypType = null;
     this.assignPolypName();
   }
 
   save() {
     this.polyp.exploration = this.exploration;
-    if (!this.editingPolyp) {
+    if (this.creatingPolyp) {
       this.polypsService.createPolyp(this.polyp).subscribe(newPolyp => {
           this.exploration.polyps = this.exploration.polyps.concat(newPolyp);
           this.assignPolypName();
@@ -73,8 +151,9 @@ export class PolypComponent implements OnInit {
       );
     } else {
       this.polypsService.editPolyp(this.polyp).subscribe(updatedPolyp => {
-        Object.assign(this.exploration.polyps.find((polyp) =>
-          polyp.id === this.polyp.id
+        Object.assign(this.exploration.polyps.find((polyp) => {
+            return polyp.id === this.polyp.id;
+          }
         ), updatedPolyp);
         this.notificationService.success('Polyp edited successfully.', 'Polyp edited.');
       });
@@ -85,6 +164,7 @@ export class PolypComponent implements OnInit {
   editPolyp(id: string) {
     this.editingPolyp = true;
     this.polyp = this.exploration.polyps.find(polyp => polyp.id === id);
+    this.polypType = this.polyp.histology.polypType;
   }
 
   delete(id: string) {
@@ -138,7 +218,6 @@ export class PolypComponent implements OnInit {
   private assignPolypName() {
     this.polyp.name = 'Polyp ' + (this.exploration.polyps.length + 1);
   }
-
 
 }
 

@@ -1,11 +1,37 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import {Polyp, LST, NICE, PARIS, WASP, LOCATION} from '../models/Polyp';
+import {LOCATION, LST, NICE, PARIS, Polyp, WASP} from '../models/Polyp';
 import {environment} from '../../environments/environment';
 import {PolypInfo} from './entities/PolypInfo';
 import {EnumUtils} from '../utils/enum.utils';
 import {map} from 'rxjs/operators';
+import {
+  Adenoma,
+  AdenomaDysplasingGrade,
+  AdenomaType,
+  Hyperplastic,
+  Invasive,
+  PolypHistology,
+  PolypType,
+  SSA,
+  SsaDysplasingGrade,
+  TSA,
+  TsaDysplasingGrade
+} from '../models/PolypHistology';
+import {
+  AdenomaInfo,
+  HyperplasticInfo,
+  InvasiveInfo,
+  isAdenomaInfo,
+  isHyperplasticInfo,
+  isInvasiveInfo,
+  isSSAInfo,
+  isTSAInfo,
+  PolypHistologyInfo,
+  SSAInfo,
+  TSAInfo
+} from './entities/PolypHistologyInfo';
 
 @Injectable()
 export class PolypsService {
@@ -25,7 +51,7 @@ export class PolypsService {
   getPolyp(uuid: string): Observable<Polyp> {
     return this.http.get<PolypInfo>(`${environment.restApi}/polyp/${uuid}`)
       .pipe(
-        map(this.mapPolypInfo)
+        map(this.mapPolypInfo.bind(this))
       );
   }
 
@@ -34,7 +60,7 @@ export class PolypsService {
 
     return this.http.put<PolypInfo>(`${environment.restApi}/polyp/${polypInfo.id}`, polypInfo)
       .pipe(
-        map(this.mapPolypInfo)
+        map(this.mapPolypInfo.bind(this))
       );
   }
 
@@ -60,11 +86,40 @@ export class PolypsService {
       lst: LST[polypInfo.lst],
       parisPrimary: PARIS[polypInfo.parisPrimary],
       parisSecondary: PARIS[polypInfo.parisSecondary],
-      histology: polypInfo.histology,
+      histology: this.mapPolypHistologyInfo(polypInfo.histology),
       observation: polypInfo.observation,
       polypRecordings: [],
       exploration: null
     };
+  }
+
+  private mapPolypHistologyInfo(polypHistologyInfo: PolypHistologyInfo): PolypHistology {
+    if (isAdenomaInfo(polypHistologyInfo)) {
+      return new Adenoma(
+        AdenomaType[polypHistologyInfo.adenomaType],
+        AdenomaDysplasingGrade[polypHistologyInfo.adenomaDysplasingGrade]
+      );
+    }
+    if (isTSAInfo(polypHistologyInfo)) {
+      return new TSA(
+        TsaDysplasingGrade[polypHistologyInfo.tsaDysplasingGrade]
+      );
+    }
+
+    if (isSSAInfo(polypHistologyInfo)) {
+      return new SSA(
+        SsaDysplasingGrade[polypHistologyInfo.ssaDysplasingGrade]
+      );
+    }
+
+    if (isInvasiveInfo(polypHistologyInfo)) {
+      return new Invasive();
+    }
+
+    if (isHyperplasticInfo(polypHistologyInfo)) {
+      return new Hyperplastic();
+    }
+    return new PolypHistology(null);
   }
 
   private toPolypInfo(polyp: Polyp): PolypInfo {
@@ -78,9 +133,34 @@ export class PolypsService {
       lst: EnumUtils.findKeyForValue(LST, polyp.lst),
       parisPrimary: EnumUtils.findKeyForValue(PARIS, polyp.parisPrimary),
       parisSecondary: EnumUtils.findKeyForValue(PARIS, polyp.parisSecondary),
-      histology: polyp.histology,
+      histology: this.toPolypHistologyInfo(polyp.histology),
       observation: polyp.observation,
       exploration: polyp.exploration.id
     };
   }
+
+  private toPolypHistologyInfo(polypHistology: PolypHistology): PolypHistologyInfo {
+    if (polypHistology !== undefined && polypHistology !== null) {
+      switch (polypHistology.polypType) {
+        case PolypType.ADENOMA:
+          return new AdenomaInfo(
+            EnumUtils.findKeyForValue(AdenomaType, (<Adenoma>polypHistology).type),
+            EnumUtils.findKeyForValue(AdenomaDysplasingGrade, (<Adenoma>polypHistology).dysplasingGrade));
+        case PolypType.INVASIVE:
+          return new InvasiveInfo();
+        case PolypType.HYPERPLASTIC:
+          return new HyperplasticInfo();
+        case PolypType.SESSILE_SERRATED_ADENOMA:
+          return new SSAInfo(
+            EnumUtils.findKeyForValue(SsaDysplasingGrade, (<SSA>polypHistology).dysplasingGrade));
+        case PolypType.TRADITIONAL_SERRATED_ADENOMA:
+          return new TSAInfo(
+            EnumUtils.findKeyForValue(TsaDysplasingGrade, (<TSA>polypHistology).dysplasingGrade));
+        default:
+          return null;
+          break;
+      }
+    }
+  }
+
 }
