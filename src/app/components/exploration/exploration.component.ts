@@ -123,7 +123,7 @@ export class ExplorationComponent implements OnInit {
     };
   }
 
-  private assignVideoName(){
+  private assignVideoName() {
     this.newVideo.title = 'Video ' + (this.exploration.videos.length + 1);
   }
 }
