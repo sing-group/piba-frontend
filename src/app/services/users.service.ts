@@ -5,6 +5,7 @@ import {UserInfo} from './entities/UserInfo';
 import {environment} from '../../environments/environment';
 import {map} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
+import {User} from '../models/User';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,14 @@ export class UsersService {
         map(this.mapUserInfo.bind(this))
       );
 
+  }
+
+  editUser(user: Users): Observable<User> {
+    const userInfo = this.toUserInfo(user);
+    return this.http.put<UserInfo>(`${environment.restApi}/user/${user.login}`, userInfo)
+      .pipe(
+        map(this.mapUserInfo.bind(this))
+      );
   }
 
   getUsers(): Observable<Users[]> {

@@ -6,38 +6,48 @@
 </div>
 
 
-<form ngNativeValidate #userForm="ngForm" (submit)="save()">
-  <clr-modal [(clrModalOpen)]="creatingUser" [clrModalClosable]="false">
+<form ngNativeValidate #userForm="ngForm" (submit)="save(); userForm.reset()">
+  <clr-modal [(clrModalOpen)]="creatingUser || editingUser" [clrModalClosable]="false">
     <h3 class="modal-title" *ngIf="creatingUser">Add User</h3>
+    <h3 class="modal-title" *ngIf="editingUser">Edit User: "{{ user.login }}"</h3>
     <div class="modal-body">
 
       <section class="form-block">
-        <div class="form-group">
+        <div class="form-group" *ngIf="creatingUser">
           <label for="user-form-name" class="required">Login</label>
           <input type="text" id="user-form-name" id="login" name="login" [(ngModel)]="user.login" required
                  pattern="[a-zA-ZñÑ0-9_]{1,100}" title="Must be a alphanumeric" #loginUser="ngModel"
           />
-
-          <div *ngIf="userForm.submitted && loginUser.invalid" class="alert alert-danger">
+          <div *ngIf="loginUser.invalid && !loginUser.pristine" class="alert alert-danger">
             <div *ngIf="loginUser.errors.required">Username is required.</div>
             <div *ngIf="loginUser.errors.pattern">Username can only contain letters, numbers or underscore and should
               have a length between 1 and 100.
             </div>
           </div>
-
         </div>
+
         <div class="form-group">
-          <label for="user-form-password" class="required">Password</label>
-          <input type="password" id="user-form-password" name="password" [(ngModel)]="user.password" required
-                 minlength="6" #passwordUser="ngModel"
+          <label for="user-form-password" [ngClass]="{'required' : creatingUser}">Password</label>
+          <input type="password" id="user-form-password" name="password" [(ngModel)]="user.password"
+                 [required]="creatingUser" minlength="6" #passwordUser="ngModel"
           />
-          <div *ngIf="userForm.submitted && passwordUser.invalid" class="alert alert-danger">
+          <div *ngIf="passwordUser.invalid && !passwordUser.pristine && creatingUser" class="alert alert-danger">
             <div *ngIf="passwordUser.errors.required">Password is required.</div>
             <div *ngIf="passwordUser.errors.minlength">Password can't be shorter than 6 characters.</div>
           </div>
-
         </div>
+
         <div class="form-group">
+          <label for="user-form-confirm-password" [ngClass]="{'required' : creatingUser}">Confirm password</label>
+          <input type="password" id="user-form-confirm-password" name="confirmPassword"
+                 [(ngModel)]="confirmPassword" [required]="creatingUser" #confirmPasswordUser="ngModel"
+          />
+          <div *ngIf="passwordUser.value !== '' && passwordUser.value !== confirmPasswordUser.value &&
+          !confirmPasswordUser.pristine" class="alert alert-danger">Passwords don't match
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="creatingUser">
           <label for="user-form-role" class="required">Role</label>
           <div class="select">
             <select id="user-form-role" [(ngModel)]="user.role" name="role" required
@@ -47,11 +57,12 @@
           </div>
         </div>
       </section>
-
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
-      <button type="submit" class="btn btn-primary">
+      <button type="button" class="btn btn-outline" (click)="cancel(); userForm.reset()">Cancel</button>
+      <button type="submit" class="btn btn-primary"
+              [disabled]="userForm.invalid || passwordUser.value === '' ||
+              passwordUser.value !== confirmPasswordUser.value">
         Ok
       </button>
     </div>
@@ -72,7 +83,7 @@
     <clr-dg-cell>{{user.role}}</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-link btn-icon">
-        <button class="btn">
+        <button class="btn" (click)="edit(user.login)">
           <clr-icon shape="cog"></clr-icon>
           <span class="clr-icon-title">Settings</span>
         </button>

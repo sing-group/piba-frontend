@@ -12,7 +12,9 @@ import {NotificationService} from '../../modules/notification/services/notificat
 export class UserComponent implements OnInit {
 
   creatingUser: Boolean = false;
+  editingUser: Boolean = false;
   user: Users = new Users();
+  confirmPassword: string;
 
   roles = Role;
   // to show the value of the enum
@@ -29,16 +31,32 @@ export class UserComponent implements OnInit {
   }
 
   save() {
-    this.usersServices.create(this.user).subscribe((newUser) => {
-      this.users = this.users.concat(newUser);
-      this.notificationService.success('User registered successfully.', 'User registered.');
-      this.cancel();
-    });
+    if (this.creatingUser) {
+      this.usersServices.create(this.user).subscribe((newUser) => {
+        this.users = this.users.concat(newUser);
+        this.notificationService.success('User registered successfully.', 'User registered.');
+        this.cancel();
+      });
+    } else {
+      this.usersServices.editUser(this.user).subscribe(updated => {
+        Object.assign(this.users.find((user) => user.login === this.user.login), updated);
+        this.notificationService.success('User edited successfully.', 'User edited.');
+        this.cancel();
+      });
+    }
   }
 
   cancel() {
     this.creatingUser = false;
+    this.editingUser = false;
     this.user = new Users();
+  }
+
+  edit(login: string) {
+    this.editingUser = true;
+    this.user = this.users.find((user) => user.login === login);
+    // to not show the password in the editing modal
+    this.user.password = '';
   }
 
 }
