@@ -23,8 +23,7 @@ video {
 }
 
 .controls,
-.controls button,
-.timer {
+.controls button{
   background: #222;
   color: white;
   height: 38px;
@@ -48,22 +47,6 @@ video {
   border-radius: 0 10px 10px 0;
 }
 
-.timer {
-  line-height: 38px;
-  font-size: 10px;
-  font-family: monospace;
-  text-shadow: 1px 1px 0px black;
-  color: white;
-  flex: 5;
-  position: relative;
-}
-
-.timer span {
-  position: absolute;
-  z-index: 3;
-  left: 19px;
-}
-
 .controls button:hover,
 .controls button:focus {
   box-shadow: inset 1px 1px 2px black;
@@ -73,4 +56,8 @@ video {
 .controls button:active {
   box-shadow: inset 3px 3px 2px black;
   background-color: black;
+}
+
+.progressVideo {
+  margin-top: 2%;
 }

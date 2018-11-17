@@ -10,8 +10,10 @@
     <button class="stop" aria-label="stop" (click)="stopVideo()">
       <clr-icon shape="stop"></clr-icon>
     </button>
-    <div class="timer">
-      <span aria-label="timer">{{currentTime | time}}</span>
+    <div class="progressVideo">
+      <input type="range" id="progress" [value]="progress.value" min="0" max="100" (mousedown)="mouseDownProgress()"
+             (mouseup)="mouseUpProgress()"/>
+      {{progress.value | time}}
     </div>
     <button class="backward" aria-label="backward" (click)="backwardVideo()">
       <clr-icon shape="rewind"></clr-icon>

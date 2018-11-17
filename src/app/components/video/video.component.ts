@@ -13,6 +13,9 @@ export class VideoComponent implements OnInit {
   @ViewChild('video') videoElement: ElementRef;
 
   fullscreen = false;
+  playWatcher: any;
+  progress: HTMLInputElement;
+  moveProgress = false;
 
   constructor() {
   }
@@ -24,6 +27,9 @@ export class VideoComponent implements OnInit {
     document.addEventListener('fullscreenchange', updateFullscreen);
     document.addEventListener('mozfullscreenchange', updateFullscreen);
     document.addEventListener('webkitfullscreenchange', updateFullscreen);
+
+    this.progress = document.getElementById('progress') as HTMLInputElement;
+    this.progress.valueAsNumber = 0;
   }
 
   private get video() {
@@ -44,6 +50,14 @@ export class VideoComponent implements OnInit {
     } else {
       this.video.pause();
     }
+    if (this.playWatcher !== undefined && this.playWatcher != null) {
+      clearInterval(this.playWatcher);
+    }
+    this.playWatcher = setInterval(() => {
+      if (!this.moveProgress) {
+        this.progress.value = this.video.currentTime;
+      }
+    }, 100);
   }
 
   stopVideo() {
@@ -98,5 +112,14 @@ export class VideoComponent implements OnInit {
       || document.webkitFullscreenElement
       || document.mozFullScreenElement
       || document.msFullscreenElement;
+  }
+
+  mouseDownProgress() {
+    this.moveProgress = true;
+  }
+
+  mouseUpProgress() {
+    this.moveProgress = false;
+    this.video.currentTime = this.progress.valueAsNumber;
   }
 }
