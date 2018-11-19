@@ -42,6 +42,7 @@ export class UsersService {
   private toUserInfo(user: Users): UserInfo {
     return {
       login: user.login,
+      email: user.email,
       password: user.password,
       role: user.role
     };
@@ -50,6 +51,7 @@ export class UsersService {
   private mapUserInfo(userInfo: UserInfo): Users {
     return {
       login: userInfo.login,
+      email: userInfo.email,
       password: userInfo.password,
       role: userInfo.role
     };

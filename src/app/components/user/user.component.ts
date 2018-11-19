@@ -35,15 +35,14 @@ export class UserComponent implements OnInit {
       this.usersServices.create(this.user).subscribe((newUser) => {
         this.users = this.users.concat(newUser);
         this.notificationService.success('User registered successfully.', 'User registered.');
-        this.cancel();
       });
     } else {
       this.usersServices.editUser(this.user).subscribe(updated => {
         Object.assign(this.users.find((user) => user.login === this.user.login), updated);
         this.notificationService.success('User edited successfully.', 'User edited.');
-        this.cancel();
       });
     }
+    this.cancel();
   }
 
   cancel() {

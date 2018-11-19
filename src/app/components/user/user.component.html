@@ -27,13 +27,26 @@
         </div>
 
         <div class="form-group">
+          <label for="user-form-email" class="required">Email</label>
+          <input type="email" id="user-form-email" name="email" [(ngModel)]="user.email"
+                 required email #emailUser="ngModel"
+          />
+          <div *ngIf="emailUser.invalid && !emailUser.pristine" class="alert alert-danger">
+            <div *ngIf="emailUser.errors.required">Email is required.</div>
+            <div *ngIf="emailUser.errors.email">Invalid email format.</div>
+          </div>
+        </div>
+
+        <div class="form-group">
           <label for="user-form-password" [ngClass]="{'required' : creatingUser}">Password</label>
           <input type="password" id="user-form-password" name="password" [(ngModel)]="user.password"
                  [required]="creatingUser" minlength="6" #passwordUser="ngModel"
           />
-          <div *ngIf="passwordUser.invalid && !passwordUser.pristine && creatingUser" class="alert alert-danger">
+          <div *ngIf="passwordUser.invalid && !passwordUser.pristine" class="alert alert-danger">
             <div *ngIf="passwordUser.errors.required">Password is required.</div>
-            <div *ngIf="passwordUser.errors.minlength">Password can't be shorter than 6 characters.</div>
+            <div *ngIf="passwordUser.errors.minlength && passwordUser.value !== ''">Password can't be shorter than 6
+              characters.
+            </div>
           </div>
         </div>
 
@@ -61,8 +74,8 @@
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel(); userForm.reset()">Cancel</button>
       <button type="submit" class="btn btn-primary"
-              [disabled]="userForm.invalid || passwordUser.value === '' ||
-              passwordUser.value !== confirmPasswordUser.value">
+              [disabled]="userForm.invalid || (passwordUser.value !== '' &&
+              passwordUser.value !== confirmPasswordUser.value)">
         Ok
       </button>
     </div>
@@ -75,11 +88,13 @@
   <clr-dg-placeholder>We couldn't find any users!</clr-dg-placeholder>
 
   <clr-dg-column>Username</clr-dg-column>
+  <clr-dg-column>Email</clr-dg-column>
   <clr-dg-column>Role</clr-dg-column>
   <clr-dg-column>Actions</clr-dg-column>
 
   <clr-dg-row *clrDgItems="let user of users" [clrDgItem]="user">
     <clr-dg-cell>{{user.login}}</clr-dg-cell>
+    <clr-dg-cell>{{user.email}}</clr-dg-cell>
     <clr-dg-cell>{{user.role}}</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-link btn-icon">
