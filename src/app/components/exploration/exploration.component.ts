@@ -21,9 +21,10 @@ export class ExplorationComponent implements OnInit {
 
   newVideo: Video = new Video();
 
-  userUploadingVideo: Boolean = false;
+  userUploadingVideo: false;
 
-  isReadonly: Boolean = true;
+  isReadonly = true;
+  editingVideo: string;
 
   constructor(
     private videosService: VideosService,
@@ -96,13 +97,21 @@ export class ExplorationComponent implements OnInit {
     );
   }
 
+  selectedVideo(video: Video) {
+    this.editingVideo = video.id;
+    this.isReadonly = false;
+  }
+
   editVideo(video: Video) {
     const title = document.getElementsByClassName('title-' + video.id) as HTMLCollectionOf<HTMLInputElement>;
     const observations = document.getElementsByClassName('observations-' + video.id) as HTMLCollectionOf<HTMLInputElement>;
+    const withText = document.getElementsByClassName('withText-' + video.id) as HTMLCollectionOf<HTMLInputElement>;
     video.title = title[0].value;
     video.observations = observations[0].value;
+    video.withText = withText[0].checked;
 
     this.videosService.editVideo(video).subscribe(updatedVideo => {
+      this.editingVideo = null;
       this.isReadonly = true;
       Object.assign(this.exploration.videos.find((v) =>
         v.id === video.id
@@ -119,6 +128,7 @@ export class ExplorationComponent implements OnInit {
       title: video.title,
       observations: video.observations,
       file: null,
+      withText: String(video.withText),
       exploration: video.exploration
     };
   }

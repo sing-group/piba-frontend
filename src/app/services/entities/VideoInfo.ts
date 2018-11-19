@@ -6,6 +6,7 @@ export interface VideoInfo {
   observations: string;
   video_sources: VideoSource[];
   processing: boolean;
+  withText: boolean;
   exploration: IdAndUri | string;
 }
 

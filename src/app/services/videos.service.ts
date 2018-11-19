@@ -44,6 +44,7 @@ export class VideosService {
     formData.append('title', video.title);
     formData.append('observations', video.observations);
     formData.append('video', video.file);
+    formData.append('withText', video.withText);
     formData.append('exploration_id', video.exploration);
     return this.http.post<VideoInfo>(`${environment.restApi}/video`, formData)
       .pipe(
@@ -75,6 +76,7 @@ export class VideosService {
       })),
       polypRecording: [],
       isProcessing: videoInfo.processing,
+      withText: videoInfo.withText,
       exploration: (<IdAndUri>videoInfo.exploration).id
     };
   }
@@ -89,6 +91,7 @@ export class VideosService {
         src: source.url
       })),
       processing: video.isProcessing,
+      withText: video.withText,
       exploration: video.exploration
     };
   }

@@ -66,7 +66,7 @@
                       </div>
                       <div class="col-md-12 col-lg-8">
                         <input type="text" id="video-title" class="title-{{video.id}}" size="50"
-                               [readonly]="isReadonly ? true : null" value="{{video.title}}"/>
+                               [readonly]="editingVideo == video.id ? null : true" value="{{video.title}}"/>
                       </div>
                     </div>
                     <div class="form-group row">
@@ -75,23 +75,38 @@
                       </div>
                       <div class="col-md-12 col-lg-8">
                         <textarea type="text" id="video-observations" class="observations-{{video.id}}" rows="4"
-                                  [readonly]="isReadonly ? true : null" value="{{video.observations}}"></textarea>
+                                  [readonly]="editingVideo == video.id ? null : true"
+                                  value="{{video.observations}}"></textarea>
                       </div>
                     </div>
                     <div class="form-group row">
-                      <button type="button" class="btn btn-secondary" *ngIf="isReadonly" (click)="isReadonly=false">
+                      <div class="col-md-12 col-lg-4">
+                      </div>
+                      <div class="col-md-12 col-lg-8">
+                        <label class="label-check"><input type="checkbox" name="withText" class="withText-{{video.id}}"
+                                                          [(ngModel)]="video.withText"
+                                                          [disabled]="editingVideo == video.id ? null : true"/>
+                          Video with text</label>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <button type="button" class="btn btn-secondary" *ngIf="isReadonly || video.id !== editingVideo"
+                              (click)="selectedVideo(video)">
                         <clr-icon shape="note"></clr-icon>
                         Edit information
                       </button>
-                      <button type="button" class="btn btn-primary" *ngIf="!isReadonly" (click)="editVideo(video)">
+                      <button type="button" class="btn btn-primary" *ngIf="!isReadonly && video.id == editingVideo"
+                              (click)="editVideo(video)">
                         <clr-icon shape="cog"></clr-icon>
                         Save information
                       </button>
-                      <button type="button" class="btn btn-secondary" routerLink="/video/{{video.id}}" [disabled]="video.isProcessing" >
+                      <button type="button" class="btn btn-secondary" routerLink="/video/{{video.id}}"
+                              [disabled]="video.isProcessing">
                         <clr-icon shape="video-gallery"></clr-icon>
                         Edit video
                       </button>
-                      <button type="button" class="btn btn-secondary" (click)="delete(video.id)" [disabled]="video.isProcessing" >
+                      <button type="button" class="btn btn-secondary" (click)="delete(video.id)"
+                              [disabled]="video.isProcessing">
                         <clr-icon shape="trash"></clr-icon>
                         Remove video
                       </button>
@@ -131,6 +146,11 @@
           <div class="form-group">
             <label for="video-form-file" class="required">File</label>
             <input *ngIf="userUploadingVideo" type="file" id="video-form-file" required/>
+          </div>
+          <div class="form-group">
+            <clr-checkbox name="withText" id="video-form-withText" [(ngModel)]="newVideo.withText">
+              Video with text
+            </clr-checkbox>
           </div>
         </section>
       </div>

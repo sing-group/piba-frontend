@@ -8,5 +8,6 @@ export class Video {
   sources: VideoSource[];
   polypRecording: PolypRecording[];
   isProcessing: boolean;
+  withText: boolean;
   exploration: string;
 }
