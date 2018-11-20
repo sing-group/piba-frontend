@@ -5,6 +5,7 @@
   margin: auto;
   width: 100%;
   height: 100%;
+  align-items: center;
 }
 
 video {
@@ -14,28 +15,27 @@ video {
 .controls {
   opacity: 0.5;
   width: 80%;
-  max-width: 400px;
-  border-radius: 10px;
+  max-width: 600px;
+  border-radius: 5px;
   position: absolute;
-  bottom: 5%;
+  bottom: 2%;
   transition: 1s all;
   display: flex;
 }
 
 .controls,
-.controls button{
+.controls button,
+.timer {
   background: #222;
   color: white;
-  height: 38px;
+  min-height: 38px;
   line-height: 19px;
   box-shadow: inset 0 -5px 25px rgba(0, 0, 0, 0.3);
-  border-right: 1px solid #333;
 }
 
 .controls button {
   position: relative;
   border: 0;
-  flex: 1;
   outline: none;
 }
 
@@ -58,6 +58,90 @@ video {
   background-color: black;
 }
 
-.progressVideo {
-  margin-top: 2%;
+.timer {
+  line-height: 38px;
+  font-size: 10px;
+  font-family: monospace;
+  text-shadow: 1px 1px 0px black;
+  color: white;
+  flex: 5;
+  position: relative;
+}
+
+.timer input {
+  width: 79%;
+}
+
+.timer span {
+  float: right;
+  z-index: 3;
+  width: 20%;
+  margin-top: 0.1rem;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+
+}
+
+input[type=range]:focus {
+  outline: none;
+}
+
+/*CHROME*/
+/*line in progress bar*/
+input[type=range]::-webkit-slider-runnable-track {
+  height: 2px;
+  cursor: pointer;
+  box-shadow: 0px 0px 1px #000000, 0px 0px 0px #0d0d0d;
+  background: #ffffff;
+  border-radius: 0px;
+  border: 0px solid #010101;
+}
+
+/*button in progress bar*/
+input[type=range]::-webkit-slider-thumb {
+  box-shadow: 0px 0px 0px rgba(255, 0, 0, 0.49), 0px 0px 0px rgba(255, 26, 26, 0.49);
+  border: 0px solid #ffffff;
+  background: #ffffff;
+  height: 15px;
+  width: 10px;
+  border-radius: 28px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -7px;
+}
+
+.margin-progress {
+  margin-bottom: 4%;
+}
+
+/*MOZILLA*/
+/*line in progress bar*/
+input[type=range]::-moz-range-track {
+  height: 2px;
+  cursor: pointer;
+  box-shadow: 0px 0px 1px #000000, 0px 0px 0px #0d0d0d;
+  border-radius: 0px;
+  border: 0px solid #010101;
+  margin-top: 3%;
+  width: 98%;
+}
+
+/*button in progress bar*/
+input[type=range]::-moz-range-thumb {
+  box-shadow: 0px 0px 0px rgba(255, 0, 0, 0.49), 0px 0px 0px rgba(255, 26, 26, 0.49);
+  border: 0px solid #ffffff;
+  height: 15px;
+  width: 10px;
+  border-radius: 28px;
+  cursor: pointer;
+  margin-top: 3%;
+}
+
+@-moz-document url-prefix() {
+  .margin-progress {
+    padding-top: 3%;
+    margin-bottom: 0% !important;
+  }
 }

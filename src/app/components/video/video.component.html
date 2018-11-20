@@ -10,11 +10,12 @@
     <button class="stop" aria-label="stop" (click)="stopVideo()">
       <clr-icon shape="stop"></clr-icon>
     </button>
-    <div class="progressVideo">
-      <input type="range" id="progress" [value]="progress.value" min="0" max="100" (mousedown)="mouseDownProgress()"
-             (mouseup)="mouseUpProgress()"/>
-      {{progress.value | time}}
+    <div class="timer">
+      <input type="range" id="progress" [value]="progress.value" (mousedown)="mouseDownProgress()"
+             (mouseup)="mouseUpProgress()" class="margin-progress"/>
+      <span>{{progress.value | time}}/{{video.duration | time}}</span>
     </div>
+
     <button class="backward" aria-label="backward" (click)="backwardVideo()">
       <clr-icon shape="rewind"></clr-icon>
     </button>

@@ -30,6 +30,8 @@ export class VideoComponent implements OnInit {
 
     this.progress = document.getElementById('progress') as HTMLInputElement;
     this.progress.valueAsNumber = 0;
+
+    this.videoElement.nativeElement.addEventListener('loadedmetadata', () => this.progress.max = this.video.duration);
   }
 
   private get video() {
