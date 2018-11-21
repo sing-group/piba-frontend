@@ -38,6 +38,6 @@ export enum PARIS {
 }
 
 export enum LOCATION {
-  CECUM = 'Cecum', ASCENDING_COLON = 'Ascending color', HEPATIC_FLEXURE = 'Hepatic flexure', TRANSVERSE_COLON = 'Transverse color',
-  SPLENIC_FLEXURE = 'Splenic flexure', DESCENDING_COLON = 'Descending color', SIGMOID = 'Sigmoid', RECTUM = 'Rectum'
+  CECUM = 'Cecum', ASCENDING_COLON = 'Ascending colon', HEPATIC_FLEXURE = 'Hepatic flexure', TRANSVERSE_COLON = 'Transverse colon',
+  SPLENIC_FLEXURE = 'Splenic flexure', DESCENDING_COLON = 'Descending colon', SIGMOID = 'Sigmoid', RECTUM = 'Rectum'
 }
