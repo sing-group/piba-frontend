@@ -18,7 +18,6 @@ import {
   TSA,
   TsaDysplasingGrade
 } from '../../models/PolypHistology';
-import {logger} from 'codelyzer/util/logger';
 
 @Component({
   selector: 'app-polyp',

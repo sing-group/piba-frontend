@@ -159,7 +159,7 @@
   </clr-tree-node>
 
 </div>
-<form ngNativeValidate (submit)="save()">
+<form ngNativeValidate #polypForm="ngForm" (submit)="save()">
   <clr-modal [(clrModalOpen)]="editingPolyp|| creatingPolyp" [clrModalClosable]="false">
 
     <h3 class="modal-title" *ngIf="creatingPolyp">Add polyp</h3>
@@ -169,13 +169,19 @@
       <section class="form-block">
         <div class="form-group">
           <label for="polyp-form-name" class="required">Name</label>
-          <input type="text" class="complete-space" id="polyp-form-name" name="name" [(ngModel)]="polyp.name" required>
+          <input type="text" class="complete-space" id="polyp-form-name" name="name" [(ngModel)]="polyp.name" required
+                 #namePolyp="ngModel">
+          <div *ngIf="namePolyp.invalid && !namePolyp.pristine" class="alert alert-danger complete-space">
+            <div *ngIf="namePolyp?.errors.required">Name is required.</div>
+          </div>
         </div>
         <div class="form-group">
           <label for="polyp-form-size">Size (mm)</label>
           <input type="text" class="complete-space" id="polyp-form-size" name="size" [(ngModel)]="polyp.size"
-                 pattern="[0-9]*"
-                 title="Must be a number">
+                 pattern="[0-9]*" #sizePolyp="ngModel">
+          <div *ngIf="sizePolyp.invalid && !sizePolyp.pristine" class="alert alert-danger complete-space">
+            <div *ngIf="sizePolyp?.errors.pattern">Must be only numbers.</div>
+          </div>
         </div>
         <div class="form-group">
           <label for="polyp-form-location">Location</label>
@@ -183,16 +189,18 @@
             <select id="polyp-form-location" [(ngModel)]="polyp.location" name="location">
               <option *ngFor="let loc of LOCATIONValues" [ngValue]="loc">{{loc}}</option>
             </select>
+            <clr-icon class="clear-select" shape="window-close" (click)="polyp.location = null"
+                      *ngIf="polyp.location"></clr-icon>
           </div>
         </div>
-
-
         <div class="form-group">
           <label for="polyp-form-wasp">WASP</label>
           <div class="select complete-space">
             <select id="polyp-form-wasp" [(ngModel)]="polyp.wasp" name="wasp">
               <option *ngFor="let w of WASPValues" [ngValue]="w">{{w}}</option>
             </select>
+            <clr-icon class="clear-select" shape="window-close" (click)="polyp.wasp = null"
+                      *ngIf="polyp.wasp"></clr-icon>
           </div>
         </div>
         <div class="form-group">
@@ -201,6 +209,8 @@
             <select id="polyp-form-nice" [(ngModel)]="polyp.nice" name="nice">
               <option *ngFor="let n of NICEValues" [ngValue]="n">{{n}}</option>
             </select>
+            <clr-icon class="clear-select" shape="window-close" (click)="polyp.nice = null"
+                      *ngIf="polyp.nice"></clr-icon>
           </div>
         </div>
         <div class="form-group">
@@ -209,6 +219,7 @@
             <select id="polyp-form-lst" [(ngModel)]="polyp.lst" name="lst">
               <option *ngFor="let l of LSTValues" [ngValue]="l">{{l}}</option>
             </select>
+            <clr-icon class="clear-select" shape="window-close" (click)="polyp.lst = null" *ngIf="polyp.lst"></clr-icon>
           </div>
         </div>
         <div class="form-group">
@@ -217,14 +228,19 @@
             <select id="polyp-form-parisPrimary" [(ngModel)]="polyp.parisPrimary" name="parisPrimary">
               <option *ngFor="let p of PARISValues" [ngValue]="p">{{p}}</option>
             </select>
+            <clr-icon class="clear-select" shape="window-close"
+                      (click)="polyp.parisPrimary = null; polyp.parisSecondary = null"
+                      *ngIf="polyp.parisPrimary"></clr-icon>
           </div>
         </div>
-        <div class="form-group" *ngIf="polyp.parisPrimary !== undefined">
+        <div class="form-group" *ngIf="polyp.parisPrimary">
           <label for="polyp-form-parisSecondary">PARIS Secondary</label>
           <div class="select complete-space">
             <select id="polyp-form-parisSecondary" [(ngModel)]="polyp.parisSecondary" name="parisSecondary">
               <option *ngFor="let p2 of PARISValues" [ngValue]="p2">{{p2}}</option>
             </select>
+            <clr-icon class="clear-select" shape="window-close" (click)="polyp.parisSecondary = null"
+                      *ngIf="polyp.parisSecondary"></clr-icon>
           </div>
         </div>
         <div class="form-group">
@@ -241,6 +257,8 @@
                     (ngModelChange)="onPolypTypeChange($event)">
               <option *ngFor="let pt of POLYPTYPEValues" [ngValue]="pt">{{pt}}</option>
             </select>
+            <clr-icon class="clear-select" shape="window-close" (click)="polypType = null; polyp.histology = null"
+                      *ngIf="polypType"></clr-icon>
           </div>
         </div>
 
@@ -251,6 +269,8 @@
                     required>
               <option *ngFor="let a of ADENOMAValues" [ngValue]="a">{{a}}</option>
             </select>
+            <clr-icon class="clear-select" shape="window-close" (click)="asAdenoma(polyp.histology).type = null"
+                      *ngIf="asAdenoma(polyp.histology).type"></clr-icon>
           </div>
         </div>
 
@@ -261,6 +281,9 @@
                     name="adenomaDysplasing" required>
               <option *ngFor="let adv of ADENOMADYSPLASINGValues" [ngValue]="adv">{{adv}}</option>
             </select>
+            <clr-icon class="clear-select" shape="window-close"
+                      (click)="asAdenoma(polyp.histology).dysplasingGrade = null"
+                      *ngIf="asAdenoma(polyp.histology).dysplasingGrade"></clr-icon>
           </div>
         </div>
 
@@ -271,6 +294,8 @@
                     required>
               <option *ngFor="let s of SSADYSPLASINGGRADEValues" [ngValue]="s">{{s}}</option>
             </select>
+            <clr-icon class="clear-select" shape="window-close" (click)="asSSA(polyp.histology).dysplasingGrade = null"
+                      *ngIf="asSSA(polyp.histology).dysplasingGrade"></clr-icon>
           </div>
         </div>
 
@@ -281,6 +306,8 @@
                     required>
               <option *ngFor="let t of TSADYSPLASINGGRADEValues" [ngValue]="t">{{t}}</option>
             </select>
+            <clr-icon class="clear-select" shape="window-close" (click)="asTSA(polyp.histology).dysplasingGrade = null"
+                      *ngIf="asTSA(polyp.histology).dysplasingGrade"></clr-icon>
           </div>
         </div>
 
@@ -289,7 +316,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
-      <button type="submit" class="btn btn-primary">Ok</button>
+      <button type="submit" class="btn btn-primary" [disabled]="polypForm.invalid">Ok</button>
     </div>
 
   </clr-modal>

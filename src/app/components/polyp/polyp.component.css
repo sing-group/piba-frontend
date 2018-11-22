@@ -54,3 +54,10 @@
   }
 }
 
+.clear-select {
+  z-index: 1000;
+  float: right;
+  position: absolute;
+  top: .15rem;
+  right: .90rem;
+}
