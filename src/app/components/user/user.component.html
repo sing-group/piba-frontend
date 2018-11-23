@@ -101,15 +101,12 @@
           <clr-icon shape="cog"></clr-icon>
           <span class="clr-icon-title">Settings</span>
         </button>
-        <button class="btn" (click)="deleting=true">
+        <button class="btn" (click)="remove(user.login)">
           <clr-icon shape="trash"></clr-icon>
           <span class="clr-icon-title">Delete</span>
         </button>
       </div>
     </clr-dg-cell>
-    <app-delete-confirmation *ngIf="deleting" [deleting]="deleting" [data]="user.login"
-                             (confirmDelete)="delete(user.login, $event); cancel()">
-    </app-delete-confirmation>
   </clr-dg-row>
   <clr-dg-footer>
     <clr-dg-pagination #pagination [clrDgPageSize]="15">
@@ -117,6 +114,10 @@
     </clr-dg-pagination>
   </clr-dg-footer>
 </clr-datagrid>
+<!-- Delete confirmation modal -->
+<app-delete-confirmation *ngIf="deleting" [deleting]="deleting" [data]="user.login"
+                         (confirmDelete)="delete(user.login, $event); cancel()">
+</app-delete-confirmation>
 
 
 

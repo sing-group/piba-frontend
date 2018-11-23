@@ -71,4 +71,9 @@ export class UserComponent implements OnInit {
       });
     }
   }
+
+  remove(login: string) {
+    this.deleting = true;
+    this.user = this.users.find((user) => user.login === login);
+  }
 }
