@@ -82,7 +82,6 @@
   </clr-modal>
 </form>
 
-
 <clr-datagrid>
 
   <clr-dg-placeholder>We couldn't find any users!</clr-dg-placeholder>
@@ -102,19 +101,22 @@
           <clr-icon shape="cog"></clr-icon>
           <span class="clr-icon-title">Settings</span>
         </button>
-        <button class="btn">
+        <button class="btn" (click)="deleting=true">
           <clr-icon shape="trash"></clr-icon>
           <span class="clr-icon-title">Delete</span>
         </button>
       </div>
     </clr-dg-cell>
+    <app-delete-confirmation *ngIf="deleting" [deleting]="deleting" [data]="user.login"
+                             (confirmDelete)="delete(user.login, $event); cancel()">
+    </app-delete-confirmation>
   </clr-dg-row>
-
   <clr-dg-footer>
     <clr-dg-pagination #pagination [clrDgPageSize]="15">
       {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{pagination.totalItems}} users
     </clr-dg-pagination>
   </clr-dg-footer>
 </clr-datagrid>
+
 
 

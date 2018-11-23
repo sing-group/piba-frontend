@@ -33,6 +33,10 @@ export class UsersService {
       );
   }
 
+  deleteUser(login: string) {
+    return this.http.delete(`${environment.restApi}/user/${login}`);
+  }
+
   getUsers(): Observable<Users[]> {
     return this.http.get<UserInfo[]>(`${environment.restApi}/user/`).pipe(
       map((users) => users.map(this.mapUserInfo.bind(this)))

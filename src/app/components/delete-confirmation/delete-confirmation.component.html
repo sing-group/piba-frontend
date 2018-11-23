@@ -1,0 +1,12 @@
+<clr-modal [(clrModalOpen)]="deleting" [clrModalClosable]="false">
+  <h3 class="modal-title">Confirm deletion</h3>
+  <div class="modal-body">
+    Are you sure you want to delete <b>{{data}}</b>?
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="modalEmitter.emit(); deleting=false">Cancel</button>
+    <button type="button" class="btn btn-danger-outline" (click)="modalEmitter.emit(true)">
+      Delete
+    </button>
+  </div>
+</clr-modal>

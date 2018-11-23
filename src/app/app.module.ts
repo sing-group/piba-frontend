@@ -33,6 +33,7 @@ import {AgePipe} from './pipes/age.pipe';
 import {SimpleNotificationsModule} from 'angular2-notifications';
 import {IdspaceComponent} from './components/idspace/idspace.component';
 import {UserComponent} from './components/user/user.component';
+import {DeleteConfirmationComponent} from './components/delete-confirmation/delete-confirmation.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import {UserComponent} from './components/user/user.component';
     LoginComponent,
     AgePipe,
     IdspaceComponent,
-    UserComponent
+    UserComponent,
+    DeleteConfirmationComponent
   ],
   imports: [
     BrowserModule,
