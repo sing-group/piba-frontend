@@ -44,6 +44,7 @@ export class PolypComponent implements OnInit {
 
   creatingPolyp = false;
   editingPolyp = false;
+  deletingPolyp = false;
 
   polyp: Polyp = new Polyp();
   polypType: PolypType = null;
@@ -134,6 +135,7 @@ export class PolypComponent implements OnInit {
   cancel() {
     this.creatingPolyp = false;
     this.editingPolyp = false;
+    this.deletingPolyp = false;
     this.polyp = new Polyp();
     this.polypType = null;
     this.assignPolypName();
@@ -177,6 +179,12 @@ export class PolypComponent implements OnInit {
         this.notificationService.success('Polyp removed successfully.', 'Polyp removed.');
       }
     );
+    this.cancel();
+  }
+
+  remove(id: string) {
+    this.deletingPolyp = true;
+    this.polyp = this.exploration.polyps.find(polyp => polyp.id === id);
   }
 
   playVideo(videoId: string, polypId: string) {

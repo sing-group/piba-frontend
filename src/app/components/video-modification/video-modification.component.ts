@@ -26,7 +26,9 @@ export class VideoModificationComponent implements OnInit {
   modifiers: Modifier[];
   selectedModifier: Modifier;
 
-  newVideoModification: VideoModification;
+  deletingVideoModification = false;
+
+  videoModification: VideoModification;
   videoModifications: VideoModification[] = [];
 
   constructor(
@@ -60,15 +62,15 @@ export class VideoModificationComponent implements OnInit {
   }
 
   addVideoModification() {
-    this.newVideoModification = {
+    this.videoModification = {
       id: null,
       video: this.video,
       modifier: this.selectedModifier,
       start: this.timeToNumber.transform(this.start),
       end: this.timeToNumber.transform(this.end)
     };
-    this.videoModificationsService.createVideoModification(this.newVideoModification).subscribe(newVideoModification => {
-        this.videoModifications = this.videoModifications.concat(newVideoModification);
+    this.videoModificationsService.createVideoModification(this.videoModification).subscribe(videoModification => {
+        this.videoModifications = this.videoModifications.concat(videoModification);
         this.notificationService.success('Video modifier registered successfully.', 'Video modifier registered.');
       }
     );
@@ -85,6 +87,17 @@ export class VideoModificationComponent implements OnInit {
         this.notificationService.success('Video modifier removed successfully.', 'Video modifier removed');
       }
     );
+    this.cancel();
+  }
+
+  remove(videoModification: VideoModification) {
+    this.deletingVideoModification = true;
+    this.videoModification = this.videoModifications.find((toFind) => toFind === videoModification
+    );
+  }
+
+  cancel() {
+    this.deletingVideoModification = false;
   }
 
 }

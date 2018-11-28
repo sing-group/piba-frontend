@@ -59,7 +59,7 @@
           <clr-icon shape="cog"></clr-icon>
           <span class="clr-icon-title">Settings</span>
         </button>
-        <button class="btn" (click)="delete(exploration.id)">
+        <button class="btn" (click)="remove(exploration.id)">
           <clr-icon shape="trash"></clr-icon>
           <span class="clr-icon-title">Delete</span>
         </button>
@@ -75,7 +75,7 @@
 </clr-datagrid>
 
 <form ngNativeValidate #explorationForm="ngForm" (submit)="save()">
-  <clr-modal [(clrModalOpen)]="editingExploration|| creatingExploration" [clrModalClosable]="false">
+  <clr-modal [(clrModalOpen)]="editingExploration || creatingExploration" [clrModalClosable]="false">
     <h3 class="modal-title" *ngIf="creatingExploration">Add Exploration</h3>
     <h3 class="modal-title" *ngIf="editingExploration">Edit Exploration</h3>
     <div class="modal-body">
@@ -138,3 +138,11 @@
     </div>
   </clr-modal>
 </form>
+
+<!-- Delete confirmation modal -->
+<app-delete-confirmation *ngIf="deletingExploration" [modelName]="'exploration'" [id]="exploration.id"
+                         [name]="exploration.title"
+                         [cancel]="cancel.bind(this)" [delete]="delete.bind(this)"
+>
+</app-delete-confirmation>
+

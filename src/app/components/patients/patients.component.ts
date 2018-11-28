@@ -13,8 +13,9 @@ import {NotificationService} from '../../modules/notification/services/notificat
 })
 export class PatientsComponent implements OnInit {
 
-  creatingPatient: Boolean = false;
-  editingPatient: Boolean = false;
+  creatingPatient = false;
+  editingPatient = false;
+  deletingPatient = false;
 
   newPatient: Patient = new Patient();
 
@@ -69,6 +70,7 @@ export class PatientsComponent implements OnInit {
     this.newPatient = new Patient();
     this.creatingPatient = false;
     this.editingPatient = false;
+    this.deletingPatient = false;
     this.patientID = null;
     this.birthdate = null;
     this.sex = null;
@@ -97,6 +99,6 @@ export class PatientsComponent implements OnInit {
       this.patient = null;
       this.notificationService.success('Patient removed successfully.', 'Patient removed.');
     });
+    this.cancel();
   }
-
 }

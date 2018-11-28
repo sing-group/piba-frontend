@@ -10,8 +10,9 @@ import {NotificationService} from '../../modules/notification/services/notificat
 })
 export class IdspaceComponent implements OnInit {
 
-  creatingIdSpace: Boolean = false;
-  editingIdSpace: Boolean = false;
+  creatingIdSpace = false;
+  editingIdSpace = false;
+  deletingIdSpace = false;
   idSpace: IdSpace = new IdSpace();
 
   idSpaces: IdSpace[] = [];
@@ -55,12 +56,19 @@ export class IdspaceComponent implements OnInit {
       this.idSpaces.splice(index, 1);
       this.notificationService.success('ID Space removed successfully.', 'ID Space removed.');
     });
+    this.cancel();
+  }
+
+  remove(id: string) {
+    this.deletingIdSpace = true;
+    this.idSpace = this.idSpaces.find((idSpace) => idSpace.id === id);
   }
 
   cancel() {
     this.idSpace = new IdSpace();
     this.creatingIdSpace = false;
     this.editingIdSpace = false;
+    this.deletingIdSpace = false;
   }
 
 }

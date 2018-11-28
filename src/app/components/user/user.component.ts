@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Role} from '../../models/User';
 import {UsersService} from '../../services/users.service';
 import {Users} from '../../models/Users';
@@ -11,9 +11,9 @@ import {NotificationService} from '../../modules/notification/services/notificat
 })
 export class UserComponent implements OnInit {
 
-  creatingUser: Boolean = false;
-  editingUser: Boolean = false;
-  deleting: Boolean = false;
+  creatingUser = false;
+  editingUser = false;
+  deletingUser = false;
   user: Users = new Users();
   confirmPassword: string;
 
@@ -49,7 +49,7 @@ export class UserComponent implements OnInit {
   cancel() {
     this.creatingUser = false;
     this.editingUser = false;
-    this.deleting = false;
+    this.deletingUser = false;
     this.user = new Users();
   }
 
@@ -60,20 +60,19 @@ export class UserComponent implements OnInit {
     this.user.password = '';
   }
 
-  delete(login: string, confirmDelete: boolean) {
-    if (confirmDelete) {
-      this.usersServices.deleteUser(login).subscribe(() => {
-        const index = this.users.indexOf(
-          this.users.find((user) => user.login === login)
-        );
-        this.users.splice(index, 1);
-        this.notificationService.success('User removed successfully.', 'User removed.');
-      });
-    }
+  delete(login: string) {
+    this.usersServices.deleteUser(login).subscribe(() => {
+      const index = this.users.indexOf(
+        this.users.find((user) => user.login === login)
+      );
+      this.users.splice(index, 1);
+      this.notificationService.success('User removed successfully.', 'User removed.');
+    });
+    this.cancel();
   }
 
   remove(login: string) {
-    this.deleting = true;
+    this.deletingUser = true;
     this.user = this.users.find((user) => user.login === login);
   }
 }

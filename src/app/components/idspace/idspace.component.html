@@ -47,7 +47,7 @@
           <clr-icon shape="cog"></clr-icon>
           <span class="clr-icon-title">Settings</span>
         </button>
-        <button class="btn" (click)="delete(idSpace.id)">
+        <button class="btn" (click)="remove(idSpace.id)">
           <clr-icon shape="trash"></clr-icon>
           <span class="clr-icon-title">Delete</span>
         </button>
@@ -61,3 +61,9 @@
     </clr-dg-pagination>
   </clr-dg-footer>
 </clr-datagrid>
+
+<!-- Delete confirmation modal -->
+<app-delete-confirmation *ngIf="deletingIdSpace" [modelName]="'ID Space'" [id]="idSpace.id" [name]="idSpace.name"
+                         [cancel]="cancel.bind(this)" [delete]="delete.bind(this)"
+>
+</app-delete-confirmation>

@@ -24,8 +24,9 @@ export class ExplorationsComponent implements OnInit {
 
   explorations: Exploration[] = [];
 
-  editingExploration: Boolean;
-  creatingExploration: Boolean;
+  editingExploration = false;
+  creatingExploration = false;
+  deletingExploration = false;
   date: string;
   location: string;
   title: string;
@@ -107,12 +108,13 @@ export class ExplorationsComponent implements OnInit {
     }
   }
 
-  cancel() {
+  public cancel() {
     this.date = null;
     this.location = null;
     this.title = null;
     this.creatingExploration = false;
     this.editingExploration = false;
+    this.deletingExploration = false;
     this.patientId = null;
     this.idSpace = null;
     this.patientError = null;
@@ -128,6 +130,12 @@ export class ExplorationsComponent implements OnInit {
         this.notificationService.success('Exploration removed successfully.', 'Exploration removed.');
       }
     );
+    this.cancel();
+  }
+
+  remove(id: string) {
+    this.deletingExploration = true;
+    this.exploration = this.explorations.find((exploration) => exploration.id === id);
   }
 
   public patientIdAreCorrect(): Boolean {

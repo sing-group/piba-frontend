@@ -105,7 +105,7 @@
                         <clr-icon shape="video-gallery"></clr-icon>
                         Edit video
                       </button>
-                      <button type="button" class="btn btn-secondary" (click)="delete(video.id)"
+                      <button type="button" class="btn btn-secondary" (click)="remove(video.id)"
                               [disabled]="video.isProcessing">
                         <clr-icon shape="trash"></clr-icon>
                         Remove video
@@ -136,11 +136,11 @@
         <section class="form-block">
           <div class="form-group">
             <label for="video-form-title">Title</label>
-            <input type="text" id="video-form-title" [(ngModel)]="newVideo.title" name="title"/>
+            <input type="text" id="video-form-title" [(ngModel)]="video.title" name="title"/>
           </div>
           <div class="form-group">
             <label for="video-form-observations">Observations</label>
-            <textarea type="text" id="video-form-observations" rows="4" [(ngModel)]="newVideo.observations"
+            <textarea type="text" id="video-form-observations" rows="4" [(ngModel)]="video.observations"
                       name="observations"></textarea>
           </div>
           <div class="form-group">
@@ -148,7 +148,7 @@
             <input *ngIf="userUploadingVideo" type="file" id="video-form-file" required/>
           </div>
           <div class="form-group">
-            <clr-checkbox name="withText" id="video-form-withText" [(ngModel)]="newVideo.withText">
+            <clr-checkbox name="withText" id="video-form-withText" [(ngModel)]="video.withText">
               Video with text
             </clr-checkbox>
           </div>
@@ -161,3 +161,7 @@
     </clr-modal>
   </form>
 </div>
+<!-- Delete confirmation modal -->
+<app-delete-confirmation *ngIf="deletingVideo" [modelName]="'video'" [id]="video.id" [name]="video.title"
+                         [cancel]="cancel.bind(this)" [delete]="delete.bind(this)">
+</app-delete-confirmation>

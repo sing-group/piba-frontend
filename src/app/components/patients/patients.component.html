@@ -101,7 +101,7 @@
       <td>{{patient.idSpace.name}}</td>
     </tr>
     <tr>
-      <th>ID Pacient</th>
+      <th>ID Patient</th>
       <td>{{patient.patientID}}</td>
     </tr>
     <tr>
@@ -120,7 +120,7 @@
             <clr-icon shape="cog"></clr-icon>
             <span class="clr-icon-title">Settings</span>
           </button>
-          <button class="btn" (click)="delete()">
+          <button class="btn" (click)="deletingPatient=true">
             <clr-icon shape="trash"></clr-icon>
             <span class="clr-icon-title">Delete</span>
           </button>
@@ -135,4 +135,8 @@
     </tr>
     </tbody>
   </table>
+  <!-- Delete confirmation modal -->
+  <app-delete-confirmation *ngIf="deletingPatient" [modelName]="'patient'" [name]="patient.patientID"
+                           [cancel]="cancel.bind(this)" [delete]="delete.bind(this)">
+  </app-delete-confirmation>
 </div>

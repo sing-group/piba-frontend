@@ -107,7 +107,7 @@
               <clr-dg-cell>{{polypRecording.start | time}}</clr-dg-cell>
               <clr-dg-cell>{{polypRecording.end | time}}</clr-dg-cell>
               <clr-dg-cell style="padding: 0px;">
-                <button type="button" class="btn btn-secondary" (click)="removePolypRecording(polypRecording)">
+                <button type="button" class="btn btn-secondary" (click)="remove(polypRecording)">
                   <clr-icon shape="times"></clr-icon>
                   Remove
                 </button>
@@ -141,3 +141,8 @@
     </clr-tab-content>
   </clr-tab>
 </clr-tabs>
+<!-- Delete confirmation modal -->
+<app-delete-confirmation *ngIf="deletingPolypRecording" [modelName]="'polyp recording'" [id]="polypRecording"
+                         [name]="polypRecording.polyp.name"
+                         [cancel]="cancel.bind(this)" [delete]="removePolypRecording.bind(this)">
+</app-delete-confirmation>

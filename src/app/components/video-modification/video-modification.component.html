@@ -62,7 +62,7 @@
       <clr-dg-cell>{{videoModification.start | time}}</clr-dg-cell>
       <clr-dg-cell>{{videoModification.end | time}}</clr-dg-cell>
       <clr-dg-cell style="padding: 0px;">
-        <button type="button" class="btn btn-secondary" (click)="removeVideoModification(videoModification)">
+        <button type="button" class="btn btn-secondary" (click)="remove(videoModification)">
           <clr-icon shape="times"></clr-icon>
           Remove
         </button>
@@ -76,5 +76,9 @@
 
     <clr-dg-footer>{{videoModifications.length}} modifiers</clr-dg-footer>
   </clr-datagrid>
-
 </div>
+<!-- Delete confirmation modal -->
+<app-delete-confirmation *ngIf="deletingVideoModification" [modelName]="'video modifier'" [id]="videoModification"
+                         [name]="videoModification.modifier.name"
+                         [cancel]="cancel.bind(this)" [delete]="removeVideoModification.bind(this)">
+</app-delete-confirmation>

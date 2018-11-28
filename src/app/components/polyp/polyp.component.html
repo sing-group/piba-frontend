@@ -7,7 +7,7 @@
 
 <div class="card" *ngFor="let polyp of exploration.polyps">
   <div class="card-header">
-    <button type="button" class="btn btn-link card-button" title="Delete polyp" (click)="delete(polyp.id)">
+    <button type="button" class="btn btn-link card-button" title="Delete polyp" (click)="remove(polyp.id)">
       <clr-icon shape="trash"></clr-icon>
     </button>
     <button type="button" class="btn btn-link card-button" title="Edit polyp" (click)="editPolyp(polyp.id)">
@@ -321,3 +321,8 @@
 
   </clr-modal>
 </form>
+<!-- Delete confirmation modal -->
+<app-delete-confirmation *ngIf="deletingPolyp"
+                         [modelName]="'polyp'" [id]="polyp.id" [name]="polyp.name"
+                         [cancel]="cancel.bind(this)" [delete]="delete.bind(this)">
+</app-delete-confirmation>

@@ -19,12 +19,13 @@ export class ExplorationComponent implements OnInit {
 
   exploration: Exploration = null;
 
-  newVideo: Video = new Video();
+  video: Video = new Video();
 
   userUploadingVideo: false;
 
   isReadonly = true;
   editingVideo: string;
+  deletingVideo = false;
 
   constructor(
     private videosService: VideosService,
@@ -63,8 +64,8 @@ export class ExplorationComponent implements OnInit {
   uploadVideo() {
     const fileElement = document.getElementById('video-form-file') as HTMLInputElement;
     const file = fileElement.files[0];
-    this.newVideo.exploration = this.exploration.id;
-    const videoUploadInfo = this.mapVideo(this.newVideo);
+    this.video.exploration = this.exploration.id;
+    const videoUploadInfo = this.mapVideo(this.video);
     videoUploadInfo.file = file;
     this.videosService
       .createVideo(videoUploadInfo).subscribe(video => {
@@ -80,7 +81,8 @@ export class ExplorationComponent implements OnInit {
 
   cancel() {
     this.userUploadingVideo = false;
-    this.newVideo = new Video();
+    this.video = new Video();
+    this.deletingVideo = false;
     this.assignVideoName();
   }
 
@@ -95,6 +97,12 @@ export class ExplorationComponent implements OnInit {
         this.notificationService.success('Video removed successfully.', 'Video removed.');
       }
     );
+    this.cancel();
+  }
+
+  remove(id: string) {
+    this.deletingVideo = true;
+    this.video = this.exploration.videos.find((video) => video.id === id);
   }
 
   selectedVideo(video: Video) {
@@ -134,6 +142,6 @@ export class ExplorationComponent implements OnInit {
   }
 
   private assignVideoName() {
-    this.newVideo.title = 'Video ' + (this.exploration.videos.length + 1);
+    this.video.title = 'Video ' + (this.exploration.videos.length + 1);
   }
 }

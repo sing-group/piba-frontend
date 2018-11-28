@@ -28,11 +28,12 @@ export class VideoEditorComponent implements OnInit {
   polyps: Polyp[] = [];
   selectedPolyp: Polyp;
 
-  newPolypRecording: PolypRecording;
+  polypRecording: PolypRecording;
 
   currentTime: number;
   videoHTML: HTMLMediaElement;
 
+  deletingPolypRecording = false;
   modalOpened = false;
 
   pauseWatcher: any;
@@ -41,7 +42,7 @@ export class VideoEditorComponent implements OnInit {
     private videosService: VideosService,
     private route: ActivatedRoute,
     private timePipe: TimePipe,
-    private polysService: PolypsService,
+    private polypsService: PolypsService,
     private explorationsService: ExplorationsService,
     private polypRecordingsService: PolypRecordingsService,
     private timeToNumber: TimeToNumberPipe,
@@ -82,6 +83,10 @@ export class VideoEditorComponent implements OnInit {
     }
   }
 
+  cancel() {
+    this.deletingPolypRecording = false;
+  }
+
   onCurrentTimeUpdate(time: number) {
     this.currentTime = time;
   }
@@ -101,7 +106,7 @@ export class VideoEditorComponent implements OnInit {
   addPolyp() {
     this.explorationsService.getExploration(this.video.exploration).subscribe(exploration => {
       this.newPolyp.exploration = exploration;
-      this.polysService.createPolyp(this.newPolyp).subscribe(polyp => {
+      this.polypsService.createPolyp(this.newPolyp).subscribe(polyp => {
         this.polyps.push(polyp);
         this.newPolyp = new Polyp();
         this.notificationService.success('Polyp registed successfully.', 'Polyp registered.');
@@ -112,16 +117,16 @@ export class VideoEditorComponent implements OnInit {
   }
 
   addPolypRecording() {
-    this.newPolypRecording = {
+    this.polypRecording = {
       video: this.video,
       polyp: this.selectedPolyp,
       start: this.timeToNumber.transform(this.start),
       end: this.timeToNumber.transform(this.end)
     };
-    this.polypRecordingsService.createPolypRecording(this.newPolypRecording)
+    this.polypRecordingsService.createPolypRecording(this.polypRecording)
       .subscribe(
-        newPolypRecording => {
-          this.video.polypRecording = this.video.polypRecording.concat(newPolypRecording);
+        polypRecording => {
+          this.video.polypRecording = this.video.polypRecording.concat(polypRecording);
           this.start = null;
           this.end = null;
           this.cleanAlreadySelectedPolyps(this.selectedPolyp.name);
@@ -150,6 +155,13 @@ export class VideoEditorComponent implements OnInit {
         this.notificationService.success('Polyp recording removed successfully.', 'Polyp recording removed.');
       }
     );
+    this.cancel();
+  }
+
+  remove(polypRecording: PolypRecording) {
+    this.deletingPolypRecording = true;
+    this.polypRecording = this.video.polypRecording.find(
+      (polypRecordingFind) => polypRecordingFind === polypRecording);
   }
 
   playInterval(start: number, end: number) {
