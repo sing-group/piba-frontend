@@ -81,11 +81,12 @@ video {
 
 input[type=range] {
   -webkit-appearance: none;
-
+  margin-bottom: -4px;
 }
 
 input[type=range]:focus {
   outline: none;
+
 }
 
 /*CHROME*/
@@ -137,11 +138,4 @@ input[type=range]::-moz-range-thumb {
   border-radius: 28px;
   cursor: pointer;
   margin-top: 3%;
-}
-
-@-moz-document url-prefix() {
-  .margin-progress {
-    padding-top: 3%;
-    margin-bottom: 0% !important;
-  }
 }
