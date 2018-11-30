@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Video} from '../../models/Video';
 import {Exploration} from '../../models/Exploration';
@@ -6,14 +6,14 @@ import {VideoUploadInfo} from '../../services/entities/VideoUploadInfo';
 import {VideosService} from '../../services/videos.service';
 import {ExplorationsService} from '../../services/explorations.service';
 import {NotificationService} from '../../modules/notification/services/notification.service';
-
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-exploration',
   templateUrl: './exploration.component.html',
   styleUrls: ['./exploration.component.css']
 })
-export class ExplorationComponent implements OnInit {
+export class ExplorationComponent implements OnInit, OnDestroy {
 
   readonly POLLING_INTERVAL: number = 5000;
 
@@ -26,6 +26,8 @@ export class ExplorationComponent implements OnInit {
   isReadonly = true;
   editingVideo: string;
   deletingVideo = false;
+
+  pollings: Subscription[] = [];
 
   constructor(
     private videosService: VideosService,
@@ -50,6 +52,12 @@ export class ExplorationComponent implements OnInit {
     });
   }
 
+  ngOnDestroy()  {
+    this.pollings.forEach( (polling) => {
+      polling.unsubscribe();
+    });
+  }
+
   pollProcessingVideo(processingVideo: Video) {
     const videoPolling = this.videosService.getVideo(processingVideo.id, this.POLLING_INTERVAL).subscribe((video) => {
       this.exploration.videos.filter((currentVideo) => currentVideo.id === video.id).forEach((currentVideo) => {
@@ -57,8 +65,10 @@ export class ExplorationComponent implements OnInit {
       });
       if (!video.isProcessing) {
         videoPolling.unsubscribe();
+        this.pollings.splice(this.pollings.indexOf(videoPolling, 0), 1);
       }
     });
+    this.pollings.push(videoPolling);
   }
 
   uploadVideo() {
