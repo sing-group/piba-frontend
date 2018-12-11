@@ -65,7 +65,8 @@ export class ExplorationsComponent implements OnInit {
   }
 
   edit(id: string) {
-    this.exploration = this.explorations.find((exploration) => exploration.id === id);
+    this.exploration = new Exploration();
+    Object.assign(this.exploration, this.explorations.find((exploration) => exploration.id === id));
     this.date = new Date(this.exploration.date).toLocaleDateString();
     this.location = this.exploration.location;
     this.title = this.exploration.title;

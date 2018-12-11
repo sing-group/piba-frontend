@@ -154,6 +154,7 @@ export class PolypComponent implements OnInit {
           this.exploration.polyps = this.exploration.polyps.concat(newPolyp);
           this.assignPolypName();
           this.notificationService.success('Polyp registered successfully.', 'Polyp registered.');
+          this.cancel();
         }
       );
     } else {
@@ -163,14 +164,15 @@ export class PolypComponent implements OnInit {
           }
         ), updatedPolyp);
         this.notificationService.success('Polyp edited successfully.', 'Polyp edited.');
+        this.cancel();
       });
     }
-    this.cancel();
   }
 
   editPolyp(id: string) {
     this.editingPolyp = true;
-    this.polyp = this.exploration.polyps.find(polyp => polyp.id === id);
+    this.polyp = new Polyp();
+    Object.assign(this.polyp, this.exploration.polyps.find(polyp => polyp.id === id));
     this.polypType = this.polyp.histology.polypType;
   }
 

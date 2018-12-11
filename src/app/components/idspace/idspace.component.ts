@@ -45,7 +45,8 @@ export class IdspaceComponent implements OnInit {
 
   edit(id: string) {
     this.editingIdSpace = true;
-    this.idSpace = this.idSpaces.find((idSpace) => idSpace.id === id);
+    this.idSpace = new IdSpace();
+    Object.assign(this.idSpace, this.idSpaces.find((idSpace) => idSpace.id === id));
   }
 
   delete(id: string) {
