@@ -257,7 +257,7 @@
                     (ngModelChange)="onPolypTypeChange($event)">
               <option *ngFor="let pt of POLYPTYPEValues" [ngValue]="pt">{{pt}}</option>
             </select>
-            <clr-icon class="clear-select" shape="window-close" (click)="polypType = null; polyp.histology = null"
+            <clr-icon class="clear-select" shape="window-close" (click)="polypType = null; polyp.histology = []"
                       *ngIf="polypType"></clr-icon>
           </div>
         </div>

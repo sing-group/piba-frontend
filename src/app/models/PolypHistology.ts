@@ -6,6 +6,7 @@ export enum PolypType {
   HYPERPLASTIC = 'Hyperplastic polyp',
   SESSILE_SERRATED_ADENOMA = 'Sessile serrated adenoma',
   TRADITIONAL_SERRATED_ADENOMA = 'Traditional serrated adenoma',
+  NON_EPITHELIAL_NEOPLASTIC = 'Non-epithelial/Non-neoplastic'
 }
 
 export enum AdenomaType {
@@ -106,6 +107,7 @@ export class TSA extends PolypHistology {
     this.dysplasingGrade = dysplasingGrade;
   }
 }
+
 export function isTSA(object: any): object is TSA {
   return isPolypHistology(object) && (
     object instanceof TSA
@@ -114,4 +116,10 @@ export function isTSA(object: any): object is TSA {
       && object.polypType === EnumUtils.findKeyForValue(PolypType, PolypType.TRADITIONAL_SERRATED_ADENOMA)
     )
   );
+}
+
+export class NonEpithelialNeoplastic extends PolypHistology {
+  constructor() {
+    super(PolypType.NON_EPITHELIAL_NEOPLASTIC);
+  }
 }

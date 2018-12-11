@@ -10,7 +10,10 @@ import {
   AdenomaDysplasingGrade,
   AdenomaType,
   Hyperplastic,
-  Invasive, isAdenoma, isSSA, isTSA,
+  Invasive,
+  isAdenoma,
+  isSSA,
+  isTSA, NonEpithelialNeoplastic,
   PolypHistology,
   PolypType,
   SSA,
@@ -98,6 +101,9 @@ export class PolypComponent implements OnInit {
         break;
       case PolypType.TRADITIONAL_SERRATED_ADENOMA:
         this.polyp.histology = new TSA(null);
+        break;
+      case PolypType.NON_EPITHELIAL_NEOPLASTIC:
+        this.polyp.histology = new NonEpithelialNeoplastic();
         break;
     }
   }

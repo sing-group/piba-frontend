@@ -115,3 +115,21 @@ export function isTSAInfo(object: any): object is TSAInfo {
     )
   );
 }
+
+export class NonEpithelialNeoplasticInfo extends PolypHistologyInfo {
+  private ___attribute_to_differentiate_from_PolypHistologyInfo: string;
+
+  constructor() {
+    super(EnumUtils.findKeyForValue(PolypType, PolypType.NON_EPITHELIAL_NEOPLASTIC));
+  }
+}
+
+export function isNonEpithelialNeoplasticInfo(object: any): object is NonEpithelialNeoplasticInfo {
+  return isPolypHistologyInfo(object) && (
+    object instanceof HyperplasticInfo
+    || (
+      object.polypType === EnumUtils.findKeyForValue(PolypType, PolypType.NON_EPITHELIAL_NEOPLASTIC
+      )
+    )
+  );
+}

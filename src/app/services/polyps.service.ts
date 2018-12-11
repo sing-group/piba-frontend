@@ -12,6 +12,7 @@ import {
   AdenomaType,
   Hyperplastic,
   Invasive,
+  NonEpithelialNeoplastic,
   PolypHistology,
   PolypType,
   SSA,
@@ -26,8 +27,9 @@ import {
   isAdenomaInfo,
   isHyperplasticInfo,
   isInvasiveInfo,
+  isNonEpithelialNeoplasticInfo,
   isSSAInfo,
-  isTSAInfo,
+  isTSAInfo, NonEpithelialNeoplasticInfo,
   PolypHistologyInfo,
   SSAInfo,
   TSAInfo
@@ -119,6 +121,9 @@ export class PolypsService {
     if (isHyperplasticInfo(polypHistologyInfo)) {
       return new Hyperplastic();
     }
+    if (isNonEpithelialNeoplasticInfo(polypHistologyInfo)) {
+      return new NonEpithelialNeoplastic();
+    }
     return new PolypHistology(null);
   }
 
@@ -156,6 +161,8 @@ export class PolypsService {
         case PolypType.TRADITIONAL_SERRATED_ADENOMA:
           return new TSAInfo(
             EnumUtils.findKeyForValue(TsaDysplasingGrade, (<TSA>polypHistology).dysplasingGrade));
+        case PolypType.NON_EPITHELIAL_NEOPLASTIC:
+          return new NonEpithelialNeoplasticInfo();
         default:
           return null;
           break;
