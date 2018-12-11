@@ -7,6 +7,7 @@ import {VideosService} from '../../services/videos.service';
 import {ExplorationsService} from '../../services/explorations.service';
 import {NotificationService} from '../../modules/notification/services/notification.service';
 import {Subscription} from 'rxjs';
+import {HttpEventType} from '@angular/common/http';
 
 @Component({
   selector: 'app-exploration',
@@ -22,6 +23,10 @@ export class ExplorationComponent implements OnInit, OnDestroy {
   video: Video = new Video();
 
   userUploadingVideo: false;
+  uploadingVideo: false;
+  progress = 0;
+  uploadTimeRemaining = 0;
+  uploadSpeed = 0;
 
   isReadonly = true;
   editingVideo: string;
@@ -77,15 +82,38 @@ export class ExplorationComponent implements OnInit, OnDestroy {
     this.video.exploration = this.exploration.id;
     const videoUploadInfo = this.mapVideo(this.video);
     videoUploadInfo.file = file;
+    let startTime = Date.now();
+
     this.videosService
-      .createVideo(videoUploadInfo).subscribe(video => {
-      this.exploration.videos = this.exploration.videos.concat(video);
-      this.assignVideoName();
-      this.notificationService.success('Video is being processed..', 'Video uploaded');
-      if (video.isProcessing) {
-        this.pollProcessingVideo(video);
+      .createVideo(videoUploadInfo).subscribe(event => {
+      switch (event.type) {
+        case HttpEventType.Sent:
+          startTime = Date.now();
+          break;
+        case HttpEventType.UploadProgress:
+          if (event.total) {
+            this.progress = Math.round(event.loaded / event.total * 100);
+            const timeElapsed = Date.now() - startTime;
+            const uploadSpeed = event.loaded / (timeElapsed / 1000);
+            this.uploadTimeRemaining = Math.ceil(
+              (event.total - event.loaded) / uploadSpeed
+            );
+            this.uploadSpeed = uploadSpeed / 1024 / 1024;
+          }
+          break;
+        case HttpEventType.Response:
+          this.progress = 0;
+          this.uploadingVideo = false;
+          const video = this.videosService.getMapVideoInfo(event.body);
+          this.exploration.videos = this.exploration.videos.concat(video);
+          this.notificationService.success('Video is being processed..', 'Video uploaded');
+          if (video.isProcessing) {
+            this.pollProcessingVideo(video);
+          }
+          break;
       }
     });
+
     this.cancel();
   }
 

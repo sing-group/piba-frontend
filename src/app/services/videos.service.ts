@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpEvent} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
 import {Video} from '../models/Video';
@@ -39,17 +39,21 @@ export class VideosService {
     }
   }
 
-  createVideo(video: VideoUploadInfo): Observable<Video> {
+  createVideo(video: VideoUploadInfo): Observable<HttpEvent<VideoInfo>> {
     const formData: FormData = new FormData();
     formData.append('title', video.title);
     formData.append('observations', video.observations);
     formData.append('video', video.file);
     formData.append('withText', video.withText);
     formData.append('exploration_id', video.exploration);
-    return this.http.post<VideoInfo>(`${environment.restApi}/video`, formData)
+    return this.http.post<VideoInfo>(`${environment.restApi}/video`, formData, {observe: 'events', reportProgress: true})
       .pipe(
-        map(this.mapVideoInfo)
+        map(response => response)
       );
+  }
+
+  getMapVideoInfo(video: VideoInfo): Video {
+    return this.mapVideoInfo(video);
   }
 
   delete(id: string) {

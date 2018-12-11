@@ -126,10 +126,9 @@
           </clr-tab-content>
         </clr-tab>
       </clr-tabs>
-
     </div>
   </div>
-  <form enctype="multipart/form-data" ngNativeValidate (submit)="uploadVideo()">
+  <form enctype="multipart/form-data" ngNativeValidate (submit)="uploadVideo(); uploadingVideo = true">
     <clr-modal [(clrModalOpen)]="userUploadingVideo">
       <h3 class="modal-title">Upload Video</h3>
       <div class="modal-body">
@@ -165,3 +164,24 @@
 <app-delete-confirmation *ngIf="deletingVideo" [modelName]="'video'" [id]="video.id" [name]="video.title"
                          [cancel]="cancel.bind(this)" [delete]="delete.bind(this)">
 </app-delete-confirmation>
+
+<!-- Progress bar modal -->
+<clr-modal [(clrModalOpen)]="uploadingVideo" [clrModalClosable]="false" [clrModalSize]="'lg'">
+  <h5 class="modal-title">Upload video: "{{video.title}}"</h5>
+  <div class="modal-body">
+    <div class="progress labeled">
+      <progress max="100" value="{{progress}}" [attr.data-displayval]="progress + '%'"></progress>
+      <span>{{progress}}%</span>
+    </div>
+    <div class="row">
+      <div *ngIf="uploadTimeRemaining <= 60" class="col-md-8">Remaining time: {{uploadTimeRemaining | number:'.1-2'}}
+        second(s)
+      </div>
+      <div *ngIf="uploadTimeRemaining > 60" class="col-md-8">Remaining time: {{uploadTimeRemaining/60 | number:'.1-2'}}
+        minute(s)
+      </div>
+      <div class="col-md-4">Upload speed: {{uploadSpeed | number:'.1-2'}} MB/s</div>
+    </div>
+  </div>
+</clr-modal>
+
