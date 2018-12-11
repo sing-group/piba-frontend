@@ -19,7 +19,7 @@ export class Polyp {
 }
 
 export enum WASP {
-  HYPERPLASTIC = 'Hyperplastic', SERRATED = 'Serrated', ADENOMA = 'Adenoma'
+  WASP_POSITIVE = 'WASP +', WASP_NEGATIVE= 'WASP -'
 }
 
 export enum NICE {
