@@ -29,10 +29,12 @@ export class ExplorationComponent implements OnInit, OnDestroy {
   uploadSpeed = 0;
 
   isReadonly = true;
-  editingVideo: string;
+  editingVideo: string = null;
   deletingVideo = false;
 
   pollings: Subscription[] = [];
+
+  videoClones: Video[] = [];
 
   constructor(
     private videosService: VideosService,
@@ -51,29 +53,37 @@ export class ExplorationComponent implements OnInit, OnDestroy {
       exploration.videos.filter((video) => video.isProcessing).forEach((processingVideo) => {
         this.pollProcessingVideo(processingVideo);
       });
+      exploration.videos.forEach((video) => {
+        this.videoClones.push({...video});
+      });
       this.exploration.polyps.forEach((polyp) => {
         polyp.exploration = exploration;
       });
     });
   }
 
-  ngOnDestroy()  {
-    this.pollings.forEach( (polling) => {
+  ngOnDestroy() {
+    this.pollings.forEach((polling) => {
       polling.unsubscribe();
     });
   }
 
   pollProcessingVideo(processingVideo: Video) {
     const videoPolling = this.videosService.getVideo(processingVideo.id, this.POLLING_INTERVAL).subscribe((video) => {
-      this.exploration.videos.filter((currentVideo) => currentVideo.id === video.id).forEach((currentVideo) => {
-        Object.assign(currentVideo, video);
-      });
+      this.updateVideo(this.exploration.videos, video);
+      this.updateVideo(this.videoClones, video);
       if (!video.isProcessing) {
         videoPolling.unsubscribe();
         this.pollings.splice(this.pollings.indexOf(videoPolling, 0), 1);
       }
     });
     this.pollings.push(videoPolling);
+  }
+
+  private updateVideo(list: Video[], video: Video) {
+    list.filter((currentVideo) => currentVideo.id === video.id).forEach((currentVideo) => {
+      Object.assign(currentVideo, video);
+    });
   }
 
   uploadVideo() {
@@ -105,16 +115,16 @@ export class ExplorationComponent implements OnInit, OnDestroy {
           this.progress = 0;
           this.uploadingVideo = false;
           const video = this.videosService.getMapVideoInfo(event.body);
-          this.exploration.videos = this.exploration.videos.concat(video);
-          this.notificationService.success('Video is being processed..', 'Video uploaded');
+          this.exploration.videos.push(video);
+          this.videoClones.push({...video});
+          this.notificationService.success('Video is being processed.', 'Video uploaded');
           if (video.isProcessing) {
             this.pollProcessingVideo(video);
           }
+          this.cancel();
           break;
       }
     });
-
-    this.cancel();
   }
 
   cancel() {
@@ -124,44 +134,44 @@ export class ExplorationComponent implements OnInit, OnDestroy {
     this.assignVideoName();
   }
 
+  selectedVideoToRemove(id: string) {
+    this.deletingVideo = true;
+    this.video = {...this.findIn(this.exploration.videos, id)};
+  }
+
   delete(id: string) {
     this.videosService.delete(id).subscribe(() => {
-        const index = this.exploration.videos.indexOf(
-          this.exploration.videos.find((video) => video.id === id
-          )
-        );
-        this.exploration.videos.splice(index, 1);
-        this.assignVideoName();
+        this.exploration.videos.splice(this.getIndexIn(this.exploration.videos, id), 1);
+        this.videoClones.splice(this.getIndexIn(this.videoClones, id), 1);
         this.notificationService.success('Video removed successfully.', 'Video removed.');
+        this.cancel();
       }
     );
-    this.cancel();
   }
 
-  remove(id: string) {
-    this.deletingVideo = true;
-    this.video = this.exploration.videos.find((video) => video.id === id);
+  private getIndexIn(list: Video[], id: string): number {
+    return list.indexOf(
+      this.findIn(list, id)
+    );
   }
 
-  selectedVideo(video: Video) {
+  private findIn(list: Video[], id: string): Video {
+    return list.find((video) => video.id === id);
+  }
+
+  selectedVideoToEdit(video: Video) {
+    if (this.editingVideo != null) {
+      Object.assign(this.findIn(this.videoClones, this.editingVideo), this.findIn(this.exploration.videos, this.editingVideo));
+    }
     this.editingVideo = video.id;
     this.isReadonly = false;
   }
 
   editVideo(video: Video) {
-    const title = document.getElementsByClassName('title-' + video.id) as HTMLCollectionOf<HTMLInputElement>;
-    const observations = document.getElementsByClassName('observations-' + video.id) as HTMLCollectionOf<HTMLInputElement>;
-    const withText = document.getElementsByClassName('withText-' + video.id) as HTMLCollectionOf<HTMLInputElement>;
-    video.title = title[0].value;
-    video.observations = observations[0].value;
-    video.withText = withText[0].checked;
-
     this.videosService.editVideo(video).subscribe(updatedVideo => {
       this.editingVideo = null;
       this.isReadonly = true;
-      Object.assign(this.exploration.videos.find((v) =>
-        v.id === video.id
-      ), updatedVideo);
+      Object.assign(this.findIn(this.exploration.videos, video.id), updatedVideo);
       this.notificationService.success('Video edited successfully.', 'Video edited.');
     });
   }

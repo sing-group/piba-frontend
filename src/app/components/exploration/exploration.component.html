@@ -48,7 +48,7 @@
             <clr-datagrid>
               <clr-dg-column>Video</clr-dg-column>
               <clr-dg-column>Information</clr-dg-column>
-              <clr-dg-row *ngFor="let video of exploration.videos">
+              <clr-dg-row *ngFor="let video of videoClones">
                 <clr-dg-cell>
                   <video class="exploration-video" controls *ngIf="video.isProcessing == false">
                     <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}"/>
@@ -62,28 +62,29 @@
                   <form>
                     <div class="form-group row ">
                       <div class="col-md-12 col-lg-4">
-                        <label for="video-title">Title</label>
+                        <label for="video-title-{{video.id}}">Title</label>
                       </div>
                       <div class="col-md-12 col-lg-8">
-                        <input type="text" id="video-title" class="title-{{video.id}}" size="50"
-                               [readonly]="editingVideo == video.id ? null : true" value="{{video.title}}"/>
+                        <input type="text" id="video-title-{{video.id}}" name="title-{{video.id}}" size="50"
+                               [readonly]="editingVideo == video.id ? null : true" [(ngModel)]="video.title"/>
                       </div>
                     </div>
                     <div class="form-group row">
                       <div class="col-md-12 col-lg-4">
-                        <label for="video-observations">Observation</label>
+                        <label for="video-observations-{{video.id}}">Observation</label>
                       </div>
                       <div class="col-md-12 col-lg-8">
-                        <textarea type="text" id="video-observations" class="observations-{{video.id}}" rows="4"
+                        <textarea type="text" id="video-observations-{{video.id}}" name="observation-{{video.id}}"
+                                  rows="4"
                                   [readonly]="editingVideo == video.id ? null : true"
-                                  value="{{video.observations}}"></textarea>
+                                  [(ngModel)]="video.observations"></textarea>
                       </div>
                     </div>
                     <div class="form-group row">
                       <div class="col-md-12 col-lg-4">
                       </div>
                       <div class="col-md-12 col-lg-8">
-                        <label class="label-check"><input type="checkbox" name="withText" class="withText-{{video.id}}"
+                        <label class="label-check"><input type="checkbox" name="withText-{{video.id}}"
                                                           [(ngModel)]="video.withText"
                                                           [disabled]="editingVideo == video.id ? null : true"/>
                           Video with text</label>
@@ -91,7 +92,7 @@
                     </div>
                     <div class="form-group row">
                       <button type="button" class="btn btn-secondary" *ngIf="isReadonly || video.id !== editingVideo"
-                              (click)="selectedVideo(video)">
+                              (click)="selectedVideoToEdit(video)">
                         <clr-icon shape="note"></clr-icon>
                         Edit information
                       </button>
@@ -105,7 +106,7 @@
                         <clr-icon shape="video-gallery"></clr-icon>
                         Edit video
                       </button>
-                      <button type="button" class="btn btn-secondary" (click)="remove(video.id)"
+                      <button type="button" class="btn btn-secondary" (click)="selectedVideoToRemove(video.id)"
                               [disabled]="video.isProcessing">
                         <clr-icon shape="trash"></clr-icon>
                         Remove video
