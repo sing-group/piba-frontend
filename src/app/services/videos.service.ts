@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpEvent} from '@angular/common/http';
+import {HttpClient, HttpEventType} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
 import {Video} from '../models/Video';
@@ -8,7 +8,7 @@ import {VideoUploadInfo} from './entities/VideoUploadInfo';
 import {environment} from '../../environments/environment';
 import {IdAndUri} from './entities/IdAndUri';
 import {interval} from 'rxjs/internal/observable/interval';
-import {map, switchMap} from 'rxjs/operators';
+import {filter, map, switchMap} from 'rxjs/operators';
 
 @Injectable()
 export class VideosService {
@@ -39,21 +39,43 @@ export class VideosService {
     }
   }
 
-  createVideo(video: VideoUploadInfo): Observable<HttpEvent<VideoInfo>> {
+  createVideo(video: VideoUploadInfo,
+              onStart: () => void,
+              onProgress: (loaded: number, total: number) => void,
+              onFinish: () => void): Observable<Video> {
+
     const formData: FormData = new FormData();
     formData.append('title', video.title);
     formData.append('observations', video.observations);
     formData.append('video', video.file);
     formData.append('withText', video.withText);
     formData.append('exploration_id', video.exploration);
+
     return this.http.post<VideoInfo>(`${environment.restApi}/video`, formData, {observe: 'events', reportProgress: true})
       .pipe(
-        map(response => response)
+        map(event => {
+          switch (event.type) {
+            case HttpEventType.Sent:
+              onStart();
+              break;
+            case HttpEventType.UploadProgress:
+              onProgress(event.loaded, event.total);
+              break;
+          }
+          return event;
+        })
+      )
+      .pipe(
+        filter(event => event.type === HttpEventType.Response))
+      .pipe(
+        map(event => {
+            onFinish();
+            if (event.type === HttpEventType.Response) {
+              return this.mapVideoInfo(event.body);
+            }
+          }
+        )
       );
-  }
-
-  getMapVideoInfo(video: VideoInfo): Video {
-    return this.mapVideoInfo(video);
   }
 
   delete(id: string) {
