@@ -39,7 +39,8 @@ export class ExplorationsComponent implements OnInit {
   idSpaces: IdSpace[];
   idSpace: IdSpace = new IdSpace();
 
-  findPatient = '';
+  idSpaceToFind: IdSpace = new IdSpace();
+  patientToFind = '';
 
   // needed to sort by date in the explorations table
   readonly explorationComparator = new ExplorationComparator();
@@ -55,7 +56,7 @@ export class ExplorationsComponent implements OnInit {
     if (patient != null) {
       this.patientsService.getPatient(patient).subscribe(patientFound => {
         this.idSpace = patientFound.idSpace;
-        this.findPatient = publicPatient;
+        this.patientToFind = publicPatient;
         this.searchPatient();
       });
     } else {
@@ -154,22 +155,23 @@ export class ExplorationsComponent implements OnInit {
   }
 
   searchPatient() {
-    if (this.idSpace.id !== undefined && this.findPatient === '') {
-      this.notificationService.error('Selected and patient', 'Not possible to do the search');
+    if (this.idSpaceToFind.id !== undefined && this.patientToFind === '') {
+      this.notificationService.error('Selected an patient', 'Not possible to do the search');
       return;
     }
-    if (this.idSpace.id === undefined && this.findPatient !== '') {
+    if (this.idSpaceToFind.id === undefined && this.patientToFind !== '') {
       this.notificationService.error('Selected an ID Space', 'Not possible to do the search');
       return;
     }
-    this.explorationsService.getExplorationsBy(this.findPatient, this.idSpace).subscribe(explorations => {
+    this.explorationsService.getExplorationsBy(this.patientToFind, this.idSpaceToFind).subscribe(explorations => {
       this.explorations = explorations;
     });
   }
 
   clear() {
-    this.findPatient = '';
+    this.patientToFind = '';
     this.idSpace = new IdSpace();
+    this.idSpaceToFind = new IdSpace();
   }
 }
 

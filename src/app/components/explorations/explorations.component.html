@@ -4,20 +4,18 @@
       <div class="content-search">
         <h4>Find a patient</h4>
         <div class="row">
-          <div class="col-xs-12 col-lg-4">
+          <div class="col-xs-12 col-sm-6 col-lg-4">
             <div class="select">
-              <select id="search-idspace" [(ngModel)]="idSpace" name="idSpace"
-                      #findidSpaceExploration="ngModel">
+              <select id="search-idspace" [(ngModel)]="idSpaceToFind" name="idSpace">
                 <option *ngFor="let i of idSpaces" [ngValue]="i">{{i.name}}</option>
               </select>
             </div>
           </div>
-          <div class="col-xs-12 col-lg-4">
+          <div class="col-xs-12 col-sm-6 col-lg-4">
             <input type="text" id="search-patient" placeholder="ID Patient" class="complete-space"
-                   [(ngModel)]="findPatient" name="findPatient" pattern="[a-zA-ZñÑ0-9_\s]+"
-                   title="Must be a alphanumeric" #findPatientExploration="ngModel">
+                   [(ngModel)]="patientToFind" name="patientToFind">
           </div>
-          <div class="col-lg-4 btn-search">
+          <div class="col-sm-12 col-lg-4 btn-search">
             <button class="btn btn-primary btn-icon">
               <clr-icon shape="search"></clr-icon>
             </button>

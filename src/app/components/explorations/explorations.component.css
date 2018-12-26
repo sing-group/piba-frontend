@@ -7,7 +7,7 @@
 }
 
 .content-select {
-  width: 60%;
+  width: 70%;
 }
 
 .btn-add {
@@ -28,15 +28,17 @@ form > .content-search {
   margin-bottom: 0.5rem;
 }
 
-.content-search .btn {
-  margin-left: 0.5rem;
-}
-
 .complete-space {
   width: 100%;
 }
 
-.btn-search {
-  margin-left: 0rem !important;
-  margin-top: -0.5rem;
+@media (min-width: 992px) {
+  .content-search .btn {
+    margin-left: 0.5rem;
+  }
+
+  .btn-search {
+    margin-left: 0rem !important;
+    margin-top: -0.5rem;
+  }
 }
