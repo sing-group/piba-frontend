@@ -34,6 +34,8 @@ import {SimpleNotificationsModule} from 'angular2-notifications';
 import {IdspaceComponent} from './components/idspace/idspace.component';
 import {UserComponent} from './components/user/user.component';
 import {DeleteConfirmationComponent} from './components/delete-confirmation/delete-confirmation.component';
+import {GalleryComponent} from './components/gallery/gallery.component';
+import {SafehtmlPipe} from './pipes/safehtml.pipe';
 
 @NgModule({
   declarations: [
@@ -51,7 +53,9 @@ import {DeleteConfirmationComponent} from './components/delete-confirmation/dele
     AgePipe,
     IdspaceComponent,
     UserComponent,
-    DeleteConfirmationComponent
+    DeleteConfirmationComponent,
+    GalleryComponent,
+    SafehtmlPipe
   ],
   imports: [
     BrowserModule,

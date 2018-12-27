@@ -8,8 +8,12 @@ import {LoginComponent} from './components/login/login.component';
 import {AuthGuard} from './guards/authGuard';
 import {IdspaceComponent} from './components/idspace/idspace.component';
 import {UserComponent} from './components/user/user.component';
+import {GalleryComponent} from './components/gallery/gallery.component';
 
 const routes: Routes = [
+  {
+    path: 'gallery/:id', component: GalleryComponent, canActivate: [AuthGuard]
+  },
   {
     path: 'users', component: UserComponent, canActivate: [AuthGuard]
   },

@@ -1,0 +1,15 @@
+.gallery-container {
+  width: 100%;
+  overflow: hidden;
+}
+
+.gallery-item {
+  float: left;
+  width: 30%;
+  margin: 1% 2% 10px 1%;
+}
+
+.gallery-item img {
+  max-width: 100%;
+  cursor: pointer;
+}
