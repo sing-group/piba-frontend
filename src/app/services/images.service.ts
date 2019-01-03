@@ -8,6 +8,8 @@ import {concatMap, map} from 'rxjs/operators';
 import {Video} from '../models/Video';
 import {IdAndUri} from './entities/IdAndUri';
 import {VideosService} from './videos.service';
+import {PolypLocation} from '../models/PolypLocation';
+import {PolypLocationInfo} from './entities/PolypLocationInfo';
 
 @Injectable({
   providedIn: 'root'
@@ -51,6 +53,13 @@ export class ImagesService {
       }));
   }
 
+  createLocation(id: string, polypLocation: PolypLocation): Observable<PolypLocation> {
+    return this.http.post<PolypLocationInfo>(`${environment.restApi}/image/${id}/polyplocation`, polypLocation).pipe(
+      map(
+        this.maptoPolypLocationInfo.bind(this))
+    );
+  }
+
   private mapImageInfo(imageInfo: ImageInfo, video: Video): Image {
     return {
       id: imageInfo.id,
@@ -58,7 +67,17 @@ export class ImagesService {
       isRemoved: imageInfo.isRemoved,
       base64contents: imageInfo.base64contents,
       video: video,
-      gallery: null
+      gallery: null,
+      polypLocation: null
+    };
+  }
+
+  private maptoPolypLocationInfo(polypLocationInfo: PolypLocationInfo): PolypLocation {
+    return {
+      x: polypLocationInfo.x,
+      y: polypLocationInfo.y,
+      width: polypLocationInfo.width,
+      height: polypLocationInfo.height
     };
   }
 

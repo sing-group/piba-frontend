@@ -1,0 +1,21 @@
+<div align="center">
+  <canvas id="canvas"></canvas>
+</div>
+
+<div align="center">
+  <div class="btn-group">
+    <button class="btn btn-success" (click)="save()"
+            [disabled]="last_mousex == null && last_mousey == null && width==null && height==null">
+      <clr-icon shape="plus"></clr-icon>
+      Save
+    </button>
+    <button class="btn btn-primary" (click)="clear()">
+      <clr-icon shape="refresh"></clr-icon>
+      Clear
+    </button>
+    <button class="btn btn-danger">
+      <clr-icon shape="trash"></clr-icon>
+      Remove image
+    </button>
+  </div>
+</div>

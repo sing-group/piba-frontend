@@ -7,6 +7,8 @@ import {GalleryInfo} from './entities/GalleryInfo';
 import {Image} from '../models/Image';
 import {forkJoin, Observable, of} from 'rxjs';
 import {ImagesService} from './images.service';
+import {ImageInfo} from './entities/ImageInfo';
+import {IdAndUri} from './entities/IdAndUri';
 
 @Injectable({
   providedIn: 'root'
@@ -35,6 +37,11 @@ export class GalleriesService {
           )
         )
       );
+  }
+
+  getGalleryForImage(id: string): Observable<Gallery> {
+    return this.http.get<ImageInfo>(`${environment.restApi}/image/${id}/metadata`)
+      .pipe(concatMap(imageInfo => this.getGallery((<IdAndUri>imageInfo.gallery).id)));
   }
 
   private mapGalleryInfo(galleryInfo: GalleryInfo, images: Image[]): Gallery {

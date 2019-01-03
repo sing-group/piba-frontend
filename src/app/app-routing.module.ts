@@ -9,10 +9,14 @@ import {AuthGuard} from './guards/authGuard';
 import {IdspaceComponent} from './components/idspace/idspace.component';
 import {UserComponent} from './components/user/user.component';
 import {GalleryComponent} from './components/gallery/gallery.component';
+import {ImageComponent} from './components/image/image.component';
 
 const routes: Routes = [
   {
     path: 'gallery/:id', component: GalleryComponent, canActivate: [AuthGuard]
+  },
+  {
+    path: 'image/:id', component: ImageComponent, canActivate: [AuthGuard]
   },
   {
     path: 'users', component: UserComponent, canActivate: [AuthGuard]
