@@ -35,9 +35,9 @@ export class ImagesService {
       .pipe(
         concatMap(imageInfo =>
           forkJoin(
-          this.videosService.getVideo((<IdAndUri> imageInfo.video).id),
-          this.getLocation(imageInfo.id).pipe(catchError((err) => err.status === 400 ? of(null) : throwError(err)))
-        ).pipe(
+            this.videosService.getVideo((<IdAndUri> imageInfo.video).id),
+            this.getLocation(imageInfo.id).pipe(catchError((err) => err.status === 400 ? of(null) : throwError(err)))
+          ).pipe(
             map(videoAndLocation =>
               this.mapImageInfo(imageInfo, videoAndLocation[0], videoAndLocation[1])
             )
@@ -68,6 +68,10 @@ export class ImagesService {
       map(
         this.maptoPolypLocationInfo.bind(this))
     );
+  }
+
+  delete(id: string) {
+    return this.http.delete(`${environment.restApi}/image/${id}`);
   }
 
   private mapImageInfo(imageInfo: ImageInfo, video: Video, polypLocation: PolypLocation): Image {

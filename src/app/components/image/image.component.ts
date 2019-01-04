@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {Image} from '../../models/Image';
 import {GalleriesService} from '../../services/galleries.service';
 import {Gallery} from '../../models/Gallery';
@@ -29,11 +29,14 @@ export class ImageComponent implements OnInit {
   public width: number = null;
   public height: number = null;
 
+  deleting = false;
+
   constructor(private route: ActivatedRoute,
               private galleriesService: GalleriesService,
               private imagesService: ImagesService,
               private notificationService: NotificationService,
-              private location: Location) {
+              private location: Location,
+              private router: Router) {
     this.imageElement = document.createElement('img');
   }
 
@@ -109,6 +112,24 @@ export class ImageComponent implements OnInit {
     });
   }
 
+  delete() {
+    this.imagesService.delete(this.image.id).subscribe(() => {
+      this.notificationService.success('Image removed successfully.', 'Image removed.');
+      this.images.splice(this.getPositionInArray(), 1);
+      if (this.images.length <= 0) {
+        this.notificationService.info('No images in this gallery', 'No images');
+        this.router.navigateByUrl('/gallery/' + this.gallery.id);
+      } else if (this.getPositionInArray() < this.images.length - 1) {
+        this.move(+1);
+      }
+      this.cancel();
+    });
+  }
+
+  cancel() {
+    this.deleting = false;
+  }
+
   getPositionInArray(): number {
     return this.images.indexOf(
       this.images.find(
@@ -160,6 +181,7 @@ export class ImageComponent implements OnInit {
     this.width = null;
     this.height = null;
   }
+
   private hasLocation() {
     if (this.image.polypLocation !== null) {
       this.restoreLocation(this.image.polypLocation);

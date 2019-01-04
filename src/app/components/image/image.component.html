@@ -1,35 +1,41 @@
-<div class="clr-row container">
-  <div class="clr-col-1 container-move">
-    <button class="btn btn-link" (click)="move(-1)" [disabled]="getPositionInArray() <= 0">
-      <i class="arrow-left"></i>
-    </button>
-  </div>
-  <div class="clr-col-10">
-
-    <div align="center">
-      <canvas id="canvas"></canvas>
-    </div>
-
-    <div align="center">
-      <button class="btn btn-success" (click)="save()"
-              [disabled]="last_mousex == null && last_mousey == null && width==null && height==null">
-        <clr-icon shape="plus"></clr-icon>
-        Save
-      </button>
-      <button class="btn btn-primary" (click)="clear()">
-        <clr-icon shape="refresh"></clr-icon>
-        Clear
-      </button>
-      <button class="btn btn-danger">
-        <clr-icon shape="trash"></clr-icon>
-        Remove image
+<div [hidden]="image.id == null">
+  <div class="clr-row container">
+    <div class="clr-col-1 container-move">
+      <button class="btn btn-link" (click)="move(-1)" [disabled]="getPositionInArray() <= 0">
+        <i class="arrow-left"></i>
       </button>
     </div>
+    <div class="clr-col-10">
+      <div align="center">
+        <canvas id="canvas"></canvas>
+      </div>
 
-  </div>
-  <div class="clr-col-1 container-move">
-    <button class="btn btn-link" (click)="move(+1)" [disabled]="getPositionInArray() >= images.length-1">
-      <i class="arrow-right"></i>
-    </button>
+      <div align="center">
+        <button class="btn btn-success" (click)="save()"
+                [disabled]="last_mousex == null && last_mousey == null && width==null && height==null">
+          <clr-icon shape="plus"></clr-icon>
+          Save
+        </button>
+        <button class="btn btn-primary" (click)="clear()">
+          <clr-icon shape="refresh"></clr-icon>
+          Clear
+        </button>
+        <button class="btn btn-danger" (click)="deleting = true">
+          <clr-icon shape="trash"></clr-icon>
+          Remove image
+        </button>
+      </div>
+      ¡
+    </div>
+    <div class="clr-col-1 container-move">
+      <button class="btn btn-link" (click)="move(+1)" [disabled]="getPositionInArray() >= images.length-1">
+        <i class="arrow-right"></i>
+      </button>
+    </div>
   </div>
 </div>
+
+<app-delete-confirmation *ngIf="deleting" [modelName]="'image'" [id]="image.id"
+                         [name]="'this image'" [cancel]="cancel.bind(this)" [delete]="delete.bind(this)"
+>
+</app-delete-confirmation>
