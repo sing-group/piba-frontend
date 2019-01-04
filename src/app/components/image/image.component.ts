@@ -6,6 +6,7 @@ import {Gallery} from '../../models/Gallery';
 import {PolypLocation} from '../../models/PolypLocation';
 import {ImagesService} from '../../services/images.service';
 import {NotificationService} from '../../modules/notification/services/notification.service';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-image',
@@ -31,7 +32,8 @@ export class ImageComponent implements OnInit {
   constructor(private route: ActivatedRoute,
               private galleriesService: GalleriesService,
               private imagesService: ImagesService,
-              private notificationService: NotificationService) {
+              private notificationService: NotificationService,
+              private location: Location) {
     this.imageElement = document.createElement('img');
   }
 
@@ -56,14 +58,7 @@ export class ImageComponent implements OnInit {
         }
       )[0];
 
-      this.imageElement.src = 'data:image/png;base64,' + this.image.base64contents;
-
-      // force a width, comment this two lines for use original image size
-      /*this.imageElement.width='500';
-      this.imageElement.height='500';*/
-      this.canvas.width = this.imageElement.width;
-      this.canvas.height = this.imageElement.height;
-      this.repaint();
+      this.load();
     });
 
     // Mouseup
@@ -90,20 +85,11 @@ export class ImageComponent implements OnInit {
 
       if (this.mousedown) {
         this.repaint();
-        this.ctx.beginPath();
         this.width = mousex - this.last_mousex;
         this.height = mousey - this.last_mousey;
         this.draw();
       }
     });
-  }
-
-  private draw() {
-    // left, top, width, height
-    this.ctx.rect(this.last_mousex, this.last_mousey, this.width, this.height);
-    this.ctx.strokeStyle = 'red';
-    this.ctx.lineWidth = 2;
-    this.ctx.stroke();
   }
 
   save() {
@@ -117,7 +103,24 @@ export class ImageComponent implements OnInit {
       this.image.polypLocation = location;
       this.notificationService.success('Location of the polyp stored correctly', 'Location of the polyp stored');
       this.reset();
+      if (this.getPositionInArray() < this.images.length - 1) {
+        this.move(+1);
+      }
     });
+  }
+
+  getPositionInArray(): number {
+    return this.images.indexOf(
+      this.images.find(
+        image =>
+          image === this.image
+      ));
+  }
+
+  move(position: number) {
+    this.image = this.images[this.getPositionInArray() + position];
+    this.load();
+    this.location.go('/image/' + this.image.id);
   }
 
   clear() {
@@ -125,9 +128,30 @@ export class ImageComponent implements OnInit {
     this.reset();
   }
 
+  private load() {
+    this.loadImage();
+    this.repaint();
+    this.hasLocation();
+  }
+
+  private loadImage() {
+    this.imageElement.src = 'data:image/png;base64,' + this.image.base64contents;
+    this.canvas.width = this.imageElement.width;
+    this.canvas.height = this.imageElement.height;
+  }
+
   private repaint() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // clear canvas
     this.ctx.drawImage(this.imageElement, 0, 0, this.imageElement.width, this.imageElement.height);
+  }
+
+  private draw() {
+    this.ctx.beginPath();
+    // left, top, width, height
+    this.ctx.rect(this.last_mousex, this.last_mousey, this.width, this.height);
+    this.ctx.strokeStyle = 'red';
+    this.ctx.lineWidth = 2;
+    this.ctx.stroke();
   }
 
   private reset() {
@@ -136,5 +160,19 @@ export class ImageComponent implements OnInit {
     this.width = null;
     this.height = null;
   }
+  private hasLocation() {
+    if (this.image.polypLocation !== null) {
+      this.restoreLocation(this.image.polypLocation);
+    }
+  }
+
+  private restoreLocation(polypLocation: PolypLocation) {
+    this.last_mousex = polypLocation.x;
+    this.last_mousey = polypLocation.y;
+    this.width = polypLocation.width;
+    this.height = polypLocation.height;
+    this.draw();
+  }
+
 
 }

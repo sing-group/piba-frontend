@@ -2,9 +2,9 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {Image} from '../models/Image';
-import {Observable} from 'rxjs';
+import {forkJoin, Observable, of, throwError} from 'rxjs';
 import {ImageInfo} from './entities/ImageInfo';
-import {concatMap, map} from 'rxjs/operators';
+import {catchError, concatMap, map} from 'rxjs/operators';
 import {Video} from '../models/Video';
 import {IdAndUri} from './entities/IdAndUri';
 import {VideosService} from './videos.service';
@@ -34,9 +34,12 @@ export class ImagesService {
       )
       .pipe(
         concatMap(imageInfo =>
-          this.videosService.getVideo((<IdAndUri> imageInfo.video).id).pipe(
-            map(video =>
-              this.mapImageInfo(imageInfo, video)
+          forkJoin(
+          this.videosService.getVideo((<IdAndUri> imageInfo.video).id),
+          this.getLocation(imageInfo.id).pipe(catchError((err) => err.status === 400 ? of(null) : throwError(err)))
+        ).pipe(
+            map(videoAndLocation =>
+              this.mapImageInfo(imageInfo, videoAndLocation[0], videoAndLocation[1])
             )
           )
         )
@@ -60,7 +63,14 @@ export class ImagesService {
     );
   }
 
-  private mapImageInfo(imageInfo: ImageInfo, video: Video): Image {
+  getLocation(id: string): Observable<PolypLocation> {
+    return this.http.get<PolypLocationInfo>(`${environment.restApi}/image/${id}/polyplocation`,).pipe(
+      map(
+        this.maptoPolypLocationInfo.bind(this))
+    );
+  }
+
+  private mapImageInfo(imageInfo: ImageInfo, video: Video, polypLocation: PolypLocation): Image {
     return {
       id: imageInfo.id,
       numFrame: imageInfo.numFrame,
@@ -68,7 +78,7 @@ export class ImagesService {
       base64contents: imageInfo.base64contents,
       video: video,
       gallery: null,
-      polypLocation: null
+      polypLocation: polypLocation
     };
   }
 
