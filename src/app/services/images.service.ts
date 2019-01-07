@@ -74,6 +74,10 @@ export class ImagesService {
     return this.http.delete(`${environment.restApi}/image/${id}`);
   }
 
+  deleteLocation(id: string) {
+    return this.http.delete(`${environment.restApi}/image/${id}/polyplocation`);
+  }
+
   private mapImageInfo(imageInfo: ImageInfo, video: Video, polypLocation: PolypLocation): Image {
     return {
       id: imageInfo.id,

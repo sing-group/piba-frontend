@@ -153,6 +153,14 @@ export class ImageComponent implements OnInit {
     this.router.navigateByUrl('gallery/' + this.gallery.id);
   }
 
+  deleteLocation(id: string) {
+    this.imagesService.deleteLocation(id).subscribe(() => {
+        this.image.polypLocation = null;
+        this.notificationService.success('The location of the polyp has been correctly removed ', 'Polyp location removed');
+      }
+    );
+  }
+
   private load() {
     this.loadImage();
     this.repaint();
@@ -189,6 +197,8 @@ export class ImageComponent implements OnInit {
   private hasLocation() {
     if (this.image.polypLocation !== null) {
       this.restoreLocation(this.image.polypLocation);
+    } else {
+      this.reset();
     }
   }
 

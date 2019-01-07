@@ -18,7 +18,8 @@
           <clr-icon shape="plus"></clr-icon>
           Save
         </button>
-        <button class="btn btn-primary" (click)="clear()">
+        <button class="btn btn-primary"
+                (click)="clear(); image.polypLocation != null ? deleteLocation(image.id) : false;">
           <clr-icon shape="refresh"></clr-icon>
           Clear
         </button>
