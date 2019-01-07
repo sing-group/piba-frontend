@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {forkJoin, Observable, of} from 'rxjs';
-
 import {Exploration} from '../models/Exploration';
 import {Video} from '../models/Video';
 import {Polyp} from '../models/Polyp';
@@ -15,6 +14,7 @@ import {IdAndUri} from './entities/IdAndUri';
 import {Patient} from '../models/Patient';
 import {PibaError} from '../modules/notification/entities';
 import {IdSpace} from '../models/IdSpace';
+import {ExplorationPage} from './entities/ExplorationPage';
 
 @Injectable()
 export class ExplorationsService {
@@ -55,20 +55,38 @@ export class ExplorationsService {
       );
   }
 
-  getExplorations(): Observable<Exploration[]> {
-    return this.withPatient(this.http.get<ExplorationInfo[]>(`${environment.restApi}/exploration/`));
+  getTotalExplorations(page: number, pageSize: number): Observable<ExplorationPage> {
+    return this.getExplorations(page, pageSize, new HttpParams());
   }
 
-  getExplorationsBy(patientID: string, idSpace: IdSpace): Observable<Exploration[]> {
+  getExplorationsBy(patientID: string, idSpace: IdSpace, page: number, pageSize: number): Observable<ExplorationPage> {
     let params = new HttpParams();
     params = params.append('patient', patientID).append('idspace', idSpace.id);
-    return this.withPatient(this.http.get<ExplorationInfo[]>(`${environment.restApi}/exploration`, {params}))
+    return this.getExplorations(page, pageSize, params)
       .pipe(
         PibaError.throwOnError(
           'Error retrieving explorations',
           `No explorations are found for that patient.`
         )
       );
+  }
+
+  private getExplorations(page: number, pageSize: number, params: HttpParams): Observable<ExplorationPage> {
+    params = params.append('page', page.toString()).append('pageSize', pageSize.toString());
+    return this.http.get<ExplorationInfo[]>(`${environment.restApi}/exploration/`, {params, observe: 'response'}).pipe(
+      concatMap(response => {
+        return this.withPatient(of(response.body)
+        ).pipe(
+          map(explorationsWithPatient => {
+            const explorationPage: ExplorationPage = {
+              totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
+              explorations: explorationsWithPatient
+            };
+            return explorationPage;
+          })
+        );
+      })
+    );
   }
 
   private withPatient(explorationInfoObservable: Observable<ExplorationInfo[]>): Observable<Exploration[]> {

@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ClrDatagridComparatorInterface} from '@clr/angular';
+import {State} from '@clr/angular';
 import {ExplorationsService} from '../../services/explorations.service';
 import {Exploration} from '../../models/Exploration';
 import {PatientsService} from '../../services/patients.service';
@@ -7,12 +7,6 @@ import {IdSpacesService} from '../../services/idspaces.service';
 import {IdSpace} from '../../models/IdSpace';
 import {NotificationService} from '../../modules/notification/services/notification.service';
 import {ActivatedRoute} from '@angular/router';
-
-class ExplorationComparator implements ClrDatagridComparatorInterface<Exploration> {
-  compare(exploration1: Exploration, exploration2: Exploration) {
-    return new Date(exploration1.date).getTime() - new Date(exploration2.date).getTime();
-  }
-}
 
 @Component({
   selector: 'app-explorations',
@@ -27,11 +21,15 @@ export class ExplorationsComponent implements OnInit {
   editingExploration = false;
   creatingExploration = false;
   deletingExploration = false;
+  paginatePatientExplorations = false;
   date: string;
   location: string;
   title: string;
   newExploration: Exploration;
   exploration: Exploration = new Exploration();
+  paginationTotalItems = 0;
+  pageSize = 15;
+  currentPage: number;
 
   patientId: string;
   patientError: string;
@@ -41,9 +39,6 @@ export class ExplorationsComponent implements OnInit {
 
   idSpaceToFind: IdSpace = new IdSpace();
   patientToFind = '';
-
-  // needed to sort by date in the explorations table
-  readonly explorationComparator = new ExplorationComparator();
 
   constructor(private explorationsService: ExplorationsService, private patientsService: PatientsService,
               private idSpacesService: IdSpacesService, private notificationService: NotificationService,
@@ -60,7 +55,8 @@ export class ExplorationsComponent implements OnInit {
         this.searchPatient();
       });
     } else {
-      this.explorationsService.getExplorations().subscribe(explorations => this.explorations = explorations);
+      this.currentPage = 1;
+      this.getPageExplorations();
     }
     this.idSpacesService.getIdSpaces().subscribe(idSpaces => this.idSpaces = idSpaces);
   }
@@ -92,6 +88,7 @@ export class ExplorationsComponent implements OnInit {
               this.explorations = this.explorations.concat(newExploration);
               this.patientError = null;
               this.notificationService.success('Exploration registered successfully.', 'Exploration registered.');
+              this.getPageExplorations();
               this.cancel();
             });
         }, error => {
@@ -105,9 +102,42 @@ export class ExplorationsComponent implements OnInit {
       this.explorationsService.editExploration(this.exploration).subscribe(updatedExploration => {
         Object.assign(this.explorations.find((exploration) => exploration.id === this.exploration.id), updatedExploration);
         this.notificationService.success('Exploration edited successfully.', 'Exploration edited.');
+        this.getPageExplorations();
         this.cancel();
       });
     }
+  }
+
+  getPageExplorations() {
+    if (this.paginatePatientExplorations) {
+      this.getPageExplorationsByPatient();
+    } else {
+      this.getPageTotalExplorations();
+    }
+  }
+
+  // Return the explorations of the current page
+  getPageTotalExplorations() {
+    this.explorationsService.getTotalExplorations(this.currentPage, this.pageSize).subscribe(explorationPage => {
+      this.paginationTotalItems = explorationPage.totalItems;
+      this.explorations = explorationPage.explorations;
+    });
+  }
+
+  // Return the explorations of a patient's current page
+  getPageExplorationsByPatient() {
+    this.explorationsService.getExplorationsBy(this.patientToFind, this.idSpaceToFind, this.currentPage, this.pageSize)
+      .subscribe(explorationPage => {
+        this.paginatePatientExplorations = true;
+        this.paginationTotalItems = explorationPage.totalItems;
+        this.explorations = explorationPage.explorations;
+      });
+  }
+
+  // It is executed when the page is changed in the view
+  refreshPage(state: State) {
+    this.currentPage = (state.page.from / state.page.size) + 1;
+    this.getPageExplorations();
   }
 
   public cancel() {
@@ -130,9 +160,10 @@ export class ExplorationsComponent implements OnInit {
         );
         this.explorations.splice(index, 1);
         this.notificationService.success('Exploration removed successfully.', 'Exploration removed.');
+        this.getPageExplorations();
+        this.cancel();
       }
     );
-    this.cancel();
   }
 
   remove(id: string) {
@@ -163,15 +194,19 @@ export class ExplorationsComponent implements OnInit {
       this.notificationService.error('Selected an ID Space', 'Not possible to do the search');
       return;
     }
-    this.explorationsService.getExplorationsBy(this.patientToFind, this.idSpaceToFind).subscribe(explorations => {
-      this.explorations = explorations;
-    });
+    if (this.idSpaceToFind.id === undefined && this.patientToFind === '') {
+      return;
+    }
+    this.currentPage = 1;
+    this.getPageExplorationsByPatient();
   }
 
   clear() {
     this.patientToFind = '';
     this.idSpace = new IdSpace();
     this.idSpaceToFind = new IdSpace();
+    this.paginatePatientExplorations = false;
+    this.getPageTotalExplorations();
   }
 }
 
