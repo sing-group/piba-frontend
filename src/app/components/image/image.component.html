@@ -1,4 +1,7 @@
 <div [hidden]="image.id == null">
+  <div class="clr-row clr-justify-content-end">
+    <button class="btn btn-primary" (click)="back()">Back</button>
+  </div>
   <div class="clr-row container">
     <div class="clr-col-1 container-move">
       <button class="btn btn-link" (click)="move(-1)" [disabled]="getPositionInArray() <= 0">
@@ -9,7 +12,6 @@
       <div align="center">
         <canvas id="canvas"></canvas>
       </div>
-
       <div align="center">
         <button class="btn btn-success" (click)="save()"
                 [disabled]="last_mousex == null && last_mousey == null && width==null && height==null">
@@ -25,7 +27,6 @@
           Remove image
         </button>
       </div>
-      ¡
     </div>
     <div class="clr-col-1 container-move">
       <button class="btn btn-link" (click)="move(+1)" [disabled]="getPositionInArray() >= images.length-1">

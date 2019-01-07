@@ -149,6 +149,10 @@ export class ImageComponent implements OnInit {
     this.reset();
   }
 
+  back() {
+    this.router.navigateByUrl('gallery/' + this.gallery.id);
+  }
+
   private load() {
     this.loadImage();
     this.repaint();
