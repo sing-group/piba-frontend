@@ -34,12 +34,12 @@
     </button>
   </div>
 </div>
-<clr-datagrid (clrDgRefresh)="refreshPage($event)">
+<clr-datagrid (clrDgRefresh)="refreshPage($event)" [clrDgLoading]="loading">
 
   <clr-dg-placeholder>We couldn't find any explorations!</clr-dg-placeholder>
 
   <clr-dg-column>Title</clr-dg-column>
-  <clr-dg-column [clrDgField]="'exploration.date'" [clrDgSortBy]="explorationComparator">Date</clr-dg-column>
+  <clr-dg-column>Date</clr-dg-column>
   <clr-dg-column>Location</clr-dg-column>
   <clr-dg-column>Actions</clr-dg-column>
 
@@ -66,7 +66,7 @@
   </clr-dg-row>
 
   <clr-dg-footer>
-    <clr-dg-pagination #pagination [clrDgPageSize]="pageSize"
+    <clr-dg-pagination #pagination [clrDgPageSize]="(pageSize > paginationTotalItems) ? paginationTotalItems : pageSize"
                        [clrDgTotalItems]="paginationTotalItems" [(clrDgPage)]="currentPage">
       {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{paginationTotalItems}} explorations
     </clr-dg-pagination>

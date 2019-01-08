@@ -22,6 +22,7 @@ export class ExplorationsComponent implements OnInit {
   creatingExploration = false;
   deletingExploration = false;
   paginatePatientExplorations = false;
+  loading = false;
   date: string;
   location: string;
   title: string;
@@ -109,6 +110,7 @@ export class ExplorationsComponent implements OnInit {
   }
 
   getPageExplorations() {
+    this.loading = true;
     if (this.paginatePatientExplorations) {
       this.getPageExplorationsByPatient();
     } else {
@@ -121,6 +123,7 @@ export class ExplorationsComponent implements OnInit {
     this.explorationsService.getTotalExplorations(this.currentPage, this.pageSize).subscribe(explorationPage => {
       this.paginationTotalItems = explorationPage.totalItems;
       this.explorations = explorationPage.explorations;
+      this.loading = false;
     });
   }
 
@@ -128,9 +131,9 @@ export class ExplorationsComponent implements OnInit {
   getPageExplorationsByPatient() {
     this.explorationsService.getExplorationsBy(this.patientToFind, this.idSpaceToFind, this.currentPage, this.pageSize)
       .subscribe(explorationPage => {
-        this.paginatePatientExplorations = true;
         this.paginationTotalItems = explorationPage.totalItems;
         this.explorations = explorationPage.explorations;
+        this.loading = false;
       });
   }
 
@@ -198,7 +201,8 @@ export class ExplorationsComponent implements OnInit {
       return;
     }
     this.currentPage = 1;
-    this.getPageExplorationsByPatient();
+    this.paginatePatientExplorations = true;
+    this.getPageExplorations();
   }
 
   clear() {
@@ -206,7 +210,7 @@ export class ExplorationsComponent implements OnInit {
     this.idSpace = new IdSpace();
     this.idSpaceToFind = new IdSpace();
     this.paginatePatientExplorations = false;
-    this.getPageTotalExplorations();
+    this.getPageExplorations();
   }
 }
 
