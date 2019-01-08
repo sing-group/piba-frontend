@@ -3,6 +3,7 @@ import {Role} from '../../models/User';
 import {UsersService} from '../../services/users.service';
 import {Users} from '../../models/Users';
 import {NotificationService} from '../../modules/notification/services/notification.service';
+import {AuthenticationService} from '../../services/authentication.service';
 
 @Component({
   selector: 'app-user',
@@ -24,11 +25,16 @@ export class UserComponent implements OnInit {
   users: Users[] = [];
 
   constructor(private usersServices: UsersService,
-              private notificationService: NotificationService) {
+              private notificationService: NotificationService,
+              private authenticationService: AuthenticationService) {
   }
 
   ngOnInit() {
-    this.usersServices.getUsers().subscribe(users => this.users = users);
+    this.usersServices.getUsers().subscribe(users => {
+      this.users = users;
+      const loggedUser = this.users.find((user) => user.login === this.authenticationService.getUser().login);
+      this.users.splice(this.users.indexOf(loggedUser), 1);
+    });
   }
 
   save() {
