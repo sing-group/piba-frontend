@@ -11,7 +11,7 @@
       <clr-icon shape="stop"></clr-icon>
     </button>
     <div class="timer">
-      <input type="range" id="progress" [value]="progress.value" (mousedown)="mouseDownProgress()"
+      <input #progressbar type="range" id="progress" [value]="progress.value" (mousedown)="mouseDownProgress()"
              (mouseup)="mouseUpProgress()" class="margin-progress"/>
       <span>{{progress.value | time}}/{{video.duration | time}}</span>
     </div>

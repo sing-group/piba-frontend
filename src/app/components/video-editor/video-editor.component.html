@@ -5,7 +5,7 @@
 </div>
 
 <div class="row video-container" *ngIf="video != null">
-  <app-video (currentTime)="onCurrentTimeUpdate($event)">
+  <app-video (currentTime)="onCurrentTimeUpdate($event)" (mouseInProgress)="mouseInProgress($event)" >
     <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}"/>
     <p>Your browser does not support the video tag.</p>
   </app-video>
@@ -46,7 +46,7 @@
                      required #startP="ngModel"/>
             </div>
             <div class="col-xs-2 col-sm-1 col-md-2">
-              <button type="button" (click)="startPolyp()" class="btn btn-icon">
+              <button type="button" (click)="startInterval()" class="btn btn-icon">
                 <clr-icon shape="clock"></clr-icon>
               </button>
             </div>
@@ -62,7 +62,7 @@
 
             </div>
             <div class="col-xs-2 col-sm-1 col-md-2">
-              <button type="button" (click)="endPolyp()" class="btn btn-icon">
+              <button type="button" (click)="endInterval()" class="btn btn-icon">
                 <clr-icon shape="clock"></clr-icon>
               </button>
             </div>
@@ -133,9 +133,11 @@
     <clr-tab-content *clrIfActive>
 
       <div class="tab-container">
-        <app-video-modification [video]="video" [currentTime]="currentTime"
+        <app-video-modification [video]="video" [currentTime]="currentTime" [moveProgress]="moveProgress"
                                 [timesAreCorrect]="timesAreCorrect"
-                                [playInterval]="playInterval"></app-video-modification>
+                                [playInterval]="playInterval"
+                                [startInterval]="startInterval" [endInterval]="endInterval"
+                                [transformToTimePipe]="transformToTimePipe"></app-video-modification>
       </div>
 
     </clr-tab-content>

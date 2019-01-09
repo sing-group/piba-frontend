@@ -14,14 +14,17 @@ export class VideoComponent implements OnInit {
 
   fullscreen = false;
   playWatcher: any;
+
   progress: HTMLInputElement;
   moveProgress = false;
+  // tslint:disable-next-line:no-output-rename
+  @Output('mouseInProgress') mouseInProgress = new EventEmitter<boolean>();
 
   constructor() {
   }
 
   ngOnInit() {
-    this.video.addEventListener('timeupdate', event => this.timeEmitter.emit(this.video.currentTime));
+    this.video.addEventListener('timeupdate', () => this.timeEmitter.emit(this.video.currentTime));
 
     const updateFullscreen = this.updateFullscreen.bind(this);
     document.addEventListener('fullscreenchange', updateFullscreen);
@@ -65,6 +68,7 @@ export class VideoComponent implements OnInit {
   stopVideo() {
     this.video.pause();
     this.video.currentTime = 0;
+    clearInterval(this.playWatcher);
   }
 
   forwardVideo() {
@@ -118,10 +122,12 @@ export class VideoComponent implements OnInit {
 
   mouseDownProgress() {
     this.moveProgress = true;
+    this.mouseInProgress.emit(this.moveProgress);
   }
 
   mouseUpProgress() {
     this.moveProgress = false;
     this.video.currentTime = this.progress.valueAsNumber;
+    this.mouseInProgress.emit(this.moveProgress);
   }
 }

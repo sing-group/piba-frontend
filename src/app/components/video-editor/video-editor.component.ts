@@ -37,6 +37,8 @@ export class VideoEditorComponent implements OnInit {
   modalOpened = false;
 
   pauseWatcher: any;
+  progress: HTMLInputElement;
+  moveProgress = false;
 
   constructor(
     private videosService: VideosService,
@@ -67,19 +69,19 @@ export class VideoEditorComponent implements OnInit {
       });
   }
 
-  startPolyp() {
-    if (this.currentTime === undefined) {
-      this.start = this.timePipe.transform(0);
-    } else {
-      this.start = this.timePipe.transform(this.currentTime);
-    }
+  startInterval() {
+    this.start = this.transformToTimePipe();
   }
 
-  endPolyp() {
+  endInterval() {
+    this.end = this.transformToTimePipe();
+  }
+
+  transformToTimePipe(): string {
     if (this.currentTime === undefined) {
-      this.end = this.timePipe.transform(0);
+      return this.timePipe.transform(0);
     } else {
-      this.end = this.timePipe.transform(this.currentTime);
+      return this.timePipe.transform(this.currentTime);
     }
   }
 
@@ -89,6 +91,10 @@ export class VideoEditorComponent implements OnInit {
 
   onCurrentTimeUpdate(time: number) {
     this.currentTime = time;
+  }
+
+  mouseInProgress(move: boolean) {
+    this.moveProgress = move;
   }
 
   public timesAreCorrect(): Boolean {
@@ -164,19 +170,25 @@ export class VideoEditorComponent implements OnInit {
       (polypRecordingFind) => polypRecordingFind === polypRecording);
   }
 
+
   playInterval(start: number, end: number) {
+    this.progress = document.getElementById('progress') as HTMLInputElement;
     this.videoHTML = document.getElementById('video-exploration') as HTMLMediaElement;
     this.videoHTML.currentTime = start;
     this.videoHTML.play();
+
     if (this.pauseWatcher !== undefined && this.pauseWatcher != null) {
       clearInterval(this.pauseWatcher);
     }
     this.pauseWatcher = setInterval(() => {
+      if (!this.moveProgress) {
+        this.progress.value = this.videoHTML.currentTime.toString();
+      }
       if (this.videoHTML.currentTime >= end) {
         this.videoHTML.pause();
         clearInterval(this.pauseWatcher);
       }
-    }, 500);
+    }, 100);
   }
 
   back() {

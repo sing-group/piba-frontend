@@ -17,8 +17,12 @@ export class VideoModificationComponent implements OnInit {
 
   @Input() video: Video;
   @Input() currentTime: number;
+  @Input() moveProgress: boolean;
   @Input() timesAreCorrect: Function;
   @Input() playInterval: Function;
+  @Input() startInterval: Function;
+  @Input() endInterval: Function;
+  @Input() transformToTimePipe: Function;
 
   start: string;
   end: string;
@@ -45,22 +49,6 @@ export class VideoModificationComponent implements OnInit {
       .subscribe(videoModifications => this.videoModifications = videoModifications);
   }
 
-  startModifier() {
-    if (this.currentTime === undefined) {
-      this.start = this.timePipe.transform(0);
-    } else {
-      this.start = this.timePipe.transform(this.currentTime);
-    }
-  }
-
-  endModifier() {
-    if (this.currentTime === undefined) {
-      this.end = this.timePipe.transform(0);
-    } else {
-      this.end = this.timePipe.transform(this.currentTime);
-    }
-  }
-
   addVideoModification() {
     this.videoModification = {
       id: null,
@@ -72,6 +60,9 @@ export class VideoModificationComponent implements OnInit {
     this.videoModificationsService.createVideoModification(this.videoModification).subscribe(videoModification => {
         this.videoModifications = this.videoModifications.concat(videoModification);
         this.notificationService.success('Video modifier registered successfully.', 'Video modifier registered.');
+        this.start = null;
+        this.end = null;
+        this.selectedModifier = null;
       }
     );
   }
