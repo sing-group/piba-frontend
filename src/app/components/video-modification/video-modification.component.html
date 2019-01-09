@@ -61,15 +61,15 @@
       <clr-dg-cell>{{videoModification.modifier.name}}</clr-dg-cell>
       <clr-dg-cell>{{videoModification.start | time}}</clr-dg-cell>
       <clr-dg-cell>{{videoModification.end | time}}</clr-dg-cell>
-      <clr-dg-cell style="padding: 0px;">
-        <button type="button" class="btn btn-secondary" (click)="remove(videoModification)">
-          <clr-icon shape="times"></clr-icon>
-          Remove
-        </button>
-        <button type="button" class="btn btn-secondary"
+      <clr-dg-cell>
+        <button type="button" class="btn btn-success-outline"
                 (click)="playInterval(videoModification.start, videoModification.end)">
           <clr-icon shape="play"></clr-icon>
           Play
+        </button>
+        <button type="button" class="btn btn-danger-outline" (click)="remove(videoModification)">
+          <clr-icon shape="times"></clr-icon>
+          Remove
         </button>
       </clr-dg-cell>
     </clr-dg-row>
