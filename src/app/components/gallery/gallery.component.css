@@ -5,7 +5,7 @@
 
 .gallery-item {
   float: left;
-  width: 30%;
+  width: 97%;
   margin: 1% 2% 10px 1%;
 }
 
@@ -13,3 +13,21 @@
   max-width: 100%;
   cursor: pointer;
 }
+
+canvas {
+  width: 100%;
+  border: 1px solid #000000;
+}
+
+@media (min-width: 576px) {
+  .gallery-item {
+    width: 47%;
+  }
+}
+
+@media (min-width: 992px) {
+  .gallery-item {
+    width: 30%;
+  }
+}
+

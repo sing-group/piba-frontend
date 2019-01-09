@@ -25,11 +25,12 @@
       <div *ngFor="let image of gallery.images">
         <div class="gallery-item">
           <a routerLink="/image/{{image.id}}">
-            <img [src]="'data:image/png;base64,' + image.base64contents | safehtml">
+            <canvas id="canvas-{{image.id}}"></canvas>
           </a>
         </div>
       </div>
     </div>
+
   </div>
 
 </div>

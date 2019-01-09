@@ -29,3 +29,7 @@ i {
   transform: rotate(135deg);
   -webkit-transform: rotate(135deg);
 }
+
+.clr-col-1 {
+  width: auto;
+}

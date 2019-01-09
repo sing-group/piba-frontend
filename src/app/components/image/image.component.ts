@@ -38,6 +38,9 @@ export class ImageComponent implements OnInit {
               private location: Location,
               private router: Router) {
     this.imageElement = document.createElement('img');
+    // Needed for Chrome
+    document.body.appendChild(this.imageElement);
+    this.imageElement.classList.toggle('hidden-element');
   }
 
   ngOnInit() {
@@ -162,15 +165,21 @@ export class ImageComponent implements OnInit {
   }
 
   private load() {
-    this.loadImage();
-    this.repaint();
-    this.hasLocation();
+    this.loadImage(() => {
+      this.repaint();
+      this.hasLocation();
+    });
   }
 
-  private loadImage() {
+  private loadImage(onLoad: () => void) {
+    this.imageElement.onload = () => {
+      this.canvas.width = this.imageElement.width;
+      this.canvas.height = this.imageElement.height;
+      onLoad();
+    }
     this.imageElement.src = 'data:image/png;base64,' + this.image.base64contents;
-    this.canvas.width = this.imageElement.width;
-    this.canvas.height = this.imageElement.height;
+
+
   }
 
   private repaint() {
