@@ -139,8 +139,10 @@ export class ExplorationsComponent implements OnInit {
 
   // It is executed when the page is changed in the view
   refreshPage(state: State) {
-    this.currentPage = (state.page.from / state.page.size) + 1;
-    this.getPageExplorations();
+    if (state.page !== undefined) {
+      this.currentPage = (state.page.from / state.page.size) + 1;
+      this.getPageExplorations();
+    }
   }
 
   public cancel() {
