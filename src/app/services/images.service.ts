@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {Image} from '../models/Image';
 import {forkJoin, Observable, of, throwError} from 'rxjs';
@@ -64,14 +64,17 @@ export class ImagesService {
   }
 
   getLocation(id: string): Observable<PolypLocation> {
-    return this.http.get<PolypLocationInfo>(`${environment.restApi}/image/${id}/polyplocation`,).pipe(
+    return this.http.get<PolypLocationInfo>(`${environment.restApi}/image/${id}/polyplocation`).pipe(
       map(
         this.maptoPolypLocationInfo.bind(this))
     );
   }
 
-  delete(id: string) {
-    return this.http.delete(`${environment.restApi}/image/${id}`);
+  delete(id: string, observationsToRemove: string) {
+    const httpOptions = {
+      headers: new HttpHeaders({'X-ReasonToRemove': observationsToRemove})
+    };
+    return this.http.delete(`${environment.restApi}/image/${id}`, httpOptions);
   }
 
   deleteLocation(id: string) {

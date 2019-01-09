@@ -30,6 +30,10 @@ export class ImageComponent implements OnInit {
   public height: number = null;
 
   deleting = false;
+  definingDeletion = false;
+  options = ['Not polyp', 'Bad quality', 'Others'];
+  selected: string;
+  observationToRemove: string = null;
 
   constructor(private route: ActivatedRoute,
               private galleriesService: GalleriesService,
@@ -116,7 +120,15 @@ export class ImageComponent implements OnInit {
   }
 
   delete() {
-    this.imagesService.delete(this.image.id).subscribe(() => {
+    this.deleting = false;
+    this.definingDeletion = true;
+  }
+
+  remove() {
+    if (this.selected !== 'Others') {
+      this.observationToRemove = this.selected;
+    }
+    this.imagesService.delete(this.image.id, this.observationToRemove).subscribe(() => {
       this.notificationService.success('Image removed successfully.', 'Image removed.');
       this.images.splice(this.getPositionInArray(), 1);
       if (this.images.length <= 0) {
@@ -131,6 +143,9 @@ export class ImageComponent implements OnInit {
 
   cancel() {
     this.deleting = false;
+    this.definingDeletion = false;
+    this.selected = null;
+    this.observationToRemove = null;
   }
 
   getPositionInArray(): number {
@@ -176,7 +191,7 @@ export class ImageComponent implements OnInit {
       this.canvas.width = this.imageElement.width;
       this.canvas.height = this.imageElement.height;
       onLoad();
-    }
+    };
     this.imageElement.src = 'data:image/png;base64,' + this.image.base64contents;
 
 

@@ -35,9 +35,45 @@
       </button>
     </div>
   </div>
+
+  <clr-modal [(clrModalOpen)]="definingDeletion" [clrModalClosable]="false">
+    <h3 class="modal-title">Reason to delete this image</h3>
+    <div class="modal-body">
+      <form>
+        <section class="form-block">
+          <div class="form-group">
+            <label for="selectToRemove">Select a reason</label>
+            <div class="select">
+              <select id="selectToRemove" name="selectedToRemove" required [(ngModel)]="selected">
+                <option *ngFor="let option of options" [ngValue]="option" (click)="observationToRemove = null">
+                  {{option}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div *ngIf="selected == 'Others'" class="form-group">
+            <label>Describe the reason </label>
+            <input type="text" name="observationToRemove" [(ngModel)]="observationToRemove"/>
+          </div>
+        </section>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
+      <button type="button" class="btn btn-danger-outline" (click)="remove()"
+              [disabled]="(!observationToRemove && selected == 'Others') || selected == null">Delete
+      </button>
+    </div>
+  </clr-modal>
+
+  <app-delete-confirmation *ngIf="deleting" [modelName]="'image'" [id]="image.id"
+                           [name]="'this image'" [cancel]="cancel.bind(this)" [delete]="delete.bind(this)"
+  >
+  </app-delete-confirmation>
+
 </div>
 
-<app-delete-confirmation *ngIf="deleting" [modelName]="'image'" [id]="image.id"
-                         [name]="'this image'" [cancel]="cancel.bind(this)" [delete]="delete.bind(this)"
->
-</app-delete-confirmation>
+
+
+
+
