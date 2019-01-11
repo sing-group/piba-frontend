@@ -33,3 +33,16 @@ i {
 .clr-col-1 {
   width: auto;
 }
+
+.margin-row {
+  margin: 1%;
+}
+
+.spinner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}

@@ -1,3 +1,7 @@
+<span class="spinner" *ngIf="!gallery.images">
+    Loading...
+</span>
+
 <div [hidden]="image.id == null">
   <div class="clr-row clr-justify-content-end">
     <button class="btn btn-primary" (click)="back()">Back</button>
@@ -34,6 +38,98 @@
         <i class="arrow-right"></i>
       </button>
     </div>
+  </div>
+
+  <div *ngIf="polypRecording" class="card">
+    <div class="clr-row margin-row">
+      <div class="col-lg-2 col-sm-3 col-xs-4">
+        <label class="txt-strong" for="polyp-name">Name</label>
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8">
+        <input type="text" id="polyp-name" readonly value="{{polypRecording.polyp.name}}"/>
+      </div>
+      <div class="col-lg-2 col-sm-3 col-xs-4">
+        <label class="txt-strong" for="polyp-size">Size (mm)</label>
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8">
+        <input type="text" id="polyp-size" readonly value="{{polypRecording.polyp.size}}"/>
+      </div>
+    </div>
+    <div class="clr-row margin-row">
+      <div class="col-lg-2 col-sm-3 col-xs-4">
+        <label class="txt-strong" for="polyp-location">Location</label>
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8">
+        <input type="text" id="polyp-location" readonly value="{{polypRecording.polyp.location}}"/>
+      </div>
+      <div class="col-lg-2 col-sm-3 col-xs-4">
+        <label class="txt-strong" for="polyp-nice">NICE</label>
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8">
+        <input type="text" id="polyp-nice" readonly value="{{polypRecording.polyp.nice}}"/>
+      </div>
+    </div>
+    <div class="clr-row margin-row">
+      <div class="col-lg-2 col-sm-3 col-xs-4">
+        <label class="txt-strong" for="polyp-wasp">WASP</label>
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8">
+        <input type="text" id="polyp-wasp" readonly value="{{polypRecording.polyp.wasp}}"/>
+      </div>
+      <div class="col-lg-2 col-sm-3 col-xs-4">
+        <label class="txt-strong" for="polyp-lst">LST</label>
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8">
+        <input type="text" id="polyp-lst" readonly value="{{polypRecording.polyp.lst}}"/>
+      </div>
+    </div>
+    <div class="clr-row margin-row">
+      <div class="col-lg-2 col-sm-3 col-xs-4">
+        <label class="txt-strong" for="polyp-parisPrimary">PARIS</label>
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8">
+        <input type="text" id="polyp-parisPrimary" readonly value="{{polypRecording.polyp.parisPrimary}}"/>
+      </div>
+      <div class="col-lg-2 col-sm-3 col-xs-4" *ngIf="polypRecording.polyp.parisSecondary !== undefined">
+        <label class="txt-strong" for="polyp-parisSecondary">PARIS Secondary</label>
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8" *ngIf="polypRecording.polyp.parisSecondary !== undefined">
+        <input type="text" id="polyp-parisSecondary" readonly value="{{polypRecording.polyp.parisSecondary}}"/>
+      </div>
+    </div>
+    <div class="clr-row margin-row">
+      <div class="col-lg-2 col-sm-4 col-xs-4">
+        <label class="txt-strong" for="polyp-histology">Histology</label>
+      </div>
+      <div class="col-lg-4 col-sm-8 col-xs-8">
+        <input type="text" id="polyp-histology" readonly value="{{polypRecording.polyp.histology.polypType}}"/>
+      </div>
+    </div>
+    <div class="clr-row margin-row">
+      <div class="col-lg-2 col-sm-4 col-xs-4" *ngIf="type">
+        <label class="txt-strong" for="polyp-type">Type</label>
+      </div>
+      <div class="col-lg-4 col-sm-8 col-xs-8" *ngIf="type">
+        <input type="text" id="polyp-type" readonly value="{{type}}"/>
+      </div>
+      <div class="col-lg-2 col-sm-4 col-xs-4" *ngIf="dysplasingGrade">
+        <label class="txt-strong" for="polyp-dyplasingGrade">Dyplasing drade</label>
+      </div>
+
+      <div class="col-lg-4 col-sm-8 col-xs-8" *ngIf="dysplasingGrade">
+        <input type="text" id="polyp-dyplasingGrade" readonly value="{{dysplasingGrade}}"/>
+      </div>
+    </div>
+
+    <div class="clr-row margin-row">
+      <div class="col-xs-12">
+        <label class="txt-strong" for="polyp-observation">Observation</label>
+      </div>
+      <div class="col-xs-12">
+        <input type="text" id="polyp-observation" readonly value="{{polypRecording.polyp.observation}}"/>
+      </div>
+    </div>
+
   </div>
 
   <clr-modal [(clrModalOpen)]="definingDeletion" [clrModalClosable]="false">

@@ -7,6 +7,9 @@ import {PolypLocation} from '../../models/PolypLocation';
 import {ImagesService} from '../../services/images.service';
 import {NotificationService} from '../../modules/notification/services/notification.service';
 import {Location} from '@angular/common';
+import {PolypRecordingsService} from '../../services/polyprecordings.service';
+import {PolypRecording} from '../../models/PolypRecording';
+import {Adenoma, PolypType, SSA, TSA} from '../../models/PolypHistology';
 
 @Component({
   selector: 'app-image',
@@ -31,16 +34,21 @@ export class ImageComponent implements OnInit {
 
   deleting = false;
   definingDeletion = false;
-  options = ['Not polyp', 'Bad quality', 'Others'];
+  options = ['Not polyp', 'Bad quality', 'Polyp error information', 'Others'];
   selected: string;
   observationToRemove: string = null;
+
+  polypRecording: PolypRecording;
+  type: string;
+  dysplasingGrade: string;
 
   constructor(private route: ActivatedRoute,
               private galleriesService: GalleriesService,
               private imagesService: ImagesService,
               private notificationService: NotificationService,
               private location: Location,
-              private router: Router) {
+              private router: Router,
+              private polypRecordingService: PolypRecordingsService) {
     this.imageElement = document.createElement('img');
     // Needed for Chrome
     document.body.appendChild(this.imageElement);
@@ -69,6 +77,7 @@ export class ImageComponent implements OnInit {
       )[0];
 
       this.load();
+      this.getPolypRecordingInfo();
     });
 
     // Mouseup
@@ -159,6 +168,7 @@ export class ImageComponent implements OnInit {
   move(position: number) {
     this.image = this.images[this.getPositionInArray() + position];
     this.load();
+    this.getPolypRecordingInfo();
     this.location.go('/image/' + this.image.id);
   }
 
@@ -232,6 +242,39 @@ export class ImageComponent implements OnInit {
     this.width = polypLocation.width;
     this.height = polypLocation.height;
     this.draw();
+  }
+
+  private getPolypRecordingInfo() {
+    this.polypRecordingService.getPolypRecordingsByVideo(this.image.video.id).subscribe(polypRecordings => {
+      for (const polypRecording of polypRecordings) {
+        if (this.image.numFrame >= polypRecording.start && this.image.numFrame <= polypRecording.end) {
+          this.polypRecording = polypRecording;
+          switch (polypRecording.polyp.histology.polypType) {
+            case PolypType.ADENOMA:
+              this.type = (<Adenoma>polypRecording.polyp.histology).type;
+              this.dysplasingGrade = (<Adenoma>polypRecording.polyp.histology).dysplasingGrade;
+              break;
+            case PolypType.INVASIVE:
+            case PolypType.HYPERPLASTIC:
+            case PolypType.NON_EPITHELIAL_NEOPLASTIC:
+              this.type = null;
+              this.dysplasingGrade = null;
+              break;
+            case PolypType.SESSILE_SERRATED_ADENOMA:
+              this.type = null;
+              this.dysplasingGrade = (<SSA>polypRecording.polyp.histology).dysplasingGrade;
+              break;
+            case PolypType.TRADITIONAL_SERRATED_ADENOMA:
+              this.type = null;
+              this.dysplasingGrade = (<TSA>polypRecording.polyp.histology).dysplasingGrade;
+              break;
+            default:
+              this.type = null;
+              this.dysplasingGrade = null;
+          }
+        }
+      }
+    });
   }
 
 
