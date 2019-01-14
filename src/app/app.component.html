@@ -4,7 +4,9 @@
       <div class="title">PIBA</div>
     </div>
     <div class="header-actions">
-
+      <a *ngIf="authenticationService.getUser().authenticated == true" class="nav-link nav-icon" (click)="getProfile()">
+        <clr-icon shape="user"></clr-icon>
+      </a>
       <a *ngIf="authenticationService.getUser().authenticated == true" class="nav-link nav-icon" (click)="logOut()">
         <clr-icon shape="logout"></clr-icon>
       </a>

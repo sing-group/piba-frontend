@@ -1,0 +1,31 @@
+<div *ngIf="loggedUser != null">
+  <div class="card">
+    <div class="card-header">
+      User Profile: "{{loggedUser.login}}"
+    </div>
+    <div class="card-block">
+      <section class="form-block">
+        <table class="table">
+          <tbody>
+          <tr>
+            <td class="left">Login</td>
+            <td class="left td-data">{{loggedUser.login}}</td>
+          </tr>
+          <tr>
+            <td class="left">Email</td>
+            <td class="left td-data">{{loggedUser.email}}</td>
+          </tr>
+          <tr>
+            <td class="left">Role</td>
+            <td class="left td-data">{{loggedUser.role}}</td>
+          </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+    <button type="button" class="btn btn-secondary btn-profile">
+      <clr-icon shape="note"></clr-icon>
+      Edit information
+    </button>
+  </div>
+</div>

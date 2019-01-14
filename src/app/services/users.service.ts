@@ -43,6 +43,12 @@ export class UsersService {
     );
   }
 
+  getUser(login: string): Observable<Users> {
+    return this.http.get<UserInfo[]>(`${environment.restApi}/user/${login}`).pipe(
+      map(this.mapUserInfo.bind(this))
+    );
+  }
+
   private toUserInfo(user: Users): UserInfo {
     return {
       login: user.login,

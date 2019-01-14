@@ -10,8 +10,12 @@ import {IdspaceComponent} from './components/idspace/idspace.component';
 import {UserComponent} from './components/user/user.component';
 import {GalleryComponent} from './components/gallery/gallery.component';
 import {ImageComponent} from './components/image/image.component';
+import {ProfileComponent} from './components/profile/profile.component';
 
 const routes: Routes = [
+  {
+    path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]
+  },
   {
     path: 'gallery/:id', component: GalleryComponent, canActivate: [AuthGuard]
   },

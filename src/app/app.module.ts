@@ -37,6 +37,7 @@ import {DeleteConfirmationComponent} from './components/delete-confirmation/dele
 import {GalleryComponent} from './components/gallery/gallery.component';
 import {SafehtmlPipe} from './pipes/safehtml.pipe';
 import {ImageComponent} from './components/image/image.component';
+import {ProfileComponent} from './components/profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +58,8 @@ import {ImageComponent} from './components/image/image.component';
     DeleteConfirmationComponent,
     GalleryComponent,
     SafehtmlPipe,
-    ImageComponent
+    ImageComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,
