@@ -1,0 +1,35 @@
+<clr-datagrid>
+
+  <clr-dg-placeholder>We couldn't find any galleries!</clr-dg-placeholder>
+
+  <clr-dg-column>Title</clr-dg-column>
+  <clr-dg-column>Description</clr-dg-column>
+  <clr-dg-column>Actions</clr-dg-column>
+
+  <clr-dg-row *clrDgItems="let gallery of galleries" [clrDgItem]="gallery">
+    <clr-dg-cell>{{gallery.title}}</clr-dg-cell>
+    <clr-dg-cell>{{gallery.description}}</clr-dg-cell>
+    <clr-dg-cell>
+      <div class="btn-group btn-link btn-icon">
+        <button class="btn" routerLink="/gallery/{{gallery.id}}">
+          <clr-icon shape="eye"></clr-icon>
+          <span class="clr-icon-title">View</span>
+        </button>
+        <button class="btn">
+          <clr-icon shape="cog"></clr-icon>
+          <span class="clr-icon-title">Settings</span>
+        </button>
+        <button class="btn">
+          <clr-icon shape="trash"></clr-icon>
+          <span class="clr-icon-title">Delete</span>
+        </button>
+      </div>
+    </clr-dg-cell>
+  </clr-dg-row>
+  <clr-dg-footer>
+    <clr-dg-pagination #pagination [clrDgPageSize]="15">
+      {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{pagination.totalItems}} galleries
+    </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>
+

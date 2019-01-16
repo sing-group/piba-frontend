@@ -19,6 +19,13 @@ export class GalleriesService {
               private imagesService: ImagesService) {
   }
 
+  getGalleries(): Observable<Gallery[]> {
+    return this.http.get<GalleryInfo[]>(`${environment.restApi}/gallery/`)
+      .pipe(
+        map(galleries => galleries.map(this.mapGalleryInfo.bind(this)))
+      );
+  }
+
   getGallery(id: string): Observable<Gallery> {
     return this.http.get<GalleryInfo>(`${environment.restApi}/gallery/${id}`)
       .pipe(
