@@ -1,12 +1,11 @@
-<span class="spinner" *ngIf="!gallery.images">
+<div *ngIf="gallery">
+  <span class="spinner" *ngIf="!images">
     Loading...
 </span>
-<div *ngIf="gallery">
   <div class="card">
     <div class="card-header">
       Gallery data
     </div>
-
     <div class="card-block">
       <section class="form-block">
         <table class="table">
@@ -23,17 +22,22 @@
         </table>
       </section>
     </div>
-
-    <div class="gallery-container">
-      <div *ngFor="let image of gallery.images">
-        <div class="gallery-item">
-          <a routerLink="/image/{{image.id}}">
-            <canvas id="canvas-{{image.id}}"></canvas>
-          </a>
+    <clr-datagrid (clrDgRefresh)="refreshPage($event)">
+      <div class="gallery-container">
+        <div *ngFor="let image of images">
+          <div class="gallery-item">
+            <a routerLink="/gallery/{{gallery.id}}/image/{{image.id}}" [queryParams]="{page: this.page}">
+              <canvas id="canvas-{{image.id}}"></canvas>
+            </a>
+          </div>
         </div>
       </div>
-    </div>
-
+      <clr-dg-footer>
+        <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [clrDgTotalItems]="totalImages" [(clrDgPage)]="page">
+          {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+          of {{totalImages}} images
+        </clr-dg-pagination>
+      </clr-dg-footer>
+    </clr-datagrid>
   </div>
-
 </div>

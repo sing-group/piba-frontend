@@ -7,6 +7,7 @@ export interface VideoInfo {
   video_sources: VideoSource[];
   processing: boolean;
   withText: boolean;
+  fps: number;
   exploration: IdAndUri | string;
 }
 

@@ -31,7 +31,7 @@ canvas {
   }
 }
 
-.spinner{
+.spinner {
   position: absolute;
   top: 0;
   left: 0;
@@ -40,3 +40,10 @@ canvas {
   margin: auto;
 }
 
+:host /deep/ .datagrid-placeholder-image {
+  background-image: none !important;
+}
+
+.datagrid-host {
+  margin-bottom: 1%;
+}

@@ -24,7 +24,7 @@ const routes: Routes = [
     path: 'gallery/:id', component: GalleryComponent, canActivate: [AuthGuard]
   },
   {
-    path: 'image/:id', component: ImageComponent, canActivate: [AuthGuard]
+    path: 'gallery/:gallery_id/image/:id', component: ImageComponent, canActivate: [AuthGuard]
   },
   {
     path: 'users', component: UserComponent, canActivate: [AuthGuard]

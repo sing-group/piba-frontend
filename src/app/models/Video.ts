@@ -9,5 +9,6 @@ export class Video {
   polypRecording: PolypRecording[];
   isProcessing: boolean;
   withText: boolean;
+  fps: number;
   exploration: string;
 }

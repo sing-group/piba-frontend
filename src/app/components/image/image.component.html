@@ -1,14 +1,13 @@
-<span class="spinner" *ngIf="!gallery.images">
+<span class="spinner" *ngIf="!images">
     Loading...
 </span>
-
 <div [hidden]="image.id == null">
   <div class="clr-row clr-justify-content-end">
-    <button class="btn btn-primary" (click)="back()">Back</button>
+    <button class="btn btn-primary" (click)="redirectToGallery()">Back</button>
   </div>
   <div class="clr-row container">
     <div class="clr-col-1 container-move">
-      <button class="btn btn-link" (click)="move(-1)" [disabled]="getPositionInArray() <= 0">
+      <button class="btn btn-link" (click)="toLeft()" [disabled]="getPositionInArray() <= 0 && page == 1">
         <i class="arrow-left"></i>
       </button>
     </div>
@@ -34,7 +33,8 @@
       </div>
     </div>
     <div class="clr-col-1 container-move">
-      <button class="btn btn-link" (click)="move(+1)" [disabled]="getPositionInArray() >= images.length-1">
+      <button class="btn btn-link" (click)="toRight()"
+              [disabled]="getPositionInArray() >= images.length-1 && page >= numPages">
         <i class="arrow-right"></i>
       </button>
     </div>

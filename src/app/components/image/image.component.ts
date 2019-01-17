@@ -42,6 +42,11 @@ export class ImageComponent implements OnInit {
   type: string;
   dysplasingGrade: string;
 
+  page: number;
+  pageSize = 12;
+  totalImages: number;
+  numPages: number;
+
   constructor(private route: ActivatedRoute,
               private galleriesService: GalleriesService,
               private imagesService: ImagesService,
@@ -57,27 +62,27 @@ export class ImageComponent implements OnInit {
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
+    const gallery_id = this.route.snapshot.paramMap.get('gallery_id');
+    this.page = Number(this.route.snapshot.queryParamMap.get('page'));
+
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
     this.ctx = this.canvas.getContext('2d');
 
-
-    // get gallery with images
-    this.galleriesService.getGalleryForImage(id).subscribe(gallery => {
+    this.galleriesService.getGallery(gallery_id).subscribe(gallery => {
       this.gallery = gallery;
-      // assign the gallery to the images
-      this.gallery.images.forEach(image => {
-          image.gallery = this.gallery;
+
+      this.imagesService.getImagesByGallery(gallery, this.page, this.pageSize).subscribe(images => {
+          this.images = images.images;
+          this.totalImages = images.totalItems;
+          this.numPages = this.totalImages / this.pageSize;
+          this.image = this.images.filter(image => {
+              return image.id === id;
+            }
+          )[0];
+          this.load();
+          this.getPolypRecordingInfo();
         }
       );
-      this.images = this.gallery.images;
-
-      this.image = this.gallery.images.filter(image => {
-          return image.id === id;
-        }
-      )[0];
-
-      this.load();
-      this.getPolypRecordingInfo();
     });
 
     // Mouseup
@@ -122,8 +127,10 @@ export class ImageComponent implements OnInit {
       this.image.polypLocation = location;
       this.notificationService.success('Location of the polyp stored correctly', 'Location of the polyp stored');
       this.reset();
-      if (this.getPositionInArray() < this.images.length - 1) {
-        this.move(+1);
+      if (this.getPositionInArray() === this.numberOfImages() && this.onLastPage()) {
+        this.notificationService.info('There are no more images in this gallery', 'No images remain');
+      } else {
+        this.toRight();
       }
     });
   }
@@ -139,22 +146,26 @@ export class ImageComponent implements OnInit {
     }
     this.imagesService.delete(this.image.id, this.observationToRemove).subscribe(() => {
       this.notificationService.success('Image removed successfully.', 'Image removed.');
-      this.images.splice(this.getPositionInArray(), 1);
-      if (this.images.length <= 0) {
+      if (this.images.length <= 0 && this.totalImages === 0) {
         this.notificationService.info('No images in this gallery', 'No images');
-        this.router.navigateByUrl('/gallery/' + this.gallery.id);
-      } else if (this.getPositionInArray() < this.images.length - 1) {
-        this.move(+1);
+        this.redirectToGallery();
+      } else {
+        const lastPosition = this.getPositionInArray();
+        const onLastImageOfPage = lastPosition === this.numberOfImages();
+        this.getImagesAndReloadImage((onLastImageOfPage && this.onLastPage()) ? lastPosition - 1 : lastPosition);
       }
+      this.images.splice(this.getPositionInArray(), 1);
+      this.totalImages = this.totalImages - 1;
       this.cancel();
     });
   }
 
-  cancel() {
-    this.deleting = false;
-    this.definingDeletion = false;
-    this.selected = null;
-    this.observationToRemove = null;
+  deleteLocation(id: string) {
+    this.imagesService.deleteLocation(id).subscribe(() => {
+        this.image.polypLocation = null;
+        this.notificationService.success('The location of the polyp has been correctly removed ', 'Polyp location removed');
+      }
+    );
   }
 
   getPositionInArray(): number {
@@ -165,11 +176,24 @@ export class ImageComponent implements OnInit {
       ));
   }
 
-  move(position: number) {
-    this.image = this.images[this.getPositionInArray() + position];
-    this.load();
-    this.getPolypRecordingInfo();
-    this.location.go('/image/' + this.image.id);
+  toLeft() {
+    if (this.getPositionInArray() <= 0 && this.page !== 1) {
+      this.page = this.page - 1;
+      this.getImagesAndReloadImage(this.numberOfImages());
+    } else {
+      this.reloadImage(this.getPositionInArray() - 1);
+    }
+    this.changeURL();
+  }
+
+  toRight() {
+    if (this.getPositionInArray() >= this.numberOfImages() && this.page < this.numPages) {
+      this.page = this.page + 1;
+      this.getImagesAndReloadImage(0);
+    } else {
+      this.reloadImage(this.getPositionInArray() + 1);
+    }
+    this.changeURL();
   }
 
   clear() {
@@ -177,16 +201,42 @@ export class ImageComponent implements OnInit {
     this.reset();
   }
 
-  back() {
-    this.router.navigateByUrl('gallery/' + this.gallery.id);
+  redirectToGallery() {
+    this.router.navigateByUrl('gallery/' + this.gallery.id + '?page=' + this.page);
   }
 
-  deleteLocation(id: string) {
-    this.imagesService.deleteLocation(id).subscribe(() => {
-        this.image.polypLocation = null;
-        this.notificationService.success('The location of the polyp has been correctly removed ', 'Polyp location removed');
+  cancel() {
+    this.deleting = false;
+    this.definingDeletion = false;
+    this.selected = null;
+    this.observationToRemove = null;
+  }
+
+  private changeURL() {
+    this.location.go('gallery/' + this.gallery.id + '/image/' + this.image.id + '?page=' + this.page);
+  }
+
+  private onLastPage(): boolean {
+    return this.page >= this.numPages;
+  }
+
+  private numberOfImages(): number {
+    return this.images.length - 1;
+  }
+
+  private getImagesAndReloadImage(position: number) {
+    this.imagesService.getImagesByGallery(this.gallery, this.page, this.pageSize).subscribe(images => {
+        this.images = images.images;
+        this.totalImages = images.totalItems;
+        this.reloadImage(position);
       }
     );
+  }
+
+  private reloadImage(position: number) {
+    this.image = this.images[position];
+    this.load();
+    this.getPolypRecordingInfo();
   }
 
   private load() {
@@ -203,8 +253,6 @@ export class ImageComponent implements OnInit {
       onLoad();
     };
     this.imageElement.src = 'data:image/png;base64,' + this.image.base64contents;
-
-
   }
 
   private repaint() {
@@ -247,7 +295,8 @@ export class ImageComponent implements OnInit {
   private getPolypRecordingInfo() {
     this.polypRecordingService.getPolypRecordingsByVideo(this.image.video.id).subscribe(polypRecordings => {
       for (const polypRecording of polypRecordings) {
-        if (this.image.numFrame >= polypRecording.start && this.image.numFrame <= polypRecording.end) {
+        const frame = Math.floor(this.image.numFrame / this.image.video.fps - 1);
+        if (frame >= polypRecording.start && frame <= polypRecording.end) {
           this.polypRecording = polypRecording;
           switch (polypRecording.polyp.histology.polypType) {
             case PolypType.ADENOMA:
@@ -276,6 +325,5 @@ export class ImageComponent implements OnInit {
       }
     });
   }
-
 
 }

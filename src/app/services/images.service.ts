@@ -10,6 +10,8 @@ import {IdAndUri} from './entities/IdAndUri';
 import {VideosService} from './videos.service';
 import {PolypLocation} from '../models/PolypLocation';
 import {PolypLocationInfo} from './entities/PolypLocationInfo';
+import {Gallery} from '../models/Gallery';
+import {ImagePage} from './entities/ImagePage';
 
 @Injectable({
   providedIn: 'root'
@@ -18,32 +20,6 @@ export class ImagesService {
 
   constructor(private http: HttpClient,
               private videosService: VideosService) {
-  }
-
-  getImage(id: string): Observable<Image> {
-    return this.http.get<ImageInfo>(`${environment.restApi}/image/${id}/metadata`)
-      .pipe(
-        concatMap(imageInfo =>
-          this.getImageContents(imageInfo.id).pipe(
-            map(base64contents => {
-              imageInfo.base64contents = base64contents;
-              return imageInfo;
-            })
-          )
-        )
-      )
-      .pipe(
-        concatMap(imageInfo =>
-          forkJoin(
-            this.videosService.getVideo((<IdAndUri> imageInfo.video).id),
-            this.getLocation(imageInfo.id).pipe(catchError((err) => err.status === 400 ? of(null) : throwError(err)))
-          ).pipe(
-            map(videoAndLocation =>
-              this.mapImageInfo(imageInfo, videoAndLocation[0], videoAndLocation[1])
-            )
-          )
-        )
-      );
   }
 
   getImageContents(id: string): Observable<string> {
@@ -79,6 +55,49 @@ export class ImagesService {
 
   deleteLocation(id: string) {
     return this.http.delete(`${environment.restApi}/image/${id}/polyplocation`);
+  }
+
+  getImagesByGallery(gallery: Gallery, page: number, pageSize: number): Observable<ImagePage> {
+    return this.http.get<ImageInfo[]>(`${environment.restApi}/image/gallery/${gallery.id}?page=${page}&pageSize=${pageSize}`,
+      {observe: 'response'})
+      .pipe(
+        concatMap(response => {
+            return this.videoAndLocationAndImagesContentsAndGallery(of(response.body), gallery).pipe(
+              map(images => {
+                  return {
+                    totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
+                    images: images
+                  };
+                }
+              ));
+          }
+        )
+      );
+  }
+
+  private videoAndLocationAndImagesContentsAndGallery(imageInfoObservable: Observable<ImageInfo[]>,
+                                                      gallery: Gallery): Observable<Image[]> {
+    return imageInfoObservable.pipe(
+      concatMap(imageInfos =>
+        forkJoin(
+          forkJoin(imageInfos.map(imageInfo => this.videosService.getVideo((<IdAndUri>imageInfo.video).id))),
+          forkJoin(imageInfos.map(imageInfo => this.getLocation(imageInfo.id)
+            .pipe(catchError((err) => err.status === 400 ? of(null) : throwError(err))))),
+          forkJoin(imageInfos.map(imageInfo => this.getImageContents(imageInfo.id)))
+        ).pipe(
+          map(videosAndLocationsAndImageContents =>
+            imageInfos.map((imageInfo, index) => {
+                imageInfo.base64contents = videosAndLocationsAndImageContents[2][index];
+                const image: Image = this.mapImageInfo(
+                  imageInfo, videosAndLocationsAndImageContents[0][index], videosAndLocationsAndImageContents[1][index]);
+                image.gallery = gallery;
+                return image;
+              }
+            )
+          )
+        )
+      )
+    );
   }
 
   private mapImageInfo(imageInfo: ImageInfo, video: Video, polypLocation: PolypLocation): Image {

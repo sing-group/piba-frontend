@@ -103,6 +103,7 @@ export class VideosService {
       polypRecording: [],
       isProcessing: videoInfo.processing,
       withText: videoInfo.withText,
+      fps: videoInfo.fps,
       exploration: (<IdAndUri>videoInfo.exploration).id
     };
   }
@@ -118,6 +119,7 @@ export class VideosService {
       })),
       processing: video.isProcessing,
       withText: video.withText,
+      fps: video.fps,
       exploration: video.exploration
     };
   }
