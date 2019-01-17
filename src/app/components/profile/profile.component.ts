@@ -12,16 +12,37 @@ import {AuthenticationService} from '../../services/authentication.service';
 export class ProfileComponent implements OnInit {
 
   loggedUser: Users = new Users();
+  password: string;
+  confirmPassword: string;
+  editingUser = false;
 
-  constructor(private usersServices: UsersService,
+  constructor(private usersService: UsersService,
               private notificationService: NotificationService,
               private authenticationService: AuthenticationService) {
   }
 
   ngOnInit() {
     if (this.authenticationService.getUser().authenticated) {
-      this.usersServices.getUser(this.authenticationService.getUser().login).subscribe(user => this.loggedUser = user);
+      this.usersService.getUser(this.authenticationService.getUser().login).subscribe(user => this.loggedUser = user);
     }
   }
 
+  edit() {
+    this.editingUser = true;
+    // to not show the password in the edition
+    this.loggedUser.password = '';
+  }
+
+  editUser() {
+    this.usersService.editUser(this.loggedUser).subscribe(updatedUser => {
+      this.editingUser = false;
+      if (this.loggedUser.password !== '') {
+        this.authenticationService.logOut();
+        this.authenticationService.logIn(this.loggedUser.login, this.loggedUser.password, this.loggedUser.role);
+      }
+      Object.assign(this.loggedUser, updatedUser);
+      this.confirmPassword = '';
+      this.notificationService.success('User edited successfully.', 'User edited.');
+    });
+  }
 }

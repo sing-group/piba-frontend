@@ -5,27 +5,71 @@
     </div>
     <div class="card-block">
       <section class="form-block">
-        <table class="table">
-          <tbody>
-          <tr>
-            <td class="left">Login</td>
-            <td class="left td-data">{{loggedUser.login}}</td>
-          </tr>
-          <tr>
-            <td class="left">Email</td>
-            <td class="left td-data">{{loggedUser.email}}</td>
-          </tr>
-          <tr>
-            <td class="left">Role</td>
-            <td class="left td-data">{{loggedUser.role}}</td>
-          </tr>
-          </tbody>
-        </table>
+        <form ngNativeValidate #userForm="ngForm">
+          <table class="table">
+            <tbody>
+            <tr>
+              <td class="left">Login</td>
+              <td class="left td-data">{{loggedUser.login}}</td>
+            </tr>
+
+            <tr>
+              <td class="left">Email</td>
+              <td class="left td-data" *ngIf="!editingUser">{{loggedUser.email}}</td>
+              <td *ngIf="editingUser" class="left td-data">
+                <input type="email" name="email" [(ngModel)]="loggedUser.email"
+                       required email #emailUser="ngModel"/>
+                <div *ngIf="emailUser.invalid && !emailUser.pristine" class="alert alert-danger">
+                  <div *ngIf="emailUser.errors.required">Email is required.</div>
+                  <div *ngIf="emailUser.errors.email">Invalid email format.</div>
+                </div>
+              </td>
+            </tr>
+
+            <div class="tr-password" [hidden]="!editingUser">
+              <td class="left">Password</td>
+              <td class="left td-data">
+                <input type="password" name="password"
+                       [(ngModel)]="loggedUser.password" minlength="6" #passwordUser="ngModel"/>
+                <div *ngIf="passwordUser.invalid && !passwordUser.pristine" class="alert alert-danger">
+                  <div *ngIf="passwordUser.errors.minlength && passwordUser.value !== ''">Password can't be shorter
+                    than 6 characters.
+                  </div>
+                </div>
+              </td>
+            </div>
+
+            <div class="tr-password" [hidden]="!editingUser">
+              <td class="left">Confirm Password</td>
+              <td class="left td-data">
+                <input type="password" name="confirmPassword"
+                       [(ngModel)]="confirmPassword" #confirmPasswordUser="ngModel"/>
+                <div *ngIf="passwordUser.value !== '' && passwordUser.value !== confirmPasswordUser.value &&
+                    !confirmPasswordUser.pristine" class="alert alert-danger">Passwords don't match
+                </div>
+              </td>
+            </div>
+
+            <tr>
+              <td class="left">Role</td>
+              <td class="left td-data">{{loggedUser.role}}</td>
+            </tr>
+
+            <button type="button" class="btn btn-secondary btn-profile" *ngIf="!editingUser" (click)="edit()">
+              <clr-icon shape="note"></clr-icon>
+              Edit information
+            </button>
+            <button type="button" class="btn btn-primary btn-profile" *ngIf="editingUser" (click)="editUser()"
+                    [disabled]="userForm.invalid || (passwordUser.value !== '' &&
+              passwordUser.value !== confirmPasswordUser.value)">
+              <clr-icon shape="cog"></clr-icon>
+              Save information
+            </button>
+            </tbody>
+          </table>
+        </form>
       </section>
     </div>
-    <button type="button" class="btn btn-secondary btn-profile">
-      <clr-icon shape="note"></clr-icon>
-      Edit information
-    </button>
   </div>
 </div>
+

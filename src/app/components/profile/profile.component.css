@@ -2,10 +2,23 @@
   border-color: white;
 }
 
+.table td {
+  vertical-align: middle;
+}
+
+.alert {
+  width: max-content;
+}
+
 .btn-profile {
-  margin: 0.6rem;
+  margin: 1.3rem 0 0.3rem 0;
 }
 
 .td-data {
   width: 60%;
+}
+
+.tr-password {
+  display: table-row;
+  border-color: inherit;
 }
