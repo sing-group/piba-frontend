@@ -126,9 +126,27 @@ export class NonEpithelialNeoplasticInfo extends PolypHistologyInfo {
 
 export function isNonEpithelialNeoplasticInfo(object: any): object is NonEpithelialNeoplasticInfo {
   return isPolypHistologyInfo(object) && (
-    object instanceof HyperplasticInfo
+    object instanceof NonEpithelialNeoplasticInfo
     || (
       object.polypType === EnumUtils.findKeyForValue(PolypType, PolypType.NON_EPITHELIAL_NEOPLASTIC
+      )
+    )
+  );
+}
+
+export class NoHistologyInfo extends PolypHistologyInfo {
+  private ___attribute_to_differentiate_from_PolypHistologyInfo: string;
+
+  constructor() {
+    super(EnumUtils.findKeyForValue(PolypType, PolypType.NO_HISTOLOGY));
+  }
+}
+
+export function isNoHistologyInfo(object: any): object is NonEpithelialNeoplasticInfo {
+  return isPolypHistologyInfo(object) && (
+    object instanceof NoHistologyInfo
+    || (
+      object.polypType === EnumUtils.findKeyForValue(PolypType, PolypType.NO_HISTOLOGY
       )
     )
   );

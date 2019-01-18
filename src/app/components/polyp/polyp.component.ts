@@ -13,7 +13,7 @@ import {
   Invasive,
   isAdenoma,
   isSSA,
-  isTSA, NonEpithelialNeoplastic,
+  isTSA, NoHistology, NonEpithelialNeoplastic,
   PolypHistology,
   PolypType,
   SSA,
@@ -104,6 +104,9 @@ export class PolypComponent implements OnInit {
         break;
       case PolypType.NON_EPITHELIAL_NEOPLASTIC:
         this.polyp.histology = new NonEpithelialNeoplastic();
+        break;
+      case PolypType.NO_HISTOLOGY:
+        this.polyp.histology = new NoHistology();
         break;
     }
   }

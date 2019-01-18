@@ -6,7 +6,8 @@ export enum PolypType {
   HYPERPLASTIC = 'Hyperplastic polyp',
   SESSILE_SERRATED_ADENOMA = 'Sessile serrated adenoma',
   TRADITIONAL_SERRATED_ADENOMA = 'Traditional serrated adenoma',
-  NON_EPITHELIAL_NEOPLASTIC = 'Non-epithelial/Non-neoplastic'
+  NON_EPITHELIAL_NEOPLASTIC = 'Non-epithelial/Non-neoplastic',
+  NO_HISTOLOGY = 'No histology'
 }
 
 export enum AdenomaType {
@@ -121,5 +122,11 @@ export function isTSA(object: any): object is TSA {
 export class NonEpithelialNeoplastic extends PolypHistology {
   constructor() {
     super(PolypType.NON_EPITHELIAL_NEOPLASTIC);
+  }
+}
+
+export class NoHistology extends PolypHistology {
+  constructor() {
+    super(PolypType.NO_HISTOLOGY);
   }
 }
