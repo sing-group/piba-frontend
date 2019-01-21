@@ -62,7 +62,6 @@ export class VideoEditorComponent implements OnInit {
         this.explorationsService.getPolyps(this.video.exploration).subscribe(polyps => this.polyps = polyps);
         this.polypRecordingsService.getPolypRecordingsByVideo(video.id).subscribe(polypRecordings => {
             this.video.polypRecording = polypRecordings;
-            polypRecordings.map(polypRecording => this.cleanAlreadySelectedPolyps(polypRecording.polyp.name));
             this.selectedPolyp = this.polyps[0];
           }
         );
@@ -124,6 +123,7 @@ export class VideoEditorComponent implements OnInit {
 
   addPolypRecording() {
     this.polypRecording = {
+      id: null,
       video: this.video,
       polyp: this.selectedPolyp,
       start: this.timeToNumber.transform(this.start),
@@ -135,25 +135,14 @@ export class VideoEditorComponent implements OnInit {
           this.video.polypRecording = this.video.polypRecording.concat(polypRecording);
           this.start = null;
           this.end = null;
-          this.cleanAlreadySelectedPolyps(this.selectedPolyp.name);
           this.selectedPolyp = this.polyps[0];
           this.notificationService.success('Polyp recording registered successfully.', 'Polyp recording registered');
         }
       );
   }
 
-  private cleanAlreadySelectedPolyps(namePolyp: string) {
-    const polypRemove = this.polyps.indexOf(
-      this.polyps.find((polyp) => polyp.name === namePolyp)
-    );
-    if (polypRemove > -1) {
-      this.polyps.splice(polypRemove, 1);
-    }
-  }
-
   removePolypRecording(polypRecording: PolypRecording) {
     this.polypRecordingsService.removePolypRecording(polypRecording).subscribe(() => {
-        this.polyps.push(polypRecording.polyp);
         const index = this.video.polypRecording.indexOf(
           this.video.polypRecording.find(
             (polypRecordingFind) => polypRecordingFind === polypRecording));

@@ -75,11 +75,12 @@ export class PolypRecordingsService {
   }
 
   removePolypRecording(polypRecording: PolypRecording) {
-    return this.http.delete(`${environment.restApi}/polyprecording/` + polypRecording.video.id + '/' + polypRecording.polyp.id);
+    return this.http.delete(`${environment.restApi}/polyprecording/` + polypRecording.id);
   }
 
   private mapPolypRecordingInfo(polypRecordingInfo: PolypRecordingInfo, video: Video, polyp: Polyp): PolypRecording {
     return {
+      id: polypRecordingInfo.id,
       video: video,
       polyp: polyp,
       start: polypRecordingInfo.start,
@@ -89,6 +90,7 @@ export class PolypRecordingsService {
 
   private toPolypRecordingInfo(polypRecording: PolypRecording): PolypRecordingInfo {
     return {
+      id: polypRecording.id,
       video: polypRecording.video.id,
       polyp: polypRecording.polyp.id,
       start: polypRecording.start,
