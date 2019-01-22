@@ -121,6 +121,10 @@ export class VideoEditorComponent implements OnInit {
     this.modalOpened = false;
   }
 
+  nameIsUsed(): Boolean {
+    return this.polyps.find((polyp) => polyp.name === this.newPolyp.name) !== undefined;
+  }
+
   addPolypRecording() {
     this.polypRecording = {
       id: null,

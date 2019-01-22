@@ -83,12 +83,17 @@
               <div class="form-control">
                 <label for="polyp-form-name" class="required">Name</label>
                 <input type="text" id="polyp-form-name" [(ngModel)]="newPolyp.name" name="name" required
-                       pattern="[a-zA-ZñÑ0-9_\s]+" title="Must be a alphanumeric"
+                       pattern="[a-zA-ZñÑ0-9_\s]+" title="Must be a alphanumeric" #namePolyp="ngModel"
                 />
+                <div *ngIf="namePolyp.errors && !namePolyp.pristine" class="alert alert-danger">
+                  <div *ngIf="namePolyp.errors.required">Name is required.</div>
+                  <div *ngIf="namePolyp.errors.pattern">Name can only contain letters, numbers or underscore.</div>
+                </div>
+                <div *ngIf="nameIsUsed()" class="alert alert-danger">This name is already being used</div>
               </div>
             </div>
             <div class="modal-footer">
-              <button class="btn btn-primary" type="submit">
+              <button class="btn btn-primary" type="submit" [disabled]="nameIsUsed() || namePolyp.invalid">
                 <clr-icon shape="plus"></clr-icon>
                 Add
               </button>

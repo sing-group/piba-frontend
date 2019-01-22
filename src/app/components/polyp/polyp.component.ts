@@ -51,6 +51,8 @@ export class PolypComponent implements OnInit {
 
   polyp: Polyp = new Polyp();
   polypType: PolypType = null;
+  // to check if name is used in the edition
+  polypName: String;
 
   currentTime: number;
   videoHTML: HTMLMediaElement;
@@ -147,6 +149,7 @@ export class PolypComponent implements OnInit {
     this.deletingPolyp = false;
     this.polyp = new Polyp();
     this.polypType = null;
+    this.polypName = '';
     this.assignPolypName();
   }
 
@@ -172,10 +175,19 @@ export class PolypComponent implements OnInit {
     }
   }
 
+  nameIsUsed(): Boolean {
+    if (this.creatingPolyp) {
+      return this.polyps.find((polyp) => polyp.name === this.polyp.name) !== undefined;
+    } else {
+      return this.polyps.find((polyp) => polyp.name === this.polyp.name) !== undefined && this.polyp.name !== this.polypName;
+    }
+  }
+
   editPolyp(id: string) {
     this.editingPolyp = true;
     this.polyp = new Polyp();
     Object.assign(this.polyp, this.exploration.polyps.find(polyp => polyp.id === id));
+    this.polypName = this.polyp.name;
     this.polypType = this.polyp.histology.polypType;
   }
 
