@@ -174,7 +174,7 @@
           <div *ngIf="namePolyp.invalid && !namePolyp.pristine" class="alert alert-danger complete-space">
             <div *ngIf="namePolyp?.errors.required">Name is required.</div>
           </div>
-          <div *ngIf="nameIsUsed()" class="alert alert-danger">This name is already being used</div>
+          <div *ngIf="nameIsUsed()" class="alert alert-danger complete-space">This name is already being used</div>
         </div>
         <div class="form-group">
           <label for="polyp-form-size">Size (mm)</label>
