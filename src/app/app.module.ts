@@ -38,7 +38,8 @@ import {GalleryComponent} from './components/gallery/gallery.component';
 import {SafehtmlPipe} from './pipes/safehtml.pipe';
 import {ImageComponent} from './components/image/image.component';
 import {ProfileComponent} from './components/profile/profile.component';
-import { GalleriesComponent } from './components/galleries/galleries.component';
+import {GalleriesComponent} from './components/galleries/galleries.component';
+import {ModifiersComponent} from './components/modifiers/modifiers.component';
 
 @NgModule({
   declarations: [
@@ -61,7 +62,8 @@ import { GalleriesComponent } from './components/galleries/galleries.component';
     SafehtmlPipe,
     ImageComponent,
     ProfileComponent,
-    GalleriesComponent
+    GalleriesComponent,
+    ModifiersComponent
   ],
   imports: [
     BrowserModule,

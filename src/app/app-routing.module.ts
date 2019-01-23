@@ -12,8 +12,12 @@ import {GalleryComponent} from './components/gallery/gallery.component';
 import {ImageComponent} from './components/image/image.component';
 import {ProfileComponent} from './components/profile/profile.component';
 import {GalleriesComponent} from './components/galleries/galleries.component';
+import {ModifiersComponent} from './components/modifiers/modifiers.component';
 
 const routes: Routes = [
+  {
+    path: 'modifiers', component: ModifiersComponent, canActivate: [AuthGuard]
+  },
   {
     path: 'galleries', component: GalleriesComponent, canActivate: [AuthGuard]
   },
