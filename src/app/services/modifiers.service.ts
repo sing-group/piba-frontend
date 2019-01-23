@@ -28,10 +28,25 @@ export class ModifiersService {
       );
   }
 
+  createModifier(modifier: Modifier): Observable<Modifier> {
+    const modifierInfo = this.toModifierInfo(modifier);
+    return this.http.post<ModifierInfo>(`${environment.restApi}/modifier`, modifierInfo)
+      .pipe(
+        map(this.mapModifierInfo.bind(this))
+      );
+  }
+
   private mapModifierInfo(modifierInfo: ModifierInfo): Modifier {
     return {
       id: modifierInfo.id,
       name: modifierInfo.name
+    };
+  }
+
+  private toModifierInfo(modifier: Modifier): ModifierInfo {
+    return {
+      id: modifier.id,
+      name: modifier.name
     };
   }
 }

@@ -1,9 +1,32 @@
 <div class="clr-row clr-justify-content-end">
-  <button type="button" class="btn btn-primary">
+  <button type="button" class="btn btn-primary" (click)="creatingModifier=true">
     <clr-icon shape="plus"></clr-icon>
     Add Modifier
   </button>
 </div>
+
+<form ngNativeValidate #modifierForm="ngForm" (submit)="save()">
+  <clr-modal [(clrModalOpen)]="creatingModifier" [clrModalClosable]="false">
+    <h3 class="modal-title" *ngIf="creatingModifier">Add Modifier</h3>
+    <div class="modal-body">
+      <section class="form-block">
+        <div class="form-group">
+          <label for="modifier-form-name" class="required">Name</label>
+          <input type="text" id="modifier-form-name" name="name" [(ngModel)]="modifier.name" required
+                 pattern="[a-zA-ZñÑ0-9_\s]+" title="Must be a alphanumeric" #nameModifier="ngModel"
+          />
+        </div>
+      </section>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
+      <button type="submit" class="btn btn-primary"
+              [disabled]="nameModifier.invalid ">
+        Ok
+      </button>
+    </div>
+  </clr-modal>
+</form>
 
 <clr-datagrid>
 
