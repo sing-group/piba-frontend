@@ -34,7 +34,7 @@ export class ImageComponent implements OnInit {
 
   deleting = false;
   definingDeletion = false;
-  options = ['Not polyp', 'Bad quality', 'Polyp error information', 'Others'];
+  options = ['Not polyp', 'Bad quality', 'Others'];
   selected: string;
   observationToRemove: string = null;
 
