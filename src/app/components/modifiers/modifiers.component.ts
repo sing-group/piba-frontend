@@ -11,6 +11,7 @@ import {ModifiersService} from '../../services/modifiers.service';
 export class ModifiersComponent implements OnInit {
 
   creatingModifier = false;
+  deletingModifier = false;
   modifier: Modifier = new Modifier();
 
   modifiers: Modifier[] = [];
@@ -31,9 +32,26 @@ export class ModifiersComponent implements OnInit {
       });
   }
 
+  delete(id: string) {
+    this.modifiersService.deleteModifier(id).subscribe(() => {
+      const index = this.modifiers.indexOf(
+        this.modifiers.find((modifier) => modifier.id === id)
+      );
+      this.modifiers.splice(index, 1);
+      this.notificationService.success('Modifier removed successfully.', 'Modifier removed.');
+    });
+    this.cancel();
+  }
+
+  remove(id: string) {
+    this.deletingModifier = true;
+    this.modifier = this.modifiers.find((modifier) => modifier.id === id);
+  }
+
   cancel() {
     this.modifier = new Modifier();
     this.creatingModifier = false;
+    this.deletingModifier = false;
   }
 
 }

@@ -43,7 +43,7 @@
           <clr-icon shape="cog"></clr-icon>
           <span class="clr-icon-title">Settings</span>
         </button>
-        <button class="btn">
+        <button class="btn" (click)="remove(modifier.id)">
           <clr-icon shape="trash"></clr-icon>
           <span class="clr-icon-title">Delete</span>
         </button>
@@ -57,3 +57,9 @@
     </clr-dg-pagination>
   </clr-dg-footer>
 </clr-datagrid>
+
+<!-- Delete confirmation modal -->
+<app-delete-confirmation *ngIf="deletingModifier" [modelName]="'modifier'" [id]="modifier.id" [name]="modifier.name"
+                         [cancel]="cancel.bind(this)" [delete]="delete.bind(this)"
+>
+</app-delete-confirmation>

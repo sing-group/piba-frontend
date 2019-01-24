@@ -36,6 +36,10 @@ export class ModifiersService {
       );
   }
 
+  deleteModifier(id: string) {
+    return this.http.delete(`${environment.restApi}/modifier/${id}`);
+  }
+
   private mapModifierInfo(modifierInfo: ModifierInfo): Modifier {
     return {
       id: modifierInfo.id,
