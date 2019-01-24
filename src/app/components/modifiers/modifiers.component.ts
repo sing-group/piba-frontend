@@ -11,6 +11,7 @@ import {ModifiersService} from '../../services/modifiers.service';
 export class ModifiersComponent implements OnInit {
 
   creatingModifier = false;
+  editingModifier = false;
   deletingModifier = false;
   modifier: Modifier = new Modifier();
 
@@ -24,12 +25,27 @@ export class ModifiersComponent implements OnInit {
   }
 
   save() {
-    this.modifiersService.createModifier(this.modifier).subscribe(
-      (newModifier) => {
-        this.modifiers = this.modifiers.concat(newModifier);
-        this.notificationService.success('Modifier registered successfully.', 'Modifier registered.');
-        this.cancel();
-      });
+    if (this.creatingModifier) {
+      this.modifiersService.createModifier(this.modifier).subscribe(
+        (newModifier) => {
+          this.modifiers = this.modifiers.concat(newModifier);
+          this.notificationService.success('Modifier registered successfully.', 'Modifier registered.');
+          this.cancel();
+        });
+    } else {
+      this.modifiersService.editModifier(this.modifier).subscribe(updated => {
+          Object.assign(this.modifiers.find((modifier) => modifier.id === this.modifier.id), updated);
+          this.notificationService.success('Modifier edited successfully.', 'Modifier edited.');
+          this.cancel();
+        }
+      );
+    }
+  }
+
+  edit(id: string) {
+    this.editingModifier = true;
+    this.modifier = new Modifier();
+    Object.assign(this.modifier, this.modifiers.find((modifier) => modifier.id === id));
   }
 
   delete(id: string) {
@@ -51,6 +67,7 @@ export class ModifiersComponent implements OnInit {
   cancel() {
     this.modifier = new Modifier();
     this.creatingModifier = false;
+    this.editingModifier = false;
     this.deletingModifier = false;
   }
 

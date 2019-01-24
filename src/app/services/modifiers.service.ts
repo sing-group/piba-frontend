@@ -36,6 +36,14 @@ export class ModifiersService {
       );
   }
 
+  editModifier(modifier: Modifier): Observable<Modifier> {
+    const modifierInfo = this.toModifierInfo(modifier);
+    return this.http.put<ModifierInfo>(`${environment.restApi}/modifier/${modifierInfo.id}`, modifierInfo)
+      .pipe(
+        map(this.mapModifierInfo.bind(this))
+      );
+  }
+
   deleteModifier(id: string) {
     return this.http.delete(`${environment.restApi}/modifier/${id}`);
   }

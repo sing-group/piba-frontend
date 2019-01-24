@@ -6,8 +6,9 @@
 </div>
 
 <form ngNativeValidate #modifierForm="ngForm" (submit)="save()">
-  <clr-modal [(clrModalOpen)]="creatingModifier" [clrModalClosable]="false">
-    <h3 class="modal-title" *ngIf="creatingModifier">Add Modifier</h3>
+  <clr-modal [(clrModalOpen)]="creatingModifier || editingModifier" [clrModalClosable]="false">
+    <h3 class="modal-title" *ngIf="creatingModifier">Add modifier</h3>
+    <h3 class="modal-title" *ngIf="editingModifier">Edit modifier</h3>
     <div class="modal-body">
       <section class="form-block">
         <div class="form-group">
@@ -39,7 +40,7 @@
     <clr-dg-cell>{{modifier.name}}</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-link btn-icon">
-        <button class="btn">
+        <button class="btn" (click)="edit(modifier.id)">
           <clr-icon shape="cog"></clr-icon>
           <span class="clr-icon-title">Settings</span>
         </button>
