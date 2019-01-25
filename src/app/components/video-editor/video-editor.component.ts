@@ -26,7 +26,7 @@ export class VideoEditorComponent implements OnInit {
 
   newPolyp: Polyp = new Polyp();
   polyps: Polyp[] = [];
-  selectedPolyp: Polyp;
+  selectedPolyp: Polyp = new Polyp();
 
   polypRecording: PolypRecording;
 
@@ -62,7 +62,6 @@ export class VideoEditorComponent implements OnInit {
         this.explorationsService.getPolyps(this.video.exploration).subscribe(polyps => this.polyps = polyps);
         this.polypRecordingsService.getPolypRecordingsByVideo(video.id).subscribe(polypRecordings => {
             this.video.polypRecording = polypRecordings;
-            this.selectedPolyp = this.polyps[0];
           }
         );
       });
@@ -139,7 +138,7 @@ export class VideoEditorComponent implements OnInit {
           this.video.polypRecording = this.video.polypRecording.concat(polypRecording);
           this.start = null;
           this.end = null;
-          this.selectedPolyp = this.polyps[0];
+          this.selectedPolyp = null;
           this.notificationService.success('Polyp recording registered successfully.', 'Polyp recording registered');
         }
       );
