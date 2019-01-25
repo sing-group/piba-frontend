@@ -5,7 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 import {PolypLocation} from '../../models/PolypLocation';
 import {ImagesService} from '../../services/images.service';
 import {Image} from '../../models/Image';
-import {State} from '@clr/angular';
+import {ClrDatagridStateInterface} from '@clr/angular';
 
 @Component({
   selector: 'app-gallery',
@@ -39,7 +39,7 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  refreshPage(state: State) {
+  refreshPage(state: ClrDatagridStateInterface) {
     this.images = [];
     if (state.page !== undefined) {
       this.page = (state.page.from / state.page.size) + 1;

@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {State} from '@clr/angular';
+import {ClrDatagridStateInterface} from '@clr/angular';
 import {ExplorationsService} from '../../services/explorations.service';
 import {Exploration} from '../../models/Exploration';
 import {PatientsService} from '../../services/patients.service';
@@ -138,7 +138,7 @@ export class ExplorationsComponent implements OnInit {
   }
 
   // It is executed when the page is changed in the view
-  refreshPage(state: State) {
+  refreshPage(state: ClrDatagridStateInterface) {
     if (state.page !== undefined) {
       this.currentPage = (state.page.from / state.page.size) + 1;
       this.getPageExplorations();
