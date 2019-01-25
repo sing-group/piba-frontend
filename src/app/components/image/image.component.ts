@@ -10,6 +10,8 @@ import {Location} from '@angular/common';
 import {PolypRecordingsService} from '../../services/polyprecordings.service';
 import {PolypRecording} from '../../models/PolypRecording';
 import {Adenoma, PolypType, SSA, TSA} from '../../models/PolypHistology';
+import {AuthenticationService} from '../../services/authentication.service';
+import {Role} from '../../models/User';
 
 @Component({
   selector: 'app-image',
@@ -41,6 +43,7 @@ export class ImageComponent implements OnInit {
   polypRecording: PolypRecording;
   type: string;
   dysplasingGrade: string;
+  role = Role;
 
   page: number;
   pageSize = 12;
@@ -53,7 +56,8 @@ export class ImageComponent implements OnInit {
               private notificationService: NotificationService,
               private location: Location,
               private router: Router,
-              private polypRecordingService: PolypRecordingsService) {
+              private polypRecordingService: PolypRecordingsService,
+              public authenticationService: AuthenticationService) {
     this.imageElement = document.createElement('img');
     // Needed for Chrome
     document.body.appendChild(this.imageElement);

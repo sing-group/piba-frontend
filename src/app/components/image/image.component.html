@@ -15,7 +15,7 @@
       <div align="center">
         <canvas id="canvas"></canvas>
       </div>
-      <div align="center">
+      <div align="center" *ngIf="authenticationService.getRole() == role.ENDOSCOPIST">
         <button class="btn btn-success" (click)="save()"
                 [disabled]="last_mousex == null && last_mousey == null && width==null && height==null">
           <clr-icon shape="plus"></clr-icon>
@@ -40,7 +40,7 @@
     </div>
   </div>
 
-  <div *ngIf="polypRecording" class="card">
+  <div *ngIf="polypRecording && authenticationService.getRole() != role.ENDOSCOPIST" class="card">
     <div class="clr-row margin-row">
       <div class="col-lg-2 col-sm-3 col-xs-4">
         <label class="txt-strong" for="polyp-name">Name</label>

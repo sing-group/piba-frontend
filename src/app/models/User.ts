@@ -71,5 +71,6 @@ export class User {
 
 export enum Role {
   ADMIN = 'ADMIN',
-  USER = 'USER'
+  USER = 'USER',
+  ENDOSCOPIST = 'ENDOSCOPIST'
 }

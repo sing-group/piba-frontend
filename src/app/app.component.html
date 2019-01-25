@@ -25,7 +25,7 @@
         <a class="nav-link " routerLink="/idspace" *ngIf="authenticationService.getRole() == role.ADMIN">ID
           Spaces</a>
         <a class="nav-link " routerLink="/users" *ngIf="authenticationService.getRole() == role.ADMIN">Users</a>
-        <a class="nav-link " routerLink="/galleries" *ngIf="authenticationService.getRole() == role.ADMIN">Galleries</a>
+        <a class="nav-link " routerLink="/galleries">Galleries</a>
         <a class="nav-link " routerLink="/modifiers" *ngIf="authenticationService.getRole() == role.ADMIN">Modifiers</a>
       </section>
     </nav>
