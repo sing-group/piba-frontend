@@ -12,6 +12,9 @@ import {AuthenticationService} from '../../services/authentication.service';
 })
 export class GalleriesComponent implements OnInit {
 
+  creatingGallery = false;
+  gallery: Gallery = new Gallery();
+
   galleries: Gallery[] = [];
   role = Role;
 
@@ -22,6 +25,20 @@ export class GalleriesComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  save() {
+    this.galleriesService.createGallery(this.gallery).subscribe(
+      (newGallery) => {
+        this.galleries = this.galleries.concat(newGallery);
+        this.notificationService.success('Gallery registered successfully.', 'Gallery registered.');
+        this.cancel();
+      });
+  }
+
+  cancel() {
+    this.gallery = new Gallery();
+    this.creatingGallery = false;
   }
 
 }

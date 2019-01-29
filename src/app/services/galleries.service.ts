@@ -28,11 +28,27 @@ export class GalleriesService {
     ));
   }
 
+  createGallery(gallery: Gallery): Observable<Gallery> {
+    const galleryInfo = this.toGalleryInfo(gallery, null);
+    return this.http.post<GalleryInfo>(`${environment.restApi}/gallery`, galleryInfo)
+      .pipe(
+        map(this.mapGalleryInfo.bind(this))
+      );
+  }
+
   private mapGalleryInfo(galleryInfo: GalleryInfo, images: Image[]): Gallery {
     return {
       id: galleryInfo.id,
       title: galleryInfo.title,
       description: galleryInfo.description,
+    };
+  }
+
+  private toGalleryInfo(gallery: Gallery, images: Image[]): Gallery {
+    return {
+      id: gallery.id,
+      title: gallery.title,
+      description: gallery.description,
     };
   }
 }
