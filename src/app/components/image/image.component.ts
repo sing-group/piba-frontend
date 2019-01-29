@@ -36,6 +36,8 @@ export class ImageComponent implements OnInit {
 
   deleting = false;
   definingDeletion = false;
+  warningMessage = false;
+  right = false;
   options = ['Not polyp', 'Bad quality', 'Others'];
   selected: string;
   observationToRemove: string = null;
@@ -180,6 +182,31 @@ export class ImageComponent implements OnInit {
       ));
   }
 
+  checkLocationSaved() {
+    const locationSaved = this.image.polypLocation;
+    // if polyp is selected
+    if (this.authenticationService.getRole() === this.role.ENDOSCOPIST && (this.last_mousex != null || this.last_mousey != null ||
+      this.width != null || this.height != null)) {
+      // if polyp wasn't saved
+      if (locationSaved == null || (this.last_mousex !== locationSaved.x || this.last_mousey !== locationSaved.y ||
+        this.width !== locationSaved.width || this.height !== locationSaved.height)) {
+        this.warningMessage = true;
+      } else {
+        this.changeImage();
+      }
+    } else {
+      this.changeImage();
+    }
+  }
+
+  changeImage() {
+    if (this.right === true) {
+      this.toRight();
+    } else {
+      this.toLeft();
+    }
+  }
+
   toLeft() {
     if (this.getPositionInArray() <= 0 && this.page !== 1) {
       this.page = this.page - 1;
@@ -188,6 +215,7 @@ export class ImageComponent implements OnInit {
       this.reloadImage(this.getPositionInArray() - 1);
     }
     this.changeURL();
+    this.cancel();
   }
 
   toRight() {
@@ -198,6 +226,7 @@ export class ImageComponent implements OnInit {
       this.reloadImage(this.getPositionInArray() + 1);
     }
     this.changeURL();
+    this.cancel();
   }
 
   clear() {
@@ -214,6 +243,8 @@ export class ImageComponent implements OnInit {
     this.definingDeletion = false;
     this.selected = null;
     this.observationToRemove = null;
+    this.warningMessage = false;
+    this.right = false;
   }
 
   private changeURL() {

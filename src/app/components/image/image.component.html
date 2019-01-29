@@ -7,7 +7,7 @@
   </div>
   <div class="clr-row container">
     <div class="clr-col-1 container-move">
-      <button class="btn btn-link" (click)="toLeft()" [disabled]="getPositionInArray() <= 0 && page == 1">
+      <button class="btn btn-link" (click)="checkLocationSaved()" [disabled]="getPositionInArray() <= 0 && page == 1">
         <i class="arrow-left"></i>
       </button>
     </div>
@@ -33,7 +33,7 @@
       </div>
     </div>
     <div class="clr-col-1 container-move">
-      <button class="btn btn-link" (click)="toRight()"
+      <button class="btn btn-link" (click)="right = true; checkLocationSaved()"
               [disabled]="getPositionInArray() >= images.length-1 && page >= numPages">
         <i class="arrow-right"></i>
       </button>
@@ -166,6 +166,19 @@
                            [name]="'this image'" [cancel]="cancel.bind(this)" [delete]="delete.bind(this)"
   >
   </app-delete-confirmation>
+
+  <clr-modal [(clrModalOpen)]="warningMessage" [clrModalClosable]="false">
+    <h3 class="modal-title">Warning</h3>
+    <div class="modal-body">
+      The polyp location has not been saved. Are you sure you want to continue?
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
+      <button type="button" class="btn btn-danger-outline" (click)="changeImage()">
+        Continue
+      </button>
+    </div>
+  </clr-modal>
 
 </div>
 
