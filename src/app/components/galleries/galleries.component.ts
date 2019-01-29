@@ -13,6 +13,7 @@ import {AuthenticationService} from '../../services/authentication.service';
 export class GalleriesComponent implements OnInit {
 
   creatingGallery = false;
+  editingGallery = false;
   gallery: Gallery = new Gallery();
 
   galleries: Gallery[] = [];
@@ -28,17 +29,33 @@ export class GalleriesComponent implements OnInit {
   }
 
   save() {
-    this.galleriesService.createGallery(this.gallery).subscribe(
-      (newGallery) => {
-        this.galleries = this.galleries.concat(newGallery);
-        this.notificationService.success('Gallery registered successfully.', 'Gallery registered.');
-        this.cancel();
-      });
+    if (this.creatingGallery) {
+      this.galleriesService.createGallery(this.gallery).subscribe(
+        (newGallery) => {
+          this.galleries = this.galleries.concat(newGallery);
+          this.notificationService.success('Gallery registered successfully.', 'Gallery registered.');
+          this.cancel();
+        });
+    } else {
+      this.galleriesService.editGallery(this.gallery).subscribe(updated => {
+          Object.assign(this.galleries.find((gallery) => gallery.id === this.gallery.id), updated);
+          this.notificationService.success('Gallery edited successfully.', 'Gallery edited.');
+          this.cancel();
+        }
+      );
+    }
+  }
+
+  edit(id: string) {
+    this.editingGallery = true;
+    this.gallery = new Gallery();
+    Object.assign(this.gallery, this.galleries.find((gallery) => gallery.id === id));
   }
 
   cancel() {
     this.gallery = new Gallery();
     this.creatingGallery = false;
+    this.editingGallery = false;
   }
 
 }

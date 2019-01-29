@@ -6,8 +6,9 @@
 </div>
 
 <form ngNativeValidate #galleryForm="ngForm" (submit)="save()">
-  <clr-modal [(clrModalOpen)]="creatingGallery" [clrModalClosable]="false">
+  <clr-modal [(clrModalOpen)]="creatingGallery || editingGallery" [clrModalClosable]="false">
     <h3 class="modal-title" *ngIf="creatingGallery">Add gallery</h3>
+    <h3 class="modal-title" *ngIf="editingGallery">Edit gallery</h3>
     <div class="modal-body">
       <section class="form-block">
         <div class="form-group">
@@ -50,7 +51,7 @@
           <clr-icon shape="eye"></clr-icon>
           <span class="clr-icon-title">View</span>
         </button>
-        <button class="btn" *ngIf="authenticationService.getRole() == role.ADMIN">
+        <button class="btn" (click)="edit(gallery.id)" *ngIf="authenticationService.getRole() == role.ADMIN">
           <clr-icon shape="cog"></clr-icon>
           <span class="clr-icon-title">Settings</span>
         </button>

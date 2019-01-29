@@ -36,6 +36,14 @@ export class GalleriesService {
       );
   }
 
+  editGallery(gallery: Gallery): Observable<Gallery> {
+    const galleryInfo = this.toGalleryInfo(gallery, null);
+    return this.http.put<GalleryInfo>(`${environment.restApi}/gallery/${galleryInfo.id}`, galleryInfo)
+      .pipe(
+        map(this.mapGalleryInfo.bind(this))
+      );
+  }
+
   private mapGalleryInfo(galleryInfo: GalleryInfo, images: Image[]): Gallery {
     return {
       id: galleryInfo.id,
