@@ -1,4 +1,4 @@
-<span class="spinner" *ngIf="!images">
+<span class="spinner" *ngIf="!identifiers">
     Loading...
 </span>
 <div [hidden]="image.id == null">
@@ -7,7 +7,8 @@
   </div>
   <div class="clr-row container">
     <div class="clr-col-1 container-move">
-      <button class="btn btn-link" (click)="checkLocationSaved()" [disabled]="getPositionInArray() <= 0 && page == 1">
+      <button class="btn btn-link" (click)="selectedToRight = false; checkIfLocationSavedAndScrollImage()"
+              [disabled]="isFirstImage">
         <i class="arrow-left"></i>
       </button>
     </div>
@@ -22,7 +23,7 @@
           Save
         </button>
         <button class="btn btn-primary"
-                (click)="clear(); image.polypLocation != null ? deleteLocation(image.id) : false;">
+                (click)="cleanCanvas(); image.polypLocation != null ? deleteLocation(image.id) : false;">
           <clr-icon shape="refresh"></clr-icon>
           Clear
         </button>
@@ -33,8 +34,8 @@
       </div>
     </div>
     <div class="clr-col-1 container-move">
-      <button class="btn btn-link" (click)="right = true; checkLocationSaved()"
-              [disabled]="getPositionInArray() >= images.length-1 && page >= numPages">
+      <button class="btn btn-link" (click)="selectedToRight = true; checkIfLocationSavedAndScrollImage()"
+              [disabled]="isLastImage">
         <i class="arrow-right"></i>
       </button>
     </div>
@@ -148,8 +149,8 @@
             </div>
           </div>
           <div *ngIf="selected == 'Others'" class="form-group">
-            <label>Describe the reason </label>
-            <input type="text" name="observationToRemove" [(ngModel)]="observationToRemove"/>
+            <label for="observationToRemove">Describe the reason </label>
+            <input type="text" id="observationToRemove" name="observationToRemove" [(ngModel)]="observationToRemove"/>
           </div>
         </section>
       </form>
@@ -173,8 +174,8 @@
       The polyp location has not been saved. Are you sure you want to continue?
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
-      <button type="button" class="btn btn-danger-outline" (click)="changeImage()">
+      <button type="button" class="btn btn-outline" (click)="warningMessage = false;">Cancel</button>
+      <button type="button" class="btn btn-danger-outline" (click)="warningMessage = false; toLeftOrToRight()">
         Continue
       </button>
     </div>

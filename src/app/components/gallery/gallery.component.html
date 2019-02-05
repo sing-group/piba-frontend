@@ -1,7 +1,7 @@
+<span class="spinner" *ngIf="images && totalImages === -1">
+          Loading...
+      </span>
 <div *ngIf="gallery">
-  <span class="spinner" *ngIf="!images">
-    Loading...
-</span>
   <div class="card">
     <div class="card-header">
       Gallery data
@@ -22,11 +22,25 @@
         </table>
       </section>
     </div>
+
+
     <clr-datagrid (clrDgRefresh)="refreshPage($event)">
+      <div class="clr-row clr-justify-content-lg-end not-margin-right">
+        <div class="clr-select-wrapper">
+          <select class="clr-select" [(ngModel)]="filter" (change)="filterChange()">
+            <option value="all">All</option>
+            <option value="located">Located</option>
+            <option value="no_located">No Located</option>
+          </select>
+        </div>
+      </div>
+      <clr-dg-placeholder *ngIf="images.length == 0 && totalImages !== -1">There are no images in this gallery
+      </clr-dg-placeholder>
       <div class="gallery-container">
         <div *ngFor="let image of images">
           <div class="gallery-item">
-            <a routerLink="/gallery/{{gallery.id}}/image/{{image.id}}" [queryParams]="{page: this.page}">
+            <a routerLink="/gallery/{{gallery.id}}/image/{{image.id}}"
+               [queryParams]="{filter:this.filter}">
               <canvas id="canvas-{{image.id}}"></canvas>
             </a>
           </div>

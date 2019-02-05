@@ -38,6 +38,7 @@ canvas {
   right: 0;
   bottom: 0;
   margin: auto;
+  z-index: 9999;
 }
 
 :host /deep/ .datagrid-placeholder-image {
@@ -46,4 +47,8 @@ canvas {
 
 .datagrid-host {
   margin-bottom: 1%;
+}
+
+.not-margin-right {
+  margin-right: 0px;
 }

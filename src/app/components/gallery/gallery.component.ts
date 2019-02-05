@@ -18,7 +18,8 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
   images: Image[] = [];
   pageSize = 12;
   page: number;
-  totalImages = 0;
+  totalImages = -1;
+  filter = 'all';
 
   private viewChecked = false;
 
@@ -49,8 +50,14 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  filterChange() {
+    this.page = 1;
+    this.images = [];
+    this.getImages();
+  }
+
   private getImages() {
-    this.imageService.getImagesByGallery(this.gallery, this.page, this.pageSize).subscribe(imagePage => {
+    this.imageService.getImagesByGallery(this.gallery, this.page, this.pageSize, this.filter).subscribe(imagePage => {
       this.images = imagePage.images;
       this.totalImages = imagePage.totalItems;
       this.viewChecked = false;
