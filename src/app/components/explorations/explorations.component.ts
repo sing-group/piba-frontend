@@ -65,7 +65,7 @@ export class ExplorationsComponent implements OnInit {
   edit(id: string) {
     this.exploration = new Exploration();
     Object.assign(this.exploration, this.explorations.find((exploration) => exploration.id === id));
-    this.date = new Date(this.exploration.date).toLocaleDateString();
+    this.date = new Date(this.exploration.explorationDate).toLocaleDateString();
     this.location = this.exploration.location;
     this.title = this.exploration.title;
     this.editingExploration = true;
@@ -78,10 +78,12 @@ export class ExplorationsComponent implements OnInit {
           this.newExploration = {
             id: null,
             title: this.title,
-            date: new Date(this.date),
+            explorationDate: new Date(this.date),
             location: this.location,
             videos: [],
             polyps: [],
+            numVideos: 0,
+            numPolyps: 0,
             patient: patient
           };
           this.explorationsService.createExploration(this.newExploration)
@@ -99,7 +101,7 @@ export class ExplorationsComponent implements OnInit {
     } else {
       this.exploration.title = this.title;
       this.exploration.location = this.location;
-      this.exploration.date = new Date(this.date);
+      this.exploration.explorationDate = new Date(this.date);
       this.explorationsService.editExploration(this.exploration).subscribe(updatedExploration => {
         Object.assign(this.explorations.find((exploration) => exploration.id === this.exploration.id), updatedExploration);
         this.notificationService.success('Exploration edited successfully.', 'Exploration edited.');

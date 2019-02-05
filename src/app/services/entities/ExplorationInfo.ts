@@ -3,9 +3,11 @@ import {IdAndUri} from './IdAndUri';
 export interface ExplorationInfo {
   id: string;
   title: string;
-  date: Date;
+  explorationDate: Date;
   location: string;
   videos?: IdAndUri[];
   polyps?: IdAndUri[];
+  numVideos?: number;
+  numPolyps?: number;
   patient: string | IdAndUri;
 }

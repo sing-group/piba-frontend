@@ -39,14 +39,18 @@
   <clr-dg-placeholder>We couldn't find any explorations!</clr-dg-placeholder>
 
   <clr-dg-column>Title</clr-dg-column>
-  <clr-dg-column>Date</clr-dg-column>
+  <clr-dg-column>Exploration Date</clr-dg-column>
   <clr-dg-column>Location</clr-dg-column>
+  <clr-dg-column>Polyps</clr-dg-column>
+  <clr-dg-column>Videos</clr-dg-column>
   <clr-dg-column>Actions</clr-dg-column>
 
   <clr-dg-row *ngFor="let exploration of explorations">
     <clr-dg-cell>{{exploration.title}}</clr-dg-cell>
-    <clr-dg-cell>{{exploration.date | date: 'yyyy-MM-dd'}}</clr-dg-cell>
+    <clr-dg-cell>{{exploration.explorationDate | date: 'yyyy-MM-dd'}}</clr-dg-cell>
     <clr-dg-cell>{{exploration.location}}</clr-dg-cell>
+    <clr-dg-cell>{{exploration.numPolyps}}</clr-dg-cell>
+    <clr-dg-cell>{{exploration.numVideos}}</clr-dg-cell>
     <clr-dg-cell class="btn-cell-datagrid">
       <div class="btn-group btn-link btn-icon">
         <button class="btn" routerLink="/explorations/{{exploration.id}}">

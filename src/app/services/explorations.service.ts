@@ -134,10 +134,12 @@ export class ExplorationsService {
     return {
       id: explorationInfo.id,
       title: explorationInfo.title,
-      date: explorationInfo.date,
+      explorationDate: explorationInfo.explorationDate,
       location: explorationInfo.location,
       videos: videos,
       polyps: polyps,
+      numVideos: explorationInfo.numVideos,
+      numPolyps: explorationInfo.numPolyps,
       patient: patient
     };
   }
@@ -150,7 +152,7 @@ export class ExplorationsService {
     return {
       id: exploration.id,
       title: exploration.title,
-      date: exploration.date,
+      explorationDate: exploration.explorationDate,
       location: exploration.location,
       patient: exploration.patient.id
     };
