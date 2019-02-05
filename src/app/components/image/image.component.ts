@@ -40,7 +40,8 @@ export class ImageComponent implements OnInit {
 
   deleting = false;
   definingDeletion = false;
-  warningMessage = false;
+  warningMessageWithoutSavingLocation = false;
+  warningMessageRemovingLocation = false;
   selectedToRight = true;
   options = ['Not polyp', 'Bad quality', 'Others'];
   selected: string;
@@ -192,7 +193,12 @@ export class ImageComponent implements OnInit {
     });
   }
 
-  deleteLocation(id: string) {
+  removeLocationAndCleanCanvas() {
+    this.deleteLocation(this.image.id);
+    this.cleanCanvas();
+  }
+
+  private deleteLocation(id: string) {
     this.imagesService.deleteLocation(id).subscribe(() => {
         this.image.polypLocation = null;
         this.notificationService.success('The location of the polyp has been correctly removed ', 'Polyp location removed');
@@ -275,7 +281,7 @@ export class ImageComponent implements OnInit {
       // if polyp wasn't saved
       if (locationSaved == null || (this.last_mousex !== locationSaved.x || this.last_mousey !== locationSaved.y ||
         this.width !== locationSaved.width || this.height !== locationSaved.height)) {
-        this.warningMessage = true;
+        this.warningMessageWithoutSavingLocation = true;
         return;
       }
     }

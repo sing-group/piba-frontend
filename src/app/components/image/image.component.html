@@ -23,7 +23,7 @@
           Save
         </button>
         <button class="btn btn-primary"
-                (click)="cleanCanvas(); image.polypLocation != null ? deleteLocation(image.id) : false;">
+                (click)="image.polypLocation != null ? this.warningMessageRemovingLocation = true : cleanCanvas();">
           <clr-icon shape="refresh"></clr-icon>
           Clear
         </button>
@@ -168,18 +168,40 @@
   >
   </app-delete-confirmation>
 
-  <clr-modal [(clrModalOpen)]="warningMessage" [clrModalClosable]="false">
+  <clr-modal [(clrModalOpen)]="warningMessageWithoutSavingLocation" [clrModalClosable]="false">
     <h3 class="modal-title">Warning</h3>
     <div class="modal-body">
       The polyp location has not been saved. Are you sure you want to continue?
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-outline" (click)="warningMessage = false;">Cancel</button>
-      <button type="button" class="btn btn-danger-outline" (click)="warningMessage = false; toLeftOrToRight()">
+      <button type="button" class="btn btn-outline" (click)="warningMessageWithoutSavingLocation = false;">Cancel
+      </button>
+      <button type="button" class="btn btn-danger-outline"
+              (click)="warningMessageWithoutSavingLocation = false; toLeftOrToRight()">
         Continue
       </button>
     </div>
   </clr-modal>
+
+  <clr-modal [(clrModalOpen)]="warningMessageRemovingLocation" [clrModalClosable]="false">
+    <h3 class="modal-title">Warning</h3>
+    <div class="modal-body">
+      <div class="modal-body">
+        The polyp location will be removed. Are you sure you want to continue?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" (click)="warningMessageRemovingLocation = false;">Cancel</button>
+        <button type="button" class="btn btn-success-outline"
+                (click)="warningMessageRemovingLocation = false; cleanCanvas()">Only clear
+        </button>
+        <button type="button" class="btn btn-danger-outline"
+                (click)="warningMessageRemovingLocation = false; removeLocationAndCleanCanvas(); ">
+          Clear and remove
+        </button>
+      </div>
+    </div>
+  </clr-modal>
+
 
 </div>
 
