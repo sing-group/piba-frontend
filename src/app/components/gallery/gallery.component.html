@@ -20,7 +20,17 @@
           </tr>
           </tbody>
         </table>
+
       </section>
+    </div>
+
+    <div *ngIf="totalImages > 0" class="row progress-margin">
+      <div class="col-xs-12">
+        <h5>Polyp location progress: {{locatedImages}} of {{totalImagesStored}} ({{(locatedImages*100)/totalImagesStored | number:'.0-1'}}%)</h5>
+        <div class="progress success">
+          <progress max="{{totalImagesStored}}" value="{{locatedImages}}"></progress>
+        </div>
+      </div>
     </div>
 
 

@@ -19,7 +19,9 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
   pageSize = 12;
   page: number;
   totalImages = -1;
+  totalImagesStored: number;
   filter = 'all';
+  locatedImages: number;
 
   private viewChecked = false;
 
@@ -61,6 +63,10 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
       this.images = imagePage.images;
       this.totalImages = imagePage.totalItems;
       this.viewChecked = false;
+      if (this.filter === 'all') {
+        this.totalImagesStored = imagePage.totalItems;
+        this.locatedImages = imagePage.locatedImages;
+      }
     });
   }
 

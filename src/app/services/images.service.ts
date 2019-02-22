@@ -87,6 +87,7 @@ export class ImagesService {
             if (response.body.length === 0) {
               return of({
                 totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
+                locatedImages: Number(response.headers.get('X-Located-Total-Items')),
                 images: []
               });
             }
@@ -94,6 +95,7 @@ export class ImagesService {
               map(images => {
                   return {
                     totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
+                    locatedImages: Number(response.headers.get('X-Located-Total-Items')),
                     images: images
                   };
                 }

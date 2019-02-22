@@ -52,3 +52,7 @@ canvas {
 .not-margin-right {
   margin-right: 0px;
 }
+
+.progress-margin {
+  margin: auto;
+}
