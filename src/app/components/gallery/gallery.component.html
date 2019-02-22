@@ -46,10 +46,11 @@
           </div>
         </div>
       </div>
-      <clr-dg-footer *ngIf="images.length > 0">
+      <clr-dg-footer>
         <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [clrDgTotalItems]="totalImages" [(clrDgPage)]="page">
-          {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-          of {{totalImages}} images
+          <label *ngIf="images.length > 0">
+            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+            of {{totalImages}} images </label>
         </clr-dg-pagination>
       </clr-dg-footer>
     </clr-datagrid>
