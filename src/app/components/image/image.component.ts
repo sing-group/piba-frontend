@@ -27,6 +27,7 @@ export class ImageComponent implements OnInit {
   identifiers: string[] = [];
   isFirstImage = false;
   isLastImage = false;
+  isLoading = false;
 
   private gallery: Gallery = new Gallery();
 
@@ -78,7 +79,9 @@ export class ImageComponent implements OnInit {
 
     this.galleriesService.getGallery(gallery_id).subscribe(gallery => {
       this.gallery = gallery;
+      this.isLoading = true;
       this.imagesService.getImagesIdentifiersByGallery(gallery, this.filter).subscribe(identifiers => {
+        this.isLoading = false;
           this.identifiers = identifiers;
           const index = this.identifiers.indexOf(
             this.identifiers.find(
@@ -136,7 +139,9 @@ export class ImageComponent implements OnInit {
       width: this.width,
       height: this.height
     };
+    this.isLoading = true;
     this.imagesService.createLocation(this.image.id, polypLocation).subscribe((location) => {
+      this.isLoading = false;
       this.image.polypLocation = location;
       this.notificationService.success('Location of the polyp stored correctly', 'Location of the polyp stored');
       this.reset();
@@ -158,7 +163,9 @@ export class ImageComponent implements OnInit {
     if (this.selected !== 'Others') {
       this.observationToRemove = this.selected;
     }
+    this.isLoading = true;
     this.imagesService.delete(this.image.id, this.observationToRemove).subscribe(() => {
+      this.isLoading = false;
       this.notificationService.success('Image removed successfully.', 'Image removed.');
       const position = this.getImagePositionInArray();
       this.identifiers.splice(position, 1);
@@ -199,7 +206,9 @@ export class ImageComponent implements OnInit {
   }
 
   private deleteLocation(id: string) {
+    this.isLoading = true;
     this.imagesService.deleteLocation(id).subscribe(() => {
+        this.isLoading = false;
         this.image.polypLocation = null;
         this.notificationService.success('The location of the polyp has been correctly removed ', 'Polyp location removed');
       }
@@ -207,11 +216,14 @@ export class ImageComponent implements OnInit {
   }
 
   private getImageAndLoad(id: string) {
+    this.isLoading = true;
     this.imagesService.getImage(id).subscribe(img => {
+      this.isLoading = false;
       this.image = img;
       this.paintImageAndLocation();
       if (this.authenticationService.getRole() !== Role.ENDOSCOPIST) {
         this.getPolypRecordingInfo();
+        
       }
     });
   }
@@ -249,8 +261,10 @@ export class ImageComponent implements OnInit {
 
   private loadAsFollowingImage(id: string) {
     if (!this.isLastImage) {
+      this.isLoading = true;
       this.imagesService.getImage(id).subscribe(image => {
-          this.followingImage = image;
+          this.isLoading = false;
+          this.followingImage = image;          
         }
       );
     }
@@ -258,8 +272,10 @@ export class ImageComponent implements OnInit {
 
   private loadAsPreviousImage(id: string) {
     if (!this.isFirstImage) {
+      this.isLoading = true;
       this.imagesService.getImage(id).subscribe(image => {
-          this.previousImage = image;
+          this.isLoading = false;
+          this.previousImage = image;          
         }
       );
     }
@@ -369,7 +385,9 @@ export class ImageComponent implements OnInit {
   }
 
   private getPolypRecordingInfo() {
+    this.isLoading = true;
     this.polypRecordingService.getPolypRecordingsByVideo(this.image.video.id).subscribe(polypRecordings => {
+      this.isLoading = false;
       for (const polypRecording of polypRecordings) {
         const frame = Math.floor(this.image.numFrame / this.image.video.fps - 1);
         if (frame >= polypRecording.start && frame <= polypRecording.end) {

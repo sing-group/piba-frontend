@@ -8,7 +8,7 @@
   <div class="clr-row container">
     <div class="clr-col-1 container-move">
       <button class="btn btn-link" (click)="selectedToRight = false; checkIfLocationSavedAndScrollImage()"
-              [disabled]="isFirstImage">
+              [disabled]="isFirstImage || isLoading">
         <i class="arrow-left"></i>
       </button>
     </div>
@@ -18,16 +18,16 @@
       </div>
       <div align="center" *ngIf="authenticationService.getRole() == role.ENDOSCOPIST">
         <button class="btn btn-success" (click)="save()"
-                [disabled]="last_mousex == null && last_mousey == null && width==null && height==null">
+                [disabled]="(last_mousex == null && last_mousey == null && width==null && height==null) ||  isLoading">
           <clr-icon shape="plus"></clr-icon>
           Save
         </button>
         <button class="btn btn-primary"
-                (click)="image.polypLocation != null ? this.warningMessageRemovingLocation = true : cleanCanvas();">
+                (click)="image.polypLocation != null ? this.warningMessageRemovingLocation = true : cleanCanvas();" [disabled] = "isLoading">
           <clr-icon shape="refresh"></clr-icon>
           Clear
         </button>
-        <button class="btn btn-danger" (click)="deleting = true">
+        <button class="btn btn-danger" (click)="deleting = true" [disabled] = "isLoading">
           <clr-icon shape="trash"></clr-icon>
           Remove image
         </button>
@@ -35,7 +35,7 @@
     </div>
     <div class="clr-col-1 container-move">
       <button class="btn btn-link" (click)="selectedToRight = true; checkIfLocationSavedAndScrollImage()"
-              [disabled]="isLastImage">
+              [disabled]="isLastImage || isLoading">
         <i class="arrow-right"></i>
       </button>
     </div>
