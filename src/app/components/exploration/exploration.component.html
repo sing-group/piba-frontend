@@ -67,6 +67,9 @@
                       <div class="col-md-12 col-lg-8">
                         <input type="text" id="video-title-{{video.id}}" name="title-{{video.id}}" size="50"
                                [readonly]="editingVideo == video.id ? null : true" [(ngModel)]="video.title"/>
+                        <div *ngIf="editingVideo == video.id && titleIsUsed(video)"
+                             class="alert alert-danger">This title is already being used
+                        </div>
                       </div>
                     </div>
                     <div class="form-group row">
@@ -97,7 +100,7 @@
                         Edit information
                       </button>
                       <button type="button" class="btn btn-primary" *ngIf="!isReadonly && video.id == editingVideo"
-                              (click)="editVideo(video)">
+                              (click)="editVideo(video)" [disabled]="titleIsUsed(video)">
                         <clr-icon shape="cog"></clr-icon>
                         Save information
                       </button>
@@ -137,6 +140,9 @@
           <div class="form-group">
             <label for="video-form-title">Title</label>
             <input type="text" id="video-form-title" [(ngModel)]="video.title" name="title"/>
+            <div *ngIf="titleIsUsed(video)"
+                 class="alert alert-danger">This title is already being used
+            </div>
           </div>
           <div class="form-group">
             <label for="video-form-observations">Observations</label>
@@ -156,7 +162,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Ok</button>
+        <button type="submit" class="btn btn-primary" [disabled]="titleIsUsed(video)">Ok</button>
       </div>
     </clr-modal>
   </form>

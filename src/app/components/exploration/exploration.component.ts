@@ -30,6 +30,8 @@ export class ExplorationComponent implements OnInit, OnDestroy {
   isReadonly = true;
   editingVideo: string = null;
   deletingVideo = false;
+  // to check if the title is used in the edition
+  videoTitle: String;
 
   pollings: Subscription[] = [];
 
@@ -160,6 +162,7 @@ export class ExplorationComponent implements OnInit, OnDestroy {
       Object.assign(this.findIn(this.videoClones, this.editingVideo), this.findIn(this.exploration.videos, this.editingVideo));
     }
     this.editingVideo = video.id;
+    this.videoTitle = video.title;
     this.isReadonly = false;
   }
 
@@ -170,6 +173,14 @@ export class ExplorationComponent implements OnInit, OnDestroy {
       Object.assign(this.findIn(this.exploration.videos, video.id), updatedVideo);
       this.notificationService.success('Video edited successfully.', 'Video edited.');
     });
+  }
+
+  titleIsUsed(newVideo: Video): Boolean {
+    if (this.editingVideo != null) {
+      return this.exploration.videos.find((video) => video.title === newVideo.title) !== undefined && newVideo.title !== this.videoTitle;
+    } else {
+      return this.exploration.videos.find((video) => video.title === newVideo.title) !== undefined;
+    }
   }
 
   private mapVideo(video: Video): VideoUploadInfo {
