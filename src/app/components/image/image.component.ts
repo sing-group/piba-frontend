@@ -47,6 +47,8 @@ export class ImageComponent implements OnInit {
   options = ['Not polyp', 'Bad quality', 'Others'];
   selected: string;
   observationToRemove = null;
+  observationToRemoveStartsWith = null;
+  observationsFound: string[] = [];
 
   polypRecording: PolypRecording;
   type: string;
@@ -81,7 +83,7 @@ export class ImageComponent implements OnInit {
       this.gallery = gallery;
       this.isLoading = true;
       this.imagesService.getImagesIdentifiersByGallery(gallery, this.filter).subscribe(identifiers => {
-        this.isLoading = false;
+          this.isLoading = false;
           this.identifiers = identifiers;
           const index = this.identifiers.indexOf(
             this.identifiers.find(
@@ -223,7 +225,6 @@ export class ImageComponent implements OnInit {
       this.paintImageAndLocation();
       if (this.authenticationService.getRole() !== Role.ENDOSCOPIST) {
         this.getPolypRecordingInfo();
-        
       }
     });
   }
@@ -264,7 +265,7 @@ export class ImageComponent implements OnInit {
       this.isLoading = true;
       this.imagesService.getImage(id).subscribe(image => {
           this.isLoading = false;
-          this.followingImage = image;          
+          this.followingImage = image;
         }
       );
     }
@@ -275,7 +276,7 @@ export class ImageComponent implements OnInit {
       this.isLoading = true;
       this.imagesService.getImage(id).subscribe(image => {
           this.isLoading = false;
-          this.previousImage = image;          
+          this.previousImage = image;
         }
       );
     }
@@ -360,6 +361,8 @@ export class ImageComponent implements OnInit {
     this.definingDeletion = false;
     this.selected = null;
     this.observationToRemove = null;
+    this.observationsFound = null;
+    this.observationToRemoveStartsWith = null;
   }
 
 
@@ -418,6 +421,30 @@ export class ImageComponent implements OnInit {
         }
       }
     });
+  }
+
+  searchObservations(event) {
+    this.observationToRemove = null;
+    this.observationsFound = null;
+    if (this.observationToRemoveStartsWith !== undefined && this.observationToRemoveStartsWith.length > 3) {
+      this.imagesService.searchObservations(this.observationToRemoveStartsWith)
+        .subscribe(observations => {
+          this.observationsFound = observations;
+          if (observations.length === 0) {
+            this.observationToRemove = this.observationToRemoveStartsWith;
+          }
+        });
+    }
+    if (event.key === 'Enter') {
+      this.observationToRemove = this.observationToRemoveStartsWith;
+      this.observationsFound = null;
+    }
+  }
+
+
+  selectedObservationToRemove(observation: string) {
+    this.observationToRemove = observation;
+    this.observationToRemoveStartsWith = observation;
   }
 
 }

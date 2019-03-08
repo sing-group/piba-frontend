@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {Image} from '../models/Image';
 import {forkJoin, Observable, of, throwError} from 'rxjs';
@@ -117,6 +117,18 @@ export class ImagesService {
             return ids;
           }
         )
+      );
+  }
+
+  searchObservations(observationToRemoveStartsWith: string): Observable<string[]> {
+    let params = new HttpParams();
+    params = params.append('observationStartsWith', observationToRemoveStartsWith);
+
+    return this.http.get<string[]>(`${environment.restApi}/image/observations`, {params})
+      .pipe(
+        map(observations => {
+          return observations;
+        })
       );
   }
 

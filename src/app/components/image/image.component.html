@@ -140,7 +140,7 @@
         <section class="form-block">
           <div class="form-group">
             <label for="selectToRemove">Select a reason</label>
-            <div class="select">
+            <div class="select select-style">
               <select id="selectToRemove" name="selectedToRemove" required [(ngModel)]="selected">
                 <option *ngFor="let option of options" [ngValue]="option" (click)="observationToRemove = null">
                   {{option}}
@@ -150,7 +150,14 @@
           </div>
           <div *ngIf="selected == 'Others'" class="form-group">
             <label for="observationToRemove">Describe the reason </label>
-            <input type="text" id="observationToRemove" name="observationToRemove" [(ngModel)]="observationToRemove"/>
+            <div class="autocomplete">
+            <input type="text" id="observationToRemove" (keyup)="searchObservations($event)" name="observationToRemove" [(ngModel)]="observationToRemoveStartsWith" autocomplete="off"/>
+            <div *ngIf="!observationToRemove" class="autocomplete-items">
+              <input class="inputAutocomplete" value="{{observation}}" *ngFor="let observation of observationsFound"
+                     (click)="selectedObservationToRemove(observation)" readonly
+              />
+            </div>
+            </div>
           </div>
         </section>
       </form>
