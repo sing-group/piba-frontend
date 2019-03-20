@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {ClrDatagridStateInterface} from '@clr/angular';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {ClrDatagridPagination, ClrDatagridStateInterface} from '@clr/angular';
 import {ExplorationsService} from '../../services/explorations.service';
 import {Exploration} from '../../models/Exploration';
 import {PatientsService} from '../../services/patients.service';
@@ -7,6 +7,8 @@ import {IdSpacesService} from '../../services/idspaces.service';
 import {IdSpace} from '../../models/IdSpace';
 import {NotificationService} from '../../modules/notification/services/notification.service';
 import {ActivatedRoute} from '@angular/router';
+import {Subject} from 'rxjs';
+import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 
 @Component({
   selector: 'app-explorations',
@@ -17,6 +19,7 @@ import {ActivatedRoute} from '@angular/router';
 export class ExplorationsComponent implements OnInit {
 
   explorations: Exploration[] = [];
+  pageChangeEvent = new Subject<string>();
 
   editingExploration = false;
   creatingExploration = false;
@@ -30,7 +33,7 @@ export class ExplorationsComponent implements OnInit {
   exploration: Exploration = new Exploration();
   paginationTotalItems = 0;
   pageSize = 15;
-  currentPage: number;
+  pageLength = 0;
 
   patientId: string;
   patientError: string;
@@ -41,12 +44,27 @@ export class ExplorationsComponent implements OnInit {
   idSpaceToFind: IdSpace = new IdSpace();
   patientToFind = '';
 
+  @ViewChild(ClrDatagridPagination)
+  pagination: ClrDatagridPagination;
+
   constructor(private explorationsService: ExplorationsService, private patientsService: PatientsService,
               private idSpacesService: IdSpacesService, private notificationService: NotificationService,
               private route: ActivatedRoute) {
   }
 
   ngOnInit() {
+    // to wait when the user types the page to go
+    this.pageChangeEvent.pipe(
+      debounceTime(500),
+      distinctUntilChanged()).subscribe(page => {
+      if (Number(page) > 0 && Number(page) <= Math.ceil(this.paginationTotalItems / this.pageSize)) {
+        this.pagination.page.current = Number(page);
+      } else if (page.trim() !== '' && page.length >= this.pageLength) {
+        this.notificationService.error('Invalid page entered.', 'Invalid page.');
+      }
+      this.pageLength = page.length;
+    });
+
     const patient = this.route.snapshot.paramMap.get('id');
     const publicPatient = this.route.snapshot.paramMap.get('patientId');
     if (patient != null) {
@@ -56,7 +74,7 @@ export class ExplorationsComponent implements OnInit {
         this.searchPatient();
       });
     } else {
-      this.currentPage = 1;
+      this.pagination.page.current = 1;
       this.getPageExplorations();
     }
     this.idSpacesService.getIdSpaces().subscribe(idSpaces => this.idSpaces = idSpaces);
@@ -111,6 +129,10 @@ export class ExplorationsComponent implements OnInit {
     }
   }
 
+  get currentPage(): number {
+    return this.pagination.page.current;
+  }
+
   getPageExplorations() {
     this.loading = true;
     if (this.paginatePatientExplorations) {
@@ -139,10 +161,11 @@ export class ExplorationsComponent implements OnInit {
       });
   }
 
+
   // It is executed when the page is changed in the view
   refreshPage(state: ClrDatagridStateInterface) {
     if (state.page !== undefined) {
-      this.currentPage = (state.page.from / state.page.size) + 1;
+      this.pagination.page.current = (state.page.from / state.page.size) + 1;
       this.getPageExplorations();
     }
   }
@@ -204,7 +227,8 @@ export class ExplorationsComponent implements OnInit {
     if (this.idSpaceToFind.id === undefined && this.patientToFind === '') {
       return;
     }
-    this.currentPage = 1;
+    (<HTMLInputElement>document.getElementById('page-to-go')).value = '1';
+    this.pagination.page.current = 1;
     this.paginatePatientExplorations = true;
     this.getPageExplorations();
   }
@@ -214,6 +238,8 @@ export class ExplorationsComponent implements OnInit {
     this.idSpace = new IdSpace();
     this.idSpaceToFind = new IdSpace();
     this.paginatePatientExplorations = false;
+    (<HTMLInputElement>document.getElementById('page-to-go')).value = '1';
+    this.pagination.page.current = 1;
     this.getPageExplorations();
   }
 }

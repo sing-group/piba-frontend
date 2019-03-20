@@ -36,3 +36,11 @@ form > .content-search {
     margin-top: -0.5rem;
   }
 }
+
+.input-page {
+  margin-right: 1rem;
+  width: 1.3rem;
+  padding: 0;
+  min-width: 1rem;
+  text-align: center;
+}
