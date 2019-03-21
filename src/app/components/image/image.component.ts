@@ -430,7 +430,8 @@ export class ImageComponent implements OnInit {
       this.imagesService.searchObservations(this.observationToRemoveStartsWith)
         .subscribe(observations => {
           this.observationsFound = observations;
-          if (observations.length === 0) {
+          this.observationsFound = this.observationsFound.filter(item => this.options.indexOf(item) < 0);
+          if (this.observationsFound.length === 0) {
             this.observationToRemove = this.observationToRemoveStartsWith;
           }
         });
