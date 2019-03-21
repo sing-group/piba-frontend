@@ -10,7 +10,6 @@ import {PolypRecordingsService} from '../../services/polyprecordings.service';
 import {PolypRecording} from '../../models/PolypRecording';
 import {TimeToNumberPipe} from '../../pipes/time-to-number.pipe';
 import {NotificationService} from '../../modules/notification/services/notification.service';
-import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-video-editor',
@@ -49,7 +48,6 @@ export class VideoEditorComponent implements OnInit {
     private polypRecordingsService: PolypRecordingsService,
     private timeToNumber: TimeToNumberPipe,
     private notificationService: NotificationService,
-    private location: Location
   ) {
   }
 
@@ -182,9 +180,4 @@ export class VideoEditorComponent implements OnInit {
       }
     }, 100);
   }
-
-  back() {
-    this.location.back();
-  }
-
 }
