@@ -77,7 +77,7 @@ export class ImagesService {
   }
 
   getImagesByGallery(gallery: Gallery, page: number, pageSize: number, filter: string): Observable<ImagePage> {
-    const withLocation = filter !== 'no_located';
+    const withLocation = filter !== 'not_located';
     return this.http.get<ImageInfo[]>
     (`${environment.restApi}/image?gallery_id=${gallery.id}&page=${page}&pageSize=${pageSize}&filter=${filter}`,
       {observe: 'response'})
