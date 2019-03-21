@@ -1,68 +1,71 @@
-<span class="spinner" *ngIf="images && totalImages === -1">
-          Loading...
-      </span>
-<div *ngIf="gallery">
-  <div class="card">
-    <div class="card-header">
-      Gallery data
-    </div>
-    <div class="card-block">
-      <section class="form-block">
-        <table class="table">
-          <tbody>
-          <tr>
-            <td class="left">Title</td>
-            <td class="left">{{gallery.title}}</td>
-          </tr>
-          <tr>
-            <td class="left">Description</td>
-            <td class="left">{{gallery.description}}</td>
-          </tr>
-          </tbody>
-        </table>
-
-      </section>
-    </div>
-
-    <div *ngIf="totalImages > 0" class="row progress-margin">
-      <div class="col-xs-12">
-        <h5>Polyp location progress: {{locatedImages}} of {{totalImagesStored}} ({{(locatedImages*100)/totalImagesStored | number:'.0-1'}}%)</h5>
-        <div class="progress success">
-          <progress max="{{totalImagesStored}}" value="{{locatedImages}}"></progress>
-        </div>
-      </div>
-    </div>
-
-
-    <clr-datagrid (clrDgRefresh)="refreshPage($event)">
-      <div class="clr-row clr-justify-content-lg-end not-margin-right">
-        <div class="clr-select-wrapper">
-          <select class="clr-select" [(ngModel)]="filter" (change)="filterChange()">
-            <option value="all">All</option>
-            <option value="located">Located</option>
-            <option value="no_located">No Located</option>
-          </select>
-        </div>
-      </div>
-      <clr-dg-placeholder *ngIf="images.length == 0 && totalImages !== -1">There are no images in this gallery
-      </clr-dg-placeholder>
-      <div class="gallery-container">
-        <div *ngFor="let image of images">
-          <div class="gallery-item">
-            <a routerLink="/gallery/{{gallery.id}}/image/{{image.id}}"
-               [queryParams]="{filter:this.filter}">
-              <canvas id="canvas-{{image.id}}"></canvas>
-            </a>
-          </div>
-        </div>
-      </div>
-      <clr-dg-footer>
-        <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [clrDgTotalItems]="totalImages" [(clrDgPage)]="page">
-          <label *ngIf="images.length > 0">
-            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-            of {{totalImages}} images </label>
-        </clr-dg-pagination>
-      </clr-dg-footer>
-    </clr-datagrid>
+<div class="card">
+  <div class="card-header">
+    Gallery data
   </div>
+  <div class="card-block">
+    <section class="form-block">
+      <table class="table">
+        <tbody>
+        <tr>
+          <td class="left">Title</td>
+          <td class="left">{{gallery.title}}</td>
+        </tr>
+        <tr>
+          <td class="left">Description</td>
+          <td class="left">{{gallery.description}}</td>
+        </tr>
+        </tbody>
+      </table>
+
+    </section>
+  </div>
+
+  <div *ngIf="totalImages > 0" class="row progress-margin">
+    <div class="col-xs-12">
+      <h5>Polyp location progress: {{locatedImages}} of {{totalImagesStored}} ({{(locatedImages*100)/totalImagesStored |
+        number:'.0-1'}}%)</h5>
+      <div class="progress success">
+        <progress max="{{totalImagesStored}}" value="{{locatedImages}}"></progress>
+      </div>
+    </div>
+  </div>
+
+
+  <clr-datagrid (clrDgRefresh)="refreshPage($event)" [clrDgLoading]="loading">
+    <div class="clr-row clr-justify-content-lg-end not-margin-right">
+      <div class="clr-select-wrapper">
+        <select class="clr-select" [(ngModel)]="filter" (change)="filterChange()">
+          <option value="all">All</option>
+          <option value="located">Located</option>
+          <option value="no_located">No Located</option>
+        </select>
+      </div>
+    </div>
+    <clr-dg-placeholder *ngIf="images.length == 0 && totalImages !== -1">There are no images in this gallery
+    </clr-dg-placeholder>
+    <div class="gallery-container">
+      <div *ngFor="let image of images">
+        <div class="gallery-item">
+          <a routerLink="/gallery/{{gallery.id}}/image/{{image.id}}"
+             [queryParams]="{filter:this.filter}">
+            <canvas id="canvas-{{image.id}}"></canvas>
+          </a>
+        </div>
+      </div>
+    </div>
+    <clr-dg-footer>
+      <div class="datagrid-foot-description" *ngIf="images.length > 0">
+        <label for="page-to-go">Go to page: </label>
+        <input type="text" class="input-page" id="page-to-go" name="pageToGo"
+               (keyup)="pageChangeEvent.next($event.target.value)"
+               [(ngModel)]="page" [readonly]="loading" #pageToGoPagination="ngModel"/>
+      </div>
+      <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [clrDgTotalItems]="totalImages" [(clrDgPage)]="page">
+        <label *ngIf="images.length > 0">
+          {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+          of {{totalImages}} images </label>
+      </clr-dg-pagination>
+    </clr-dg-footer>
+  </clr-datagrid>
 </div>
+

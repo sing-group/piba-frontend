@@ -1,11 +1,14 @@
-import {AfterViewChecked, Component, OnInit} from '@angular/core';
+import {AfterViewChecked, Component, OnInit, ViewChild} from '@angular/core';
 import {Gallery} from '../../models/Gallery';
 import {GalleriesService} from '../../services/galleries.service';
 import {ActivatedRoute} from '@angular/router';
 import {PolypLocation} from '../../models/PolypLocation';
 import {ImagesService} from '../../services/images.service';
 import {Image} from '../../models/Image';
-import {ClrDatagridStateInterface} from '@clr/angular';
+import {ClrDatagridPagination, ClrDatagridStateInterface} from '@clr/angular';
+import {NotificationService} from '../../modules/notification/services/notification.service';
+import {Subject} from 'rxjs';
+import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 
 @Component({
   selector: 'app-gallery',
@@ -15,26 +18,43 @@ import {ClrDatagridStateInterface} from '@clr/angular';
 export class GalleryComponent implements OnInit, AfterViewChecked {
 
   gallery: Gallery = new Gallery();
+  pageChangeEvent = new Subject<string>();
   images: Image[] = [];
   pageSize = 12;
-  page: number;
+  pageLength = 0;
   totalImages = -1;
   totalImagesStored: number;
   filter = 'all';
   locatedImages: number;
+  loading = false;
+
+  @ViewChild(ClrDatagridPagination)
+  pagination: ClrDatagridPagination;
 
   private viewChecked = false;
 
   constructor(private route: ActivatedRoute,
               private galleryService: GalleriesService,
-              private imageService: ImagesService) {
+              private imageService: ImagesService,
+              private notificationService: NotificationService) {
   }
 
   ngOnInit() {
+    // to wait when the user types the page to go
+    this.pageChangeEvent.pipe(
+      debounceTime(500),
+      distinctUntilChanged()).subscribe(page => {
+      if (Number(page) > 0 && Number(page) <= Math.ceil(this.totalImages / this.pageSize)) {
+        this.pagination.page.current = Number(page);
+      } else if (page.trim() !== '' && page.length >= this.pageLength) {
+        this.notificationService.error('Invalid page entered.', 'Invalid page.');
+      }
+      this.pageLength = page.length;
+    });
+
     const id = this.route.snapshot.paramMap.get('id');
-    this.page = Number(this.route.snapshot.queryParamMap.get('page'));
-    if (this.page === 0) {
-      this.page = 1;
+    if (Number(this.route.snapshot.queryParamMap.get('page')) === 0) {
+      this.pagination.page.current = 1;
     }
     this.galleryService.getGallery(id).subscribe(gallery => {
       this.gallery = gallery;
@@ -42,10 +62,14 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
     });
   }
 
+  get page(): number {
+    return this.pagination.page.current;
+  }
+
   refreshPage(state: ClrDatagridStateInterface) {
     this.images = [];
     if (state.page !== undefined) {
-      this.page = (state.page.from / state.page.size) + 1;
+      this.pagination.page.current = (state.page.from / state.page.size) + 1;
       if (this.gallery.id !== undefined) {
         this.getImages();
       }
@@ -53,13 +77,15 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
   }
 
   filterChange() {
-    this.page = 1;
+    (<HTMLInputElement>document.getElementById('page-to-go')).value = '1';
+    this.pagination.page.current = 1;
     this.images = [];
     this.getImages();
   }
 
   private getImages() {
-    this.imageService.getImagesByGallery(this.gallery, this.page, this.pageSize, this.filter).subscribe(imagePage => {
+    this.loading = true;
+    this.imageService.getImagesByGallery(this.gallery, this.pagination.page.current, this.pageSize, this.filter).subscribe(imagePage => {
       this.images = imagePage.images;
       this.totalImages = imagePage.totalItems;
       this.viewChecked = false;
@@ -67,6 +93,7 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
         this.totalImagesStored = imagePage.totalItems;
         this.locatedImages = imagePage.locatedImages;
       }
+      this.loading = false;
     });
   }
 

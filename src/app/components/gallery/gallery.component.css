@@ -31,16 +31,6 @@ canvas {
   }
 }
 
-.spinner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  z-index: 9999;
-}
-
 :host /deep/ .datagrid-placeholder-image {
   background-image: none !important;
 }
@@ -55,4 +45,12 @@ canvas {
 
 .progress-margin {
   margin: auto;
+}
+
+.input-page {
+  margin-right: 1rem;
+  width: 1.3rem;
+  padding: 0;
+  min-width: 1rem;
+  text-align: center;
 }
