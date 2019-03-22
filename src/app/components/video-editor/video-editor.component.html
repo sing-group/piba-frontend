@@ -1,11 +1,12 @@
 <div class="row">
-  <button type="button" class="btn-back btn btn-primary" routerLink="/explorations/{{this.video.exploration}}">
+  <button type="button" *ngIf="this.video !== undefined" class="btn-back btn btn-primary"
+          routerLink="/explorations/{{this.video.exploration}}">
     Back
   </button>
 </div>
 
 <div class="row video-container" *ngIf="video != null">
-  <app-video (currentTime)="onCurrentTimeUpdate($event)" (mouseInProgress)="mouseInProgress($event)" >
+  <app-video (currentTime)="onCurrentTimeUpdate($event)" (mouseInProgress)="mouseInProgress($event)">
     <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}"/>
     <p>Your browser does not support the video tag.</p>
   </app-video>
@@ -103,11 +104,11 @@
         <div class="polyprecordings-container">
           <clr-datagrid>
             <clr-dg-column>Polyp</clr-dg-column>
-            <clr-dg-column>Start</clr-dg-column>
-            <clr-dg-column>Stop</clr-dg-column>
+            <clr-dg-column [clrDgField]="'start'">Start</clr-dg-column>
+            <clr-dg-column [clrDgField]="'end'">Stop</clr-dg-column>
             <clr-dg-column>Actions</clr-dg-column>
 
-            <clr-dg-row *ngFor="let polypRecording of video.polypRecording">
+            <clr-dg-row *clrDgItems="let polypRecording of video.polypRecording">
               <clr-dg-cell>{{polypRecording.polyp.name}}</clr-dg-cell>
               <clr-dg-cell>{{polypRecording.start | time}}</clr-dg-cell>
               <clr-dg-cell>{{polypRecording.end | time}}</clr-dg-cell>
