@@ -53,11 +53,11 @@
 <div class="videomodifiers-container">
   <clr-datagrid>
     <clr-dg-column>Modifier</clr-dg-column>
-    <clr-dg-column>Start</clr-dg-column>
-    <clr-dg-column>Stop</clr-dg-column>
+    <clr-dg-column [clrDgField]="'start'">Start</clr-dg-column>
+    <clr-dg-column [clrDgField]="'end'">Stop</clr-dg-column>
     <clr-dg-column>Actions</clr-dg-column>
 
-    <clr-dg-row *ngFor="let videoModification of videoModifications">
+    <clr-dg-row *clrDgItems="let videoModification of videoModifications">
       <clr-dg-cell>{{videoModification.modifier.name}}</clr-dg-cell>
       <clr-dg-cell>{{videoModification.start | time}}</clr-dg-cell>
       <clr-dg-cell>{{videoModification.end | time}}</clr-dg-cell>
