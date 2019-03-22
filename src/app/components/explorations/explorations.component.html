@@ -69,7 +69,7 @@
     </clr-dg-cell>
   </clr-dg-row>
   <clr-dg-footer>
-    <div class="datagrid-foot-description">
+    <div class="datagrid-foot-description" *ngIf="paginationTotalItems > 0">
       <label for="page-to-go">Go to page: </label>
       <input type="text" class="input-page" id="page-to-go" name="pageToGo"
              (keyup)="pageChangeEvent.next($event.target.value)"
@@ -79,7 +79,9 @@
 
     <clr-dg-pagination #pagination [clrDgPageSize]="(pageSize > paginationTotalItems) ? paginationTotalItems : pageSize"
                        [clrDgTotalItems]="paginationTotalItems" [(clrDgPage)]="currentPage">
-      {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{paginationTotalItems}} explorations
+      <label *ngIf="paginationTotalItems > 0">
+        {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{paginationTotalItems}} explorations
+      </label>
     </clr-dg-pagination>
   </clr-dg-footer>
 </clr-datagrid>
