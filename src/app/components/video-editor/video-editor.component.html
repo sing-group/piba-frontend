@@ -103,7 +103,7 @@
         </form>
         <div class="polyprecordings-container">
           <clr-datagrid>
-            <clr-dg-column>Polyp</clr-dg-column>
+            <clr-dg-column [clrDgField]="'polyp.name'" [clrDgSortOrder]="ascSort">Polyp</clr-dg-column>
             <clr-dg-column [clrDgField]="'start'">Start</clr-dg-column>
             <clr-dg-column [clrDgField]="'end'">Stop</clr-dg-column>
             <clr-dg-column>Actions</clr-dg-column>

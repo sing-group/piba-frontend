@@ -10,6 +10,7 @@ import {PolypRecordingsService} from '../../services/polyprecordings.service';
 import {PolypRecording} from '../../models/PolypRecording';
 import {TimeToNumberPipe} from '../../pipes/time-to-number.pipe';
 import {NotificationService} from '../../modules/notification/services/notification.service';
+import {ClrDatagridSortOrder} from '@clr/angular';
 
 @Component({
   selector: 'app-video-editor',
@@ -19,6 +20,7 @@ import {NotificationService} from '../../modules/notification/services/notificat
 export class VideoEditorComponent implements OnInit {
 
   video: Video;
+  ascSort = ClrDatagridSortOrder.ASC;
 
   start: string;
   end: string;
