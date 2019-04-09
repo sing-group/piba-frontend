@@ -133,6 +133,12 @@ export class ExplorationsComponent implements OnInit {
     return this.pagination.page.current;
   }
 
+  set currentPage(page: number) {
+    if (typeof page === 'number') {
+      this.pagination.page.current = page;
+    }
+  }
+
   getPageExplorations() {
     this.loading = true;
     if (this.paginatePatientExplorations) {

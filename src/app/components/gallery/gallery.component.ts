@@ -66,6 +66,12 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
     return this.pagination.page.current;
   }
 
+  set page(pageNumber: number) {
+    if (typeof pageNumber === 'number') {
+      this.pagination.page.current = pageNumber;
+    }
+  }
+
   refreshPage(state: ClrDatagridStateInterface) {
     this.images = [];
     if (state.page !== undefined) {
