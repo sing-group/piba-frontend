@@ -82,6 +82,7 @@ video {
 input[type=range] {
   -webkit-appearance: none;
   margin-bottom: -4px;
+  background: transparent;
 }
 
 input[type=range]:focus {
@@ -127,6 +128,7 @@ input[type=range]::-moz-range-track {
   border: 0px solid #010101;
   margin-top: 3%;
   width: 98%;
+  background: #ffffff;
 }
 
 /*button in progress bar*/
