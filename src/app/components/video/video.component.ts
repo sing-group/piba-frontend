@@ -20,6 +20,8 @@ export class VideoComponent implements OnInit {
   // tslint:disable-next-line:no-output-rename
   @Output('mouseInProgress') mouseInProgress = new EventEmitter<boolean>();
 
+  videoSpeed = 3;
+
   constructor() {
   }
 
@@ -72,15 +74,14 @@ export class VideoComponent implements OnInit {
   }
 
   forwardVideo() {
-    this.video.currentTime = Math.min(this.video.duration, this.video.currentTime + 3);
-
+    this.video.currentTime = Math.min(this.video.duration, this.video.currentTime + Number(this.videoSpeed));
     if (this.video.currentTime === this.video.duration) {
       this.video.pause();
     }
   }
 
   backwardVideo() {
-    this.video.currentTime = Math.max(0, this.video.currentTime - 3);
+    this.video.currentTime = Math.max(0, this.video.currentTime - Number(this.videoSpeed));
   }
 
   fullscreenVideo() {
