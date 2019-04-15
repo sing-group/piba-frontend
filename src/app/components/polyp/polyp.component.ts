@@ -56,10 +56,8 @@ export class PolypComponent implements OnInit {
   polypName: String;
 
   currentTime: number;
-  videoHTML: HTMLMediaElement;
-  controls: HTMLElement;
 
-  pauseWatcher: any;
+  pauseWatcher: any [] = [];
 
   @Input() exploration: Exploration;
   polyps: Polyp[];
@@ -212,32 +210,31 @@ export class PolypComponent implements OnInit {
   }
 
   playVideo(polypRecording: PolypRecording) {
-    this.videoHTML = document.getElementById(String(polypRecording.id)) as HTMLMediaElement;
-    if (this.pauseWatcher !== undefined && this.pauseWatcher != null) {
-      clearInterval(this.pauseWatcher);
+    const videoHTML = document.getElementById(String(polypRecording.id)) as HTMLMediaElement;
+    if (this.pauseWatcher[polypRecording.id] !== undefined && this.pauseWatcher[polypRecording.id] != null) {
+      clearInterval(this.pauseWatcher[polypRecording.id]);
     }
-    this.pauseWatcher = setInterval(() => {
-      if (this.videoHTML.currentTime >= polypRecording.end) {
-        this.videoHTML.currentTime = polypRecording.end;
+    this.pauseWatcher[polypRecording.id] = setInterval(() => {
+      if (videoHTML.currentTime >= polypRecording.end) {
+        videoHTML.currentTime = polypRecording.end;
         this.pauseVideo(polypRecording);
       }
     }, 500);
 
-    this.videoHTML.currentTime = polypRecording.start;
-    this.videoHTML.play();
+    videoHTML.currentTime = polypRecording.start;
+    videoHTML.play();
 
-    this.controls = document.getElementById('controls-' + polypRecording.id);
-    this.controls.style.display = 'none';
-
+    const controls = document.getElementById('controls-' + polypRecording.id);
+    controls.style.display = 'none';
   }
 
   pauseVideo(polypRecording: PolypRecording) {
-    this.videoHTML = document.getElementById(String(polypRecording.id)) as HTMLMediaElement;
-    this.videoHTML.pause();
-    this.controls = document.getElementById('controls-' + polypRecording.id);
-    this.controls.style.display = 'flex';
-    if (this.pauseWatcher != null) {
-      clearInterval(this.pauseWatcher);
+    const videoHTML = document.getElementById(String(polypRecording.id)) as HTMLMediaElement;
+    videoHTML.pause();
+    const controls = document.getElementById('controls-' + polypRecording.id);
+    controls.style.display = 'flex';
+    if (this.pauseWatcher[polypRecording.id] != null) {
+      clearInterval(this.pauseWatcher[polypRecording.id]);
     }
   }
 
