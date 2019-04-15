@@ -21,6 +21,7 @@ import {
   TSA,
   TsaDysplasingGrade
 } from '../../models/PolypHistology';
+import {PolypRecording} from '../../models/PolypRecording';
 
 @Component({
   selector: 'app-polyp',
@@ -210,35 +211,30 @@ export class PolypComponent implements OnInit {
     this.polyp = this.exploration.polyps.find(polyp => polyp.id === id);
   }
 
-  playVideo(videoId: string, polypId: string) {
-    const indexPolyp = this.polyps.indexOf(this.polyps.find((polyp) => polyp.id === polypId));
-    const indexVideo = this.polyps[indexPolyp].polypRecordings.indexOf(
-      this.polyps[indexPolyp].polypRecordings.find(polypRecording => polypRecording.video.id === videoId)
-    );
-
-    this.videoHTML = document.getElementById(videoId + '-' + polypId) as HTMLMediaElement;
+  playVideo(polypRecording: PolypRecording) {
+    this.videoHTML = document.getElementById(String(polypRecording.id)) as HTMLMediaElement;
+    if (this.pauseWatcher !== undefined && this.pauseWatcher != null) {
+      clearInterval(this.pauseWatcher);
+    }
     this.pauseWatcher = setInterval(() => {
-
-      if (this.videoHTML.currentTime >= this.polyps[indexPolyp].polypRecordings[indexVideo].end) {
-
-        this.videoHTML.currentTime = this.polyps[indexPolyp].polypRecordings[indexVideo].end;
-        this.pauseVideo(videoId, polypId);
+      if (this.videoHTML.currentTime >= polypRecording.end) {
+        this.videoHTML.currentTime = polypRecording.end;
+        this.pauseVideo(polypRecording);
       }
     }, 500);
 
-
-    this.videoHTML.currentTime = this.polyps[indexPolyp].polypRecordings[indexVideo].start;
+    this.videoHTML.currentTime = polypRecording.start;
     this.videoHTML.play();
 
-    this.controls = document.getElementById('controls-' + videoId + '-' + polypId);
+    this.controls = document.getElementById('controls-' + polypRecording.id);
     this.controls.style.display = 'none';
 
   }
 
-  pauseVideo(videoId: string, polypId: string) {
-    this.videoHTML = document.getElementById(videoId + '-' + polypId) as HTMLMediaElement;
+  pauseVideo(polypRecording: PolypRecording) {
+    this.videoHTML = document.getElementById(String(polypRecording.id)) as HTMLMediaElement;
     this.videoHTML.pause();
-    this.controls = document.getElementById('controls-' + videoId + '-' + polypId);
+    this.controls = document.getElementById('controls-' + polypRecording.id);
     this.controls.style.display = 'flex';
     if (this.pauseWatcher != null) {
       clearInterval(this.pauseWatcher);

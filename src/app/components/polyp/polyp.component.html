@@ -128,16 +128,16 @@
           <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12" *ngFor="let polypRecording of polyp.polypRecordings ">
             <div class="card">
               <div class="card-block">
-                <video id="{{polypRecording.video.id}}-{{polypRecording.polyp.id}}" class="exploration-video"
-                       (click)="pauseVideo(polypRecording.video.id, polypRecording.polyp.id)">
+                <video id="{{polypRecording.id}}" class="exploration-video"
+                       (click)="pauseVideo(polypRecording)">
                   <source *ngFor="let source of polypRecording.video.sources"
                           src="{{source.url}}"
                           type="{{source.mediaType}}"/>
                   <p>Your browser does not support the video tag.</p>
                 </video>
-                <div id="controls-{{polypRecording.video.id}}-{{polypRecording.polyp.id}}" class="controls-overlay">
+                <div id="controls-{{polypRecording.id}}" class="controls-overlay">
                   <button id="playVideo" title="play video" class="btn btn-link btn-overlay"
-                          (click)="playVideo(polypRecording.video.id, polypRecording.polyp.id)">
+                          (click)="playVideo(polypRecording)">
                     <clr-icon shape="play" size="30"></clr-icon>
                     Play
                   </button>
