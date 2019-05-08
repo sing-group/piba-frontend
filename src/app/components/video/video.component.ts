@@ -74,14 +74,23 @@ export class VideoComponent implements OnInit {
   }
 
   forwardVideo() {
-    this.video.currentTime = Math.min(this.video.duration, this.video.currentTime + Number(this.videoSpeed));
+    if (this.video.currentTime % 1 >= 0.99 || Number(this.videoSpeed) > 1) {
+      this.video.currentTime = Math.min(this.video.duration, Math.floor(this.video.currentTime) + 0.999 + Number(this.videoSpeed));
+    } else {
+      this.video.currentTime = Math.min(this.video.duration, Math.floor(this.video.currentTime) + 0.999);
+    }
+
     if (this.video.currentTime === this.video.duration) {
       this.video.pause();
     }
   }
 
   backwardVideo() {
-    this.video.currentTime = Math.max(0, this.video.currentTime - Number(this.videoSpeed));
+    if (this.video.currentTime % 1 < 0.01 || Number(this.videoSpeed) > 1) {
+      this.video.currentTime = Math.max(0, Math.floor(this.video.currentTime) - Number(this.videoSpeed));
+    } else {
+      this.video.currentTime = Math.max(0, Math.floor(this.video.currentTime));
+    }
   }
 
   fullscreenVideo() {

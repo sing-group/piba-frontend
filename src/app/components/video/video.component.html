@@ -13,7 +13,7 @@
     <div class="timer">
       <input #progressbar type="range" id="progress" [value]="progress.value" (mousedown)="mouseDownProgress()"
              (mouseup)="mouseUpProgress()" class="margin-progress"/>
-      <span>{{progress.value | time}}/{{video.duration | time}}</span>
+      <span>{{video.currentTime | time}}/{{video.duration | time}}</span>
     </div>
 
     <button class="backward" aria-label="backward" (click)="backwardVideo()">

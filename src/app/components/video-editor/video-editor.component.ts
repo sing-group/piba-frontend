@@ -68,10 +68,18 @@ export class VideoEditorComponent implements OnInit {
   }
 
   startInterval() {
+    this.videoHTML = document.getElementById('video-exploration') as HTMLMediaElement;
+    this.videoHTML.pause();
+    this.videoHTML.currentTime = Math.floor(this.videoHTML.currentTime);
+    this.currentTime = this.videoHTML.currentTime;
     this.start = this.transformToTimePipe();
   }
 
   endInterval() {
+    this.videoHTML = document.getElementById('video-exploration') as HTMLMediaElement;
+    this.videoHTML.pause();
+    this.videoHTML.currentTime = Math.floor(this.videoHTML.currentTime) + 0.999;
+    this.currentTime = this.videoHTML.currentTime;
     this.end = this.transformToTimePipe();
   }
 
