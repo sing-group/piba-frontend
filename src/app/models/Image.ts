@@ -1,6 +1,7 @@
 import {Video} from './Video';
 import {Gallery} from './Gallery';
 import {PolypLocation} from './PolypLocation';
+import {Polyp} from './Polyp';
 
 export class Image {
   id: string;
@@ -9,5 +10,6 @@ export class Image {
   base64contents: string;
   gallery: Gallery;
   video: Video;
+  polyp: Polyp;
   polypLocation: PolypLocation;
 }

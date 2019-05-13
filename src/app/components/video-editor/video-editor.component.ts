@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, Pipe, PipeTransform, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Polyp} from '../../models/Polyp';
 import {Video} from '../../models/Video';
@@ -11,6 +11,27 @@ import {PolypRecording} from '../../models/PolypRecording';
 import {TimeToNumberPipe} from '../../pipes/time-to-number.pipe';
 import {NotificationService} from '../../modules/notification/services/notification.service';
 import {ClrDatagridSortOrder} from '@clr/angular';
+import {GalleriesService} from '../../services/galleries.service';
+import {Gallery} from '../../models/Gallery';
+import {Image} from '../../models/Image';
+import {ImagesService} from '../../services/images.service';
+import {ImageUploadInfo} from '../../services/entities/ImageUploadInfo';
+
+@Pipe({
+  name: 'dropdownFilter',
+  pure: false
+})
+export class DropdownFilterPipe implements PipeTransform {
+  transform(items: any[], filter: string): any {
+    if (!items || !filter) {
+      return items;
+    } else if (items[0].title !== undefined) {
+      return items.filter(item => item.title.toUpperCase().includes(filter.toUpperCase()));
+    } else if (items[0].name !== undefined) {
+      return items.filter(item => item.name.toUpperCase().includes(filter.toUpperCase()));
+    }
+  }
+}
 
 @Component({
   selector: 'app-video-editor',
@@ -30,16 +51,27 @@ export class VideoEditorComponent implements OnInit {
   selectedPolyp: Polyp = new Polyp();
 
   polypRecording: PolypRecording;
+  openSnapshotModal = false;
+  galleries: Gallery[] = [];
+  gallery: Gallery = new Gallery();
+  galleryInput: string;
+  polypInput: string;
+  image: Image = new Image();
 
   currentTime: number;
+  snapshotTime: number;
   videoHTML: HTMLMediaElement;
 
   deletingPolypRecording = false;
   modalOpened = false;
+  showPolypsInFrame = true;
+  showPolypCheckbox = true;
 
   pauseWatcher: any;
   progress: HTMLInputElement;
   moveProgress = false;
+
+  @ViewChild('canvas') canvas: ElementRef;
 
   constructor(
     private videosService: VideosService,
@@ -49,6 +81,8 @@ export class VideoEditorComponent implements OnInit {
     private explorationsService: ExplorationsService,
     private polypRecordingsService: PolypRecordingsService,
     private timeToNumber: TimeToNumberPipe,
+    private galleriesService: GalleriesService,
+    private imagesService: ImagesService,
     private notificationService: NotificationService,
   ) {
   }
@@ -65,6 +99,10 @@ export class VideoEditorComponent implements OnInit {
           }
         );
       });
+
+    this.galleriesService.getGalleries().subscribe(galleries => {
+      this.galleries = galleries;
+    });
   }
 
   startInterval() {
@@ -189,5 +227,110 @@ export class VideoEditorComponent implements OnInit {
         clearInterval(this.pauseWatcher);
       }
     }, 100);
+  }
+
+  getSnapshot() {
+    this.snapshotTime = this.currentTime === undefined ? 0 : this.currentTime;
+    const videoHTML = document.getElementById('video-exploration') as HTMLVideoElement;
+    videoHTML.pause();
+    this.canvas.nativeElement.width = videoHTML.videoWidth;
+    this.canvas.nativeElement.height = videoHTML.videoHeight;
+    this.canvas.nativeElement.getContext('2d').drawImage(videoHTML, 0, 0,
+      videoHTML.videoWidth, videoHTML.videoHeight);
+    this.showPolypCheckbox = this.getPolyps().length !== this.polyps.length;
+    this.openSnapshotModal = true;
+  }
+
+  saveSnapshot() {
+    this.currentTime = this.snapshotTime;
+    this.image.video = this.video;
+    this.image.gallery = this.gallery;
+    this.image.polyp = this.selectedPolyp;
+    this.image.numFrame = Math.round(this.image.video.fps * this.snapshotTime);
+    this.image.base64contents = this.canvas.nativeElement.toDataURL();
+
+    let imageUploadInfo;
+    if (this.polypInput !== '' && this.polypInput !== undefined) {
+      imageUploadInfo = this.mapImageWithPolyp(this.image);
+    } else {
+      imageUploadInfo = this.mapImage(this.image);
+    }
+    imageUploadInfo.image = this.base64toFile(this.image.base64contents);
+
+    this.discardSnapshot();
+
+    this.imagesService.uploadImage(imageUploadInfo).subscribe((image) => {
+      this.notificationService.success('Image registered successfully.', 'Image registered.');
+    });
+  }
+
+  base64toFile(dataURI): File {
+    // convert the data URL to a byte string
+    const binary = atob(dataURI.split(',')[1]);
+
+    const array = [];
+    for (let i = 0; i < binary.length; i++) {
+      array.push(binary.charCodeAt(i));
+    }
+
+    const blob = new Blob([new Uint8Array(array)], {'type': 'image/png'});
+    blob['name'] = 'file';
+
+    return <File>blob;
+  }
+
+  galleryNonExists(): boolean {
+    return this.galleries.filter(gallery => gallery.title === this.galleryInput).length <= 0 ||
+      this.gallery.title !== this.galleryInput;
+  }
+
+  polypIsCorrect() {
+    return this.selectedPolyp.name === this.polypInput || this.polypInput === '';
+  }
+
+  selectGallery(gallery: Gallery) {
+    this.galleryInput = gallery.title;
+    this.gallery = gallery;
+  }
+
+  selectPolyp(polyp: Polyp) {
+    this.polypInput = polyp.name;
+    this.selectedPolyp = polyp;
+  }
+
+  getPolyps(): Polyp[] {
+    const polypRecordings = this.video.polypRecording.filter(polypRecording => this.snapshotTime >= polypRecording.start &&
+      this.snapshotTime <= polypRecording.end);
+    const polypsInPolypRecording = Array.from(polypRecordings, p => p.polyp);
+    return polypRecordings.length > 0 && this.showPolypsInFrame ? polypsInPolypRecording : this.polyps;
+  }
+
+  discardSnapshot() {
+    this.openSnapshotModal = false;
+    this.gallery = new Gallery();
+    this.galleryInput = '';
+    this.selectedPolyp = new Polyp();
+    this.polypInput = '';
+    this.showPolypsInFrame = true;
+  }
+
+  private mapImage(image: Image): ImageUploadInfo {
+    return {
+      image: null,
+      gallery: image.gallery.id,
+      video: image.video.id,
+      polyp: null,
+      numFrame: image.numFrame
+    };
+  }
+
+  private mapImageWithPolyp(image: Image): ImageUploadInfo {
+    return {
+      image: null,
+      gallery: image.gallery.id,
+      video: image.video.id,
+      polyp: image.polyp.id,
+      numFrame: image.numFrame
+    };
   }
 }

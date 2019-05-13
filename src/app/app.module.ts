@@ -13,7 +13,7 @@ import {PatientsComponent} from './components/patients/patients.component';
 import {PolypsService} from './services/polyps.service';
 import {VideosService} from './services/videos.service';
 import {ExplorationsService} from './services/explorations.service';
-import {VideoEditorComponent} from './components/video-editor/video-editor.component';
+import {DropdownFilterPipe, VideoEditorComponent} from './components/video-editor/video-editor.component';
 import {TimePipe} from './pipes/time.pipe';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {ExplorationsComponent} from './components/explorations/explorations.component';
@@ -63,7 +63,8 @@ import {ModifiersComponent} from './components/modifiers/modifiers.component';
     ImageComponent,
     ProfileComponent,
     GalleriesComponent,
-    ModifiersComponent
+    ModifiersComponent,
+    DropdownFilterPipe
   ],
   imports: [
     BrowserModule,

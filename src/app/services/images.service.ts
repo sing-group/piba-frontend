@@ -12,6 +12,7 @@ import {PolypLocation} from '../models/PolypLocation';
 import {PolypLocationInfo} from './entities/PolypLocationInfo';
 import {Gallery} from '../models/Gallery';
 import {ImagePage} from './entities/ImagePage';
+import {ImageUploadInfo} from './entities/ImageUploadInfo';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +50,20 @@ export class ImagesService {
       .pipe(map((response) => {
         return this.arrayBufferToBase64(response);
       }));
+  }
+
+  uploadImage(image: ImageUploadInfo): Observable<Image> {
+    const formData: FormData = new FormData();
+    formData.append('image', image.image);
+    formData.append('gallery', image.gallery);
+    formData.append('video', image.video);
+    formData.append('polyp', image.polyp);
+    formData.append('numFrame', image.numFrame.toString());
+
+    return this.http.post<ImageInfo>(`${environment.restApi}/image`, formData)
+      .pipe(
+        map(this.mapImageInfo.bind(this))
+      );
   }
 
   createLocation(id: string, polypLocation: PolypLocation): Observable<PolypLocation> {
@@ -165,6 +180,7 @@ export class ImagesService {
       base64contents: imageInfo.base64contents,
       video: video,
       gallery: null,
+      polyp: null,
       polypLocation: polypLocation
     };
   }

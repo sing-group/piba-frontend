@@ -21,3 +21,55 @@
   margin-right: 1.75%;
   margin-left: auto;
 }
+
+.snapshot-canvas {
+  width: 100%;
+  margin: 0 auto;
+  display: block;
+}
+
+.margin-top-gallery {
+  margin-top: 3.6%;
+}
+
+.clr-dropdown {
+  max-height: 45%;
+  overflow-y: auto;
+  margin-left: 2%;
+}
+
+@media (min-width: 576px) {
+  .clr-dropdown {
+    min-width: 43.45%;
+  }
+}
+
+@media (max-width: 576px) {
+  .clr-dropdown {
+    min-width: 65%;
+  }
+}
+
+clr-dropdown > input {
+  padding-left: .1rem !important;
+  width: 100%;
+}
+
+.margin-top-polyp {
+  margin-top: 2.5%;
+}
+
+.polyp-checkbox {
+  font-size: small;
+}
+
+@media (min-width: 576px) {
+  .polyp-checkbox {
+    padding: 0;
+  }
+}
+
+.required-gallery {
+  color: #c92100;
+}
+

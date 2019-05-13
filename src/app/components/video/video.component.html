@@ -1,5 +1,5 @@
 <div #container class="video-container">
-  <video #video id="video-exploration">
+  <video crossorigin="anonymous" #video id="video-exploration">
     <ng-content></ng-content>
   </video>
   <div class="controls">
@@ -16,6 +16,10 @@
       <span>{{video.currentTime | time}}/{{video.duration | time}}</span>
     </div>
 
+    <button *ngIf="authenticationService.getRole() == role.ENDOSCOPIST" class="snapshot" aria-label="snapshot"
+            (click)="getSnapshot()">
+      <clr-icon shape="camera"></clr-icon>
+    </button>
     <button class="backward" aria-label="backward" (click)="backwardVideo()">
       <clr-icon shape="rewind"></clr-icon>
     </button>

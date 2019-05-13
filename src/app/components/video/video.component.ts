@@ -1,4 +1,6 @@
 import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {AuthenticationService} from '../../services/authentication.service';
+import {Role} from '../../models/User';
 
 @Component({
   selector: 'app-video',
@@ -14,15 +16,18 @@ export class VideoComponent implements OnInit {
 
   fullscreen = false;
   playWatcher: any;
+  role = Role;
 
   progress: HTMLInputElement;
   moveProgress = false;
   // tslint:disable-next-line:no-output-rename
   @Output('mouseInProgress') mouseInProgress = new EventEmitter<boolean>();
+  // tslint:disable-next-line:no-output-rename
+  @Output('doSnapshot') snapshot = new EventEmitter<boolean>();
 
   videoSpeed = 3;
 
-  constructor() {
+  constructor(public authenticationService: AuthenticationService) {
   }
 
   ngOnInit() {
@@ -139,5 +144,9 @@ export class VideoComponent implements OnInit {
     this.moveProgress = false;
     this.video.currentTime = this.progress.valueAsNumber;
     this.mouseInProgress.emit(this.moveProgress);
+  }
+
+  getSnapshot() {
+    this.snapshot.emit(true);
   }
 }

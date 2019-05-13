@@ -6,7 +6,8 @@
 </div>
 
 <div class="row video-container" *ngIf="video != null">
-  <app-video (currentTime)="onCurrentTimeUpdate($event)" (mouseInProgress)="mouseInProgress($event)">
+  <app-video (currentTime)="onCurrentTimeUpdate($event)" (mouseInProgress)="mouseInProgress($event)"
+             (doSnapshot)="getSnapshot($event)">
     <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}"/>
     <p>Your browser does not support the video tag.</p>
   </app-video>
@@ -154,3 +155,62 @@
                          [name]="polypRecording.polyp.name"
                          [cancel]="cancel.bind(this)" [delete]="removePolypRecording.bind(this)">
 </app-delete-confirmation>
+
+<!-- Snapshot modal -->
+<clr-modal [(clrModalOpen)]="openSnapshotModal" [clrModalClosable]="false">
+  <h3 class="modal-title">Save snapshot</h3>
+  <div class="modal-body">
+    <div>
+      <canvas #canvas id="canvas" class="snapshot-canvas"></canvas>
+    </div>
+    <div class="margin-top-gallery clr-row">
+      <label for="snapshot-form-gallery" class="col-xs-3">Gallery <span class="required-gallery">*</span></label>
+      <clr-dropdown class="col-xs-9 col-sm-6">
+        <input type="text" clrDropdownTrigger id="snapshot-form-gallery" [(ngModel)]="galleryInput"
+               name="galleryInput" autocomplete="off"
+               #galleryValue="ngModel" placeholder="Search gallery"/>
+        <clr-dropdown-menu *clrIfOpen class="clr-dropdown">
+          <button *ngIf="(galleries | dropdownFilter:galleryInput)?.length === 0" type="button" class="btn" disabled>No
+            matches found
+          </button>
+          <div *ngFor="let i of galleries | dropdownFilter:galleryInput">
+            <button type="button" clrDropdownItem (click)="selectGallery(i)">{{i.title}}
+            </button>
+          </div>
+        </clr-dropdown-menu>
+      </clr-dropdown>
+    </div>
+
+    <div class="clr-row">
+      <label for="snapshot-form-polyp" class="col-xs-3 margin-top-polyp">Polyp</label>
+      <clr-dropdown class="col-xs-9 col-sm-6 margin-top-polyp">
+        <input type="text" clrDropdownTrigger id="snapshot-form-polyp" [(ngModel)]="polypInput" name="polypInput"
+               autocomplete="off" #polypValue="ngModel" placeholder="Search polyp"/>
+        <clr-dropdown-menu *clrIfOpen class="clr-dropdown">
+          <button *ngIf="(getPolyps() | dropdownFilter:polypInput)?.length === 0" type="button" class="btn" disabled>No
+            matches found
+          </button>
+          <div *ngFor="let i of getPolyps() | dropdownFilter:polypInput">
+            <button type="button" clrDropdownItem (click)="selectPolyp(i)">{{i.name}}
+            </button>
+          </div>
+        </clr-dropdown-menu>
+      </clr-dropdown>
+      <div *ngIf="showPolypCheckbox" class="col-xs-12 col-sm-3 clr-align-self-end polyp-checkbox">
+        <clr-checkbox [(clrChecked)]="showPolypsInFrame">
+          Polyps in frame
+        </clr-checkbox>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger-outline" (click)="discardSnapshot()">Discard snapshot
+    </button>
+    <button type="button" class="btn btn-success-outline"
+            (click)="saveSnapshot()" [disabled]="galleryNonExists() || !polypIsCorrect()">
+      Save to gallery
+    </button>
+  </div>
+</clr-modal>
+
