@@ -7,8 +7,6 @@ import {PolypLocation} from '../../models/PolypLocation';
 import {ImagesService} from '../../services/images.service';
 import {NotificationService} from '../../modules/notification/services/notification.service';
 import {Location} from '@angular/common';
-import {PolypRecordingsService} from '../../services/polyprecordings.service';
-import {PolypRecording} from '../../models/PolypRecording';
 import {Adenoma, PolypType, SSA, TSA} from '../../models/PolypHistology';
 import {AuthenticationService} from '../../services/authentication.service';
 import {Role} from '../../models/User';
@@ -50,7 +48,6 @@ export class ImageComponent implements OnInit {
   observationToRemoveStartsWith = null;
   observationsFound: string[] = [];
 
-  polypRecording: PolypRecording;
   type: string;
   dysplasingGrade: string;
   role = Role;
@@ -63,7 +60,6 @@ export class ImageComponent implements OnInit {
               private notificationService: NotificationService,
               private location: Location,
               private router: Router,
-              private polypRecordingService: PolypRecordingsService,
               public authenticationService: AuthenticationService) {
     this.imageElement = document.createElement('img');
     // Needed for Chrome
@@ -103,35 +99,37 @@ export class ImageComponent implements OnInit {
       );
     });
 
-    // Mouseup
-    this.canvas.addEventListener('mouseup', () => {
-      this.mousedown = false;
-    });
 
-    // Mousedown
-    this.canvas.addEventListener('mousedown', (e: MouseEvent) => {
-      const canvasx: number = this.canvas.offsetLeft;
-      const canvasy: number = this.canvas.offsetTop;
-      this.last_mousex = e.clientX - canvasx;
-      this.last_mousey = e.clientY - canvasy;
-      this.mousedown = true;
-    });
+      // Mouseup
+      this.canvas.addEventListener('mouseup', () => {
+        this.mousedown = false;
+      });
 
-    // Mousemove
-    this.canvas.addEventListener('mousemove', (e: MouseEvent) => {
-      const canvasx: number = this.canvas.offsetLeft;
-      const canvasy: number = this.canvas.offsetTop;
+      // Mousedown
+      this.canvas.addEventListener('mousedown', (e: MouseEvent) => {
+        const canvasx: number = this.canvas.offsetLeft;
+        const canvasy: number = this.canvas.offsetTop;
+        this.last_mousex = e.clientX - canvasx;
+        this.last_mousey = e.clientY - canvasy;
+        this.mousedown = true;
+      });
 
-      const mousex = e.clientX - canvasx;
-      const mousey = e.clientY - canvasy;
+      // Mousemove
+      this.canvas.addEventListener('mousemove', (e: MouseEvent) => {
+        const canvasx: number = this.canvas.offsetLeft;
+        const canvasy: number = this.canvas.offsetTop;
 
-      if (this.mousedown) {
-        this.repaintImage();
-        this.width = mousex - this.last_mousex;
-        this.height = mousey - this.last_mousey;
-        this.draw();
-      }
-    });
+        const mousex = e.clientX - canvasx;
+        const mousey = e.clientY - canvasy;
+
+        if (this.mousedown && this.image.polyp != null) {
+          this.repaintImage();
+          this.width = mousex - this.last_mousex;
+          this.height = mousey - this.last_mousey;
+          this.draw();
+        }
+      });
+
   }
 
   save() {
@@ -224,7 +222,7 @@ export class ImageComponent implements OnInit {
       this.image = img;
       this.paintImageAndLocation();
       if (this.authenticationService.getRole() !== Role.ENDOSCOPIST) {
-        this.getPolypRecordingInfo();
+        this.getPolypInfo();
       }
     });
   }
@@ -294,7 +292,7 @@ export class ImageComponent implements OnInit {
     const locationSaved = this.image.polypLocation;
     // if polyp is selected
     if (this.authenticationService.getRole() === this.role.ENDOSCOPIST && (this.last_mousex != null || this.last_mousey != null ||
-      this.width != null || this.height != null)) {
+      this.width != null || this.height != null) && this.image.polyp != null) {
       // if polyp wasn't saved
       if (locationSaved == null || (this.last_mousex !== locationSaved.x || this.last_mousey !== locationSaved.y ||
         this.width !== locationSaved.width || this.height !== locationSaved.height)) {
@@ -387,40 +385,32 @@ export class ImageComponent implements OnInit {
     this.height = null;
   }
 
-  private getPolypRecordingInfo() {
-    this.isLoading = true;
-    this.polypRecordingService.getPolypRecordingsByVideo(this.image.video.id).subscribe(polypRecordings => {
-      this.isLoading = false;
-      for (const polypRecording of polypRecordings) {
-        const frame = Math.floor(this.image.numFrame / this.image.video.fps - 1);
-        if (frame >= polypRecording.start && frame <= polypRecording.end) {
-          this.polypRecording = polypRecording;
-          switch (polypRecording.polyp.histology.polypType) {
-            case PolypType.ADENOMA:
-              this.type = (<Adenoma>polypRecording.polyp.histology).type;
-              this.dysplasingGrade = (<Adenoma>polypRecording.polyp.histology).dysplasingGrade;
-              break;
-            case PolypType.INVASIVE:
-            case PolypType.HYPERPLASTIC:
-            case PolypType.NON_EPITHELIAL_NEOPLASTIC:
-              this.type = null;
-              this.dysplasingGrade = null;
-              break;
-            case PolypType.SESSILE_SERRATED_ADENOMA:
-              this.type = null;
-              this.dysplasingGrade = (<SSA>polypRecording.polyp.histology).dysplasingGrade;
-              break;
-            case PolypType.TRADITIONAL_SERRATED_ADENOMA:
-              this.type = null;
-              this.dysplasingGrade = (<TSA>polypRecording.polyp.histology).dysplasingGrade;
-              break;
-            default:
-              this.type = null;
-              this.dysplasingGrade = null;
-          }
-        }
+  private getPolypInfo() {
+    if (this.image.polyp !== null) {
+      switch (this.image.polyp.histology.polypType) {
+        case PolypType.ADENOMA:
+          this.type = (<Adenoma>this.image.polyp.histology).type;
+          this.dysplasingGrade = (<Adenoma>this.image.polyp.histology).dysplasingGrade;
+          break;
+        case PolypType.INVASIVE:
+        case PolypType.HYPERPLASTIC:
+        case PolypType.NON_EPITHELIAL_NEOPLASTIC:
+          this.type = null;
+          this.dysplasingGrade = null;
+          break;
+        case PolypType.SESSILE_SERRATED_ADENOMA:
+          this.type = null;
+          this.dysplasingGrade = (<SSA>this.image.polyp.histology).dysplasingGrade;
+          break;
+        case PolypType.TRADITIONAL_SERRATED_ADENOMA:
+          this.type = null;
+          this.dysplasingGrade = (<TSA>this.image.polyp.histology).dysplasingGrade;
+          break;
+        default:
+          this.type = null;
+          this.dysplasingGrade = null;
       }
-    });
+    }
   }
 
   searchObservations(event) {
@@ -447,5 +437,4 @@ export class ImageComponent implements OnInit {
     this.observationToRemove = observation;
     this.observationToRemoveStartsWith = observation;
   }
-
 }

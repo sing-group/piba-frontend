@@ -78,6 +78,10 @@ i {
   width: 69%;
 }
 
+.btn-remove {
+  margin-right: 0;
+}
+
 :host /deep/ .modal-body {
   overflow-x: visible !important;
   overflow-y: visible !important;

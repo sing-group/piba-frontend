@@ -13,6 +13,8 @@ import {PolypLocationInfo} from './entities/PolypLocationInfo';
 import {Gallery} from '../models/Gallery';
 import {ImagePage} from './entities/ImagePage';
 import {ImageUploadInfo} from './entities/ImageUploadInfo';
+import {PolypsService} from './polyps.service';
+import {Polyp} from '../models/Polyp';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +22,8 @@ import {ImageUploadInfo} from './entities/ImageUploadInfo';
 export class ImagesService {
 
   constructor(private http: HttpClient,
-              private videosService: VideosService) {
+              private videosService: VideosService,
+              private polypsService: PolypsService) {
   }
 
   getImage(id: string): Observable<Image> {
@@ -29,12 +32,15 @@ export class ImagesService {
           return forkJoin(
             this.videosService.getVideo((<IdAndUri>imageInfo.video).id),
             this.getLocation(imageInfo.id).pipe(catchError((err) => err.status === 400 ? of(null) : throwError(err))),
-            this.getImageContents(imageInfo.id)
+            this.getImageContents(imageInfo.id),
+            (<IdAndUri>imageInfo.polyp) !== null && (<IdAndUri>imageInfo.polyp) !== undefined ?
+              this.polypsService.getPolyp((<IdAndUri>imageInfo.polyp).id) : of(null)
           ).pipe(
             map(
               videoAndLocationAndImageContent => {
                 imageInfo.base64contents = videoAndLocationAndImageContent[2];
-                return this.mapImageInfo(imageInfo, videoAndLocationAndImageContent[0], videoAndLocationAndImageContent[1]);
+                return this.mapImageInfo(imageInfo, videoAndLocationAndImageContent[0], videoAndLocationAndImageContent[1],
+                  videoAndLocationAndImageContent[3]);
               })
           );
         }
@@ -153,15 +159,18 @@ export class ImagesService {
       concatMap(imageInfos =>
         forkJoin(
           forkJoin(imageInfos.map(imageInfo => this.videosService.getVideo((<IdAndUri>imageInfo.video).id))),
+          forkJoin(imageInfos.map(imageInfo => (<IdAndUri>imageInfo.polyp) !== null ?
+            this.polypsService.getPolyp((<IdAndUri>imageInfo.polyp).id) : of(null))),
           forkJoin(imageInfos.map(imageInfo => withLocation ? this.getLocation(imageInfo.id)
             .pipe(catchError((err) => err.status === 400 ? of(null) : throwError(err))) : of(null))),
           forkJoin(imageInfos.map(imageInfo => this.getImageContents(imageInfo.id)))
         ).pipe(
           map(videosAndLocationsAndImageContents =>
             imageInfos.map((imageInfo, index) => {
-                imageInfo.base64contents = videosAndLocationsAndImageContents[2][index];
+                imageInfo.base64contents = videosAndLocationsAndImageContents[3][index];
                 const image: Image = this.mapImageInfo(
-                  imageInfo, videosAndLocationsAndImageContents[0][index], videosAndLocationsAndImageContents[1][index]);
+                  imageInfo, videosAndLocationsAndImageContents[0][index], videosAndLocationsAndImageContents[2][index],
+                  videosAndLocationsAndImageContents[1][index]);
                 image.gallery = gallery;
                 return image;
               }
@@ -172,7 +181,7 @@ export class ImagesService {
     );
   }
 
-  private mapImageInfo(imageInfo: ImageInfo, video: Video, polypLocation: PolypLocation): Image {
+  private mapImageInfo(imageInfo: ImageInfo, video: Video, polypLocation: PolypLocation, polyp: Polyp): Image {
     return {
       id: imageInfo.id,
       numFrame: imageInfo.numFrame,
@@ -180,7 +189,7 @@ export class ImagesService {
       base64contents: imageInfo.base64contents,
       video: video,
       gallery: null,
-      polyp: null,
+      polyp: polyp,
       polypLocation: polypLocation
     };
   }

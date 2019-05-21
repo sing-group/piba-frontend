@@ -5,8 +5,8 @@
   <div class="clr-row clr-justify-content-end">
     <button class="btn btn-primary" (click)="redirectToGallery()">Back</button>
   </div>
-  <div class="clr-row container">
-    <div class="clr-col-1 container-move">
+  <div class="clr-row">
+    <div class="clr-col-1 clr-align-self-center" align="center">
       <button class="btn btn-link" (click)="selectedToRight = false; checkIfLocationSavedAndScrollImage()"
               [disabled]="isFirstImage || isLoading">
         <i class="arrow-left"></i>
@@ -16,44 +16,47 @@
       <div align="center">
         <canvas id="canvas"></canvas>
       </div>
-      <div align="center" *ngIf="authenticationService.getRole() == role.ENDOSCOPIST">
-        <button class="btn btn-success" (click)="save()"
-                [disabled]="(last_mousex == null && last_mousey == null && width==null && height==null) ||  isLoading">
-          <clr-icon shape="plus"></clr-icon>
-          Save
-        </button>
-        <button class="btn btn-primary"
-                (click)="image.polypLocation != null ? this.warningMessageRemovingLocation = true : cleanCanvas();" [disabled] = "isLoading">
-          <clr-icon shape="refresh"></clr-icon>
-          Clear
-        </button>
-        <button class="btn btn-danger" (click)="deleting = true" [disabled] = "isLoading">
-          <clr-icon shape="trash"></clr-icon>
-          Remove image
-        </button>
-      </div>
     </div>
-    <div class="clr-col-1 container-move">
+    <div class="clr-col-1 clr-align-self-center" align="center">
       <button class="btn btn-link" (click)="selectedToRight = true; checkIfLocationSavedAndScrollImage()"
               [disabled]="isLastImage || isLoading">
         <i class="arrow-right"></i>
       </button>
     </div>
   </div>
+  <div class="clr-row clr-justify-content-center">
+    <div *ngIf="authenticationService.getRole() == role.ENDOSCOPIST">
+      <button *ngIf="image.polyp != null" class="btn btn-success" (click)="save()"
+              [disabled]="(last_mousex == null && last_mousey == null && width==null && height==null) ||  isLoading">
+        <clr-icon shape="plus"></clr-icon>
+        Save
+      </button>
+      <button *ngIf="image.polyp != null" class="btn btn-primary"
+              (click)="image.polypLocation != null ? this.warningMessageRemovingLocation = true : cleanCanvas();"
+              [disabled] = "isLoading">
+        <clr-icon shape="refresh"></clr-icon>
+        Clear
+      </button>
+      <button class="btn btn-danger btn-remove" (click)="deleting = true" [disabled] = "isLoading">
+        <clr-icon shape="trash"></clr-icon>
+        Remove image
+      </button>
+    </div>
+  </div>
 
-  <div *ngIf="polypRecording && authenticationService.getRole() != role.ENDOSCOPIST" class="card">
+  <div *ngIf="image.polyp != null && authenticationService.getRole() != role.ENDOSCOPIST" class="card">
     <div class="clr-row margin-row">
       <div class="col-lg-2 col-sm-3 col-xs-4">
         <label class="txt-strong" for="polyp-name">Name</label>
       </div>
       <div class="col-lg-4 col-sm-3 col-xs-8">
-        <input type="text" id="polyp-name" readonly value="{{polypRecording.polyp.name}}"/>
+        <input type="text" id="polyp-name" readonly value="{{image.polyp.name}}"/>
       </div>
       <div class="col-lg-2 col-sm-3 col-xs-4">
         <label class="txt-strong" for="polyp-size">Size (mm)</label>
       </div>
       <div class="col-lg-4 col-sm-3 col-xs-8">
-        <input type="text" id="polyp-size" readonly value="{{polypRecording.polyp.size}}"/>
+        <input type="text" id="polyp-size" readonly value="{{image.polyp.size}}"/>
       </div>
     </div>
     <div class="clr-row margin-row">
@@ -61,13 +64,13 @@
         <label class="txt-strong" for="polyp-location">Location</label>
       </div>
       <div class="col-lg-4 col-sm-3 col-xs-8">
-        <input type="text" id="polyp-location" readonly value="{{polypRecording.polyp.location}}"/>
+        <input type="text" id="polyp-location" readonly value="{{image.polyp.location}}"/>
       </div>
       <div class="col-lg-2 col-sm-3 col-xs-4">
         <label class="txt-strong" for="polyp-nice">NICE</label>
       </div>
       <div class="col-lg-4 col-sm-3 col-xs-8">
-        <input type="text" id="polyp-nice" readonly value="{{polypRecording.polyp.nice}}"/>
+        <input type="text" id="polyp-nice" readonly value="{{image.polyp.nice}}"/>
       </div>
     </div>
     <div class="clr-row margin-row">
@@ -75,13 +78,13 @@
         <label class="txt-strong" for="polyp-wasp">WASP</label>
       </div>
       <div class="col-lg-4 col-sm-3 col-xs-8">
-        <input type="text" id="polyp-wasp" readonly value="{{polypRecording.polyp.wasp}}"/>
+        <input type="text" id="polyp-wasp" readonly value="{{image.polyp.wasp}}"/>
       </div>
       <div class="col-lg-2 col-sm-3 col-xs-4">
         <label class="txt-strong" for="polyp-lst">LST</label>
       </div>
       <div class="col-lg-4 col-sm-3 col-xs-8">
-        <input type="text" id="polyp-lst" readonly value="{{polypRecording.polyp.lst}}"/>
+        <input type="text" id="polyp-lst" readonly value="{{image.polyp.lst}}"/>
       </div>
     </div>
     <div class="clr-row margin-row">
@@ -89,13 +92,13 @@
         <label class="txt-strong" for="polyp-parisPrimary">PARIS</label>
       </div>
       <div class="col-lg-4 col-sm-3 col-xs-8">
-        <input type="text" id="polyp-parisPrimary" readonly value="{{polypRecording.polyp.parisPrimary}}"/>
+        <input type="text" id="polyp-parisPrimary" readonly value="{{image.polyp.parisPrimary}}"/>
       </div>
-      <div class="col-lg-2 col-sm-3 col-xs-4" *ngIf="polypRecording.polyp.parisSecondary !== undefined">
+      <div class="col-lg-2 col-sm-3 col-xs-4" *ngIf="image.polyp.parisSecondary !== undefined">
         <label class="txt-strong" for="polyp-parisSecondary">PARIS Secondary</label>
       </div>
-      <div class="col-lg-4 col-sm-3 col-xs-8" *ngIf="polypRecording.polyp.parisSecondary !== undefined">
-        <input type="text" id="polyp-parisSecondary" readonly value="{{polypRecording.polyp.parisSecondary}}"/>
+      <div class="col-lg-4 col-sm-3 col-xs-8" *ngIf="image.polyp.parisSecondary !== undefined">
+        <input type="text" id="polyp-parisSecondary" readonly value="{{image.polyp.parisSecondary}}"/>
       </div>
     </div>
     <div class="clr-row margin-row">
@@ -103,7 +106,7 @@
         <label class="txt-strong" for="polyp-histology">Histology</label>
       </div>
       <div class="col-lg-4 col-sm-8 col-xs-8">
-        <input type="text" id="polyp-histology" readonly value="{{polypRecording.polyp.histology.polypType}}"/>
+        <input type="text" id="polyp-histology" readonly value="{{image.polyp.histology.polypType}}"/>
       </div>
     </div>
     <div class="clr-row margin-row">
@@ -127,7 +130,7 @@
         <label class="txt-strong" for="polyp-observation">Observation</label>
       </div>
       <div class="col-xs-12">
-        <input type="text" id="polyp-observation" readonly value="{{polypRecording.polyp.observation}}"/>
+        <input type="text" id="polyp-observation" readonly value="{{image.polyp.observation}}"/>
       </div>
     </div>
 
@@ -151,7 +154,8 @@
           <div *ngIf="selected == 'Others'" class="form-group">
             <label for="observationToRemove">Describe the reason </label>
             <div class="autocomplete">
-            <input type="text" id="observationToRemove" (keyup)="searchObservations($event)" name="observationToRemove" [(ngModel)]="observationToRemoveStartsWith" autocomplete="off"/>
+            <input type="text" id="observationToRemove" (keyup)="searchObservations($event)" name="observationToRemove"
+                   [(ngModel)]="observationToRemoveStartsWith" autocomplete="off"/>
             <div *ngIf="!observationToRemove" class="autocomplete-items">
               <input class="inputAutocomplete" value="{{observation}}" *ngFor="let observation of observationsFound"
                      (click)="selectedObservationToRemove(observation)" readonly
