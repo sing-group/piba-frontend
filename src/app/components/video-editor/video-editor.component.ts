@@ -101,7 +101,7 @@ export class VideoEditorComponent implements OnInit {
       });
 
     this.galleriesService.getGalleries().subscribe(galleries => {
-      this.galleries = galleries;
+      this.galleries = galleries.sort((a, b) => a.title > b.title ? 1 : -1);
     });
   }
 
@@ -302,7 +302,8 @@ export class VideoEditorComponent implements OnInit {
     const polypRecordings = this.video.polypRecording.filter(polypRecording => this.snapshotTime >= polypRecording.start &&
       this.snapshotTime <= polypRecording.end);
     const polypsInPolypRecording = Array.from(polypRecordings, p => p.polyp);
-    return polypRecordings.length > 0 && this.showPolypsInFrame ? polypsInPolypRecording : this.polyps;
+    return polypRecordings.length > 0 && this.showPolypsInFrame ? polypsInPolypRecording.sort(
+      (a, b) => a.name > b.name ? 1 : -1) : this.polyps.sort((a, b) => a.name > b.name ? 1 : -1);
   }
 
   discardSnapshot() {
