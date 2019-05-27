@@ -16,7 +16,7 @@
       <span>{{video.currentTime | time}}/{{video.duration | time}}</span>
     </div>
 
-    <button *ngIf="authenticationService.getRole() == role.ENDOSCOPIST" class="snapshot" aria-label="snapshot"
+    <button class="snapshot" aria-label="snapshot"
             (click)="getSnapshot()">
       <clr-icon shape="camera"></clr-icon>
     </button>

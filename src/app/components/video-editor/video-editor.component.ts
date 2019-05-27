@@ -16,6 +16,8 @@ import {Gallery} from '../../models/Gallery';
 import {Image} from '../../models/Image';
 import {ImagesService} from '../../services/images.service';
 import {ImageUploadInfo} from '../../services/entities/ImageUploadInfo';
+import {AuthenticationService} from '../../services/authentication.service';
+import {Role} from '../../models/User';
 
 @Pipe({
   name: 'dropdownFilter',
@@ -56,7 +58,9 @@ export class VideoEditorComponent implements OnInit {
   gallery: Gallery = new Gallery();
   galleryInput: string;
   polypInput: string;
+  fileName: string;
   image: Image = new Image();
+  role = Role;
 
   currentTime: number;
   snapshotTime: number;
@@ -84,6 +88,7 @@ export class VideoEditorComponent implements OnInit {
     private galleriesService: GalleriesService,
     private imagesService: ImagesService,
     private notificationService: NotificationService,
+    public authenticationService: AuthenticationService
   ) {
   }
 
@@ -238,7 +243,12 @@ export class VideoEditorComponent implements OnInit {
     this.canvas.nativeElement.getContext('2d').drawImage(videoHTML, 0, 0,
       videoHTML.videoWidth, videoHTML.videoHeight);
     this.showPolypCheckbox = this.getPolyps().length !== this.polyps.length;
+    this.getFileName();
     this.openSnapshotModal = true;
+  }
+
+  getFileName() {
+    this.fileName = this.video.id + '_' + Math.round(this.video.fps * this.snapshotTime) + '.png';
   }
 
   saveSnapshot() {

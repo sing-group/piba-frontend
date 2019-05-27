@@ -29,7 +29,7 @@
 }
 
 .margin-top-gallery {
-  margin-top: 3.6%;
+  margin-top: 4.2%;
 }
 
 .clr-dropdown {
@@ -55,10 +55,6 @@ clr-dropdown > input {
   width: 100%;
 }
 
-.margin-top-polyp {
-  margin-top: 2.5%;
-}
-
 .polyp-checkbox {
   font-size: small;
 }
@@ -71,5 +67,10 @@ clr-dropdown > input {
 
 .required-gallery {
   color: #c92100;
+}
+
+.modal-body>:last-child {
+  margin-bottom: .3rem;
+  margin-top: 2.5%;
 }
 

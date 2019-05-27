@@ -1,6 +1,4 @@
 import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
-import {AuthenticationService} from '../../services/authentication.service';
-import {Role} from '../../models/User';
 
 @Component({
   selector: 'app-video',
@@ -16,7 +14,6 @@ export class VideoComponent implements OnInit {
 
   fullscreen = false;
   playWatcher: any;
-  role = Role;
 
   progress: HTMLInputElement;
   moveProgress = false;
@@ -27,7 +24,7 @@ export class VideoComponent implements OnInit {
 
   videoSpeed = 3;
 
-  constructor(public authenticationService: AuthenticationService) {
+  constructor() {
   }
 
   ngOnInit() {
