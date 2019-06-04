@@ -83,7 +83,10 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
   }
 
   filterChange() {
-    (<HTMLInputElement>document.getElementById('page-to-go')).value = '1';
+    const pageToGo = <HTMLInputElement>document.getElementById('page-to-go') as HTMLInputElement;
+    if (pageToGo != null) {
+      pageToGo.value = '1';
+    }
     this.pagination.page.current = 1;
     this.images = [];
     this.getImages();
