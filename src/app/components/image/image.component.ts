@@ -350,7 +350,8 @@ export class ImageComponent implements OnInit {
     if (isNaN(page)) {
       page = 1;
     }
-    this.router.navigateByUrl('gallery/' + this.gallery.id + '?page=' + page);
+    this.router.navigateByUrl('gallery/' + this.gallery.id + '?page=' + page + '&filter=' + this.filter + '&show_location='
+      + this.showPolypLocation);
   }
 
   private lastValidPosition(): number {

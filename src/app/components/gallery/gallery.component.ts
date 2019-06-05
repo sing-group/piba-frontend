@@ -9,6 +9,7 @@ import {ClrDatagridPagination, ClrDatagridStateInterface} from '@clr/angular';
 import {NotificationService} from '../../modules/notification/services/notification.service';
 import {Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-gallery',
@@ -37,6 +38,7 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
   constructor(private route: ActivatedRoute,
               private galleryService: GalleriesService,
               private imageService: ImagesService,
+              private location: Location,
               private notificationService: NotificationService) {
   }
 
@@ -61,6 +63,10 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
       this.gallery = gallery;
       this.getImages();
     });
+
+    this.filter = this.route.snapshot.queryParamMap.get('filter') == null ? 'all' : this.route.snapshot.queryParamMap.get('filter');
+    this.showPolypLocation = this.route.snapshot.queryParamMap.get('show_location') == null ? true :
+      this.route.snapshot.queryParamMap.get('show_location') === 'true';
   }
 
   get page(): number {
@@ -71,6 +77,11 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
     if (typeof pageNumber === 'number') {
       this.pagination.page.current = pageNumber;
     }
+  }
+
+  private changeURL() {
+    this.location.go('gallery/' + this.gallery.id + '?page=' + this.page + '&filter=' + this.filter + '&show_location='
+      + this.showPolypLocation);
   }
 
   refreshPage(state: ClrDatagridStateInterface) {
@@ -91,6 +102,7 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
     this.pagination.page.current = 1;
     this.images = [];
     this.getImages();
+    this.changeURL();
   }
 
   private getImages() {
@@ -113,6 +125,7 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
         }
       );
     }
+    this.changeURL();
   }
 
   ngAfterViewChecked() {
