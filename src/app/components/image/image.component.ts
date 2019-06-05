@@ -53,6 +53,7 @@ export class ImageComponent implements OnInit {
   role = Role;
 
   filter: string;
+  showPolypLocation: boolean;
 
   constructor(private route: ActivatedRoute,
               private galleriesService: GalleriesService,
@@ -71,6 +72,7 @@ export class ImageComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     const gallery_id = this.route.snapshot.paramMap.get('gallery_id');
     this.filter = this.route.snapshot.queryParamMap.get('filter');
+    this.showPolypLocation = this.route.snapshot.queryParamMap.get('show_location') === 'true';
 
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
     this.ctx = this.canvas.getContext('2d');
@@ -122,7 +124,7 @@ export class ImageComponent implements OnInit {
         const mousex = e.clientX - canvasx;
         const mousey = e.clientY - canvasy;
 
-        if (this.mousedown && this.image.polyp != null) {
+        if (this.mousedown && this.image.polyp != null && this.showPolypLocation) {
           this.repaintImage();
           this.width = mousex - this.last_mousex;
           this.height = mousey - this.last_mousey;
@@ -239,11 +241,12 @@ export class ImageComponent implements OnInit {
   }
 
   private changeURLToCurrentImage() {
-    this.location.go('gallery/' + this.gallery.id + '/image/' + this.image.id + '?filter=' + this.filter);
+    this.location.go('gallery/' + this.gallery.id + '/image/' + this.image.id + '?filter=' + this.filter + '&show_location='
+      + this.showPolypLocation);
   }
 
   private paintLocationIfAvailable() {
-    if (this.image.polypLocation !== null) {
+    if (this.image.polypLocation !== null && this.showPolypLocation) {
       this.paintLocation(this.image.polypLocation);
     } else {
       this.reset();
@@ -292,7 +295,7 @@ export class ImageComponent implements OnInit {
     const locationSaved = this.image.polypLocation;
     // if polyp is selected
     if (this.authenticationService.getRole() === this.role.ENDOSCOPIST && (this.last_mousex != null || this.last_mousey != null ||
-      this.width != null || this.height != null) && this.image.polyp != null) {
+      this.width != null || this.height != null) && this.image.polyp != null && this.showPolypLocation) {
       // if polyp wasn't saved
       if (locationSaved == null || (this.last_mousex !== locationSaved.x || this.last_mousey !== locationSaved.y ||
         this.width !== locationSaved.width || this.height !== locationSaved.height)) {

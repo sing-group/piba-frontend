@@ -33,8 +33,11 @@
 
   <clr-datagrid (clrDgRefresh)="refreshPage($event)" [clrDgLoading]="loading">
     <div class="clr-row clr-justify-content-lg-end not-margin-right">
+      <clr-checkbox class="checkbox-margin" [(clrChecked)]="showPolypLocation" (change)="loadImages()">
+        Show polyp location
+      </clr-checkbox>
       <div class="clr-select-wrapper">
-        <select class="clr-select" [(ngModel)]="filter" (change)="filterChange()">
+        <select class="clr-select select-margin" [(ngModel)]="filter" (change)="filterChange()">
           <option value="all">All</option>
           <option value="located">Located</option>
           <option value="not_located">Not Located</option>
@@ -47,7 +50,7 @@
       <div *ngFor="let image of images">
         <div class="gallery-item">
           <a routerLink="/gallery/{{gallery.id}}/image/{{image.id}}"
-             [queryParams]="{filter:this.filter}">
+             [queryParams]="{filter:this.filter, show_location:this.showPolypLocation}">
             <canvas id="canvas-{{image.id}}"></canvas>
           </a>
         </div>

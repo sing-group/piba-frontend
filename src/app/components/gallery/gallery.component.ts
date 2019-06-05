@@ -27,6 +27,7 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
   filter = 'all';
   locatedImages: number;
   loading = false;
+  showPolypLocation = true;
 
   @ViewChild(ClrDatagridPagination)
   pagination: ClrDatagridPagination;
@@ -106,13 +107,19 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  ngAfterViewChecked() {
-    if (this.images.length > 0 && !this.viewChecked) {
+  loadImages() {
+    if (this.images.length > 0) {
       this.images.forEach(image => {
           const canvas: HTMLCanvasElement = document.getElementById('canvas-' + image.id) as HTMLCanvasElement;
           this.drawCanvasWithImage(canvas, image);
         }
       );
+    }
+  }
+
+  ngAfterViewChecked() {
+    if (!this.viewChecked) {
+      this.loadImages();
       this.viewChecked = true;
     }
   }
@@ -129,22 +136,20 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
       canvas.height = imageElement.height;
       ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
 
-      if (image.polypLocation !== null) {
+      if (image.polypLocation !== null && this.showPolypLocation) {
         this.drawPolypLocation(ctx, image.polypLocation);
       }
-
     };
     imageElement.src = 'data:image/png;base64,' + image.base64contents;
   }
 
-
   private drawPolypLocation(ctx: CanvasRenderingContext2D, polypLocation: PolypLocation) {
-    ctx.beginPath();
-    // left, top, width, height
-    ctx.rect(polypLocation.x, polypLocation.y, polypLocation.width, polypLocation.height);
-    ctx.strokeStyle = 'red';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+      ctx.beginPath();
+      // left, top, width, height
+      ctx.rect(polypLocation.x, polypLocation.y, polypLocation.width, polypLocation.height);
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 2;
+      ctx.stroke();
   }
 
 }

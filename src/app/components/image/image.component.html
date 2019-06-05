@@ -27,13 +27,13 @@
   <div class="clr-row clr-justify-content-center">
     <div *ngIf="authenticationService.getRole() == role.ENDOSCOPIST">
       <button *ngIf="image.polyp != null" class="btn btn-success" (click)="save()"
-              [disabled]="(last_mousex == null && last_mousey == null && width==null && height==null) ||  isLoading">
+              [disabled]="(last_mousex == null && last_mousey == null && width==null && height==null) ||  isLoading || !showPolypLocation">
         <clr-icon shape="plus"></clr-icon>
         Save
       </button>
       <button *ngIf="image.polyp != null" class="btn btn-primary"
               (click)="image.polypLocation != null ? this.warningMessageRemovingLocation = true : cleanCanvas();"
-              [disabled] = "isLoading">
+              [disabled] = "isLoading || !showPolypLocation">
         <clr-icon shape="refresh"></clr-icon>
         Clear
       </button>

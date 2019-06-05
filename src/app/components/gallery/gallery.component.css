@@ -54,3 +54,13 @@ canvas {
   min-width: 1rem;
   text-align: center;
 }
+
+.checkbox-margin {
+  margin-right: 1%;
+  top: 16%;
+}
+
+.select-margin {
+  padding-top: 4.5%;
+  height: 115%;
+}
