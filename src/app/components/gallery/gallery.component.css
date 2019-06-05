@@ -44,7 +44,7 @@ canvas {
 }
 
 .progress-margin {
-  margin: auto;
+  padding: 0 .75rem .3rem .75rem;
 }
 
 .input-page {
@@ -61,6 +61,6 @@ canvas {
 }
 
 .select-margin {
-  padding-top: 4.5%;
+  padding-top: 2.7%;
   height: 115%;
 }

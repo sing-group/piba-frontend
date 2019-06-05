@@ -109,6 +109,7 @@ export class ImagesService {
               return of({
                 totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
                 locatedImages: Number(response.headers.get('X-Located-Total-Items')),
+                imagesWithPolyp: Number(response.headers.get('X-With-Polyp-Total-Items')),
                 images: []
               });
             }
@@ -117,6 +118,7 @@ export class ImagesService {
                   return {
                     totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
                     locatedImages: Number(response.headers.get('X-Located-Total-Items')),
+                    imagesWithPolyp: Number(response.headers.get('X-With-Polyp-Total-Items')),
                     images: images
                   };
                 }

@@ -23,9 +23,9 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
   pageSize = 12;
   pageLength = 0;
   totalImages = -1;
-  totalImagesStored: number;
   filter = 'all';
   locatedImages: number;
+  imagesWithPolyp: number;
   loading = false;
   showPolypLocation = true;
 
@@ -98,11 +98,9 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
     this.imageService.getImagesByGallery(this.gallery, this.pagination.page.current, this.pageSize, this.filter).subscribe(imagePage => {
       this.images = imagePage.images;
       this.totalImages = imagePage.totalItems;
+      this.imagesWithPolyp = imagePage.imagesWithPolyp;
+      this.locatedImages = imagePage.locatedImages;
       this.viewChecked = false;
-      if (this.filter === 'all') {
-        this.totalImagesStored = imagePage.totalItems;
-        this.locatedImages = imagePage.locatedImages;
-      }
       this.loading = false;
     });
   }

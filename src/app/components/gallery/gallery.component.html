@@ -20,12 +20,12 @@
     </section>
   </div>
 
-  <div *ngIf="totalImages > 0" class="row progress-margin">
+  <div *ngIf="imagesWithPolyp > 0" class="row progress-margin">
     <div class="col-xs-12">
-      <h5>Polyp location progress: {{locatedImages}} of {{totalImagesStored}} ({{(locatedImages*100)/totalImagesStored |
+      <h5>Polyp location progress: {{locatedImages}} of {{imagesWithPolyp}} ({{(locatedImages*100)/imagesWithPolyp |
         number:'.0-1'}}%)</h5>
       <div class="progress success">
-        <progress max="{{totalImagesStored}}" value="{{locatedImages}}"></progress>
+        <progress max="{{imagesWithPolyp}}" value="{{locatedImages}}"></progress>
       </div>
     </div>
   </div>
@@ -41,6 +41,7 @@
           <option value="all">All</option>
           <option value="located">Located</option>
           <option value="not_located">Not Located</option>
+          <option value="not_located_with_polyp">Not Located With Polyp</option>
         </select>
       </div>
     </div>
