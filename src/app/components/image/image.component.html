@@ -3,6 +3,8 @@
 </span>
 <div [hidden]="image.id == null">
   <div class="clr-row clr-justify-content-end">
+    <a class="btn btn-success" id="download-image-button" download="{{getFileName()}}"
+       href="{{canvas.toDataURL()}}">Download</a>
     <button class="btn btn-primary" (click)="redirectToGallery()">Back</button>
   </div>
   <div class="clr-row">

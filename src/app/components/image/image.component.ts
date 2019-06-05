@@ -366,6 +366,15 @@ export class ImageComponent implements OnInit {
     this.observationToRemoveStartsWith = null;
   }
 
+  getFileName(): string {
+    if (this.image.video !== undefined) {
+      if (this.image.polyp === null || this.image.polyp === undefined) {
+        return this.image.video.id + '_' + this.image.numFrame;
+      } else {
+        return this.image.polyp.id + '_' + this.image.video.id + '_' + this.image.numFrame;
+      }
+    }
+  }
 
   private repaintImage() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // clear canvas
