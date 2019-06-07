@@ -300,7 +300,6 @@ export class ImageComponent implements OnInit {
       // if polyp wasn't saved
       if (locationSaved == null || (this.last_mousex !== locationSaved.x || this.last_mousey !== locationSaved.y ||
         this.width !== locationSaved.width || this.height !== locationSaved.height)) {
-        this.warningMessageWithoutSavingLocation = true;
         return false;
       }
     }
@@ -310,6 +309,8 @@ export class ImageComponent implements OnInit {
   checkIfLocationSavedAndScrollImage() {
     if (this.isLocationSaved()) {
       this.toLeftOrToRight();
+    } else {
+      this.warningMessageWithoutSavingLocation = true;
     }
   }
 
@@ -355,6 +356,15 @@ export class ImageComponent implements OnInit {
   checkIfLocationSavedAndRedirectToGallery() {
     if (this.isLocationSaved()) {
       this.redirectToGallery();
+    } else {
+      this.warningMessageWithoutSavingLocation = true;
+    }
+  }
+
+  checkIfLocationSavedAndDownloadImage() {
+    if (!this.isLocationSaved()) {
+      this.repaintImage();
+      this.paintLocationIfAvailable();
     }
   }
 
