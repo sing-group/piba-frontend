@@ -26,6 +26,7 @@ export class ImageComponent implements OnInit {
   isFirstImage = false;
   isLastImage = false;
   isLoading = false;
+  back = false;
 
   private gallery: Gallery = new Gallery();
 
@@ -173,7 +174,7 @@ export class ImageComponent implements OnInit {
       this.identifiers.splice(position, 1);
       if (this.identifiers.length === 0) {
         this.notificationService.info('No images in this gallery', 'No images');
-        this.redirectToGallery();
+        this.checkIfLocationSavedAndRedirectToGallery();
       } else {
         // there is only one image
         if (this.identifiers.length === 1) {
@@ -291,7 +292,7 @@ export class ImageComponent implements OnInit {
       ));
   }
 
-  checkIfLocationSavedAndScrollImage() {
+  isLocationSaved(): boolean {
     const locationSaved = this.image.polypLocation;
     // if polyp is selected
     if (this.authenticationService.getRole() === this.role.ENDOSCOPIST && (this.last_mousex != null || this.last_mousey != null ||
@@ -300,10 +301,16 @@ export class ImageComponent implements OnInit {
       if (locationSaved == null || (this.last_mousex !== locationSaved.x || this.last_mousey !== locationSaved.y ||
         this.width !== locationSaved.width || this.height !== locationSaved.height)) {
         this.warningMessageWithoutSavingLocation = true;
-        return;
+        return false;
       }
     }
-    this.toLeftOrToRight();
+    return true;
+  }
+
+  checkIfLocationSavedAndScrollImage() {
+    if (this.isLocationSaved()) {
+      this.toLeftOrToRight();
+    }
   }
 
   toLeftOrToRight() {
@@ -345,6 +352,12 @@ export class ImageComponent implements OnInit {
     this.reset();
   }
 
+  checkIfLocationSavedAndRedirectToGallery() {
+    if (this.isLocationSaved()) {
+      this.redirectToGallery();
+    }
+  }
+
   redirectToGallery() {
     let page = Math.trunc(this.getImagePositionInArray() * (this.lastValidPosition() / 12) / this.lastValidPosition()) + 1;
     if (isNaN(page)) {
@@ -352,6 +365,11 @@ export class ImageComponent implements OnInit {
     }
     this.router.navigateByUrl('gallery/' + this.gallery.id + '?page=' + page + '&filter=' + this.filter + '&show_location='
       + this.showPolypLocation);
+  }
+
+  continueWithoutSavingLocation() {
+    this.warningMessageWithoutSavingLocation = false;
+    this.back ? this.redirectToGallery() : this.toLeftOrToRight();
   }
 
   private lastValidPosition(): number {

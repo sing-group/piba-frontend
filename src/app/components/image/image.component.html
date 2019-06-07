@@ -5,7 +5,7 @@
   <div class="clr-row clr-justify-content-end">
     <a class="btn btn-success" id="download-image-button" download="{{getFileName()}}"
        href="{{canvas.toDataURL()}}">Download</a>
-    <button class="btn btn-primary" (click)="redirectToGallery()">Back</button>
+    <button class="btn btn-primary" (click)="back = true; checkIfLocationSavedAndRedirectToGallery()">Back</button>
   </div>
   <div class="clr-row">
     <div class="clr-col-1 clr-align-self-center" align="center">
@@ -35,11 +35,11 @@
       </button>
       <button *ngIf="image.polyp != null" class="btn btn-primary"
               (click)="image.polypLocation != null ? this.warningMessageRemovingLocation = true : cleanCanvas();"
-              [disabled] = "isLoading || !showPolypLocation">
+              [disabled]="isLoading || !showPolypLocation">
         <clr-icon shape="refresh"></clr-icon>
         Clear
       </button>
-      <button class="btn btn-danger btn-remove" (click)="deleting = true" [disabled] = "isLoading">
+      <button class="btn btn-danger btn-remove" (click)="deleting = true" [disabled]="isLoading">
         <clr-icon shape="trash"></clr-icon>
         Remove image
       </button>
@@ -156,13 +156,14 @@
           <div *ngIf="selected == 'Others'" class="form-group">
             <label for="observationToRemove">Describe the reason </label>
             <div class="autocomplete">
-            <input type="text" id="observationToRemove" (keyup)="searchObservations($event)" name="observationToRemove"
-                   [(ngModel)]="observationToRemoveStartsWith" autocomplete="off"/>
-            <div *ngIf="!observationToRemove" class="autocomplete-items">
-              <input class="inputAutocomplete" value="{{observation}}" *ngFor="let observation of observationsFound"
-                     (click)="selectedObservationToRemove(observation)" readonly
-              />
-            </div>
+              <input type="text" id="observationToRemove" (keyup)="searchObservations($event)"
+                     name="observationToRemove"
+                     [(ngModel)]="observationToRemoveStartsWith" autocomplete="off"/>
+              <div *ngIf="!observationToRemove" class="autocomplete-items">
+                <input class="inputAutocomplete" value="{{observation}}" *ngFor="let observation of observationsFound"
+                       (click)="selectedObservationToRemove(observation)" readonly
+                />
+              </div>
             </div>
           </div>
         </section>
@@ -187,10 +188,11 @@
       The polyp location has not been saved. Are you sure you want to continue?
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-outline" (click)="warningMessageWithoutSavingLocation = false;">Cancel
+      <button type="button" class="btn btn-outline"
+              (click)="warningMessageWithoutSavingLocation = false; back = false;">Cancel
       </button>
       <button type="button" class="btn btn-danger-outline"
-              (click)="warningMessageWithoutSavingLocation = false; toLeftOrToRight()">
+              (click)="continueWithoutSavingLocation()">
         Continue
       </button>
     </div>
@@ -214,8 +216,6 @@
       </div>
     </div>
   </clr-modal>
-
-
 </div>
 
 
