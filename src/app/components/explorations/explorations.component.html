@@ -96,7 +96,7 @@
         <div class="form-group">
           <label for="exploration-form-title" class="required">Title</label>
           <input type="text" id="exploration-form-title" name="title" [(ngModel)]="title" required
-                 pattern="[a-zA-ZñÑ0-9\s]+"
+                 pattern="[a-zA-ZñÑ0-9_\s\(\)-]+"
                  title="Must be a alphanumeric" #titleExploration="ngModel"/>
         </div>
         <div class="form-group">
@@ -108,7 +108,7 @@
         <div class="form-group">
           <label for="exploration-form-location" class="required">Location</label>
           <input type="text" id="exploration-form-location" name="location" [(ngModel)]="location" required
-                 pattern="[a-zA-ZñÑ0-9\s]+"
+                 pattern="[a-zA-ZñÑ0-9_\s\(\)-]+"
                  title="Must be a alphanumeric" #locationExploration="ngModel"/>
         </div>
         <div *ngIf="creatingExploration">

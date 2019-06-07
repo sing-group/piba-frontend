@@ -14,7 +14,7 @@
         <div class="form-group">
           <label for="gallery-form-title" class="required">Title</label>
           <input type="text" id="gallery-form-title" name="title" [(ngModel)]="gallery.title" required
-                 pattern="[a-zA-ZñÑ0-9_\s]+" title="Must be a alphanumeric" #titleGallery="ngModel"
+                 pattern="[a-zA-ZñÑ0-9_\s\(\)-]+" title="Must be a alphanumeric" #titleGallery="ngModel"
           />
         </div>
         <div class="form-group">

@@ -16,7 +16,7 @@
         <div class="form-group" *ngIf="creatingUser">
           <label for="user-form-name" class="required">Login</label>
           <input type="text" id="user-form-name" id="login" name="login" [(ngModel)]="user.login" required
-                 pattern="[a-zA-ZñÑ0-9_]{1,100}" title="Must be a alphanumeric" #loginUser="ngModel"
+                 pattern="[a-zA-ZñÑ0-9_-]{1,100}" title="Must be a alphanumeric" #loginUser="ngModel"
           />
           <div *ngIf="loginUser.invalid && !loginUser.pristine" class="alert alert-danger">
             <div *ngIf="loginUser.errors.required">Username is required.</div>

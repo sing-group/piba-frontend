@@ -14,7 +14,7 @@
         <div class="form-group">
           <label for="modifier-form-name" class="required">Name</label>
           <input type="text" id="modifier-form-name" name="name" [(ngModel)]="modifier.name" required
-                 pattern="[a-zA-ZñÑ0-9_\s]+" title="Must be a alphanumeric" #nameModifier="ngModel"
+                 pattern="[a-zA-ZñÑ0-9_\s\(\)-]+" title="Must be a alphanumeric" #nameModifier="ngModel"
           />
         </div>
       </section>

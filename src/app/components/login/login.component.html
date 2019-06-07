@@ -6,7 +6,7 @@
     </label>
     <div class="login-group">
       <input class="username" type="text" id="login_username" placeholder="Username" name="username"
-             pattern="[a-zA-ZñÑ0-9_]{1,100}" title="Must be a alphanumeric"
+             pattern="[a-zA-ZñÑ0-9_-]{1,100}" title="Must be a alphanumeric"
              [(ngModel)]="login" required #usernameForm="ngModel">
       <div *ngIf="loginForm.submitted && usernameForm.invalid" class="alert alert-danger">
         <div *ngIf="usernameForm.errors.required">Username is required.</div>
