@@ -80,8 +80,10 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
   }
 
   private changeURL() {
-    this.location.go('gallery/' + this.gallery.id + '?page=' + this.page + '&filter=' + this.filter + '&show_location='
-      + this.showPolypLocation);
+    if (this.gallery.id !== undefined) {
+      this.location.go('gallery/' + this.gallery.id + '?page=' + this.page + '&filter=' + this.filter + '&show_location='
+        + this.showPolypLocation);
+    }
   }
 
   refreshPage(state: ClrDatagridStateInterface) {
