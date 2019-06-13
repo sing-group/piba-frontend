@@ -15,6 +15,7 @@ import {ImagePage} from './entities/ImagePage';
 import {ImageUploadInfo} from './entities/ImageUploadInfo';
 import {PolypsService} from './polyps.service';
 import {Polyp} from '../models/Polyp';
+import {ImagesInGalleryInfo} from './entities/ImagesInGalleryInfo';
 
 @Injectable({
   providedIn: 'root'
@@ -128,16 +129,21 @@ export class ImagesService {
       );
   }
 
-  getImagesIdentifiersByGallery(gallery: Gallery, filter: string): Observable<string[]> {
+  getImagesIdentifiersByGallery(gallery: Gallery, filter: string): Observable<ImagesInGalleryInfo> {
     return this.http.get<IdAndUri[]>
-    (`${environment.restApi}/image/id?gallery_id=${gallery.id}&filter=${filter}`)
+    (`${environment.restApi}/image/id?gallery_id=${gallery.id}&filter=${filter}`, {observe: 'response'})
       .pipe(
-        map(idAndUris => {
+        concatMap(response => {
             const ids = [];
-            idAndUris.forEach(idAndUri => {
+            response.body.forEach(idAndUri => {
               ids.push(idAndUri.id);
             });
-            return ids;
+            return of({
+              totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
+              locatedImages: Number(response.headers.get('X-Located-Total-Items')),
+              imagesWithPolyp: Number(response.headers.get('X-With-Polyp-Total-Items')),
+              imagesId: ids
+            });
           }
         )
       );

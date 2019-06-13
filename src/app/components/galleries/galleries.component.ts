@@ -4,6 +4,8 @@ import {GalleriesService} from '../../services/galleries.service';
 import {NotificationService} from '../../modules/notification/services/notification.service';
 import {Role} from '../../models/User';
 import {AuthenticationService} from '../../services/authentication.service';
+import {ImagesService} from '../../services/images.service';
+import {ImagesInGalleryInfo} from '../../services/entities/ImagesInGalleryInfo';
 
 @Component({
   selector: 'app-galleries',
@@ -15,17 +17,31 @@ export class GalleriesComponent implements OnInit {
   creatingGallery = false;
   editingGallery = false;
   gallery: Gallery = new Gallery();
+  loadingImagesInGalleryInfo = false;
 
+  imagesInGalleryInfoMap = new Map();
   galleries: Gallery[] = [];
   role = Role;
 
   constructor(private galleriesService: GalleriesService,
+              private imagesService: ImagesService,
               private notificationService: NotificationService,
               public authenticationService: AuthenticationService) {
-    this.galleriesService.getGalleries().subscribe((galleries) => this.galleries = galleries);
   }
 
   ngOnInit() {
+    this.loadingImagesInGalleryInfo = true;
+    this.galleriesService.getGalleries().subscribe((galleries) => {
+      this.galleries = galleries;
+      galleries.forEach(gallery => {
+        this.imagesService.getImagesIdentifiersByGallery(gallery, 'all').subscribe(imagesInGalleryInfo => {
+          this.imagesInGalleryInfoMap.set(gallery.id, imagesInGalleryInfo);
+          if (galleries.length === this.imagesInGalleryInfoMap.size) {
+            this.loadingImagesInGalleryInfo = false;
+          }
+        });
+      });
+    });
   }
 
   save() {
@@ -50,6 +66,27 @@ export class GalleriesComponent implements OnInit {
     this.editingGallery = true;
     this.gallery = new Gallery();
     Object.assign(this.gallery, this.galleries.find((gallery) => gallery.id === id));
+  }
+
+  getImagesInGalleryInfo(gallery: Gallery): ImagesInGalleryInfo {
+    if (!this.loadingImagesInGalleryInfo) {
+      return this.imagesInGalleryInfoMap.get(gallery.id);
+    } else {
+      return {
+        totalItems: 0,
+        imagesWithPolyp: 0,
+        locatedImages: 0,
+        imagesId: []
+      };
+    }
+  }
+
+  getPercentageOfLocatedPolyps(gallery: Gallery): number {
+    if (this.getImagesInGalleryInfo(gallery).imagesWithPolyp === 0) {
+      return 100;
+    } else {
+      return (this.getImagesInGalleryInfo(gallery).locatedImages * 100) / this.getImagesInGalleryInfo(gallery).imagesWithPolyp;
+    }
   }
 
   cancel() {

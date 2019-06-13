@@ -34,17 +34,24 @@
   </clr-modal>
 </form>
 
-<clr-datagrid>
+<clr-datagrid [clrDgLoading]="loadingImagesInGalleryInfo">
 
   <clr-dg-placeholder>We couldn't find any galleries!</clr-dg-placeholder>
 
   <clr-dg-column>Title</clr-dg-column>
   <clr-dg-column>Description</clr-dg-column>
+  <clr-dg-column>Images with polyp</clr-dg-column>
+  <clr-dg-column>Percentage of located polyps</clr-dg-column>
+  <clr-dg-column>Total images</clr-dg-column>
   <clr-dg-column>Actions</clr-dg-column>
 
   <clr-dg-row *clrDgItems="let gallery of galleries" [clrDgItem]="gallery">
+
     <clr-dg-cell>{{gallery.title}}</clr-dg-cell>
     <clr-dg-cell>{{gallery.description}}</clr-dg-cell>
+    <clr-dg-cell>{{getImagesInGalleryInfo(gallery).imagesWithPolyp}}</clr-dg-cell>
+    <clr-dg-cell>{{getPercentageOfLocatedPolyps(gallery) | number:'.0-1'}}%</clr-dg-cell>
+    <clr-dg-cell>{{getImagesInGalleryInfo(gallery).totalItems}}</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-link btn-icon">
         <button class="btn" routerLink="/gallery/{{gallery.id}}">

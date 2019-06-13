@@ -81,9 +81,9 @@ export class ImageComponent implements OnInit {
     this.galleriesService.getGallery(gallery_id).subscribe(gallery => {
       this.gallery = gallery;
       this.isLoading = true;
-      this.imagesService.getImagesIdentifiersByGallery(gallery, this.filter).subscribe(identifiers => {
+      this.imagesService.getImagesIdentifiersByGallery(gallery, this.filter).subscribe(imagesInGalleryInfo => {
           this.isLoading = false;
-          this.identifiers = identifiers;
+          this.identifiers = imagesInGalleryInfo.imagesId;
           const index = this.identifiers.indexOf(
             this.identifiers.find(
               identifier =>
