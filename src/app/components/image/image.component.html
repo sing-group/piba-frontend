@@ -26,6 +26,11 @@
       </button>
     </div>
   </div>
+  <div class="clr-row clr-justify-content-end polyp-checkbox" id="show-location-checkbox">
+    <clr-checkbox [(clrChecked)]="showPolypLocation" (change)="reloadImage()">
+      Show polyp location
+    </clr-checkbox>
+  </div>
   <div class="clr-row clr-justify-content-center">
     <div *ngIf="authenticationService.getRole() == role.ENDOSCOPIST">
       <button *ngIf="image.polyp != null" class="btn btn-success" (click)="save()"

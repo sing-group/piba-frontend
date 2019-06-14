@@ -102,37 +102,35 @@ export class ImageComponent implements OnInit {
       );
     });
 
+    // Mouseup
+    this.canvas.addEventListener('mouseup', () => {
+      this.mousedown = false;
+    });
 
-      // Mouseup
-      this.canvas.addEventListener('mouseup', () => {
-        this.mousedown = false;
-      });
+    // Mousedown
+    this.canvas.addEventListener('mousedown', (e: MouseEvent) => {
+      const canvasx: number = this.canvas.offsetLeft;
+      const canvasy: number = this.canvas.offsetTop;
+      this.last_mousex = e.clientX - canvasx;
+      this.last_mousey = e.clientY - canvasy;
+      this.mousedown = true;
+    });
 
-      // Mousedown
-      this.canvas.addEventListener('mousedown', (e: MouseEvent) => {
-        const canvasx: number = this.canvas.offsetLeft;
-        const canvasy: number = this.canvas.offsetTop;
-        this.last_mousex = e.clientX - canvasx;
-        this.last_mousey = e.clientY - canvasy;
-        this.mousedown = true;
-      });
+    // Mousemove
+    this.canvas.addEventListener('mousemove', (e: MouseEvent) => {
+      const canvasx: number = this.canvas.offsetLeft;
+      const canvasy: number = this.canvas.offsetTop;
 
-      // Mousemove
-      this.canvas.addEventListener('mousemove', (e: MouseEvent) => {
-        const canvasx: number = this.canvas.offsetLeft;
-        const canvasy: number = this.canvas.offsetTop;
+      const mousex = e.clientX - canvasx;
+      const mousey = e.clientY - canvasy;
 
-        const mousex = e.clientX - canvasx;
-        const mousey = e.clientY - canvasy;
-
-        if (this.mousedown && this.image.polyp != null && this.showPolypLocation) {
-          this.repaintImage();
-          this.width = mousex - this.last_mousex;
-          this.height = mousey - this.last_mousey;
-          this.draw();
-        }
-      });
-
+      if (this.mousedown && this.image.polyp != null && this.showPolypLocation) {
+        this.repaintImage();
+        this.width = mousex - this.last_mousex;
+        this.height = mousey - this.last_mousey;
+        this.draw();
+      }
+    });
   }
 
   save() {
@@ -234,6 +232,7 @@ export class ImageComponent implements OnInit {
     this.imageElement.onload = () => {
       this.canvas.width = this.imageElement.width;
       this.canvas.height = this.imageElement.height;
+      (<HTMLInputElement>document.getElementById('show-location-checkbox')).style.maxWidth = this.canvas.width + 'px';
       this.repaintImage();
       this.paintLocationIfAvailable();
     };
@@ -252,6 +251,12 @@ export class ImageComponent implements OnInit {
     } else {
       this.reset();
     }
+  }
+
+  reloadImage() {
+    this.repaintImage();
+    this.paintLocationIfAvailable();
+    this.changeURLToCurrentImage();
   }
 
   private paintLocation(polypLocation: PolypLocation) {

@@ -87,3 +87,8 @@ i {
   overflow-y: visible !important;
 }
 
+.polyp-checkbox {
+  margin: 0 auto;
+  padding: 0;
+}
+
