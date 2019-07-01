@@ -78,7 +78,7 @@
           </button>
         </form>
 
-        <form (submit)="addPolyp()" ngNativeValidate>
+        <form #newPolypForm="ngForm" (submit)="addPolyp(); namePolyp.control.markAsPristine()" ngNativeValidate>
           <clr-modal [(clrModalOpen)]="modalOpened" [clrModalSize]="'sm'">
             <h3 class="modal-title">Add polyp</h3>
             <div class="modal-body">
