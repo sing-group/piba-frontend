@@ -34,9 +34,9 @@
   <div class="clr-row clr-justify-content-center">
     <div *ngIf="authenticationService.getRole() == role.ENDOSCOPIST">
       <button *ngIf="image.polyp != null" class="btn btn-success" (click)="save()"
-              [disabled]="(last_mousex == null && last_mousey == null && width==null && height==null) ||  isLoading || !showPolypLocation">
+              [disabled]="isLocationSaved()">
         <clr-icon shape="plus"></clr-icon>
-        Save
+        Save (s)
       </button>
       <button *ngIf="image.polyp != null" class="btn btn-primary"
               (click)="image.polypLocation != null ? this.warningMessageRemovingLocation = true : cleanCanvas();"

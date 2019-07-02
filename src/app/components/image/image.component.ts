@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Image} from '../../models/Image';
 import {GalleriesService} from '../../services/galleries.service';
@@ -55,6 +55,13 @@ export class ImageComponent implements OnInit {
 
   filter: string;
   showPolypLocation: boolean;
+
+  @HostListener('document:keypress', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.key === 's' && !this.isLocationSaved()) {
+      this.save();
+    }
+  }
 
   constructor(private route: ActivatedRoute,
               private galleriesService: GalleriesService,
