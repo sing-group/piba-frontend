@@ -56,6 +56,8 @@ export class ImageComponent implements OnInit {
   filter: string;
   showPolypLocation: boolean;
 
+  private downloadButton: HTMLLinkElement;
+
   @HostListener('document:keypress', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
     if (event.key === 's' && !this.isLocationSaved()) {
@@ -84,6 +86,8 @@ export class ImageComponent implements OnInit {
 
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
     this.ctx = this.canvas.getContext('2d');
+
+    this.downloadButton = document.getElementById('download-image-button') as HTMLLinkElement;
 
     this.galleriesService.getGallery(gallery_id).subscribe(gallery => {
       this.gallery = gallery;
@@ -137,6 +141,10 @@ export class ImageComponent implements OnInit {
         this.height = mousey - this.last_mousey;
         this.draw();
       }
+    });
+
+    this.downloadButton.addEventListener('click', () => {
+      this.downloadButton.href = this.canvas.toDataURL();
     });
   }
 
