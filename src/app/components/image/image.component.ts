@@ -418,9 +418,9 @@ export class ImageComponent implements OnInit {
   getFileName(): string {
     if (this.image.video !== undefined) {
       if (this.image.polyp === null || this.image.polyp === undefined) {
-        return this.image.video.id + '_' + this.image.numFrame;
+        return this.image.video.id + '_' + this.image.numFrame + '.png';
       } else {
-        return this.image.polyp.id + '_' + this.image.video.id + '_' + this.image.numFrame;
+        return this.image.polyp.id + '_' + this.image.video.id + '_' + this.image.numFrame + '.png';
       }
     }
   }
