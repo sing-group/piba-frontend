@@ -21,8 +21,8 @@ export class ExplorationComponent implements OnInit, OnDestroy {
 
   video: Video = new Video();
 
-  userUploadingVideo: false;
-  uploadingVideo: false;
+  userUploadingVideo = false;
+  uploadingVideo = false;
   progress = 0;
   uploadTimeRemaining = 0;
   uploadSpeed = 0;
