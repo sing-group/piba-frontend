@@ -1,0 +1,11 @@
+.wrapper-links {
+  cursor: not-allowed !important;
+}
+
+.not-allowed {
+  pointer-events: none;
+}
+
+.not-margin-top {
+  margin-top: 0;
+}

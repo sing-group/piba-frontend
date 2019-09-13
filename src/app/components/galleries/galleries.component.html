@@ -62,6 +62,11 @@
           <clr-icon shape="cog"></clr-icon>
           <span class="clr-icon-title">Settings</span>
         </button>
+        <button class="btn" (click)="download(gallery.id)"
+                *ngIf="getImagesInGalleryInfo(gallery).totalItems > 0">
+          <clr-icon shape="download"></clr-icon>
+          <span class="clr-icon-title">Download</span>
+        </button>
       </div>
     </clr-dg-cell>
   </clr-dg-row>
@@ -71,4 +76,40 @@
     </clr-dg-pagination>
   </clr-dg-footer>
 </clr-datagrid>
+<form ngNativeValidate #downloadForm="ngForm">
+  <clr-modal [(clrModalOpen)]="downloadingGallery" [clrModalClosable]="false">
+    <h3 class="modal-title">Download gallery</h3>
+    <div class="modal-body">
+      <section class="form-block">
+        <div class="form-group">
+          <label class="required">Filter</label>
+          <div class="select">
+            <select id="filter" name="filter" [(ngModel)]="filter">
+              <option value="all">All</option>
+              <option value="located">Located</option>
+              <option value="not_located">Not Located</option>
+              <option value="not_located_with_polyp">Not Located With Polyp</option>
+            </select>
+          </div>
+          <div *ngIf="getNumberOfImagesAccordingToFilter() == 0" class="alert alert-danger not-margin-top">
+            The applied filter returns 0 images
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Add Polyp Location</label>
+          <clr-checkbox [(clrChecked)]="addPolypLocation" [clrDisabled]="filter.includes('not_located')">
+          </clr-checkbox>
+        </div>
+      </section>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
+      <a type="button" class="btn btn-primary" id="download-zip" target="_blank" href=""
+         [class.disabled]="getNumberOfImagesAccordingToFilter() == 0"
+         [class.not-allowed]="getNumberOfImagesAccordingToFilter() == 0" (click)="downloadGalley()">
+        Download
+      </a>
+    </div>
 
+  </clr-modal>
+</form>

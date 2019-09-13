@@ -6,6 +6,8 @@ import {Role} from '../../models/User';
 import {AuthenticationService} from '../../services/authentication.service';
 import {ImagesService} from '../../services/images.service';
 import {ImagesInGalleryInfo} from '../../services/entities/ImagesInGalleryInfo';
+import {environment} from '../../../environments/environment';
+
 
 @Component({
   selector: 'app-galleries',
@@ -16,8 +18,13 @@ export class GalleriesComponent implements OnInit {
 
   creatingGallery = false;
   editingGallery = false;
+  downloadingGallery = false;
   gallery: Gallery = new Gallery();
   loadingImagesInGalleryInfo = false;
+  filter = 'all';
+  addPolypLocation = false;
+
+  restApi = environment.restApi;
 
   imagesInGalleryInfoMap = new Map();
   galleries: Gallery[] = [];
@@ -68,6 +75,48 @@ export class GalleriesComponent implements OnInit {
     Object.assign(this.gallery, this.galleries.find((gallery) => gallery.id === id));
   }
 
+  download(id: string) {
+    this.downloadingGallery = true;
+    this.gallery = new Gallery();
+    Object.assign(this.gallery, this.galleries.find((gallery) => gallery.id === id));
+  }
+
+  getNumberOfImagesAccordingToFilter(): number {
+    let totalImages = 0;
+    const imagesInGalleryInfo = this.getImagesInGalleryInfo(this.gallery);
+
+    if (imagesInGalleryInfo !== undefined) {
+      switch (this.filter) {
+        case 'all':
+          totalImages = imagesInGalleryInfo.totalItems;
+          break;
+        case 'located':
+          totalImages = imagesInGalleryInfo.locatedImages;
+          break;
+        case 'not_located':
+          totalImages = imagesInGalleryInfo.totalItems - imagesInGalleryInfo.locatedImages;
+          break;
+        case 'not_located_with_polyp':
+          totalImages = imagesInGalleryInfo.imagesWithPolyp - imagesInGalleryInfo.locatedImages;
+          break;
+      }
+    }
+
+    return totalImages;
+  }
+
+  downloadGalley() {
+    if (this.filter.includes('not_located')) {
+      this.addPolypLocation = false;
+    }
+    const download = document.getElementById('download-zip') as HTMLAnchorElement;
+    if (this.getNumberOfImagesAccordingToFilter() > 0) {
+      download.href = this.restApi + '/download/gallery/' + this.gallery.id + '/' + this.filter + '/' + this.addPolypLocation;
+    }
+
+    this.cancel();
+  }
+
   getImagesInGalleryInfo(gallery: Gallery): ImagesInGalleryInfo {
     if (!this.loadingImagesInGalleryInfo) {
       return this.imagesInGalleryInfoMap.get(gallery.id);
@@ -93,6 +142,9 @@ export class GalleriesComponent implements OnInit {
     this.gallery = new Gallery();
     this.creatingGallery = false;
     this.editingGallery = false;
+    this.downloadingGallery = false;
+    this.filter = 'all';
+    this.addPolypLocation = false;
   }
 
 }
