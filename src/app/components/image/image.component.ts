@@ -140,6 +140,9 @@ export class ImageComponent implements OnInit {
         this.width = mousex - this.last_mousex;
         this.height = mousey - this.last_mousey;
         this.draw();
+      } else if (this.mousedown && this.image.polyp === null) {
+        this.notificationService.error('Impossible to draw a location on an image that does not have an associated polyp',
+          'Image without polyp');
       }
     });
 
@@ -426,6 +429,13 @@ export class ImageComponent implements OnInit {
   }
 
   private repaintImage() {
+    // It allows/does not allow to use the cursor if the image has/does not have a polyp
+    if (this.image.polyp === null || this.image.polyp === undefined) {
+      this.canvas.style.cursor = 'not-allowed';
+    } else {
+      this.canvas.style.cursor = '';
+    }
+
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // clear canvas
     this.ctx.drawImage(this.imageElement, 0, 0, this.imageElement.width, this.imageElement.height);
   }
