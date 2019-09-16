@@ -37,9 +37,11 @@ export class GalleriesComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadingImagesInGalleryInfo = true;
     this.galleriesService.getGalleries().subscribe((galleries) => {
       this.galleries = galleries;
+      if (galleries.length > 0) {
+        this.loadingImagesInGalleryInfo = true;
+      }
       galleries.forEach(gallery => {
         this.imagesService.getImagesIdentifiersByGallery(gallery, 'all').subscribe(imagesInGalleryInfo => {
           this.imagesInGalleryInfoMap.set(gallery.id, imagesInGalleryInfo);
@@ -131,7 +133,7 @@ export class GalleriesComponent implements OnInit {
   }
 
   getPercentageOfLocatedPolyps(gallery: Gallery): number {
-    if (this.getImagesInGalleryInfo(gallery).imagesWithPolyp === 0) {
+    if (this.getImagesInGalleryInfo(gallery) === undefined || this.getImagesInGalleryInfo(gallery).imagesWithPolyp === 0) {
       return 100;
     } else {
       return (this.getImagesInGalleryInfo(gallery).locatedImages * 100) / this.getImagesInGalleryInfo(gallery).imagesWithPolyp;

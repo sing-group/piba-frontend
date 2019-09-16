@@ -49,9 +49,11 @@
 
     <clr-dg-cell>{{gallery.title}}</clr-dg-cell>
     <clr-dg-cell>{{gallery.description}}</clr-dg-cell>
-    <clr-dg-cell>{{getImagesInGalleryInfo(gallery).imagesWithPolyp}}</clr-dg-cell>
+    <clr-dg-cell>{{getImagesInGalleryInfo(gallery) !== undefined ?
+      getImagesInGalleryInfo(gallery).imagesWithPolyp : 0}}</clr-dg-cell>
     <clr-dg-cell>{{getPercentageOfLocatedPolyps(gallery) | number:'.0-1'}}%</clr-dg-cell>
-    <clr-dg-cell>{{getImagesInGalleryInfo(gallery).totalItems}}</clr-dg-cell>
+    <clr-dg-cell>{{getImagesInGalleryInfo(gallery) !== undefined ?
+      getImagesInGalleryInfo(gallery).totalItems : 0}}</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-link btn-icon">
         <button class="btn" routerLink="/gallery/{{gallery.id}}">
@@ -63,7 +65,7 @@
           <span class="clr-icon-title">Settings</span>
         </button>
         <button class="btn" (click)="download(gallery.id)"
-                *ngIf="getImagesInGalleryInfo(gallery).totalItems > 0">
+                *ngIf="getImagesInGalleryInfo(gallery) !== undefined && getImagesInGalleryInfo(gallery).totalItems > 0">
           <clr-icon shape="download"></clr-icon>
           <span class="clr-icon-title">Download</span>
         </button>
@@ -72,7 +74,9 @@
   </clr-dg-row>
   <clr-dg-footer>
     <clr-dg-pagination #pagination [clrDgPageSize]="15">
-      {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{pagination.totalItems}} galleries
+      <label *ngIf="pagination.totalItems > 0">
+        {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{pagination.totalItems}} galleries
+      </label>
     </clr-dg-pagination>
   </clr-dg-footer>
 </clr-datagrid>
