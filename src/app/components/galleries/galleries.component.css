@@ -9,3 +9,7 @@
 .not-margin-top {
   margin-top: 0;
 }
+
+.alert {
+  padding: 1%;
+}
