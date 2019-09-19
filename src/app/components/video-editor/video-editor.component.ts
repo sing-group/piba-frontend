@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, Pipe, PipeTransform, ViewChild} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, Input, OnInit, Pipe, PipeTransform, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Polyp} from '../../models/Polyp';
 import {Video} from '../../models/Video';
@@ -18,6 +18,8 @@ import {ImagesService} from '../../services/images.service';
 import {ImageUploadInfo} from '../../services/entities/ImageUploadInfo';
 import {AuthenticationService} from '../../services/authentication.service';
 import {Role} from '../../models/User';
+import {VideoModification} from '../../models/VideoModification';
+import {VideoModificationsService} from '../../services/video-modifications.service';
 
 @Pipe({
   name: 'dropdownFilter',
@@ -40,7 +42,7 @@ export class DropdownFilterPipe implements PipeTransform {
   templateUrl: './video-editor.component.html',
   styleUrls: ['./video-editor.component.css']
 })
-export class VideoEditorComponent implements OnInit {
+export class VideoEditorComponent implements OnInit, AfterViewChecked {
 
   video: Video;
   ascSort = ClrDatagridSortOrder.ASC;
@@ -48,11 +50,17 @@ export class VideoEditorComponent implements OnInit {
   start: string;
   end: string;
 
+  modificationColor = 'rgba(241, 213, 117, 1)';
+  polypColor = 'rgba(0, 198, 194, 0.5)';
+  showPolyp = true;
+  showModification = true;
+
   newPolyp: Polyp = new Polyp();
   polyps: Polyp[] = [];
   selectedPolyp: Polyp = new Polyp();
 
   polypRecording: PolypRecording;
+  videoModifications: VideoModification[] = [];
   openSnapshotModal = false;
   galleries: Gallery[] = [];
   gallery: Gallery = new Gallery();
@@ -84,11 +92,12 @@ export class VideoEditorComponent implements OnInit {
     private polypsService: PolypsService,
     private explorationsService: ExplorationsService,
     private polypRecordingsService: PolypRecordingsService,
+    private videoModificationsService: VideoModificationsService,
     private timeToNumber: TimeToNumberPipe,
     private galleriesService: GalleriesService,
     private imagesService: ImagesService,
     private notificationService: NotificationService,
-    public authenticationService: AuthenticationService
+    public readonly authenticationService: AuthenticationService
   ) {
   }
 
@@ -103,11 +112,57 @@ export class VideoEditorComponent implements OnInit {
             this.video.polypRecording = polypRecordings;
           }
         );
+        this.videoModificationsService.getVideoModifications(this.video.id)
+          .subscribe(videoModifications => {
+            this.videoModifications = videoModifications;
+          });
       });
 
     this.galleriesService.getGalleries().subscribe(galleries => {
       this.galleries = galleries.sort((a, b) => a.title > b.title ? 1 : -1);
     });
+  }
+
+  ngAfterViewChecked() {
+    const progressbar = document.getElementById('progress') as HTMLInputElement;
+    this.videoHTML = document.getElementById('video-exploration') as HTMLMediaElement;
+    const legendCheckboxContainer = document.getElementById('legend-checkbox-container') as HTMLElement;
+
+    let background = '';
+
+    if (this.video !== undefined && !isNaN(this.videoHTML.duration)) {
+      // assign the width of the video to the legends and checkboxes container
+      legendCheckboxContainer.style.width = this.videoHTML.offsetWidth + 'px';
+
+      const duration = Math.trunc(this.videoHTML.duration);
+      if (this.showPolyp) {
+        background += 'linear-gradient(to right, transparent';
+        this.video.polypRecording.sort((p1, p2) => p1.start - p2.start).forEach(polypRecording => {
+          const start = (polypRecording.start * 100 / duration).toFixed(4);
+          const end = (polypRecording.end * 100 / duration).toFixed(4);
+
+          background += `,transparent ${start}%, ${this.polypColor} ${start}%, ${this.polypColor} ${end}%, transparent ${end}%`;
+        });
+
+        background += ')';
+      }
+
+      background += this.showPolyp && this.showModification && this.videoModifications.length > 0 ? ', ' : '';
+
+      if (this.videoModifications.length > 0 && this.showModification) {
+        background += 'linear-gradient(to right, transparent';
+        this.videoModifications.sort((p1, p2) => p1.start - p2.start).forEach(modification => {
+          const start = Math.floor(modification.start * 100 / duration);
+          const end = Math.floor(modification.end * 100 / duration);
+          background += `,transparent ${start}%,${this.modificationColor} ${start}%, ${this.modificationColor} ${end}%,transparent ${end}%`;
+        });
+
+        background += ')';
+      }
+
+      progressbar.style.background = background;
+      progressbar.style.height = '100%';
+    }
   }
 
   startInterval() {
@@ -144,6 +199,10 @@ export class VideoEditorComponent implements OnInit {
 
   mouseInProgress(move: boolean) {
     this.moveProgress = move;
+  }
+
+  videoModificationsUpdate(modifications: VideoModification[]) {
+    this.videoModifications = modifications;
   }
 
   public timesAreCorrect(): Boolean {

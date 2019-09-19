@@ -7,10 +7,29 @@
 
 <div class="row video-container" *ngIf="video != null">
   <app-video (currentTime)="onCurrentTimeUpdate($event)" (mouseInProgress)="mouseInProgress($event)"
-             (doSnapshot)="getSnapshot($event)">
+             (doSnapshot)="getSnapshot()">
     <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}"/>
     <p>Your browser does not support the video tag.</p>
   </app-video>
+</div>
+
+<div class="clr-row video-container col-xs-12" id="legend-checkbox-container">
+  <div class="clr-row legends-container">
+    <div class="square polyp-square"></div>
+    <label>Polyp</label>
+    <div class="square modification-square"></div>
+    <label>Modification</label>
+    <div class="square polyp-modification-square"></div>
+    <label>Polyp-Modification</label>
+  </div>
+  <div class="clr-row checkboxes-container">
+    <clr-checkbox [(clrChecked)]="showPolyp">
+      Show polyp
+    </clr-checkbox>
+    <clr-checkbox [(clrChecked)]="showModification">
+      Show modification
+    </clr-checkbox>
+  </div>
 </div>
 
 <clr-tabs *ngIf="video != null">
@@ -144,7 +163,8 @@
                                 [timesAreCorrect]="timesAreCorrect"
                                 [playInterval]="playInterval"
                                 [startInterval]="startInterval" [endInterval]="endInterval"
-                                [transformToTimePipe]="transformToTimePipe"></app-video-modification>
+                                [transformToTimePipe]="transformToTimePipe"
+                                (videoModifications)="videoModificationsUpdate($event)"></app-video-modification>
       </div>
 
     </clr-tab-content>

@@ -13,7 +13,7 @@ video {
 }
 
 .controls {
-  opacity: 0.5;
+  opacity: 0.75;
   width: 80%;
   max-width: 600px;
   border-radius: 5px;

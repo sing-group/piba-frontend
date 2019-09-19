@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Video} from '../../models/Video';
 import {Modifier} from '../../models/Modifier';
 import {VideoModification} from '../../models/VideoModification';
@@ -33,6 +33,9 @@ export class VideoModificationComponent implements OnInit {
   deletingVideoModification = false;
 
   videoModification: VideoModification;
+
+  // tslint:disable-next-line:no-output-rename
+  @Output('videoModifications') videoModificationsEmitter = new EventEmitter<VideoModification[]>();
   videoModifications: VideoModification[] = [];
 
   constructor(
@@ -46,7 +49,10 @@ export class VideoModificationComponent implements OnInit {
   ngOnInit() {
     this.modifiersService.getModifiers().subscribe((modifiers) => this.modifiers = modifiers);
     this.videoModificationsService.getVideoModifications(this.video.id)
-      .subscribe(videoModifications => this.videoModifications = videoModifications);
+      .subscribe(videoModifications => {
+        this.videoModifications = videoModifications;
+        this.videoModificationsChange();
+      });
   }
 
   addVideoModification() {
@@ -63,6 +69,7 @@ export class VideoModificationComponent implements OnInit {
         this.start = null;
         this.end = null;
         this.selectedModifier = null;
+        this.videoModificationsChange();
       }
     );
   }
@@ -76,6 +83,7 @@ export class VideoModificationComponent implements OnInit {
         );
         this.videoModifications.splice(index, 1);
         this.notificationService.success('Video modifier removed successfully.', 'Video modifier removed');
+        this.videoModificationsChange();
       }
     );
     this.cancel();
@@ -85,6 +93,10 @@ export class VideoModificationComponent implements OnInit {
     this.deletingVideoModification = true;
     this.videoModification = this.videoModifications.find((toFind) => toFind === videoModification
     );
+  }
+
+  videoModificationsChange() {
+    this.videoModificationsEmitter.emit(this.videoModifications);
   }
 
   cancel() {

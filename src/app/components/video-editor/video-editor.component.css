@@ -69,8 +69,59 @@ clr-dropdown > input {
   color: #c92100;
 }
 
-.modal-body>:last-child {
+.modal-body > :last-child {
   margin-bottom: .3rem;
   margin-top: 2.5%;
+}
+
+.square {
+  padding: .25rem;
+  margin: .25rem .25rem .25rem .6rem;
+  border: solid 1px black;
+  color: black;
+}
+
+.polyp-modification-square {
+  background: linear-gradient(to right, rgba(0, 198, 194, 0.5) 0%,
+  rgba(0, 198, 194, 0.5) 100%), linear-gradient(to right, rgba(241, 213, 117, 1) 0%, rgba(241, 213, 117, 1) 100%);
+  opacity: 0.65;
+}
+
+.polyp-square {
+  background: linear-gradient(to right, rgba(0, 198, 194, 0.5) 0%,
+  rgba(0, 198, 194, 0.5) 100%),
+  linear-gradient(to right, rgba(0, 2, 34, 0.5) 0%, rgba(0, 2, 34, 0.5) 100%);
+  margin-left: 0;
+}
+
+.modification-square {
+  background-color: rgba(241, 213, 117, 1);
+}
+
+@media (max-width: 992px) {
+  .legends-container {
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .checkboxes-container {
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
+
+@media (min-width: 992px) {
+  .legends-container {
+    margin-right: auto;
+  }
+
+  .checkboxes-container {
+    justify-content: end;
+  }
+}
+
+.checkboxes-container {
+  min-width: 11rem;
+  justify-content: space-between;
 }
 
