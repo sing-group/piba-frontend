@@ -40,6 +40,7 @@ import {ImageComponent} from './components/image/image.component';
 import {ProfileComponent} from './components/profile/profile.component';
 import {GalleriesComponent} from './components/galleries/galleries.component';
 import {ModifiersComponent} from './components/modifiers/modifiers.component';
+import {VideoPolypComponent} from './components/video-polyp/video-polyp.component';
 
 @NgModule({
   declarations: [
@@ -64,7 +65,8 @@ import {ModifiersComponent} from './components/modifiers/modifiers.component';
     ProfileComponent,
     GalleriesComponent,
     ModifiersComponent,
-    DropdownFilterPipe
+    DropdownFilterPipe,
+    VideoPolypComponent
   ],
   imports: [
     BrowserModule,
