@@ -22,7 +22,7 @@ export class GalleriesComponent implements OnInit {
   gallery: Gallery = new Gallery();
   loadingImagesInGalleryInfo = false;
   filter = 'all';
-  addPolypLocation = false;
+  addPolypLocation = true;
 
   restApi = environment.restApi;
 
@@ -146,7 +146,7 @@ export class GalleriesComponent implements OnInit {
     this.editingGallery = false;
     this.downloadingGallery = false;
     this.filter = 'all';
-    this.addPolypLocation = false;
+    this.addPolypLocation = true;
   }
 
 }
