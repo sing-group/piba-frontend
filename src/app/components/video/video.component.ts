@@ -59,23 +59,18 @@ export class VideoComponent implements OnInit {
     } else {
       this.video.pause();
     }
-    if (this.playWatcher !== undefined && this.playWatcher != null) {
-      clearInterval(this.playWatcher);
-    }
-    this.playWatcher = setInterval(() => {
-      if (!this.moveProgress) {
-        this.progress.value = this.video.currentTime;
-      }
-    }, 100);
+    this.initializePlayWatcher();
   }
 
   stopVideo() {
     this.video.pause();
     this.video.currentTime = 0;
+    this.progress.valueAsNumber = 0;
     clearInterval(this.playWatcher);
   }
 
   forwardVideo() {
+    this.initializePlayWatcher();
     if (this.video.currentTime % 1 >= 0.99 || Number(this.videoSpeed) > 1) {
       this.video.currentTime = Math.min(this.video.duration, Math.floor(this.video.currentTime) + 0.999 + Number(this.videoSpeed));
     } else {
@@ -88,11 +83,23 @@ export class VideoComponent implements OnInit {
   }
 
   backwardVideo() {
-    if (this.video.currentTime % 1 < 0.01 || Number(this.videoSpeed) > 1) {
+    this.initializePlayWatcher();
+    if (this.video.currentTime % 1 < 0.01 || Number(this.videoSpeed) > 1 || (!this.paused && Number(this.videoSpeed) === 1)) {
       this.video.currentTime = Math.max(0, Math.floor(this.video.currentTime) - Number(this.videoSpeed));
     } else {
       this.video.currentTime = Math.max(0, Math.floor(this.video.currentTime));
     }
+  }
+
+  initializePlayWatcher() {
+    if (this.playWatcher !== undefined && this.playWatcher != null) {
+      clearInterval(this.playWatcher);
+    }
+    this.playWatcher = setInterval(() => {
+      if (!this.moveProgress) {
+        this.progress.value = this.video.currentTime;
+      }
+    }, 100);
   }
 
   fullscreenVideo() {
