@@ -22,7 +22,6 @@ export class UsersService {
       .pipe(
         map(this.mapUserInfo.bind(this))
       );
-
   }
 
   editUser(user: Users): Observable<User> {
@@ -47,6 +46,23 @@ export class UsersService {
     return this.http.get<UserInfo[]>(`${environment.restApi}/user/${login}`).pipe(
       map(this.mapUserInfo.bind(this))
     );
+  }
+
+  recoverPassword(loginOrEmail: string) {
+    const user = {
+      loginOrEmail: loginOrEmail
+    };
+
+    return this.http.post<UserInfo>(`${environment.restApi}/loginrecovery/`, user).subscribe();
+  }
+
+  updatePassword(password: string, uuid: string): Observable<any> {
+    const passInfo = {
+      uuid: uuid,
+      password: password
+    };
+
+    return this.http.put(`${environment.restApi}/loginrecovery/password`, passInfo);
   }
 
   private toUserInfo(user: Users): UserInfo {

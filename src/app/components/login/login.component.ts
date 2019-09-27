@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthenticationService} from '../../services/authentication.service';
 import {ActivatedRoute, Router} from '@angular/router';
+import {UsersService} from '../../services/users.service';
+import {NotificationService} from '../../modules/notification/services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -11,14 +13,21 @@ export class LoginComponent implements OnInit {
 
   login: string;
   password: string;
+  confirmPassword: string;
   return = '';
+  recovery = false;
+  userRecovery: string;
+  uuid: string;
 
   constructor(private authenticationService: AuthenticationService,
+              private usersService: UsersService,
+              private notificationService: NotificationService,
               private route: ActivatedRoute,
               private router: Router) {
   }
 
   ngOnInit() {
+    this.uuid = this.route.snapshot.queryParamMap.get('uuid');
     this.route.queryParams
       .subscribe(params => this.return = params['return'] || '');
   }
@@ -30,4 +39,41 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  isTryingToLogin(): boolean {
+    return !this.recovery && this.uuid === null;
+  }
+
+  isTryingToRecoverPassword(): boolean {
+    return !this.recovery && this.uuid !== null;
+  }
+
+  isWantingToRecoverPassword(): boolean {
+    return this.recovery;
+  }
+
+  goToLogin() {
+    this.recovery = false;
+  }
+
+  goToPasswordRecovery() {
+    this.recovery = true;
+  }
+
+  recoverPassword() {
+    this.usersService.recoverPassword(this.userRecovery);
+    this.recovery = false;
+    this.router.navigateByUrl('/');
+  }
+
+  updatePassword() {
+    this.usersService.updatePassword(this.password, this.uuid).subscribe(() => {
+        this.notificationService.success('Password changed successfully.', 'Password changed');
+      },
+      response => {
+        this.notificationService.error('Password not changed. ' + response.error, 'Error.');
+      });
+
+    this.router.navigateByUrl('/');
+
+  }
 }

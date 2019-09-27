@@ -55,6 +55,9 @@ const routes: Routes = [
     path: 'login', component: LoginComponent
   },
   {
+    path: 'loginrecovery', component: LoginComponent
+  },
+  {
     path: '', redirectTo: 'explorations', pathMatch: 'full'
   }];
 

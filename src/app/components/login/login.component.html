@@ -1,9 +1,10 @@
 <div class="login-wrapper">
-  <form class="login" (submit)="logIn()" ngNativeValidate #loginForm="ngForm">
-    <label class="title">
+  <form class="login" *ngIf="isTryingToLogin()" (submit)="logIn()" ngNativeValidate #loginForm="ngForm">
+    <section class="title">
       <h3 class="welcome">Welcome to</h3>
       PIBA
-    </label>
+    </section>
+
     <div class="login-group">
       <input class="username" type="text" id="login_username" placeholder="Username" name="username"
              pattern="[a-zA-ZñÑ0-9_-]{1,100}" title="Must be a alphanumeric"
@@ -26,7 +27,71 @@
           Remember me
         </label>
       </div>
+      <div>
+        <button type="button" class="btn btn-link" (click)="goToPasswordRecovery()">Forgot your password?</button>
+      </div>
       <button type="submit" class="btn btn-primary">LOGIN</button>
     </div>
   </form>
+
+  <form class="login" *ngIf="isWantingToRecoverPassword()" (submit)="recoverPassword()" ngNativeValidate
+        #recoveryForm="ngForm">
+    <section class="title">
+      <h3 class="welcome">Welcome to</h3>
+      PIBA
+      <h5 class="hint">
+        To recover your password, please, introduce your login or email and we will send you an email.
+      </h5>
+    </section>
+    <div class="login-group">
+      <input class="username" type="text" id="recovery_username" placeholder="Username/Email" name="usernameMail"
+             pattern="(^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$)|([a-zA-ZñÑ0-9_-]{1,100})"
+             title="Must be a alphanumeric"
+             maxlength="120"
+             [(ngModel)]="userRecovery" required #userMailForm="ngModel">
+      <div *ngIf="recoveryForm.submitted && userMailForm.invalid" class="alert alert-danger">
+        <div *ngIf="userMailForm.errors.required">Username/Email is required.</div>
+        <div *ngIf="userMailForm.errors.maxlength">Email can't be longer than 120 characters.</div>
+        <div *ngIf="userMailForm.errors.pattern">Username can only contain letters, numbers or underscore and should
+          have a length between 1 and 100.
+        </div>
+      </div>
+      <div>
+        <button type="button" class="btn btn-link" (click)="goToLogin()">Return to login</button>
+      </div>
+      <button type="submit" class="btn btn-primary">RECOVER</button>
+    </div>
+  </form>
+
+  <form class="login" *ngIf="isTryingToRecoverPassword()" (submit)="updatePassword()" ngNativeValidate
+        #newPassForm="ngForm">
+    <section class="title">
+      <h3 class="welcome">Welcome to</h3>
+      PIBA
+      <h5 class="hint">
+        Please, introduce your new password.
+      </h5>
+    </section>
+    <div class="login-group">
+      <input class="password" type="password" id="recover_password" placeholder="New Password" name="password"
+             [(ngModel)]="password" required #updatePasswordForm="ngModel" minlength="6">
+      <div *ngIf="updatePasswordForm.invalid && !updatePasswordForm.pristine" class="alert alert-danger">
+        <div *ngIf="updatePasswordForm.errors.required">Password is required.</div>
+        <div *ngIf="updatePasswordForm.errors.minlength">Password can't be shorter than 6 characters.</div>
+      </div>
+
+      <input class="password" type="password" id="repeat_password" placeholder="Repeat New Password"
+             name="repeat_password"
+             [(ngModel)]="confirmPassword" required #repeatPasswordForm="ngModel" minlength="6">
+      <div *ngIf="updatePasswordForm.value !== '' && updatePasswordForm.value !== repeatPasswordForm.value &&
+          !repeatPasswordForm.pristine" class="alert alert-danger">Passwords don't match.
+      </div>
+
+      <div>
+        <button type="button" class="btn btn-link" (click)="goToLogin()">Return to login</button>
+      </div>
+      <button type="submit" class="btn btn-primary">Create New Password</button>
+    </div>
+  </form>
 </div>
+
