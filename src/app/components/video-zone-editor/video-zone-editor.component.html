@@ -1,0 +1,120 @@
+<form #elementRecordingForm="ngForm" ngNativeValidate>
+
+  <div class="form-group row">
+    <div class="col-lg-2 col-md-4 col-sm-5 col-xs-5">
+      <label for="selectZoneType" class="required">{{elementName}}</label>
+    </div>
+    <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
+      <div class="select">
+        <select id="selectZoneType" [(ngModel)]="selectedZoneType" name="selectedZoneType" required #selectZoneType="ngModel">
+          <option *ngFor="let zoneType of sortedVideoZoneTypes" [ngValue]="zoneType">{{zoneType.name}}</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-1 col-xs-2" *ngIf="canBeCreated">
+      <button type="button" class="btn btn-icon" title="Add {{elementName}}" (click)="onShowCreationDialog()">
+        <clr-icon shape="plus"></clr-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-lg-2 col-md-4 col-sm-5 col-xs-5">
+      <label for="element-start" class="required">Start</label>
+    </div>
+    <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
+      <input id="element-start" type="text" name="start" [(ngModel)]="start" class="input-timer"
+             required #inputStart="ngModel"/>
+    </div>
+    <div class="col-xs-2 col-sm-1 col-md-2">
+      <button type="button" (click)="onSetCurrentAsStart()" class="btn btn-icon">
+        <clr-icon shape="clock"></clr-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-lg-2 col-md-4 col-sm-5 col-xs-5">
+      <label for="element-end" class="required">Stop</label>
+    </div>
+    <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
+      <input id="element-end" type="text" name="end" [(ngModel)]="end" class="input-timer" required
+             #inputEnd="ngModel"/>
+
+    </div>
+    <div class="col-xs-2 col-sm-1 col-md-2">
+      <button type="button" (click)="onSetCurrentAsEnd()" class="btn btn-icon">
+        <clr-icon shape="clock"></clr-icon>
+      </button>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary"
+          [disabled]="!isCurrentIntervalValid() || selectZoneType.invalid || inputStart.invalid || inputEnd.invalid"
+          (click)="onCreateZone();elementRecordingForm.submitted">
+    <clr-icon shape="plus"></clr-icon>
+    Add
+  </button>
+</form>
+
+<div class="elementrecordings-container">
+  <clr-datagrid>
+    <clr-dg-column [clrDgField]="'element.name'" [clrDgSortOrder]="ascSort">{{elementName}}</clr-dg-column>
+    <clr-dg-column [clrDgField]="'start'">Start</clr-dg-column>
+    <clr-dg-column [clrDgField]="'end'">Stop</clr-dg-column>
+    <clr-dg-column>Actions</clr-dg-column>
+
+    <clr-dg-row *clrDgItems="let element of elements">
+      <clr-dg-cell>{{element.element.name}}</clr-dg-cell>
+      <clr-dg-cell>{{element.start | time}}</clr-dg-cell>
+      <clr-dg-cell>{{element.end | time}}</clr-dg-cell>
+      <clr-dg-cell>
+        <button type="button" class="btn btn-success-outline" (click)="onPlayInterval(element)">
+          <clr-icon shape="play"></clr-icon>
+          Play
+        </button>
+        <button type="button" class="btn btn-danger-outline" (click)="onShowRemoveDialog(element)">
+          <clr-icon shape="times"></clr-icon>
+          Remove
+        </button>
+      </clr-dg-cell>
+    </clr-dg-row>
+
+    <clr-dg-footer>{{elements.length}} {{elementName}} recording</clr-dg-footer>
+  </clr-datagrid>
+
+</div>
+
+<!-- Add new element -->
+<form #newElementForm="ngForm" (submit)="onCreateElement(); nameElement.control.markAsPristine();" ngNativeValidate>
+  <clr-modal [(clrModalOpen)]="creationModalOpened" [clrModalSize]="'sm'">
+    <h3 class="modal-title">Add {{elementName}}</h3>
+    <div class="modal-body">
+      <div class="form-control">
+        <label for="element-form-name" class="required">Name</label>
+        <input type="text" id="element-form-name" [(ngModel)]="newZoneTypeName" name="name" required
+               pattern="[a-zA-ZñÑ0-9_\s\(\)-]+" title="Must be a alphanumeric" #nameElement="ngModel"
+        />
+        <div *ngIf="nameElement.errors && !nameElement.pristine" class="alert alert-danger">
+          <div *ngIf="nameElement.errors.required">Name is required.</div>
+          <div *ngIf="nameElement.errors.pattern">Name can only contain letters, numbers or underscore.</div>
+        </div>
+        <div *ngIf="isNameAlreadyUsed()" class="alert alert-danger">This name is already being used</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" type="submit" [disabled]="isNameAlreadyUsed() || nameElement.invalid">
+        <clr-icon shape="plus"></clr-icon>
+        Add
+      </button>
+    </div>
+  </clr-modal>
+</form>
+
+<!-- Delete confirmation modal -->
+<app-delete-confirmation *ngIf="deleting" [modelName]="elementName.toLowerCase() + ' recording'"
+                         [id]="selectedElement.id"
+                         [name]="selectedElement.element.name"
+                         [cancel]="clearCreationForm.bind(this)" [delete]="onDeleteElement.bind(this)">
+</app-delete-confirmation>
+

@@ -24,7 +24,6 @@ import {IdSpacesService} from './services/idspaces.service';
 import {ModifiersService} from './services/modifiers.service';
 import {VideoModificationsService} from './services/video-modifications.service';
 import {TimeToNumberPipe} from './pipes/time-to-number.pipe';
-import {VideoModificationComponent} from './components/video-modification/video-modification.component';
 import {NotificationModule} from './modules/notification/notification.module';
 import {ErrorNotificationHandler} from './modules/notification/handlers/error-notification.handler';
 import {LoginComponent} from './components/login/login.component';
@@ -40,7 +39,7 @@ import {ImageComponent} from './components/image/image.component';
 import {ProfileComponent} from './components/profile/profile.component';
 import {GalleriesComponent} from './components/galleries/galleries.component';
 import {ModifiersComponent} from './components/modifiers/modifiers.component';
-import {VideoPolypComponent} from './components/video-polyp/video-polyp.component';
+import { VideoZoneEditorComponent } from './components/video-zone-editor/video-zone-editor.component';
 
 @NgModule({
   declarations: [
@@ -53,7 +52,6 @@ import {VideoPolypComponent} from './components/video-polyp/video-polyp.componen
     ExplorationsComponent,
     PolypComponent,
     TimeToNumberPipe,
-    VideoModificationComponent,
     LoginComponent,
     AgePipe,
     IdspaceComponent,
@@ -66,7 +64,7 @@ import {VideoPolypComponent} from './components/video-polyp/video-polyp.componen
     GalleriesComponent,
     ModifiersComponent,
     DropdownFilterPipe,
-    VideoPolypComponent
+    VideoZoneEditorComponent
   ],
   imports: [
     BrowserModule,

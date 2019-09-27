@@ -1,8 +1,9 @@
 import {Exploration} from './Exploration';
 import {PolypRecording} from './PolypRecording';
 import {PolypHistology} from './PolypHistology';
+import {VideoZoneType} from './VideoZoneType';
 
-export class Polyp {
+export class Polyp implements VideoZoneType {
   id: string;
   name: string;
   size: number;

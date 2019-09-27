@@ -1,4 +1,4 @@
-import {AfterViewChecked, Component, ElementRef, Input, OnInit, Pipe, PipeTransform, ViewChild} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, OnInit, Pipe, PipeTransform, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Polyp} from '../../models/Polyp';
 import {Video} from '../../models/Video';
@@ -16,8 +16,11 @@ import {ImagesService} from '../../services/images.service';
 import {ImageUploadInfo} from '../../services/entities/ImageUploadInfo';
 import {AuthenticationService} from '../../services/authentication.service';
 import {Role} from '../../models/User';
-import {VideoModification} from '../../models/VideoModification';
 import {VideoModificationsService} from '../../services/video-modifications.service';
+import {ModifiersService} from '../../services/modifiers.service';
+import {Modifier} from '../../models/Modifier';
+import {Interval} from '../../models/Interval';
+import {ElementInVideoZone} from '../../models/ElementInVideoZone';
 
 @Pipe({
   name: 'dropdownFilter',
@@ -40,41 +43,51 @@ export class DropdownFilterPipe implements PipeTransform {
   templateUrl: './video-editor.component.html',
   styleUrls: ['./video-editor.component.css']
 })
-export class VideoEditorComponent implements OnInit, AfterViewChecked {
-
+export class VideoEditorComponent implements AfterViewChecked, OnInit {
   video: Video;
 
   start: string;
   end: string;
 
-  modificationColor = 'rgba(241, 213, 117, 1)';
-  polypColor = 'rgba(0, 198, 194, 0.5)';
   showPolyp = true;
   showModification = true;
 
   polyps: Polyp[] = [];
-  selectedPolyp: Polyp = new Polyp();
+  modifiers: Modifier[] = [];
 
-  videoModifications: VideoModification[] = [];
+  polypRecordingZones: ElementInVideoZone[] = [];
+  videoModificationZones: ElementInVideoZone[] = [];
+
+  // Snapshot attributes
   openSnapshotModal = false;
-  galleries: Gallery[] = [];
-  gallery: Gallery = new Gallery();
-  galleryInput: string;
-  polypInput: string;
-  fileName: string;
-  image: Image = new Image();
-  role = Role;
-
-  currentTime: number;
-  snapshotTime: number;
-  videoHTML: HTMLMediaElement;
 
   showPolypsInFrame = true;
   showPolypCheckbox = true;
 
-  pauseWatcher: any;
-  progress: HTMLInputElement;
-  moveProgress = false;
+  snapshotPolypInputModel: string;
+
+  galleries: Gallery[] = [];
+  gallery: Gallery = new Gallery();
+  galleryInputModel: string;
+
+  fileName: string;
+
+  private polypForSnapshot: Polyp = new Polyp();
+
+  // Internal attributes
+  private progress: HTMLInputElement;
+
+  private moveProgress = false;
+
+  private pauseWatcher: number;
+  private image: Image = new Image();
+
+  private currentTime: number;
+
+  private snapshotTime: number;
+
+  private readonly modificationColor = 'rgba(241, 213, 117, 1)';
+  private readonly polypColor = 'rgba(0, 198, 194, 0.5)';
 
   @ViewChild('canvas') canvas: ElementRef;
 
@@ -85,12 +98,13 @@ export class VideoEditorComponent implements OnInit, AfterViewChecked {
     private polypsService: PolypsService,
     private explorationsService: ExplorationsService,
     private polypRecordingsService: PolypRecordingsService,
+    private modifiersService: ModifiersService,
     private videoModificationsService: VideoModificationsService,
     private timeToNumber: TimeToNumberPipe,
     private galleriesService: GalleriesService,
     private imagesService: ImagesService,
     private notificationService: NotificationService,
-    public readonly authenticationService: AuthenticationService
+    private authenticationService: AuthenticationService
   ) {
   }
 
@@ -100,21 +114,27 @@ export class VideoEditorComponent implements OnInit, AfterViewChecked {
     this.videosService.getVideo(id)
       .subscribe(video => {
         this.video = video;
+        this.explorationsService.getPolyps(this.video.exploration).subscribe(polyps => this.polyps = polyps);
+        this.polypRecordingsService.getPolypRecordingsByVideo(this.video.id).subscribe(polypRecordings => {
+          this.video.polypRecording = polypRecordings;
+          this.updatePolypRecoringZones();
+        });
         this.videoModificationsService.getVideoModifications(this.video.id)
           .subscribe(videoModifications => {
-            this.videoModifications = videoModifications;
+            this.video.modifications = videoModifications;
+            this.updateVideoModificationZones();
           });
       });
 
+    this.modifiersService.getModifiers().subscribe((modifiers) => this.modifiers = modifiers);
+
     this.galleriesService.getGalleries().subscribe(galleries => {
-      this.galleries = galleries.sort((a, b) => a.title > b.title ? 1 : -1);
-      this.galleries = galleries.sort((a, b) => a.title > b.title ? 1 : -1);
+      this.galleries = galleries.sort((galleryA, galleryB) => galleryA.title > galleryB.title ? 1 : -1);
     });
   }
 
   ngAfterViewChecked() {
     const progressbar = document.getElementById('progress') as HTMLInputElement;
-    this.videoHTML = document.getElementById('video-exploration') as HTMLMediaElement;
     const legendCheckboxContainer = document.getElementById('legend-checkbox-container') as HTMLElement;
 
     let background = '';
@@ -136,11 +156,11 @@ export class VideoEditorComponent implements OnInit, AfterViewChecked {
         background += ')';
       }
 
-      background += this.showPolyp && this.showModification && this.videoModifications.length > 0 ? ', ' : '';
+      background += this.showPolyp && this.showModification && this.video.modifications.length > 0 ? ', ' : '';
 
-      if (this.videoModifications.length > 0 && this.showModification) {
+      if (this.video.modifications.length > 0 && this.showModification) {
         background += 'linear-gradient(to right, transparent';
-        this.videoModifications.sort((p1, p2) => p1.start - p2.start).forEach(modification => {
+        this.video.modifications.sort((p1, p2) => p1.start - p2.start).forEach(modification => {
           const start = (modification.start * 100 / duration).toFixed(4);
           const end = (modification.end * 100 / duration).toFixed(4);
           background += `,transparent ${start}%,${this.modificationColor} ${start}%, ${this.modificationColor} ${end}%,transparent ${end}%`;
@@ -154,20 +174,53 @@ export class VideoEditorComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  startInterval() {
-    this.videoHTML = document.getElementById('video-exploration') as HTMLMediaElement;
+  private get videoHTML(): HTMLVideoElement {
+    return document.getElementById('video-exploration') as HTMLVideoElement;
+  }
+
+  private updatePolypRecoringZones() {
+    this.polypRecordingZones = this.video.polypRecording.map(
+      polypRecording => ({
+        id: polypRecording.id,
+        element: polypRecording.polyp,
+        start: polypRecording.start,
+        end: polypRecording.end
+      })
+    );
+    // .sort((zoneA: ElementInVideoZone, zoneB: ElementInVideoZone) => zoneA.element.name < zoneB.element.name ? -1 : 1);
+  }
+
+  private updateVideoModificationZones() {
+    this.videoModificationZones = this.video.modifications.map(
+      videoModification => ({
+        id: videoModification.id,
+        element: videoModification.modifier,
+        start: videoModification.start,
+        end: videoModification.end
+      })
+    ).sort((zoneA: ElementInVideoZone, zoneB: ElementInVideoZone) => zoneA.element.name < zoneB.element.name ? -1 : 1);
+  }
+
+  hasVideo(): boolean {
+    return this.video !== undefined && this.video !== null;
+  }
+
+  isEndoscopist(): boolean {
+    return this.authenticationService.getRole() === Role.ENDOSCOPIST;
+  }
+
+  startInterval(): string {
     this.videoHTML.pause();
     this.videoHTML.currentTime = Math.floor(this.videoHTML.currentTime);
     this.currentTime = this.videoHTML.currentTime;
-    this.start = this.transformToTimePipe();
+    return this.transformToTimePipe();
   }
 
-  endInterval() {
-    this.videoHTML = document.getElementById('video-exploration') as HTMLMediaElement;
+  endInterval(): string {
     this.videoHTML.pause();
     this.videoHTML.currentTime = Math.floor(this.videoHTML.currentTime) + 0.999;
     this.currentTime = this.videoHTML.currentTime;
-    this.end = this.transformToTimePipe();
+    return this.transformToTimePipe();
   }
 
   transformToTimePipe(): string {
@@ -186,26 +239,16 @@ export class VideoEditorComponent implements OnInit, AfterViewChecked {
     this.moveProgress = move;
   }
 
-  videoModificationsUpdate(modifications: VideoModification[]) {
-    this.videoModifications = modifications;
+  isValidInterval(interval: Interval): boolean {
+    return interval.start < interval.end
+      && this.videoHTML.duration !== undefined
+      && interval.start >= 0
+      && interval.end <= this.videoHTML.duration;
   }
 
-  public timesAreCorrect(): Boolean {
-    if (this.start === undefined || this.start === null || this.end === undefined || this.end === null) {
-      return false;
-    }
-    this.videoHTML = document.getElementById('video-exploration') as HTMLMediaElement;
-    if (this.videoHTML.duration === undefined && this.timeToNumber.transform(this.start) > this.videoHTML.duration ||
-      this.timeToNumber.transform(this.end) > this.videoHTML.duration) {
-      return false;
-    }
-    return (this.timeToNumber.transform(this.start) < this.timeToNumber.transform(this.end));
-  }
-
-  playInterval(start: number, end: number) {
+  playInterval(interval: Interval) {
     this.progress = document.getElementById('progress') as HTMLInputElement;
-    this.videoHTML = document.getElementById('video-exploration') as HTMLMediaElement;
-    this.videoHTML.currentTime = start;
+    this.videoHTML.currentTime = interval.start;
     this.videoHTML.play();
 
     if (this.pauseWatcher !== undefined && this.pauseWatcher != null) {
@@ -215,7 +258,7 @@ export class VideoEditorComponent implements OnInit, AfterViewChecked {
       if (!this.moveProgress) {
         this.progress.value = this.videoHTML.currentTime.toString();
       }
-      if (this.videoHTML.currentTime >= end) {
+      if (this.videoHTML.currentTime >= interval.end) {
         this.videoHTML.pause();
         clearInterval(this.pauseWatcher);
       }
@@ -224,13 +267,12 @@ export class VideoEditorComponent implements OnInit, AfterViewChecked {
 
   getSnapshot() {
     this.snapshotTime = this.currentTime === undefined ? 0 : this.currentTime;
-    const videoHTML = document.getElementById('video-exploration') as HTMLVideoElement;
-    videoHTML.pause();
-    this.canvas.nativeElement.width = videoHTML.videoWidth;
-    this.canvas.nativeElement.height = videoHTML.videoHeight;
-    this.canvas.nativeElement.getContext('2d').drawImage(videoHTML, 0, 0,
-      videoHTML.videoWidth, videoHTML.videoHeight);
-    this.showPolypCheckbox = this.getPolyps().length !== this.polyps.length;
+    this.videoHTML.pause();
+    this.canvas.nativeElement.width = this.videoHTML.videoWidth;
+    this.canvas.nativeElement.height = this.videoHTML.videoHeight;
+    this.canvas.nativeElement.getContext('2d').drawImage(this.videoHTML, 0, 0,
+      this.videoHTML.videoWidth, this.videoHTML.videoHeight);
+    this.showPolypCheckbox = this.getPolypsForSnapshot().length !== this.polyps.length;
     this.getFileName();
     this.openSnapshotModal = true;
   }
@@ -243,12 +285,12 @@ export class VideoEditorComponent implements OnInit, AfterViewChecked {
     this.currentTime = this.snapshotTime;
     this.image.video = this.video;
     this.image.gallery = this.gallery;
-    this.image.polyp = this.selectedPolyp;
+    this.image.polyp = this.polypForSnapshot;
     this.image.numFrame = Math.round(this.image.video.fps * this.snapshotTime);
     this.image.base64contents = this.canvas.nativeElement.toDataURL();
 
     let imageUploadInfo;
-    if (this.polypInput !== '' && this.polypInput !== undefined) {
+    if (this.snapshotPolypInputModel !== '' && this.snapshotPolypInputModel !== undefined) {
       imageUploadInfo = this.mapImageWithPolyp(this.image);
     } else {
       imageUploadInfo = this.mapImage(this.image);
@@ -257,7 +299,7 @@ export class VideoEditorComponent implements OnInit, AfterViewChecked {
 
     this.discardSnapshot();
 
-    this.imagesService.uploadImage(imageUploadInfo).subscribe((image) => {
+    this.imagesService.uploadImage(imageUploadInfo).subscribe(() => {
       this.notificationService.success('Image registered successfully.', 'Image registered.');
     });
   }
@@ -277,40 +319,119 @@ export class VideoEditorComponent implements OnInit, AfterViewChecked {
     return <File>blob;
   }
 
-  galleryNonExists(): boolean {
-    return this.galleries.filter(gallery => gallery.title === this.galleryInput).length <= 0 ||
-      this.gallery.title !== this.galleryInput;
+  doesGalleryNotExists(): boolean {
+    return this.galleries.filter(gallery => gallery.title === this.galleryInputModel).length <= 0 ||
+      this.gallery.title !== this.galleryInputModel;
   }
 
-  polypIsCorrect() {
-    return this.selectedPolyp.name === this.polypInput || this.polypInput === '';
+  isPolypCorrect() {
+    return this.polypForSnapshot.name === this.snapshotPolypInputModel || this.snapshotPolypInputModel === '';
   }
 
   selectGallery(gallery: Gallery) {
-    this.galleryInput = gallery.title;
+    this.galleryInputModel = gallery.title;
     this.gallery = gallery;
   }
 
-  selectPolyp(polyp: Polyp) {
-    this.polypInput = polyp.name;
-    this.selectedPolyp = polyp;
+  selectPolypForSnapshot(polyp: Polyp) {
+    this.snapshotPolypInputModel = polyp.name;
+    this.polypForSnapshot = polyp;
   }
 
-  getPolyps(): Polyp[] {
-    const polypRecordings = this.video.polypRecording.filter(polypRecording => this.snapshotTime >= polypRecording.start &&
-      this.snapshotTime <= polypRecording.end);
-    const polypsInPolypRecording = Array.from(polypRecordings, p => p.polyp);
-    return polypRecordings.length > 0 && this.showPolypsInFrame ? polypsInPolypRecording.sort(
-      (a, b) => a.name > b.name ? 1 : -1) : this.polyps.sort((a, b) => a.name > b.name ? 1 : -1);
+  getPolypsForSnapshot(): Polyp[] {
+    let polyps = this.polyps;
+
+    if (this.showPolypsInFrame) {
+      const polypRecordingsInSnapshot = this.video.polypRecording
+        .filter(polypRecording => this.snapshotTime >= polypRecording.start && this.snapshotTime <= polypRecording.end)
+        .map(polypRecording => polypRecording.polyp);
+
+      if (polypRecordingsInSnapshot.length > 0) {
+        polyps = polypRecordingsInSnapshot;
+      }
+    }
+
+    return polyps.sort((polypA, polypB) => polypA.name > polypB.name ? 1 : -1);
   }
 
   discardSnapshot() {
     this.openSnapshotModal = false;
     this.gallery = new Gallery();
-    this.galleryInput = '';
-    this.selectedPolyp = new Polyp();
-    this.polypInput = '';
+    this.galleryInputModel = '';
+    this.polypForSnapshot = new Polyp();
+    this.snapshotPolypInputModel = '';
     this.showPolypsInFrame = true;
+  }
+
+  onAddPolyp(newPolypName: string) {
+    const newPolyp = new Polyp();
+    newPolyp.name = newPolypName;
+
+    this.explorationsService.addPolypToExploration(newPolyp, this.video.exploration)
+      .subscribe(polyp => {
+        this.polyps.push(polyp);
+        this.notificationService.success('Polyp registered successfully.', 'Polyp registered.');
+      });
+  }
+
+  onAddPolypRecording(videoZone: ElementInVideoZone) {
+    const polypRecording = {
+      id: null,
+      video: this.video,
+      polyp: <Polyp>videoZone.element,
+      start: videoZone.start,
+      end: videoZone.end
+    };
+    this.polypRecordingsService.createPolypRecording(polypRecording)
+      .subscribe(
+        polypRecordingCreated => {
+          this.video.polypRecording = this.video.polypRecording.concat(polypRecordingCreated);
+          this.updatePolypRecoringZones();
+          this.notificationService.success('Polyp recording registered successfully.', 'Polyp recording registered');
+        }
+      );
+  }
+
+  onRemovePolypRecording(polypRecordingId: number) {
+    this.polypRecordingsService.removePolypRecording(polypRecordingId).subscribe(
+      () => {
+        const index = this.video.polypRecording.indexOf(
+          this.video.polypRecording.find(polypRecording => polypRecording.id === polypRecordingId)
+        );
+        this.video.polypRecording.splice(index, 1);
+        this.updatePolypRecoringZones();
+        this.notificationService.success('Polyp recording removed successfully.', 'Polyp recording removed.');
+      }
+    );
+  }
+
+  onAddVideoModification(videoZone: ElementInVideoZone) {
+    const videoModification = {
+      id: null,
+      video: this.video,
+      modifier: <Modifier>videoZone.element,
+      start: videoZone.start,
+      end: videoZone.end
+    };
+    this.videoModificationsService.createVideoModification(videoModification).subscribe(videoModificationCreated => {
+        this.video.modifications = this.video.modifications.concat(videoModificationCreated);
+        this.updateVideoModificationZones();
+        this.notificationService.success('Video modification registered successfully.', 'Video modification registered.');
+      }
+    );
+  }
+
+  onRemoveVideoModification(videoModificationId: number) {
+    this.videoModificationsService.removeVideoModification(videoModificationId).subscribe(
+      () => {
+        const index = this.video.modifications.indexOf(
+          this.video.modifications.find(videoModification => videoModification.id === videoModificationId)
+        );
+        this.video.modifications.splice(index, 1);
+        this.updateVideoModificationZones();
+        this.notificationService.success('Video modifier removed successfully.', 'Video modifier removed');
+      }
+    );
   }
 
   private mapImage(image: Image): ImageUploadInfo {

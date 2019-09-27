@@ -5,7 +5,7 @@
   </button>
 </div>
 
-<div class="row video-container" *ngIf="video != null">
+<div class="row video-container" *ngIf="hasVideo()">
   <app-video (currentTime)="onCurrentTimeUpdate($event)" (mouseInProgress)="mouseInProgress($event)"
              (doSnapshot)="getSnapshot()">
     <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}"/>
@@ -24,25 +24,29 @@
   </div>
   <div class="clr-row checkboxes-container">
     <clr-checkbox [(clrChecked)]="showPolyp">
-      Show polyp
+      Show polyps
     </clr-checkbox>
     <clr-checkbox [(clrChecked)]="showModification">
-      Show modification
+      Show modifications
     </clr-checkbox>
   </div>
 </div>
 
-<clr-tabs *ngIf="video != null">
+<clr-tabs *ngIf="hasVideo()">
   <clr-tab>
     <button clrTabLink id="Polyps">Polyps</button>
     <clr-tab-content *clrIfActive="true">
 
       <div class="tab-container">
-        <app-video-polyp [video]="video" [currentTime]="currentTime" [moveProgress]="moveProgress"
-                                [timesAreCorrect]="timesAreCorrect"
-                                [playInterval]="playInterval"
-                                [startInterval]="startInterval" [endInterval]="endInterval"
-                                [transformToTimePipe]="transformToTimePipe"></app-video-polyp>
+        <app-video-zone-editor [elementName]="'Polyp'" [canBeCreated]="true"
+                               [elements]="polypRecordingZones" [videoZoneTypes]="polyps"
+                               [isValidInterval]="isValidInterval.bind(this)"
+                               [getCurrentTimeStart]="startInterval.bind(this)"
+                               [getCurrentTimeEnd]="endInterval.bind(this)"
+                               (playInterval)="playInterval($event)" (addZoneType)="onAddPolyp($event)"
+                               (createElement)="onAddPolypRecording($event)"
+                               (removeElement)="onRemovePolypRecording($event)"
+                                ></app-video-zone-editor>
       </div>
 
     </clr-tab-content>
@@ -52,12 +56,15 @@
     <clr-tab-content *clrIfActive>
 
       <div class="tab-container">
-        <app-video-modification [video]="video" [currentTime]="currentTime" [moveProgress]="moveProgress"
-                                [timesAreCorrect]="timesAreCorrect"
-                                [playInterval]="playInterval"
-                                [startInterval]="startInterval" [endInterval]="endInterval"
-                                [transformToTimePipe]="transformToTimePipe"
-                                (videoModifications)="videoModificationsUpdate($event)"></app-video-modification>
+        <app-video-zone-editor [elementName]="'Modifier'" [canBeCreated]="false"
+                               [elements]="videoModificationZones" [videoZoneTypes]="modifiers"
+                               [isValidInterval]="isValidInterval.bind(this)"
+                               [getCurrentTimeStart]="startInterval.bind(this)"
+                               [getCurrentTimeEnd]="endInterval.bind(this)"
+                               (playInterval)="playInterval($event)"
+                               (createElement)="onAddVideoModification($event)"
+                               (removeElement)="onRemoveVideoModification($event)"
+        ></app-video-zone-editor>
       </div>
 
     </clr-tab-content>
@@ -72,37 +79,37 @@
       <canvas #canvas id="canvas" class="snapshot-canvas"></canvas>
     </div>
 
-    <div *ngIf="authenticationService.getRole() == role.ENDOSCOPIST" class="margin-top-gallery clr-row">
+    <div *ngIf="isEndoscopist()" class="margin-top-gallery clr-row">
       <label for="snapshot-form-gallery" class="col-xs-3">Gallery <span
         class="required-gallery">*</span></label>
       <clr-dropdown class="col-xs-9 col-sm-6">
-        <input type="text" clrDropdownTrigger id="snapshot-form-gallery" [(ngModel)]="galleryInput"
+        <input type="text" clrDropdownTrigger id="snapshot-form-gallery" [(ngModel)]="galleryInputModel"
                name="galleryInput" autocomplete="off"
                #galleryValue="ngModel" placeholder="Search gallery"/>
         <clr-dropdown-menu *clrIfOpen class="clr-dropdown">
-          <button *ngIf="(galleries | dropdownFilter:galleryInput)?.length === 0" type="button" class="btn"
+          <button *ngIf="(galleries | dropdownFilter:galleryInputModel)?.length === 0" type="button" class="btn"
                   disabled>No matches found
           </button>
-          <div *ngFor="let i of galleries | dropdownFilter:galleryInput">
-            <button type="button" clrDropdownItem (click)="selectGallery(i)">{{i.title}}
+          <div *ngFor="let gallery of galleries | dropdownFilter:galleryInputModel">
+            <button type="button" clrDropdownItem (click)="selectGallery(gallery)">{{gallery.title}}
             </button>
           </div>
         </clr-dropdown-menu>
       </clr-dropdown>
     </div>
 
-    <div *ngIf="authenticationService.getRole() == role.ENDOSCOPIST" class="clr-row">
+    <div *ngIf="isEndoscopist()" class="clr-row">
       <label for="snapshot-form-polyp" class="col-xs-3">Polyp</label>
       <clr-dropdown class="col-xs-9 col-sm-6 margin-top-polyp">
-        <input type="text" clrDropdownTrigger id="snapshot-form-polyp" [(ngModel)]="polypInput"
+        <input type="text" clrDropdownTrigger id="snapshot-form-polyp" [(ngModel)]="snapshotPolypInputModel"
                name="polypInput"
                autocomplete="off" #polypValue="ngModel" placeholder="Search polyp"/>
         <clr-dropdown-menu *clrIfOpen class="clr-dropdown">
-          <button *ngIf="(getPolyps() | dropdownFilter:polypInput)?.length === 0" type="button" class="btn"
+          <button *ngIf="(getPolypsForSnapshot() | dropdownFilter:snapshotPolypInputModel)?.length === 0" type="button" class="btn"
                   disabled>No matches found
           </button>
-          <div *ngFor="let i of getPolyps() | dropdownFilter:polypInput">
-            <button type="button" clrDropdownItem (click)="selectPolyp(i)">{{i.name}}
+          <div *ngFor="let polyp of getPolypsForSnapshot() | dropdownFilter:snapshotPolypInputModel">
+            <button type="button" clrDropdownItem (click)="selectPolypForSnapshot(polyp)">{{polyp.name}}
             </button>
           </div>
         </clr-dropdown-menu>
@@ -118,8 +125,8 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-danger-outline" (click)="discardSnapshot()">Discard snapshot
     </button>
-    <button *ngIf="authenticationService.getRole() == role.ENDOSCOPIST" type="button" class="btn btn-success-outline"
-            (click)="saveSnapshot()" [disabled]="galleryNonExists() || !polypIsCorrect()">
+    <button *ngIf="isEndoscopist()" type="button" class="btn btn-success-outline"
+            (click)="saveSnapshot()" [disabled]="doesGalleryNotExists() || !isPolypCorrect()">
       Save to gallery
     </button>
     <a class="btn btn-info-outline" id="download-image-button" href="{{canvas.toDataURL('image/png')}}"

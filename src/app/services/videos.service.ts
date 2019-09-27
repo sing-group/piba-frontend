@@ -101,6 +101,7 @@ export class VideosService {
         url: source.src
       })),
       polypRecording: [],
+      modifications: [],
       isProcessing: videoInfo.processing,
       withText: videoInfo.withText,
       fps: videoInfo.fps,
