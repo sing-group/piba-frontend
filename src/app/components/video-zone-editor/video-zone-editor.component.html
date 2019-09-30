@@ -86,7 +86,7 @@
 </div>
 
 <!-- Add new element -->
-<form #newElementForm="ngForm" (submit)="onCreateElement(); nameElement.control.markAsPristine();" ngNativeValidate>
+<form #newElementForm="ngForm" (submit)="onCreateElement()" ngNativeValidate>
   <clr-modal [(clrModalOpen)]="creationModalOpened" [clrModalSize]="'sm'">
     <h3 class="modal-title">Add {{elementName}}</h3>
     <div class="modal-body">

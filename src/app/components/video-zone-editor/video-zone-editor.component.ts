@@ -1,9 +1,10 @@
-import {Component, DoCheck, EventEmitter, Input, Output} from '@angular/core';
+import {Component, DoCheck, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {ClrDatagridSortOrder} from '@clr/angular';
 import {ElementInVideoZone} from '../../models/ElementInVideoZone';
 import {VideoZoneType} from '../../models/VideoZoneType';
 import {Interval} from '../../models/Interval';
 import {TimeToNumberPipe} from '../../pipes/time-to-number.pipe';
+import {NgModel} from '@angular/forms';
 
 @Component({
   selector: 'app-video-zone-editor',
@@ -25,11 +26,15 @@ export class VideoZoneEditorComponent implements DoCheck {
   @Output() createElement = new EventEmitter<ElementInVideoZone>();
   @Output() removeElement = new EventEmitter<number>();
 
+  @ViewChild('nameElement') elementNameInForm: NgModel;
+
+  private _creationModalOpened = false;
+
   ascSort = ClrDatagridSortOrder.ASC;
 
+  creationModalSubmitted = false;
   selectedZoneType: VideoZoneType;
   selectedElement: ElementInVideoZone;
-  creationModalOpened = false;
   deleting = false;
 
   newZoneTypeName = '';
@@ -45,11 +50,24 @@ export class VideoZoneEditorComponent implements DoCheck {
   ngDoCheck() {
     if (this.newZoneTypeName !== '') {
       const newZoneType = this.videoZoneTypes.find(zoneType => zoneType.name === this.newZoneTypeName);
-      if (newZoneType !== undefined && !this.creationModalOpened) {
+      if (newZoneType !== undefined && this.creationModalSubmitted) {
         this.selectedZoneType = newZoneType;
         this.newZoneTypeName = '';
+        this.creationModalSubmitted = false;
       }
     }
+  }
+
+  get creationModalOpened() {
+    return this._creationModalOpened;
+  }
+
+  set creationModalOpened(value: boolean) {
+    this._creationModalOpened = value;
+    if (!this.creationModalSubmitted) {
+      this.newZoneTypeName = '';
+    }
+    this.elementNameInForm.control.markAsPristine();
   }
 
   get sortedVideoZoneTypes(): VideoZoneType[] {
@@ -77,6 +95,7 @@ export class VideoZoneEditorComponent implements DoCheck {
 
   onCreateElement() {
     this.addZoneType.emit(this.newZoneTypeName);
+    this.creationModalSubmitted = true;
     this.creationModalOpened = false;
   }
 
