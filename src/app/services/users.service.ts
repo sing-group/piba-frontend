@@ -2,10 +2,13 @@ import {Injectable} from '@angular/core';
 import {Users} from '../models/Users';
 import {Observable} from 'rxjs';
 import {UserInfo} from './entities/UserInfo';
+import {NewPasswordInfo} from './entities/NewPasswordInfo';
 import {environment} from '../../environments/environment';
 import {map} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {User} from '../models/User';
+import {LoginOrEmailInfo} from './entities/LoginOrEmailInfo';
+import {NewPassword} from '../models/NewPassword';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +25,7 @@ export class UsersService {
       .pipe(
         map(this.mapUserInfo.bind(this))
       );
+
   }
 
   editUser(user: Users): Observable<User> {
@@ -49,20 +53,22 @@ export class UsersService {
   }
 
   recoverPassword(loginOrEmail: string) {
-    const user = {
-      loginOrEmail: loginOrEmail
-    };
+    const loginOrEmailInfo = this.toLoginOrEmailInfo(loginOrEmail);
 
-    return this.http.post<UserInfo>(`${environment.restApi}/loginrecovery/`, user).subscribe();
+    return this.http.post<UserInfo>(`${environment.restApi}/loginrecovery/`, loginOrEmailInfo).subscribe();
   }
 
-  updatePassword(password: string, uuid: string): Observable<any> {
-    const passInfo = {
-      uuid: uuid,
-      password: password
-    };
+  updatePassword(newPassword: NewPassword): Observable<any> {
+    const passInfo = this.toPasswordInfo(newPassword);
 
     return this.http.put(`${environment.restApi}/loginrecovery/password`, passInfo);
+  }
+
+  private toPasswordInfo(newPassword: NewPassword): NewPasswordInfo {
+    return{
+      password: newPassword.password,
+      uuid: newPassword.uuid
+    };
   }
 
   private toUserInfo(user: Users): UserInfo {
@@ -80,6 +86,12 @@ export class UsersService {
       email: userInfo.email,
       password: userInfo.password,
       role: userInfo.role
+    };
+  }
+
+  private toLoginOrEmailInfo(loginOrEmail: string): LoginOrEmailInfo {
+    return {
+      loginOrEmail: loginOrEmail
     };
   }
 }

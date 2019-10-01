@@ -74,7 +74,7 @@
     </section>
     <div class="login-group">
       <input class="password" type="password" id="recover_password" placeholder="New Password" name="password"
-             [(ngModel)]="password" required #updatePasswordForm="ngModel" minlength="6">
+             [(ngModel)]="newPassword.password" required #updatePasswordForm="ngModel" minlength="6">
       <div *ngIf="updatePasswordForm.invalid && !updatePasswordForm.pristine" class="alert alert-danger">
         <div *ngIf="updatePasswordForm.errors.required">Password is required.</div>
         <div *ngIf="updatePasswordForm.errors.minlength">Password can't be shorter than 6 characters.</div>

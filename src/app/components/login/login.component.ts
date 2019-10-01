@@ -3,6 +3,7 @@ import {AuthenticationService} from '../../services/authentication.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UsersService} from '../../services/users.service';
 import {NotificationService} from '../../modules/notification/services/notification.service';
+import {NewPassword} from '../../models/NewPassword';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +18,7 @@ export class LoginComponent implements OnInit {
   return = '';
   recovery = false;
   userRecovery: string;
-  uuid: string;
+  newPassword: NewPassword = new NewPassword();
 
   constructor(private authenticationService: AuthenticationService,
               private usersService: UsersService,
@@ -27,7 +28,7 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.uuid = this.route.snapshot.queryParamMap.get('uuid');
+    this.newPassword.uuid = this.route.snapshot.queryParamMap.get('uuid');
     this.route.queryParams
       .subscribe(params => this.return = params['return'] || '');
   }
@@ -40,11 +41,11 @@ export class LoginComponent implements OnInit {
   }
 
   isTryingToLogin(): boolean {
-    return !this.recovery && this.uuid === null;
+    return !this.recovery && this.newPassword.uuid === null;
   }
 
   isTryingToRecoverPassword(): boolean {
-    return !this.recovery && this.uuid !== null;
+    return !this.recovery && this.newPassword.uuid !== null;
   }
 
   isWantingToRecoverPassword(): boolean {
@@ -66,7 +67,8 @@ export class LoginComponent implements OnInit {
   }
 
   updatePassword() {
-    this.usersService.updatePassword(this.password, this.uuid).subscribe(() => {
+    this.usersService.updatePassword(this.newPassword).subscribe(
+      () => {
         this.notificationService.success('Password changed successfully.', 'Password changed');
       },
       response => {
@@ -74,6 +76,6 @@ export class LoginComponent implements OnInit {
       });
 
     this.router.navigateByUrl('/');
-
   }
+
 }
