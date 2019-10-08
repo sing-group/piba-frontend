@@ -5,6 +5,8 @@ import {VideoZoneType} from '../../models/VideoZoneType';
 import {Interval} from '../../models/Interval';
 import {TimeToNumberPipe} from '../../pipes/time-to-number.pipe';
 import {NgModel} from '@angular/forms';
+import {Role} from '../../models/User';
+import {AuthenticationService} from '../../services/authentication.service';
 
 @Component({
   selector: 'app-video-zone-editor',
@@ -25,6 +27,8 @@ export class VideoZoneEditorComponent implements DoCheck {
   @Output() addZoneType = new EventEmitter<string>();
   @Output() createElement = new EventEmitter<ElementInVideoZone>();
   @Output() removeElement = new EventEmitter<number>();
+  @Output() confirmElement = new EventEmitter<number>();
+  @Output() confirmAllElements = new EventEmitter<any>();
 
   @ViewChild('nameElement') elementNameInForm: NgModel;
 
@@ -36,6 +40,8 @@ export class VideoZoneEditorComponent implements DoCheck {
   selectedZoneType: VideoZoneType;
   selectedElement: ElementInVideoZone;
   deleting = false;
+  confirmingElementInVideoZone = false;
+  confirmingAllElements = false;
 
   newZoneTypeName = '';
   name: string;
@@ -43,7 +49,8 @@ export class VideoZoneEditorComponent implements DoCheck {
   end: string;
 
   constructor(
-    private timeToNumber: TimeToNumberPipe
+    private timeToNumber: TimeToNumberPipe,
+    private readonly authenticationService: AuthenticationService
   ) {
   }
 
@@ -79,7 +86,8 @@ export class VideoZoneEditorComponent implements DoCheck {
       id: -1,
       start: this.timeToNumber.transform(this.start),
       end: this.timeToNumber.transform(this.end),
-      element: this.selectedZoneType
+      element: this.selectedZoneType,
+      confirmed: false
     });
 
     this.clearCreationForm();
@@ -102,6 +110,26 @@ export class VideoZoneEditorComponent implements DoCheck {
   onShowRemoveDialog(element: ElementInVideoZone) {
     this.deleting = true;
     this.selectedElement = element;
+  }
+
+  onShowConfirmElementDialog(element: ElementInVideoZone) {
+    this.confirmingElementInVideoZone = true;
+    this.selectedElement = element;
+  }
+
+  onShowConfirmElementsDialog() {
+    this.confirmingAllElements = true;
+  }
+
+  onConfirmElement() {
+    this.confirmElement.emit(this.selectedElement.id);
+    this.selectedElement = null;
+    this.confirmingElementInVideoZone = false;
+  }
+
+  onConfirmAllElements() {
+    this.confirmAllElements.emit();
+    this.confirmingAllElements = false;
   }
 
   onDeleteElement() {
@@ -135,9 +163,19 @@ export class VideoZoneEditorComponent implements DoCheck {
   }
 
   clearCreationForm() {
+    this.confirmingElementInVideoZone = false;
+    this.confirmingAllElements = false;
     this.deleting = false;
     this.selectedZoneType = null;
     this.start = null;
     this.end = null;
+  }
+
+  areAllElementsConfirmed(): boolean {
+    return this.elements.find(element => element.confirmed === false) === undefined;
+  }
+
+  isEndoscopist(): boolean {
+    return this.authenticationService.getRole() === Role.ENDOSCOPIST;
   }
 }

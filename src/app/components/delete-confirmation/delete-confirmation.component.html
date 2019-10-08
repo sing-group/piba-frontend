@@ -1,8 +1,6 @@
 <clr-modal [(clrModalOpen)]="opened" [clrModalClosable]="false">
   <h3 class="modal-title">Delete {{modelName}}</h3>
-  <div class="modal-body">
-    Are you sure you want to delete <b>{{name}}</b>? This action is permanent and cannot be recovered.
-  </div>
+  <div class="modal-body" [innerHTML]="message"></div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline" (click)="cancel();">Cancel</button>
     <button type="button" class="btn btn-danger-outline" (click)="delete(id)">

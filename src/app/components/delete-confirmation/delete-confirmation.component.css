@@ -1,0 +1,4 @@
+::ng-deep .warning {
+  color: #c92100;
+  font-weight: bold;
+}

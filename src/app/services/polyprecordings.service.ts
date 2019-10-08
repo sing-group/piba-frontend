@@ -10,6 +10,9 @@ import {Polyp} from '../models/Polyp';
 import {Video} from '../models/Video';
 import {concatMap, map} from 'rxjs/operators';
 import {IdAndUri} from './entities/IdAndUri';
+import {PolypInfo} from './entities/PolypInfo';
+import {VideoModification} from '../models/VideoModification';
+import {VideoModificationInfo} from './entities/VideoModificationInfo';
 
 @Injectable()
 export class PolypRecordingsService {
@@ -80,13 +83,51 @@ export class PolypRecordingsService {
     return this.http.delete(`${environment.restApi}/polyprecording/${id}`);
   }
 
+  editPolypRecording(polypRecording: PolypRecording): Observable<PolypRecording> {
+    const newPolypRecordingInfo = this.toPolypRecordingInfo(polypRecording);
+    return this.http.put<PolypRecordingInfo>(`${environment.restApi}/polyprecording/${newPolypRecordingInfo.id}`, newPolypRecordingInfo)
+      .pipe(
+        concatMap((polypRecordingInfo) =>
+          forkJoin(
+            this.videosService.getVideo((<IdAndUri>polypRecordingInfo.video).id),
+            this.polypsService.getPolyp((<IdAndUri>polypRecordingInfo.polyp).id)
+          ).pipe(
+            map(videoAndPolyp =>
+              this.mapPolypRecordingInfo(polypRecordingInfo, videoAndPolyp[0], videoAndPolyp[1]
+              )
+            )
+          )
+        )
+      );
+  }
+
+  editPolypRecordings(polypRecordings: PolypRecording[]): Observable<PolypRecording[]> {
+    const newPolypRecordingsInfo: PolypRecordingInfo[] = polypRecordings.map(polypRecording => this.toPolypRecordingInfo(polypRecording));
+    return this.http.put<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording`, newPolypRecordingsInfo)
+      .pipe(
+        concatMap(polypRecordingInfos =>
+          forkJoin(polypRecordingInfos.map(polypRecordingInfo =>
+            forkJoin(
+              this.videosService.getVideo((<IdAndUri>polypRecordingInfo.video).id),
+              this.polypsService.getPolyp((<IdAndUri>polypRecordingInfo.polyp).id))
+          )).pipe(
+            map(videoAndPolyp =>
+              polypRecordingInfos.map((polypRecordingInfo, index) =>
+                this.mapPolypRecordingInfo(polypRecordingInfo, videoAndPolyp[index][0], videoAndPolyp[index][1]))
+            )
+          )
+        )
+      );
+  }
+
   private mapPolypRecordingInfo(polypRecordingInfo: PolypRecordingInfo, video: Video, polyp: Polyp): PolypRecording {
     return {
       id: polypRecordingInfo.id,
       video: video,
       polyp: polyp,
       start: polypRecordingInfo.start,
-      end: polypRecordingInfo.end
+      end: polypRecordingInfo.end,
+      confirmed: polypRecordingInfo.confirmed
     };
   }
 
@@ -96,7 +137,8 @@ export class PolypRecordingsService {
       video: polypRecording.video.id,
       polyp: polypRecording.polyp.id,
       start: polypRecording.start,
-      end: polypRecording.end
+      end: polypRecording.end,
+      confirmed: polypRecording.confirmed
     };
   }
 

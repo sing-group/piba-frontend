@@ -6,4 +6,5 @@ export class VideoModificationInfo {
   modifier: IdAndUri | string;
   start: number;
   end: number;
+  confirmed: boolean;
 }

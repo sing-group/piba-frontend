@@ -63,13 +63,52 @@ export class VideoModificationsService {
     return this.http.delete(`${environment.restApi}/videomodification/${id}`);
   }
 
+  editVideoModification(videoModification: VideoModification): Observable<VideoModification> {
+    const newVideoModificationInfo = this.toVideoModificationInfo(videoModification);
+    return this.http.put<VideoModificationInfo>(`${environment.restApi}/videomodification/${newVideoModificationInfo.id}`,
+      newVideoModificationInfo)
+      .pipe(
+        concatMap((videoModificationInfo) =>
+          forkJoin(
+            this.videosService.getVideo((<IdAndUri>videoModificationInfo.video).id),
+            this.modifiersService.getModifier((<IdAndUri>videoModificationInfo.modifier).id)
+          ).pipe(
+            map(videoAndModifier =>
+              this.mapVideoModificationInfo(videoModificationInfo, videoAndModifier[0], videoAndModifier[1]
+              )
+            )
+          )
+        )
+      );
+  }
+
+  editVideoModifications(modifications: VideoModification[]): Observable<VideoModification[]> {
+    const modificationsInfo: VideoModificationInfo[] = modifications.map(modification => this.toVideoModificationInfo(modification));
+
+    return this.http.put<VideoModificationInfo[]>(`${environment.restApi}/videomodification`, modificationsInfo).pipe(
+      concatMap(videoModificationInfos =>
+        forkJoin(videoModificationInfos.map(videoModificationInfo =>
+          forkJoin(
+            this.videosService.getVideo((<IdAndUri>videoModificationInfo.video).id),
+            this.modifiersService.getModifier((<IdAndUri>videoModificationInfo.modifier).id))
+        )).pipe(
+          map(videosAndModifiers =>
+            videoModificationInfos.map((videoModificationInfo, index) =>
+              this.mapVideoModificationInfo(videoModificationInfo, videosAndModifiers[index][0], videosAndModifiers[index][1]))
+          )
+        )
+      )
+    );
+  }
+
   private toVideoModificationInfo(videoModification: VideoModification): VideoModificationInfo {
     return {
       id: videoModification.id,
       video: videoModification.video.id,
       modifier: videoModification.modifier.id,
       start: videoModification.start,
-      end: videoModification.end
+      end: videoModification.end,
+      confirmed: videoModification.confirmed
     };
   }
 
@@ -79,7 +118,8 @@ export class VideoModificationsService {
       video: video,
       modifier: modifier,
       start: videoModificationInfo.start,
-      end: videoModificationInfo.end
+      end: videoModificationInfo.end,
+      confirmed: videoModificationInfo.confirmed
     };
   }
 }

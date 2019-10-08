@@ -27,9 +27,22 @@
             <td class="left">Age</td>
             <td class="left">{{exploration.patient.birthdate | age}}</td>
           </tr>
+          <tr>
+            <td class="left">Status</td>
+            <td class="left">{{exploration.confirmed ? 'Confirmed' : 'Not confirmed'}}</td>
+          </tr>
           </tbody>
         </table>
       </section>
+    </div>
+    <div *ngIf="!isExplorationConfirmed() && isEndoscopist()" class="card-footer">
+      <button class="btn btn-primary" (click)="explorationConfirmationModalOpened = true">
+        <clr-icon shape="warning-standard"></clr-icon>
+        Confirm Exploration
+      </button>
+      <button class="btn btn-primary-outline" (click)="polypsConfirmationModalOpened = true"
+              [disabled]="areAllPolypsConfirmed()">Confirm All Polyps
+      </button>
     </div>
   </div>
 
@@ -40,7 +53,7 @@
           <button clrTabLink id="tab-videos">Videos</button>
           <clr-tab-content id="content1" *clrIfActive="true">
             <div class="toolbar">
-              <button type="button" class="btn btn-icon btn-link" (click)="userUploadingVideo = true">
+              <button type="button" class="btn btn-icon btn-link" (click)="uploadVideoModalOpened = true" [disabled]="exploration.confirmed">
                 <clr-icon shape="upload"></clr-icon>
                 Upload
               </button>
@@ -67,6 +80,9 @@
                       <div class="col-md-12 col-lg-8">
                         <input type="text" id="video-title-{{video.id}}" name="title-{{video.id}}" size="50"
                                [readonly]="editingVideo == video.id ? null : true" [(ngModel)]="video.title"/>
+                        <div *ngIf="editingVideo == video.id && isTitleUsed(video)"
+                             class="alert alert-danger">This title is already being used
+                        </div>
                       </div>
                     </div>
                     <div class="form-group row">
@@ -91,23 +107,24 @@
                       </div>
                     </div>
                     <div class="form-group row">
-                      <button type="button" class="btn btn-secondary" *ngIf="isReadonly || video.id !== editingVideo"
-                              (click)="selectedVideoToEdit(video)">
+                      <button type="button" class="btn btn-secondary"
+                              *ngIf="isVideoReadonly || video.id !== editingVideo"
+                              (click)="selectedVideoToEdit(video)" [disabled]="video.isProcessing || isExplorationConfirmed()">
                         <clr-icon shape="note"></clr-icon>
                         Edit information
                       </button>
-                      <button type="button" class="btn btn-primary" *ngIf="!isReadonly && video.id == editingVideo"
+                      <button type="button" class="btn btn-primary" *ngIf="!isVideoReadonly && video.id == editingVideo"
                               (click)="editVideo(video)" [disabled]="isTitleUsed(video)">
                         <clr-icon shape="cog"></clr-icon>
                         Save information
                       </button>
                       <button type="button" class="btn btn-secondary" routerLink="/video/{{video.id}}"
-                              [disabled]="video.isProcessing">
+                              [disabled]="video.isProcessing || isExplorationConfirmed()">
                         <clr-icon shape="video-gallery"></clr-icon>
                         Edit video
                       </button>
                       <button type="button" class="btn btn-secondary" (click)="selectedVideoToRemove(video.id)"
-                              [disabled]="video.isProcessing">
+                              [disabled]="video.isProcessing || isExplorationConfirmed() || hasConfirmedElements(video)">
                         <clr-icon shape="trash"></clr-icon>
                         Remove video
                       </button>
@@ -130,7 +147,7 @@
     </div>
   </div>
   <form enctype="multipart/form-data" #videoForm="ngForm" (submit)="uploadVideo(); uploadingVideo = true">
-    <clr-modal [(clrModalOpen)]="userUploadingVideo" [clrModalClosable]="false">
+    <clr-modal [(clrModalOpen)]="uploadVideoModalOpened" [clrModalClosable]="false">
       <h3 class="modal-title">Upload Video</h3>
       <div class="modal-body">
         <section class="form-block">
@@ -138,6 +155,9 @@
             <label for="video-form-title">Title</label>
             <input type="text" id="video-form-title" [(ngModel)]="video.title" name="title"
                    pattern="[a-zA-ZñÑ0-9_\s\(\)-]+" title="Must be a alphanumeric" #videoTitleExploration="ngModel"/>
+            <div *ngIf="isTitleUsed(video)"
+                 class="alert alert-danger">This title is already being used
+            </div>
           </div>
           <div class="form-group">
             <label for="video-form-observations">Observations</label>
@@ -146,7 +166,7 @@
           </div>
           <div class="form-group">
             <label for="video-form-file" class="required">File</label>
-            <input *ngIf="userUploadingVideo" type="file" id="video-form-file" (change)="videoUploaded = true"/>
+            <input *ngIf="uploadVideoModalOpened" type="file" id="video-form-file" (change)="videoUploaded = true"/>
           </div>
           <div class="form-group">
             <clr-checkbox name="withText" id="video-form-withText" [(ngModel)]="video.withText">
@@ -165,7 +185,7 @@
   </form>
 </div>
 <!-- Delete confirmation modal -->
-<app-delete-confirmation *ngIf="deletingVideo" [modelName]="'video'" [id]="video.id" [name]="video.title"
+<app-delete-confirmation *ngIf="deletingVideo" [modelName]="'video'" [id]="video.id" [name]="video.title" [message]="getVideoDeletionMessage()"
                          [cancel]="cancel.bind(this)" [delete]="delete.bind(this)">
 </app-delete-confirmation>
 
@@ -174,8 +194,8 @@
   <h5 class="modal-title">Upload video: "{{video.title}}"</h5>
   <div class="modal-body">
     <div class="progress labeled">
-      <progress max="100" value="{{progress}}" [attr.data-displayval]="progress + '%'"></progress>
-      <span>{{progress}}%</span>
+      <progress max="100" value="{{uploadProgress}}" [attr.data-displayval]="uploadProgress + '%'"></progress>
+      <span>{{uploadProgress}}%</span>
     </div>
     <div class="row">
       <div *ngIf="uploadTimeRemaining <= 60" class="col-md-8">Remaining time: {{uploadTimeRemaining | number:'.1-2'}}
@@ -190,3 +210,22 @@
   </div>
 </clr-modal>
 
+<!-- Exploration confirmation modal -->
+<app-confirmation-modal *ngIf="explorationConfirmationModalOpened"
+                        [title]="'Confirm exploration'" [id]="exploration.id" [message]="'Are you sure you want ' +
+                         'to confirm <strong>' + exploration.title + '</strong>? All items associated with this ' +
+                         'exploration will also be confirmed.' +
+                         '<div class=\'warning\'>This action is permanent and cannot be undone.</div>'"
+                        (cancelAction)="cancel()" (actionToDo)="onConfirmExploration()"
+                        [action]="'Confirm'">
+</app-confirmation-modal>
+
+<!-- Polyps confirmation modal -->
+<app-confirmation-modal *ngIf="polypsConfirmationModalOpened"
+                        [title]="'Confirm polyps'" [id]="exploration.id" [message]="'Are you sure you want ' +
+                         'to confirm <strong>all the polyps of ' + exploration.title + '</strong>? All polyp ' +
+                         'recordings associated with this polyps will also be confirmed.' +
+                         '<div class=\'warning\'>This action is permanent and cannot be undone.</div>'"
+                        (cancelAction)="cancel()" (actionToDo)="onConfirmPolyps()"
+                        [action]="'Confirm'">
+</app-confirmation-modal>

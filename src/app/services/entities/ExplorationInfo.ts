@@ -10,4 +10,5 @@ export interface ExplorationInfo {
   numVideos?: number;
   numPolyps?: number;
   patient: string | IdAndUri;
+  confirmed: boolean;
 }

@@ -150,7 +150,8 @@ export class ExplorationsService {
       polyps: polyps,
       numVideos: explorationInfo.numVideos,
       numPolyps: explorationInfo.numPolyps,
-      patient: patient
+      patient: patient,
+      confirmed: explorationInfo.confirmed
     };
   }
 
@@ -164,7 +165,8 @@ export class ExplorationsService {
       title: exploration.title,
       explorationDate: exploration.explorationDate,
       location: exploration.location,
-      patient: exploration.patient.id
+      patient: exploration.patient.id,
+      confirmed: exploration.confirmed
     };
   }
 

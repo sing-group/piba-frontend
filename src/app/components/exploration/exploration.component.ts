@@ -7,6 +7,13 @@ import {VideosService} from '../../services/videos.service';
 import {ExplorationsService} from '../../services/explorations.service';
 import {NotificationService} from '../../modules/notification/services/notification.service';
 import {Subscription} from 'rxjs';
+import {PolypsService} from '../../services/polyps.service';
+import {Polyp} from '../../models/Polyp';
+import {VideoModificationsService} from '../../services/video-modifications.service';
+import {VideoModification} from '../../models/VideoModification';
+import {Role} from '../../models/User';
+import {AuthenticationService} from '../../services/authentication.service';
+import {PolypRecordingsService} from '../../services/polyprecordings.service';
 
 @Component({
   selector: 'app-exploration',
@@ -15,35 +22,45 @@ import {Subscription} from 'rxjs';
 })
 export class ExplorationComponent implements OnInit, OnDestroy {
 
-  readonly POLLING_INTERVAL: number = 5000;
-
   exploration: Exploration = null;
-
   video: Video = new Video();
 
+  explorationConfirmationModalOpened = false;
+  polypsConfirmationModalOpened = false;
+
+  isVideoReadonly = true;
+  editingVideo: string = null;
+  deletingVideo = false;
+
+  videoClones: Video[] = [];
+
+  // Upload progress attributes
+  uploadVideoModalOpened = false;
   videoUploaded = false;
 
-  userUploadingVideo = false;
   uploadingVideo = false;
-  progress = 0;
+  uploadProgress = 0;
   uploadTimeRemaining = 0;
   uploadSpeed = 0;
 
-  isReadonly = true;
-  editingVideo: string = null;
-  deletingVideo = false;
+  // Internal attributes
+  private readonly POLLING_INTERVAL: number = 5000;
+  private pollings: Subscription[] = [];
+
   // to check if the title is used in the edition
-  videoTitle: String;
+  private videoTitle: String;
 
-  pollings: Subscription[] = [];
-
-  videoClones: Video[] = [];
+  private videoModificationsInExploration: VideoModification[] = [];
 
   constructor(
     private videosService: VideosService,
     private explorationsService: ExplorationsService,
+    private polypsService: PolypsService,
+    private polypRecordingsService: PolypRecordingsService,
+    private videoModificationsService: VideoModificationsService,
     private route: ActivatedRoute,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private readonly authenticationService: AuthenticationService
   ) {
   }
 
@@ -58,6 +75,15 @@ export class ExplorationComponent implements OnInit, OnDestroy {
       });
       exploration.videos.forEach((video) => {
         this.videoClones.push({...video});
+        this.videoModificationsService.getVideoModifications(video.id).subscribe(modifications => {
+          this.videoModificationsInExploration = this.videoModificationsInExploration.concat(modifications);
+          video.modifications = modifications;
+          this.videoClones.find(clone => clone.id === video.id).modifications = modifications.map(m => ({...m}));
+        });
+        this.polypRecordingsService.getPolypRecordingsByVideo(video.id).subscribe(polypRecordings => {
+          video.polypRecording = polypRecordings;
+          this.videoClones.find(clone => clone.id === video.id).polypRecording = polypRecordings.map(pr => ({...pr}));
+        });
       });
       this.exploration.polyps.forEach((polyp) => {
         polyp.exploration = exploration;
@@ -71,7 +97,7 @@ export class ExplorationComponent implements OnInit, OnDestroy {
     });
   }
 
-  pollProcessingVideo(processingVideo: Video) {
+  private pollProcessingVideo(processingVideo: Video) {
     const videoPolling = this.videosService.getVideo(processingVideo.id, this.POLLING_INTERVAL).subscribe((video) => {
       this.updateVideo(this.exploration.videos, video);
       this.updateVideo(this.videoClones, video);
@@ -90,6 +116,10 @@ export class ExplorationComponent implements OnInit, OnDestroy {
   }
 
   uploadVideo() {
+    if (this.exploration.confirmed) {
+      throw Error('Videos can\'t be uploaded to confirmed explorations');
+    }
+
     const fileElement = document.getElementById('video-form-file') as HTMLInputElement;
     const file = fileElement.files[0];
     this.video.exploration = this.exploration.id;
@@ -103,7 +133,7 @@ export class ExplorationComponent implements OnInit, OnDestroy {
       },
       (loaded, total) => {
         if (total) {
-          this.progress = Math.round(loaded / total * 100);
+          this.uploadProgress = Math.round(loaded / total * 100);
           const timeElapsed = Date.now() - startTime;
           const uploadSpeed = loaded / (timeElapsed / 1000);
           this.uploadTimeRemaining = Math.ceil(
@@ -113,7 +143,7 @@ export class ExplorationComponent implements OnInit, OnDestroy {
         }
       },
       () => {
-        this.progress = 0;
+        this.uploadProgress = 0;
         this.uploadingVideo = false;
       }
     ).subscribe(video => {
@@ -128,9 +158,11 @@ export class ExplorationComponent implements OnInit, OnDestroy {
   }
 
   cancel() {
-    this.userUploadingVideo = false;
+    this.uploadVideoModalOpened = false;
     this.video = new Video();
     this.deletingVideo = false;
+    this.polypsConfirmationModalOpened = false;
+    this.explorationConfirmationModalOpened = false;
     this.videoUploaded = false;
     this.assignVideoName();
   }
@@ -166,21 +198,26 @@ export class ExplorationComponent implements OnInit, OnDestroy {
     }
     this.editingVideo = video.id;
     this.videoTitle = video.title;
-    this.isReadonly = false;
+    this.isVideoReadonly = false;
   }
 
   editVideo(video: Video) {
+    if (this.exploration.confirmed) {
+      throw Error('Videos can\'t be edited on confirmed explorations');
+    }
+
     this.videosService.editVideo(video).subscribe(updatedVideo => {
       this.editingVideo = null;
-      this.isReadonly = true;
+      this.isVideoReadonly = true;
       Object.assign(this.findIn(this.exploration.videos, video.id), updatedVideo);
       this.notificationService.success('Video edited successfully.', 'Video edited.');
     });
   }
 
-  isTitleUsed(newVideo: Video): Boolean {
+  isTitleUsed(newVideo: Video): boolean {
     if (this.editingVideo != null) {
-      return this.exploration.videos.find((video) => video.title === newVideo.title) !== undefined && newVideo.title !== this.videoTitle;
+      return this.exploration.videos.find((video) => video.title === newVideo.title) !== undefined
+        && newVideo.title !== this.videoTitle;
     } else {
       return this.exploration.videos.find((video) => video.title === newVideo.title) !== undefined;
     }
@@ -205,5 +242,65 @@ export class ExplorationComponent implements OnInit, OnDestroy {
 
   private assignVideoName() {
     this.video.title = 'Video ' + (this.exploration.videos.length + 1);
+  }
+
+  areAllPolypsConfirmed(): boolean {
+    return this.exploration.polyps.find(polyp => polyp.confirmed === false) === undefined;
+  }
+
+  isExplorationConfirmed(): boolean {
+    return this.exploration.confirmed;
+  }
+
+  onConfirmExploration() {
+    this.exploration.confirmed = true;
+    this.explorationsService.editExploration(this.exploration).subscribe(updatedExploration => {
+      this.explorationsService.getExploration(updatedExploration.id).subscribe(exploration => this.exploration = exploration);
+      this.notificationService.success('Exploration edited successfully.', 'Exploration edited.');
+      this.cancel();
+    });
+  }
+
+  onConfirmPolyps() {
+    const polypsToBeConfirmed: Polyp[] = [];
+    this.exploration.polyps.filter(polyp => polyp.confirmed === false).forEach(
+      unconfirmedPolyp => {
+        const polypToBeConfirmed: Polyp = new Polyp();
+        Object.assign(polypToBeConfirmed, unconfirmedPolyp);
+        polypsToBeConfirmed.push(polypToBeConfirmed);
+      });
+
+    polypsToBeConfirmed.forEach(polyp => polyp.confirmed = true);
+
+    this.polypsService.editPolyps(polypsToBeConfirmed).subscribe(updatedPolyps => {
+      updatedPolyps.forEach(updatedPolyp => {
+        Object.assign(this.exploration.polyps.find((polyp) => {
+            return polyp.id === updatedPolyp.id;
+          }
+        ), updatedPolyp);
+        this.notificationService.success('All polyps were confirmed successfully', 'Polyps confirmed');
+        this.cancel();
+      });
+    });
+
+  }
+
+  isEndoscopist(): boolean {
+    return this.authenticationService.getRole() === Role.ENDOSCOPIST;
+  }
+
+  hasConfirmedElements(video: Video): boolean {
+    return video.polypRecording.some(pr => pr.confirmed) || video.modifications.some(m => m.confirmed);
+  }
+
+  getVideoDeletionMessage() {
+    const locationsCount = this.video.polypRecording.length;
+    const modificationsCount = this.video.modifications.length;
+    const polypsCount = new Set(this.video.polypRecording.map(pr => pr.polyp.id)).size; // Counts unique
+
+    return `Are you sure you want to delete the video <strong>${this.video.title}</strong>? This video has <strong>${polypsCount} polyps ` +
+        `</strong> located in <strong>${locationsCount} segments</strong> and <strong>${modificationsCount} zones annotated with ` +
+        'modifications</strong>.' +
+        '<div class="warning">This action is permanent and cannot be undone.</div>';
   }
 }

@@ -46,6 +46,8 @@
                                (playInterval)="playInterval($event)" (addZoneType)="onAddPolyp($event)"
                                (createElement)="onAddPolypRecording($event)"
                                (removeElement)="onRemovePolypRecording($event)"
+                               (confirmElement)="onConfirmPolypRecording($event)"
+                               (confirmAllElements)="onConfirmAllPolypRecordings()"
                                 ></app-video-zone-editor>
       </div>
 
@@ -64,6 +66,8 @@
                                (playInterval)="playInterval($event)"
                                (createElement)="onAddVideoModification($event)"
                                (removeElement)="onRemoveVideoModification($event)"
+                               (confirmElement)="onConfirmVideoModification($event)"
+                               (confirmAllElements)="onConfirmAllVideoModifications()"
         ></app-video-zone-editor>
       </div>
 

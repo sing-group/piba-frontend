@@ -6,7 +6,8 @@
     </div>
     <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
       <div class="select">
-        <select id="selectZoneType" [(ngModel)]="selectedZoneType" name="selectedZoneType" required #selectZoneType="ngModel">
+        <select id="selectZoneType" [(ngModel)]="selectedZoneType" name="selectedZoneType" required
+                #selectZoneType="ngModel">
           <option *ngFor="let zoneType of sortedVideoZoneTypes" [ngValue]="zoneType">{{zoneType.name}}</option>
         </select>
       </div>
@@ -55,26 +56,38 @@
     Add
   </button>
 </form>
-
+<button *ngIf="isEndoscopist()" class="btn btn-primary margin-confirm-button" (click)="onShowConfirmElementsDialog()"
+        [disabled]="areAllElementsConfirmed()">
+  <clr-icon shape="check"></clr-icon>
+  Confirm all {{elementName}} recordings
+</button>
 <div class="elementrecordings-container">
   <clr-datagrid>
     <clr-dg-column [clrDgField]="'element.name'" [clrDgSortOrder]="ascSort">{{elementName}}</clr-dg-column>
     <clr-dg-column [clrDgField]="'start'">Start</clr-dg-column>
     <clr-dg-column [clrDgField]="'end'">Stop</clr-dg-column>
+    <clr-dg-column [clrDgField]="'status'">Status</clr-dg-column>
     <clr-dg-column>Actions</clr-dg-column>
 
     <clr-dg-row *clrDgItems="let element of elements">
       <clr-dg-cell>{{element.element.name}}</clr-dg-cell>
       <clr-dg-cell>{{element.start | time}}</clr-dg-cell>
       <clr-dg-cell>{{element.end | time}}</clr-dg-cell>
+      <clr-dg-cell>{{element.confirmed ? 'Confirmed' : 'Not confirmed'}}</clr-dg-cell>
       <clr-dg-cell>
         <button type="button" class="btn btn-success-outline" (click)="onPlayInterval(element)">
           <clr-icon shape="play"></clr-icon>
           Play
         </button>
-        <button type="button" class="btn btn-danger-outline" (click)="onShowRemoveDialog(element)">
+        <button *ngIf="!element.confirmed" type="button" class="btn btn-danger-outline"
+                (click)="onShowRemoveDialog(element)">
           <clr-icon shape="times"></clr-icon>
           Remove
+        </button>
+        <button *ngIf="!element.confirmed && isEndoscopist()" type="button" class="btn btn-primary-outline"
+                (click)="onShowConfirmElementDialog(element)">
+          <clr-icon shape="check"></clr-icon>
+          Confirm
         </button>
       </clr-dg-cell>
     </clr-dg-row>
@@ -117,3 +130,20 @@
                          [cancel]="clearCreationForm.bind(this)" [delete]="onDeleteElement.bind(this)">
 </app-delete-confirmation>
 
+<!-- Element recording confirmation modal -->
+<app-confirmation-modal *ngIf="confirmingElementInVideoZone"
+                        [title]="'Confirm ' + elementName.toLowerCase() + ' recording'"
+                        [message]="'Are you sure you want to confirm this ' + elementName.toLowerCase()
+                        + ' recording? <div class=\'warning\'>This action is permanent and cannot be undone.</div>'"
+                        [action]="'confirm'"
+                        (actionToDo)="onConfirmElement()" (cancelAction)="clearCreationForm()">
+</app-confirmation-modal>
+
+<!-- Elements recording confirmation modal -->
+<app-confirmation-modal *ngIf="confirmingAllElements"
+                        [title]="'Confirm ' + elementName.toLowerCase() + ' recordings'"
+                        [message]="'Are you sure you want to confirm all ' + elementName.toLowerCase()
+                        + ' recordings? <div class=\'warning\'>This action is permanent and cannot be undone.</div>'"
+                        [action]="'confirm'"
+                        (actionToDo)="onConfirmAllElements()" (cancelAction)="clearCreationForm()">
+</app-confirmation-modal>

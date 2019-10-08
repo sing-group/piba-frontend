@@ -39,7 +39,8 @@ import {ImageComponent} from './components/image/image.component';
 import {ProfileComponent} from './components/profile/profile.component';
 import {GalleriesComponent} from './components/galleries/galleries.component';
 import {ModifiersComponent} from './components/modifiers/modifiers.component';
-import { VideoZoneEditorComponent } from './components/video-zone-editor/video-zone-editor.component';
+import {VideoZoneEditorComponent} from './components/video-zone-editor/video-zone-editor.component';
+import {ConfirmationModalComponent} from './components/confirmation-modal/confirmation-modal.component';
 
 @NgModule({
   declarations: [
@@ -64,7 +65,8 @@ import { VideoZoneEditorComponent } from './components/video-zone-editor/video-z
     GalleriesComponent,
     ModifiersComponent,
     DropdownFilterPipe,
-    VideoZoneEditorComponent
+    VideoZoneEditorComponent,
+    ConfirmationModalComponent
   ],
   imports: [
     BrowserModule,

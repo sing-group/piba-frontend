@@ -1,18 +1,22 @@
 <div class="toolbar">
-  <button type="button" class="btn btn-icon btn-link" (click)="creatingPolyp = true">
+  <button type="button" class="btn btn-icon btn-link" (click)="creatingPolyp = true" [disabled]="exploration.confirmed">
     <clr-icon shape="plus"></clr-icon>
     New
   </button>
 </div>
 
 <div class="card" *ngFor="let polyp of exploration.polyps">
-  <div class="card-header">
+  <div class="card-header clr-justify-content-end clr-align-items-center" *ngIf="!polyp.confirmed">
     <div class="clr-row clr-justify-content-end">
-      <button type="button" class="btn btn-link" title="Delete polyp" (click)="remove(polyp.id)">
-        <clr-icon shape="trash"></clr-icon>
+      <button *ngIf="isEndoscopist()" type="button" class="btn btn-link" title="Confirm polyp"
+              (click)="confirmPolyp(polyp.id)">
+        <clr-icon shape="check"></clr-icon>
       </button>
       <button type="button" class="btn btn-link" title="Edit polyp" (click)="editPolyp(polyp.id)">
         <clr-icon shape="cog"></clr-icon>
+      </button>
+      <button type="button" class="btn btn-link" title="Delete polyp" (click)="remove(polyp.id)">
+        <clr-icon shape="trash"></clr-icon>
       </button>
     </div>
   </div>
@@ -122,52 +126,56 @@
     </div>
   </div>
 
-  <clr-tree-node>
-    Views
-    <ng-template [clrIfExpanded]>
-      <clr-tree-node>
-        <div class="row">
-          <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12" *ngFor="let polypRecording of polyp.polypRecordings ">
-            <div class="card">
-              <div class="card-block">
-                <video id="{{polypRecording.id}}" class="exploration-video"
-                       (click)="pauseVideo(polypRecording)">
-                  <source *ngFor="let source of polypRecording.video.sources"
-                          src="{{source.url}}"
-                          type="{{source.mediaType}}"/>
-                  <p>Your browser does not support the video tag.</p>
-                </video>
-                <div id="controls-{{polypRecording.id}}" class="controls-overlay">
-                  <button id="playVideo" title="play video" class="btn btn-link btn-overlay"
-                          (click)="playVideo(polypRecording)">
-                    <clr-icon shape="play" size="30"></clr-icon>
-                    Play
-                  </button>
-                  <button type="button" title="edit video" class="btn btn-link btn-overlay"
-                          routerLink="/video/{{polypRecording.video.id}}">
-                    <clr-icon shape="video-gallery" size="30"></clr-icon>
-                    Edit
-                  </button>
-                </div>
-                <div class="card-text">
-                  <p>Title: {{polypRecording.video.title}}</p>
+  <div class="card-block">
+    <clr-tree-node>
+      Views
+      <ng-template [clrIfExpanded]>
+        <clr-tree-node>
+          <div class="row">
+            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12" *ngFor="let polypRecording of polyp.polypRecordings ">
+              <div class="card">
+                <div class="card-block">
+                  <video id="{{polypRecording.id}}" class="exploration-video"
+                         (click)="pauseVideo(polypRecording)">
+                    <source *ngFor="let source of polypRecording.video.sources"
+                            src="{{source.url}}"
+                            type="{{source.mediaType}}"/>
+                    <p>Your browser does not support the video tag.</p>
+                  </video>
+                  <div id="controls-{{polypRecording.id}}" class="controls-overlay">
+                    <button id="playVideo" title="play video" class="btn btn-link btn-overlay"
+                            (click)="playVideo(polypRecording)">
+                      <clr-icon shape="play" size="30"></clr-icon>
+                      Play
+                    </button>
+                    <button type="button" title="edit video" class="btn btn-link btn-overlay"
+                            routerLink="/video/{{polypRecording.video.id}}">
+                      <clr-icon shape="video-gallery" size="30"></clr-icon>
+                      Edit
+                    </button>
+                  </div>
+                  <div class="card-text">
+                    <p>Title: {{polypRecording.video.title}}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </clr-tree-node>
-    </ng-template>
-  </clr-tree-node>
+        </clr-tree-node>
+      </ng-template>
+    </clr-tree-node>
+  </div>
+
+  <div class="card-footer" *ngIf="polyp.confirmed">
+    Confirmed polyp
+  </div>
 
 </div>
 <form ngNativeValidate #polypForm="ngForm" (submit)="save()">
-  <clr-modal [(clrModalOpen)]="editingPolyp|| creatingPolyp" [clrModalClosable]="false">
-
+  <clr-modal [(clrModalOpen)]="editingPolyp || creatingPolyp" [clrModalClosable]="false">
     <h3 class="modal-title" *ngIf="creatingPolyp">Add polyp</h3>
     <h3 class="modal-title" *ngIf="editingPolyp">Edit polyp</h3>
     <div class="modal-body">
-
       <section class="form-block">
         <div class="form-group">
           <label for="polyp-form-name" class="required">Name</label>
@@ -176,7 +184,7 @@
           <div *ngIf="namePolyp.invalid && !namePolyp.pristine" class="alert alert-danger complete-space">
             <div *ngIf="namePolyp?.errors.required">Name is required.</div>
           </div>
-          <div *ngIf="nameIsUsed()" class="alert alert-danger complete-space">This name is already being used</div>
+          <div *ngIf="isNameUsed()" class="alert alert-danger complete-space">This name is already being used</div>
         </div>
         <div class="form-group">
           <label for="polyp-form-size">Size (mm)</label>
@@ -313,13 +321,11 @@
                       *ngIf="asTSA(polyp.histology).dysplasingGrade"></clr-icon>
           </div>
         </div>
-
       </section>
-
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
-      <button type="submit" class="btn btn-primary" [disabled]="polypForm.invalid || nameIsUsed()">Ok</button>
+      <button type="submit" class="btn btn-primary" [disabled]="polypForm.invalid || isNameUsed()">Ok</button>
     </div>
 
   </clr-modal>
@@ -329,3 +335,13 @@
                          [modelName]="'polyp'" [id]="polyp.id" [name]="polyp.name"
                          [cancel]="cancel.bind(this)" [delete]="delete.bind(this)">
 </app-delete-confirmation>
+
+<!-- Polyp confirmation modal -->
+<app-confirmation-modal *ngIf="confirmingPolyp"
+                        [title]="'Confirm polyp'" [id]="polyp.id"
+                        [message]="'Are you sure you want to confirm <b>' + polyp.name + '</b>? All polyp ' +
+                        'recordings associated with this polyp will also be confirmed.' +
+                         '<div class=\'warning\'>This action is permanent and cannot be undone.</div>'"
+                        (cancelAction)="cancel()" (actionToDo)="save()"
+                        [action]="'Confirm'">
+</app-confirmation-modal>

@@ -55,7 +55,13 @@
   right: .90rem;
 }
 
-.card-header {
-  padding: 0rem .5rem;
+.card-footer {
+  padding: 0.15rem 0.75rem;
+  text-align: right;
+  background-color: #d4f7d4;
 }
 
+.card-header {
+  display: flex;
+  max-height: 1.6rem;
+}

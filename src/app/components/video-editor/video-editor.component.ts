@@ -21,6 +21,8 @@ import {ModifiersService} from '../../services/modifiers.service';
 import {Modifier} from '../../models/Modifier';
 import {Interval} from '../../models/Interval';
 import {ElementInVideoZone} from '../../models/ElementInVideoZone';
+import {PolypRecording} from '../../models/PolypRecording';
+import {VideoModification} from '../../models/VideoModification';
 
 @Pipe({
   name: 'dropdownFilter',
@@ -110,10 +112,13 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     this.videosService.getVideo(id)
       .subscribe(video => {
         this.video = video;
-        this.explorationsService.getPolyps(this.video.exploration).subscribe(polyps => this.polyps = polyps);
+        this.explorationsService.getPolyps(this.video.exploration)
+          .subscribe(polyps =>
+            this.polyps = polyps.filter(polyp => !polyp.confirmed)
+          );
         this.polypRecordingsService.getPolypRecordingsByVideo(this.video.id).subscribe(polypRecordings => {
           this.video.polypRecording = polypRecordings;
-          this.updatePolypRecoringZones();
+          this.updatePolypRecordingZones();
         });
         this.videoModificationsService.getVideoModifications(this.video.id)
           .subscribe(videoModifications => {
@@ -177,16 +182,16 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     return document.getElementById('video-exploration') as HTMLVideoElement;
   }
 
-  private updatePolypRecoringZones() {
+  private updatePolypRecordingZones() {
     this.polypRecordingZones = this.video.polypRecording.map(
       polypRecording => ({
         id: polypRecording.id,
         element: polypRecording.polyp,
         start: polypRecording.start,
-        end: polypRecording.end
+        end: polypRecording.end,
+        confirmed: polypRecording.confirmed
       })
     );
-    // .sort((zoneA: ElementInVideoZone, zoneB: ElementInVideoZone) => zoneA.element.name < zoneB.element.name ? -1 : 1);
   }
 
   private updateVideoModificationZones() {
@@ -195,7 +200,8 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
         id: videoModification.id,
         element: videoModification.modifier,
         start: videoModification.start,
-        end: videoModification.end
+        end: videoModification.end,
+        confirmed: videoModification.confirmed
       })
     ).sort((zoneA: ElementInVideoZone, zoneB: ElementInVideoZone) => zoneA.element.name < zoneB.element.name ? -1 : 1);
   }
@@ -258,7 +264,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     this.videoHTML.currentTime = interval.start;
     this.videoHTML.play();
 
-    if (this.pauseWatcher !== undefined && this.pauseWatcher != null) {
+    if (this.pauseWatcher !== undefined && this.pauseWatcher !== null) {
       clearInterval(this.pauseWatcher);
     }
     this.pauseWatcher = setInterval(() => {
@@ -397,13 +403,14 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
       video: this.video,
       polyp: <Polyp>videoZone.element,
       start: videoZone.start,
-      end: videoZone.end
+      end: videoZone.end,
+      confirmed: false
     };
     this.polypRecordingsService.createPolypRecording(polypRecording)
       .subscribe(
         polypRecordingCreated => {
           this.video.polypRecording = this.video.polypRecording.concat(polypRecordingCreated);
-          this.updatePolypRecoringZones();
+          this.updatePolypRecordingZones();
           this.notificationService.success('Polyp recording registered successfully.', 'Polyp recording registered');
         }
       );
@@ -416,10 +423,57 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
           this.video.polypRecording.find(polypRecording => polypRecording.id === polypRecordingId)
         );
         this.video.polypRecording.splice(index, 1);
-        this.updatePolypRecoringZones();
+        this.updatePolypRecordingZones();
         this.notificationService.success('Polyp recording removed successfully.', 'Polyp recording removed.');
       }
     );
+  }
+
+  onConfirmPolypRecording(polypRecordingId: number) {
+    const polypRecordingToConfirm = this.video.polypRecording.find(polypRecording => polypRecording.id === polypRecordingId);
+    const polypRecordingConfirmed: PolypRecording = {
+      id: polypRecordingId,
+      video: this.video,
+      polyp: polypRecordingToConfirm.polyp,
+      start: polypRecordingToConfirm.start,
+      end: polypRecordingToConfirm.end,
+      confirmed: true
+    };
+
+    this.polypRecordingsService.editPolypRecording(polypRecordingConfirmed).subscribe(updatedPolypRecording => {
+      Object.assign(this.video.polypRecording.find((polypRecording) => polypRecording.id === updatedPolypRecording.id),
+        updatedPolypRecording);
+      this.updatePolypRecordingZones();
+      this.notificationService.success('Polyp recording confirmed successfully.', 'Polyp recording confirmed.');
+    });
+
+  }
+
+  onConfirmAllPolypRecordings() {
+    const polypRecordingsToBeConfirmed: PolypRecording[] = [];
+    this.video.polypRecording.filter(polypRecording => polypRecording.confirmed === false).forEach(
+      unconfirmedPolypRecording => {
+        const polypRecordingToBeConfirmed: PolypRecording = {
+          id: unconfirmedPolypRecording.id,
+          video: this.video,
+          polyp: unconfirmedPolypRecording.polyp,
+          start: unconfirmedPolypRecording.start,
+          end: unconfirmedPolypRecording.end,
+          confirmed: true
+        };
+        polypRecordingsToBeConfirmed.push(polypRecordingToBeConfirmed);
+      });
+
+    this.polypRecordingsService.editPolypRecordings(polypRecordingsToBeConfirmed).subscribe(updatedPolypRecordings => {
+      updatedPolypRecordings.forEach(updatedPolypRecording => {
+        Object.assign(this.video.polypRecording.find((polypRecording) => {
+            return polypRecording.id === updatedPolypRecording.id;
+          }
+        ), updatedPolypRecording);
+      });
+      this.updatePolypRecordingZones();
+      this.notificationService.success('All polyp recordings were confirmed.', 'Polyp recordings confirmed');
+    });
   }
 
   onAddVideoModification(videoZone: ElementInVideoZone) {
@@ -428,7 +482,8 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
       video: this.video,
       modifier: <Modifier>videoZone.element,
       start: videoZone.start,
-      end: videoZone.end
+      end: videoZone.end,
+      confirmed: false
     };
     this.videoModificationsService.createVideoModification(videoModification).subscribe(videoModificationCreated => {
         this.video.modifications = this.video.modifications.concat(videoModificationCreated);
@@ -449,6 +504,49 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
         this.notificationService.success('Video modifier removed successfully.', 'Video modifier removed');
       }
     );
+  }
+
+  onConfirmVideoModification(videoModificationId: number) {
+    const videoModificationToConfirm = this.video.modifications.find(videoModification => videoModification.id === videoModificationId);
+    const videoModificationConfirmed: VideoModification = {
+      id: videoModificationId,
+      video: this.video,
+      modifier: videoModificationToConfirm.modifier,
+      start: videoModificationToConfirm.start,
+      end: videoModificationToConfirm.end,
+      confirmed: true
+    };
+
+    this.videoModificationsService.editVideoModification(videoModificationConfirmed).subscribe(updatedVideoModification => {
+      Object.assign(this.video.modifications.find((videoModification) => videoModification.id === updatedVideoModification.id),
+        updatedVideoModification);
+      this.updateVideoModificationZones();
+      this.notificationService.success('Video modification confirmed successfully.', 'Video modification confirmed.');
+    });
+
+  }
+
+  onConfirmAllVideoModifications() {
+    const modificationsToBeConfirmed: VideoModification[] = [];
+    this.video.modifications.filter(modifier => modifier.confirmed === false).forEach(
+      unconfirmedModification => {
+        const modificationToBeConfirmed: VideoModification = new VideoModification();
+        Object.assign(modificationToBeConfirmed, unconfirmedModification);
+        modificationsToBeConfirmed.push(modificationToBeConfirmed);
+      });
+
+    modificationsToBeConfirmed.forEach(modification => modification.confirmed = true);
+
+    this.videoModificationsService.editVideoModifications(modificationsToBeConfirmed).subscribe(updatedModifications => {
+      updatedModifications.forEach(updatedModification => {
+        Object.assign(this.video.modifications.find((modification) => {
+            return modification.id === updatedModification.id;
+          }
+        ), updatedModification);
+      });
+      this.updateVideoModificationZones();
+      this.notificationService.success('All video modifications were confirmed.', 'Video modifications confirmed');
+    });
   }
 
   private mapImage(image: Image): ImageUploadInfo {

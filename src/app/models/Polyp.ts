@@ -17,6 +17,7 @@ export class Polyp implements VideoZoneType {
   observation: string;
   polypRecordings: PolypRecording[];
   exploration: Exploration;
+  confirmed: boolean;
 }
 
 export enum WASP {

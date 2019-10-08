@@ -103,7 +103,8 @@ export class ExplorationsComponent implements OnInit {
             polyps: [],
             numVideos: 0,
             numPolyps: 0,
-            patient: patient
+            patient: patient,
+            confirmed: false
           };
           this.explorationsService.createExploration(this.newExploration)
             .subscribe(newExploration => {

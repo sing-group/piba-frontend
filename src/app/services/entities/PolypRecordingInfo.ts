@@ -6,4 +6,5 @@ export interface PolypRecordingInfo {
   polyp: IdAndUri | string;
   start: number;
   end: number;
+  confirmed: boolean;
 }

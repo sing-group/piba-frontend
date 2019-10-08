@@ -7,4 +7,5 @@ export interface PolypRecording {
   polyp: Polyp;
   start: number;
   end: number;
+  confirmed: boolean;
 }

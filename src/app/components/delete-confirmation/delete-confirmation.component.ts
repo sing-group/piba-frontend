@@ -2,7 +2,8 @@ import {Component, OnInit, Input} from '@angular/core';
 
 @Component({
   selector: 'app-delete-confirmation',
-  templateUrl: './delete-confirmation.component.html'
+  templateUrl: './delete-confirmation.component.html',
+  styleUrls: ['./delete-confirmation.component.css']
 })
 export class DeleteConfirmationComponent implements OnInit {
 
@@ -11,6 +12,7 @@ export class DeleteConfirmationComponent implements OnInit {
   @Input() id: string;
   // identifying name that will be shown
   @Input() name: string;
+  @Input() message: string;
 
   @Input() cancel: Function;
   @Input() delete: Function;
@@ -18,6 +20,9 @@ export class DeleteConfirmationComponent implements OnInit {
   opened = true;
 
   ngOnInit() {
+    if (this.message === undefined) {
+      this.message = `Are you sure you want to delete <strong>${this.name}</strong>?` +
+        '<div class="warning">This action is permanent and cannot be undone.</div>';
+    }
   }
-
 }

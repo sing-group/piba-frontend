@@ -22,6 +22,8 @@ import {
   TsaDysplasingGrade
 } from '../../models/PolypHistology';
 import {PolypRecording} from '../../models/PolypRecording';
+import {Role} from '../../models/User';
+import {AuthenticationService} from '../../services/authentication.service';
 
 @Component({
   selector: 'app-polyp',
@@ -31,13 +33,9 @@ import {PolypRecording} from '../../models/PolypRecording';
 export class PolypComponent implements OnInit {
 
   WASPValues: WASP[];
-
   NICEValues: NICE[];
-
   LSTValues: LST[];
-
   PARISValues: PARIS[];
-
   LOCATIONValues: LOCATION[];
 
   POLYPTYPEValues: PolypType[];
@@ -49,22 +47,36 @@ export class PolypComponent implements OnInit {
   creatingPolyp = false;
   editingPolyp = false;
   deletingPolyp = false;
+  confirmingPolyp = false;
 
   polyp: Polyp = new Polyp();
   polypType: PolypType = null;
-  // to check if name is used in the edition
-  polypName: String;
 
   currentTime: number;
-
   pauseWatcher: any [] = [];
 
-  @Input() exploration: Exploration;
   polyps: Polyp[];
+
+  @Input() set exploration(exploration: Exploration) {
+    this._exploration = exploration;
+    this.polyps = this.exploration.polyps;
+    this.polyps.map((polyp) => {
+      this.polypRecordingsService.getPolypRecordingsByPolyp(polyp.id)
+        .subscribe((polypRecordings) => polyp.polypRecordings = polypRecordings);
+    });
+  }
+
+  get exploration() {
+    return this._exploration;
+  }
+
+  private _exploration: Exploration;
+  private polypName: String;
 
   constructor(private polypsService: PolypsService,
               private  polypRecordingsService: PolypRecordingsService,
-              private notificationService: NotificationService) {
+              private notificationService: NotificationService,
+              private readonly authenticationService: AuthenticationService) {
   }
 
   ngOnInit() {
@@ -78,12 +90,7 @@ export class PolypComponent implements OnInit {
     this.ADENOMADYSPLASINGValues = EnumUtils.enumValues(AdenomaDysplasingGrade);
     this.SSADYSPLASINGGRADEValues = EnumUtils.enumValues(SsaDysplasingGrade);
     this.TSADYSPLASINGGRADEValues = EnumUtils.enumValues(TsaDysplasingGrade);
-    this.polyps = this.exploration.polyps;
     this.assignPolypName();
-    this.polyps.map((polyp) => {
-      this.polypRecordingsService.getPolypRecordingsByPolyp(polyp.id)
-        .subscribe((polypRecordings) => polyp.polypRecordings = polypRecordings);
-    });
   }
 
   public onPolypTypeChange(polypType: PolypType) {
@@ -112,31 +119,31 @@ export class PolypComponent implements OnInit {
     }
   }
 
-  public isAdenoma(histology: PolypHistology): histology is Adenoma {
+  isAdenoma(histology: PolypHistology): histology is Adenoma {
     return isAdenoma(histology);
   }
 
-  public asAdenoma(histology: PolypHistology): Adenoma {
+  asAdenoma(histology: PolypHistology): Adenoma {
     if (isAdenoma(histology)) {
       return histology;
     }
   }
 
-  public isSSA(histology: PolypHistology): histology is SSA {
+  isSSA(histology: PolypHistology): histology is SSA {
     return isSSA(histology);
   }
 
-  public asSSA(histology: PolypHistology): SSA {
+  asSSA(histology: PolypHistology): SSA {
     if (isSSA(histology)) {
       return histology;
     }
   }
 
-  public isTSA(histology: PolypHistology): histology is TSA {
+  isTSA(histology: PolypHistology): histology is TSA {
     return isTSA(histology);
   }
 
-  public asTSA(histology: PolypHistology): TSA {
+  asTSA(histology: PolypHistology): TSA {
     if (isTSA(histology)) {
       return histology;
     }
@@ -146,6 +153,7 @@ export class PolypComponent implements OnInit {
     this.creatingPolyp = false;
     this.editingPolyp = false;
     this.deletingPolyp = false;
+    this.confirmingPolyp = false;
     this.polyp = new Polyp();
     this.polypType = null;
     this.polypName = '';
@@ -155,6 +163,10 @@ export class PolypComponent implements OnInit {
   save() {
     this.polyp.exploration = this.exploration;
     if (this.creatingPolyp) {
+      if (this.exploration.confirmed) {
+        throw Error('Polyps can\'t be added to confirmed explorations');
+      }
+
       this.polypsService.createPolyp(this.polyp).subscribe(newPolyp => {
           this.exploration.polyps = this.exploration.polyps.concat(newPolyp);
           this.assignPolypName();
@@ -164,17 +176,21 @@ export class PolypComponent implements OnInit {
       );
     } else {
       this.polypsService.editPolyp(this.polyp).subscribe(updatedPolyp => {
-        Object.assign(this.exploration.polyps.find((polyp) => {
-            return polyp.id === this.polyp.id;
-          }
-        ), updatedPolyp);
-        this.notificationService.success('Polyp edited successfully.', 'Polyp edited.');
-        this.cancel();
+        this.polypRecordingsService.getPolypRecordingsByPolyp(updatedPolyp.id)
+          .subscribe((polypRecordings) => {
+            updatedPolyp.polypRecordings = polypRecordings;
+            Object.assign(this.exploration.polyps.find((polyp) => {
+                return polyp.id === updatedPolyp.id;
+              }
+            ), updatedPolyp);
+            this.notificationService.success('Polyp edited successfully.', 'Polyp edited.');
+            this.cancel();
+          });
       });
     }
   }
 
-  nameIsUsed(): Boolean {
+  isNameUsed(): boolean {
     if (this.creatingPolyp) {
       return this.polyps.find((polyp) => polyp.name === this.polyp.name) !== undefined;
     } else {
@@ -183,11 +199,17 @@ export class PolypComponent implements OnInit {
   }
 
   editPolyp(id: string) {
-    this.editingPolyp = true;
+    this.editingPolyp = !this.confirmingPolyp;
     this.polyp = new Polyp();
     Object.assign(this.polyp, this.exploration.polyps.find(polyp => polyp.id === id));
     this.polypName = this.polyp.name;
     this.polypType = this.polyp.histology.polypType;
+    this.polyp.confirmed = this.polyp.confirmed !== true ? this.confirmingPolyp : true;
+  }
+
+  confirmPolyp(id: string) {
+    this.confirmingPolyp = true;
+    this.editPolyp(id);
   }
 
   delete(id: string) {
@@ -236,6 +258,10 @@ export class PolypComponent implements OnInit {
     if (this.pauseWatcher[polypRecording.id] != null) {
       clearInterval(this.pauseWatcher[polypRecording.id]);
     }
+  }
+
+  isEndoscopist(): boolean {
+    return this.authenticationService.getRole() === Role.ENDOSCOPIST;
   }
 
   private assignPolypName() {

@@ -7,4 +7,5 @@ export class VideoModification {
   modifier: Modifier;
   start: number;
   end: number;
+  confirmed: boolean;
 }

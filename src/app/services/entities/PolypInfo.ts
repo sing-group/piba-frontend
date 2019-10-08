@@ -14,4 +14,5 @@ export interface PolypInfo {
   histology: PolypHistologyInfo;
   observation: string;
   exploration: IdAndUri | string;
+  confirmed: boolean;
 }

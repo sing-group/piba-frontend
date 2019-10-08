@@ -12,4 +12,5 @@ export class Exploration {
   numVideos: number;
   numPolyps: number;
   patient: Patient;
+  confirmed: boolean;
 }
