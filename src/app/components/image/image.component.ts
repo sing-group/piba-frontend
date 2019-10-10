@@ -134,12 +134,12 @@ export class ImageComponent implements OnInit {
       const mousex = e.clientX - canvasx;
       const mousey = e.clientY - canvasy;
 
-      if (this.mousedown && this.image.polyp != null && this.showPolypLocation) {
+      if (this.mousedown && !this.isPolypEmpty() && this.showPolypLocation && this.isEndoscopist()) {
         this.repaintImage();
         this.width = mousex - this.last_mousex;
         this.height = mousey - this.last_mousey;
         this.draw();
-      } else if (this.mousedown && this.image.polyp === null) {
+      } else if (this.mousedown && this.isPolypEmpty() && this.isEndoscopist()) {
         this.notificationService.error('Impossible to draw a location on an image that does not have an associated polyp',
           'Image without polyp');
       }
@@ -330,7 +330,7 @@ export class ImageComponent implements OnInit {
     const locationSaved = this.image.polypLocation;
     // if polyp is selected
     if (this.isEndoscopist() && (this.last_mousex != null || this.last_mousey != null ||
-      this.width != null || this.height != null) && this.image.polyp != null && this.showPolypLocation) {
+      this.width != null || this.height != null) && !this.isPolypEmpty() && this.showPolypLocation) {
       // if polyp wasn't saved
       if (locationSaved == null || (this.last_mousex !== locationSaved.x || this.last_mousey !== locationSaved.y ||
         this.width !== locationSaved.width || this.height !== locationSaved.height)) {
@@ -431,7 +431,7 @@ export class ImageComponent implements OnInit {
 
   getFileName(): string {
     if (this.image.video !== undefined) {
-      if (this.image.polyp === null || this.image.polyp === undefined) {
+      if (this.isPolypEmpty()) {
         return this.image.video.id + '_' + this.image.numFrame + '.png';
       } else {
         return this.image.polyp.id + '_' + this.image.video.id + '_' + this.image.numFrame + '.png';
@@ -441,7 +441,7 @@ export class ImageComponent implements OnInit {
 
   private repaintImage() {
     // It allows/does not allow to use the cursor if the image has/does not have a polyp
-    if (this.image.polyp === null || this.image.polyp === undefined) {
+    if (this.isPolypEmpty() || !this.isEndoscopist()) {
       this.canvas.style.cursor = 'not-allowed';
     } else {
       this.canvas.style.cursor = '';
@@ -468,7 +468,7 @@ export class ImageComponent implements OnInit {
   }
 
   private getPolypInfo() {
-    if (this.image.polyp !== null) {
+    if (!this.isPolypEmpty()) {
       switch (this.image.polyp.histology.polypType) {
         case PolypType.ADENOMA:
           this.type = (<Adenoma>this.image.polyp.histology).type;
