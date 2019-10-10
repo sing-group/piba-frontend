@@ -9,4 +9,5 @@ export class ImageInfo {
   video: string | IdAndUri;
   polyp: string | IdAndUri;
   observation: string;
+  manuallySelected: boolean;
 }

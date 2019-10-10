@@ -13,4 +13,5 @@ export class Image {
   polyp: Polyp;
   polypLocation: PolypLocation;
   observation: string;
+  manuallySelected: boolean;
 }

@@ -67,6 +67,7 @@ export class ImagesService {
     formData.append('polyp', image.polyp);
     formData.append('numFrame', image.numFrame.toString());
     formData.append('observation', image.observation);
+    formData.append('manuallySelected', image.manuallySelected.toString());
 
     return this.http.post<ImageInfo>(`${environment.restApi}/image`, formData)
       .pipe(
@@ -200,7 +201,8 @@ export class ImagesService {
       gallery: null,
       polyp: polyp,
       polypLocation: polypLocation,
-      observation: imageInfo.observation
+      observation: imageInfo.observation,
+      manuallySelected: imageInfo.manuallySelected
     };
   }
 

@@ -6,4 +6,5 @@ export interface ImageUploadInfo {
   polyp: string;
   numFrame: number;
   observation: string;
+  manuallySelected: boolean;
 }

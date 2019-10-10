@@ -120,7 +120,7 @@
           <input type="text" id="polyp-histology" readonly value="{{image.polyp.histology.polypType}}"/>
         </div>
       </div>
-      <div class="clr-row margin-row">
+      <div class="clr-row margin-row" *ngIf="type || dysplasingGrade">
         <div class="col-lg-2 col-sm-4 col-xs-4" *ngIf="type">
           <label class="txt-strong" for="polyp-type">Type</label>
         </div>
@@ -133,6 +133,14 @@
 
         <div class="col-lg-4 col-sm-8 col-xs-8" *ngIf="dysplasingGrade">
           <input type="text" id="polyp-dyplasingGrade" readonly value="{{dysplasingGrade}}"/>
+        </div>
+      </div>
+      <div class="clr-row margin-row">
+        <div class="col-lg-2 col-sm-4 col-xs-4">
+          <label class="txt-strong" for="manually-selected">Manually selected</label>
+        </div>
+        <div class="col-lg-4 col-sm-8 col-xs-8">
+          <input type="text" id="manually-selected" readonly value="{{image.manuallySelected ? 'Yes' : 'No' }}"/>
         </div>
       </div>
 

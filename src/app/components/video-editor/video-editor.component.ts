@@ -294,6 +294,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     this.image.numFrame = Math.round(this.image.video.fps * this.snapshotTime);
     this.image.base64contents = this.canvas.nativeElement.toDataURL();
     this.image.observation = this.imageObservation;
+    this.image.manuallySelected = true;
 
     let imageUploadInfo;
     if (this.snapshotPolypInputModel !== '' && this.snapshotPolypInputModel !== undefined) {
@@ -448,7 +449,8 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
       video: image.video.id,
       polyp: null,
       numFrame: image.numFrame,
-      observation: image.observation
+      observation: image.observation,
+      manuallySelected: image.manuallySelected
     };
   }
 
@@ -459,7 +461,8 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
       video: image.video.id,
       polyp: image.polyp.id,
       numFrame: image.numFrame,
-      observation: image.observation
+      observation: image.observation,
+      manuallySelected: image.manuallySelected
     };
   }
 }
