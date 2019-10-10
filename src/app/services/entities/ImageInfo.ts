@@ -8,4 +8,5 @@ export class ImageInfo {
   gallery: string | IdAndUri;
   video: string | IdAndUri;
   polyp: string | IdAndUri;
+  observation: string;
 }

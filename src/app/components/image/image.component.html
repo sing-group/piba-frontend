@@ -32,13 +32,13 @@
     </clr-checkbox>
   </div>
   <div class="clr-row clr-justify-content-center">
-    <div *ngIf="authenticationService.getRole() == role.ENDOSCOPIST">
-      <button *ngIf="image.polyp != null" class="btn btn-success" (click)="save()"
+    <div *ngIf="isEndoscopist()">
+      <button *ngIf="!isPolypEmpty()" class="btn btn-success" (click)="save()"
               [disabled]="isLocationSaved()">
         <clr-icon shape="plus"></clr-icon>
         Save (s)
       </button>
-      <button *ngIf="image.polyp != null" class="btn btn-primary"
+      <button *ngIf="!isPolypEmpty()" class="btn btn-primary"
               (click)="image.polypLocation != null ? this.warningMessageRemovingLocation = true : cleanCanvas();"
               [disabled]="isLoading || !showPolypLocation">
         <clr-icon shape="refresh"></clr-icon>
@@ -51,96 +51,99 @@
     </div>
   </div>
 
-  <div *ngIf="image.polyp != null && authenticationService.getRole() != role.ENDOSCOPIST" class="card">
-    <div class="clr-row margin-row">
-      <div class="col-lg-2 col-sm-3 col-xs-4">
-        <label class="txt-strong" for="polyp-name">Name</label>
+  <div *ngIf="!isImageObservationEmpty()" class="card card-size">
+      <div class="margin-row">{{image.observation}}</div>
+  </div>
+  <div *ngIf="!isPolypEmpty() && !isEndoscopist()" class="card card-size">
+    <div class="card-header">Polyp info</div>
+      <div class="clr-row margin-row">
+        <div class="col-lg-2 col-sm-3 col-xs-4">
+          <label class="txt-strong" for="polyp-name">Name</label>
+        </div>
+        <div class="col-lg-4 col-sm-3 col-xs-8">
+          <input type="text" id="polyp-name" readonly value="{{image.polyp.name}}"/>
+        </div>
+        <div class="col-lg-2 col-sm-3 col-xs-4">
+          <label class="txt-strong" for="polyp-size">Size (mm)</label>
+        </div>
+        <div class="col-lg-4 col-sm-3 col-xs-8">
+          <input type="text" id="polyp-size" readonly value="{{image.polyp.size}}"/>
+        </div>
       </div>
-      <div class="col-lg-4 col-sm-3 col-xs-8">
-        <input type="text" id="polyp-name" readonly value="{{image.polyp.name}}"/>
+      <div class="clr-row margin-row">
+        <div class="col-lg-2 col-sm-3 col-xs-4">
+          <label class="txt-strong" for="polyp-location">Location</label>
+        </div>
+        <div class="col-lg-4 col-sm-3 col-xs-8">
+          <input type="text" id="polyp-location" readonly value="{{image.polyp.location}}"/>
+        </div>
+        <div class="col-lg-2 col-sm-3 col-xs-4">
+          <label class="txt-strong" for="polyp-nice">NICE</label>
+        </div>
+        <div class="col-lg-4 col-sm-3 col-xs-8">
+          <input type="text" id="polyp-nice" readonly value="{{image.polyp.nice}}"/>
+        </div>
       </div>
-      <div class="col-lg-2 col-sm-3 col-xs-4">
-        <label class="txt-strong" for="polyp-size">Size (mm)</label>
+      <div class="clr-row margin-row">
+        <div class="col-lg-2 col-sm-3 col-xs-4">
+          <label class="txt-strong" for="polyp-wasp">WASP</label>
+        </div>
+        <div class="col-lg-4 col-sm-3 col-xs-8">
+          <input type="text" id="polyp-wasp" readonly value="{{image.polyp.wasp}}"/>
+        </div>
+        <div class="col-lg-2 col-sm-3 col-xs-4">
+          <label class="txt-strong" for="polyp-lst">LST</label>
+        </div>
+        <div class="col-lg-4 col-sm-3 col-xs-8">
+          <input type="text" id="polyp-lst" readonly value="{{image.polyp.lst}}"/>
+        </div>
       </div>
-      <div class="col-lg-4 col-sm-3 col-xs-8">
-        <input type="text" id="polyp-size" readonly value="{{image.polyp.size}}"/>
+      <div class="clr-row margin-row">
+        <div class="col-lg-2 col-sm-3 col-xs-4">
+          <label class="txt-strong" for="polyp-parisPrimary">PARIS</label>
+        </div>
+        <div class="col-lg-4 col-sm-3 col-xs-8">
+          <input type="text" id="polyp-parisPrimary" readonly value="{{image.polyp.parisPrimary}}"/>
+        </div>
+        <div class="col-lg-2 col-sm-3 col-xs-4" *ngIf="image.polyp.parisSecondary !== undefined">
+          <label class="txt-strong" for="polyp-parisSecondary">PARIS Secondary</label>
+        </div>
+        <div class="col-lg-4 col-sm-3 col-xs-8" *ngIf="image.polyp.parisSecondary !== undefined">
+          <input type="text" id="polyp-parisSecondary" readonly value="{{image.polyp.parisSecondary}}"/>
+        </div>
       </div>
-    </div>
-    <div class="clr-row margin-row">
-      <div class="col-lg-2 col-sm-3 col-xs-4">
-        <label class="txt-strong" for="polyp-location">Location</label>
+      <div class="clr-row margin-row">
+        <div class="col-lg-2 col-sm-4 col-xs-4">
+          <label class="txt-strong" for="polyp-histology">Histology</label>
+        </div>
+        <div class="col-lg-4 col-sm-8 col-xs-8">
+          <input type="text" id="polyp-histology" readonly value="{{image.polyp.histology.polypType}}"/>
+        </div>
       </div>
-      <div class="col-lg-4 col-sm-3 col-xs-8">
-        <input type="text" id="polyp-location" readonly value="{{image.polyp.location}}"/>
-      </div>
-      <div class="col-lg-2 col-sm-3 col-xs-4">
-        <label class="txt-strong" for="polyp-nice">NICE</label>
-      </div>
-      <div class="col-lg-4 col-sm-3 col-xs-8">
-        <input type="text" id="polyp-nice" readonly value="{{image.polyp.nice}}"/>
-      </div>
-    </div>
-    <div class="clr-row margin-row">
-      <div class="col-lg-2 col-sm-3 col-xs-4">
-        <label class="txt-strong" for="polyp-wasp">WASP</label>
-      </div>
-      <div class="col-lg-4 col-sm-3 col-xs-8">
-        <input type="text" id="polyp-wasp" readonly value="{{image.polyp.wasp}}"/>
-      </div>
-      <div class="col-lg-2 col-sm-3 col-xs-4">
-        <label class="txt-strong" for="polyp-lst">LST</label>
-      </div>
-      <div class="col-lg-4 col-sm-3 col-xs-8">
-        <input type="text" id="polyp-lst" readonly value="{{image.polyp.lst}}"/>
-      </div>
-    </div>
-    <div class="clr-row margin-row">
-      <div class="col-lg-2 col-sm-3 col-xs-4">
-        <label class="txt-strong" for="polyp-parisPrimary">PARIS</label>
-      </div>
-      <div class="col-lg-4 col-sm-3 col-xs-8">
-        <input type="text" id="polyp-parisPrimary" readonly value="{{image.polyp.parisPrimary}}"/>
-      </div>
-      <div class="col-lg-2 col-sm-3 col-xs-4" *ngIf="image.polyp.parisSecondary !== undefined">
-        <label class="txt-strong" for="polyp-parisSecondary">PARIS Secondary</label>
-      </div>
-      <div class="col-lg-4 col-sm-3 col-xs-8" *ngIf="image.polyp.parisSecondary !== undefined">
-        <input type="text" id="polyp-parisSecondary" readonly value="{{image.polyp.parisSecondary}}"/>
-      </div>
-    </div>
-    <div class="clr-row margin-row">
-      <div class="col-lg-2 col-sm-4 col-xs-4">
-        <label class="txt-strong" for="polyp-histology">Histology</label>
-      </div>
-      <div class="col-lg-4 col-sm-8 col-xs-8">
-        <input type="text" id="polyp-histology" readonly value="{{image.polyp.histology.polypType}}"/>
-      </div>
-    </div>
-    <div class="clr-row margin-row">
-      <div class="col-lg-2 col-sm-4 col-xs-4" *ngIf="type">
-        <label class="txt-strong" for="polyp-type">Type</label>
-      </div>
-      <div class="col-lg-4 col-sm-8 col-xs-8" *ngIf="type">
-        <input type="text" id="polyp-type" readonly value="{{type}}"/>
-      </div>
-      <div class="col-lg-2 col-sm-4 col-xs-4" *ngIf="dysplasingGrade">
-        <label class="txt-strong" for="polyp-dyplasingGrade">Dyplasing drade</label>
+      <div class="clr-row margin-row">
+        <div class="col-lg-2 col-sm-4 col-xs-4" *ngIf="type">
+          <label class="txt-strong" for="polyp-type">Type</label>
+        </div>
+        <div class="col-lg-4 col-sm-8 col-xs-8" *ngIf="type">
+          <input type="text" id="polyp-type" readonly value="{{type}}"/>
+        </div>
+        <div class="col-lg-2 col-sm-4 col-xs-4" *ngIf="dysplasingGrade">
+          <label class="txt-strong" for="polyp-dyplasingGrade">Dyplasing drade</label>
+        </div>
+
+        <div class="col-lg-4 col-sm-8 col-xs-8" *ngIf="dysplasingGrade">
+          <input type="text" id="polyp-dyplasingGrade" readonly value="{{dysplasingGrade}}"/>
+        </div>
       </div>
 
-      <div class="col-lg-4 col-sm-8 col-xs-8" *ngIf="dysplasingGrade">
-        <input type="text" id="polyp-dyplasingGrade" readonly value="{{dysplasingGrade}}"/>
+      <div class="clr-row margin-row">
+        <div class="col-xs-12">
+          <label class="txt-strong" for="polyp-observation">Observation</label>
+        </div>
+        <div class="col-xs-12">
+          <input type="text" id="polyp-observation" readonly value="{{image.polyp.observation}}"/>
+        </div>
       </div>
-    </div>
-
-    <div class="clr-row margin-row">
-      <div class="col-xs-12">
-        <label class="txt-strong" for="polyp-observation">Observation</label>
-      </div>
-      <div class="col-xs-12">
-        <input type="text" id="polyp-observation" readonly value="{{image.polyp.observation}}"/>
-      </div>
-    </div>
-
   </div>
 
   <clr-modal [(clrModalOpen)]="definingDeletion" [clrModalClosable]="false">

@@ -66,6 +66,7 @@ export class ImagesService {
     formData.append('video', image.video);
     formData.append('polyp', image.polyp);
     formData.append('numFrame', image.numFrame.toString());
+    formData.append('observation', image.observation);
 
     return this.http.post<ImageInfo>(`${environment.restApi}/image`, formData)
       .pipe(
@@ -198,7 +199,8 @@ export class ImagesService {
       video: video,
       gallery: null,
       polyp: polyp,
-      polypLocation: polypLocation
+      polypLocation: polypLocation,
+      observation: imageInfo.observation
     };
   }
 

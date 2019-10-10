@@ -5,4 +5,5 @@ export interface ImageUploadInfo {
   video: string;
   polyp: string;
   numFrame: number;
+  observation: string;
 }

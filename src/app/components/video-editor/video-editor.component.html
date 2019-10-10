@@ -99,7 +99,7 @@
     </div>
 
     <div *ngIf="isEndoscopist()" class="clr-row">
-      <label for="snapshot-form-polyp" class="col-xs-3">Polyp</label>
+      <label for="snapshot-form-polyp" class="col-xs-3 margin-top-polyp">Polyp</label>
       <clr-dropdown class="col-xs-9 col-sm-6 margin-top-polyp">
         <input type="text" clrDropdownTrigger id="snapshot-form-polyp" [(ngModel)]="snapshotPolypInputModel"
                name="polypInput"
@@ -120,6 +120,12 @@
         </clr-checkbox>
       </div>
     </div>
+
+    <div *ngIf="isEndoscopist()" class="clr-row">
+      <label for="snapshot-form-observation" class="col-xs-3">Observation</label>
+      <textarea class="col-xs-9 margin-textarea" type="text" id="snapshot-form-observation" name="observation"
+                [(ngModel)]="imageObservation"></textarea>
+    </div>
   </div>
 
   <div class="modal-footer">
@@ -129,8 +135,8 @@
             (click)="saveSnapshot()" [disabled]="doesGalleryNotExists() || !isPolypCorrect()">
       Save to gallery
     </button>
-    <a class="btn btn-info-outline" id="download-image-button" href="{{canvas.toDataURL('image/png')}}"
-       (click)="discardSnapshot()" download="{{fileName}}">Download</a>
+    <a class="btn btn-info-outline" id="download-image-button" href="#"
+       (click)="downloadSnapshot()" download="{{fileName}}">Download</a>
   </div>
 </clr-modal>
 

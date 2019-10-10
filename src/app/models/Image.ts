@@ -12,4 +12,5 @@ export class Image {
   video: Video;
   polyp: Polyp;
   polypLocation: PolypLocation;
+  observation: string;
 }

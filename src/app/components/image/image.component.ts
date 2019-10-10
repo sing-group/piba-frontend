@@ -51,7 +51,6 @@ export class ImageComponent implements OnInit {
 
   type: string;
   dysplasingGrade: string;
-  role = Role;
 
   filter: string;
   showPolypLocation: boolean;
@@ -71,7 +70,7 @@ export class ImageComponent implements OnInit {
               private notificationService: NotificationService,
               private location: Location,
               private router: Router,
-              public authenticationService: AuthenticationService) {
+              private readonly authenticationService: AuthenticationService) {
     this.imageElement = document.createElement('img');
     // Needed for Chrome
     document.body.appendChild(this.imageElement);
@@ -219,6 +218,18 @@ export class ImageComponent implements OnInit {
     });
   }
 
+  isImageObservationEmpty() {
+    return this.image.observation === null || this.image.observation === '' || this.image.observation === undefined;
+  }
+
+  isEndoscopist(): boolean {
+    return this.authenticationService.getRole() === Role.ENDOSCOPIST;
+  }
+
+  isPolypEmpty(): boolean {
+    return this.image.polyp === null || this.image.polyp === undefined;
+  }
+
   removeLocationAndCleanCanvas() {
     this.deleteLocation(this.image.id);
     this.cleanCanvas();
@@ -240,7 +251,7 @@ export class ImageComponent implements OnInit {
       this.isLoading = false;
       this.image = img;
       this.paintImageAndLocation();
-      if (this.authenticationService.getRole() !== Role.ENDOSCOPIST) {
+      if (!this.isEndoscopist()) {
         this.getPolypInfo();
       }
     });
@@ -318,7 +329,7 @@ export class ImageComponent implements OnInit {
   isLocationSaved(): boolean {
     const locationSaved = this.image.polypLocation;
     // if polyp is selected
-    if (this.authenticationService.getRole() === this.role.ENDOSCOPIST && (this.last_mousex != null || this.last_mousey != null ||
+    if (this.isEndoscopist() && (this.last_mousex != null || this.last_mousey != null ||
       this.width != null || this.height != null) && this.image.polyp != null && this.showPolypLocation) {
       // if polyp wasn't saved
       if (locationSaved == null || (this.last_mousex !== locationSaved.x || this.last_mousey !== locationSaved.y ||

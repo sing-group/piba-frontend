@@ -60,19 +60,16 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
 
   // Snapshot attributes
   openSnapshotModal = false;
-
   showPolypsInFrame = true;
   showPolypCheckbox = true;
-
   snapshotPolypInputModel: string;
-
   galleries: Gallery[] = [];
   gallery: Gallery = new Gallery();
   galleryInputModel: string;
-
+  imageObservation = null;
   fileName: string;
-
   private polypForSnapshot: Polyp = new Polyp();
+  private downloadButton: HTMLLinkElement;
 
   // Internal attributes
   private progress: HTMLInputElement;
@@ -131,6 +128,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     this.galleriesService.getGalleries().subscribe(galleries => {
       this.galleries = galleries.sort((galleryA, galleryB) => galleryA.title > galleryB.title ? 1 : -1);
     });
+
   }
 
   ngAfterViewChecked() {
@@ -172,6 +170,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
       progressbar.style.background = background;
       progressbar.style.height = '100%';
     }
+
   }
 
   private get videoHTML(): HTMLVideoElement {
@@ -281,6 +280,12 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     this.fileName = this.video.id + '_' + Math.round(this.video.fps * this.snapshotTime) + '.png';
   }
 
+  downloadSnapshot() {
+    this.downloadButton = document.getElementById('download-image-button') as HTMLLinkElement;
+    this.downloadButton.href = this.canvas.nativeElement.toDataURL();
+    this.discardSnapshot();
+  }
+
   saveSnapshot() {
     this.currentTime = this.snapshotTime;
     this.image.video = this.video;
@@ -288,6 +293,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     this.image.polyp = this.polypForSnapshot;
     this.image.numFrame = Math.round(this.image.video.fps * this.snapshotTime);
     this.image.base64contents = this.canvas.nativeElement.toDataURL();
+    this.image.observation = this.imageObservation;
 
     let imageUploadInfo;
     if (this.snapshotPolypInputModel !== '' && this.snapshotPolypInputModel !== undefined) {
@@ -360,6 +366,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     this.galleryInputModel = '';
     this.polypForSnapshot = new Polyp();
     this.snapshotPolypInputModel = '';
+    this.imageObservation = null;
     this.showPolypsInFrame = true;
   }
 
@@ -440,7 +447,8 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
       gallery: image.gallery.id,
       video: image.video.id,
       polyp: null,
-      numFrame: image.numFrame
+      numFrame: image.numFrame,
+      observation: image.observation
     };
   }
 
@@ -450,7 +458,8 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
       gallery: image.gallery.id,
       video: image.video.id,
       polyp: image.polyp.id,
-      numFrame: image.numFrame
+      numFrame: image.numFrame,
+      observation: image.observation
     };
   }
 }

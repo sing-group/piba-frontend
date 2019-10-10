@@ -24,6 +24,16 @@
   margin-top: 4.2%;
 }
 
+.margin-top-polyp {
+  margin-top: 2%;
+}
+
+.margin-textarea {
+  max-width: 70.3%;
+  margin-left: 2.3%;
+  margin-top: .5%;
+}
+
 .clr-dropdown {
   max-height: 45%;
   overflow-y: auto;
