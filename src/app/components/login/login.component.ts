@@ -61,9 +61,12 @@ export class LoginComponent implements OnInit {
   }
 
   recoverPassword() {
-    this.usersService.recoverPassword(this.userRecovery);
-    this.recovery = false;
-    this.router.navigateByUrl('/');
+    this.usersService.recoverPassword(this.userRecovery).subscribe(
+      () => {
+        this.recovery = false;
+        this.router.navigateByUrl('/');
+      }
+    );
   }
 
   updatePassword() {

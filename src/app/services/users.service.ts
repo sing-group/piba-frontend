@@ -2,13 +2,13 @@ import {Injectable} from '@angular/core';
 import {Users} from '../models/Users';
 import {Observable} from 'rxjs';
 import {UserInfo} from './entities/UserInfo';
-import {NewPasswordInfo} from './entities/NewPasswordInfo';
 import {environment} from '../../environments/environment';
 import {map} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {User} from '../models/User';
-import {LoginOrEmailInfo} from './entities/LoginOrEmailInfo';
 import {NewPassword} from '../models/NewPassword';
+import {LoginOrEmailInfo} from './entities/LoginOrEmailInfo';
+import {NewPasswordInfo} from './entities/NewPasswordInfo';
 
 @Injectable({
   providedIn: 'root'
@@ -52,10 +52,10 @@ export class UsersService {
     );
   }
 
-  recoverPassword(loginOrEmail: string) {
+  recoverPassword(loginOrEmail: string): Observable<any> {
     const loginOrEmailInfo = this.toLoginOrEmailInfo(loginOrEmail);
 
-    return this.http.post<UserInfo>(`${environment.restApi}/loginrecovery/`, loginOrEmailInfo).subscribe();
+    return this.http.post<UserInfo>(`${environment.restApi}/loginrecovery/`, loginOrEmailInfo);
   }
 
   updatePassword(newPassword: NewPassword): Observable<any> {
