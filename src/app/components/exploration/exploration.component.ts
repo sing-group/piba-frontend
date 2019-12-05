@@ -21,6 +21,8 @@ export class ExplorationComponent implements OnInit, OnDestroy {
 
   video: Video = new Video();
 
+  videoUploaded = false;
+
   userUploadingVideo = false;
   uploadingVideo = false;
   progress = 0;
@@ -129,6 +131,7 @@ export class ExplorationComponent implements OnInit, OnDestroy {
     this.userUploadingVideo = false;
     this.video = new Video();
     this.deletingVideo = false;
+    this.videoUploaded = false;
     this.assignVideoName();
   }
 
@@ -175,12 +178,16 @@ export class ExplorationComponent implements OnInit, OnDestroy {
     });
   }
 
-  titleIsUsed(newVideo: Video): Boolean {
+  isTitleUsed(newVideo: Video): Boolean {
     if (this.editingVideo != null) {
       return this.exploration.videos.find((video) => video.title === newVideo.title) !== undefined && newVideo.title !== this.videoTitle;
     } else {
       return this.exploration.videos.find((video) => video.title === newVideo.title) !== undefined;
     }
+  }
+
+  isVideoUploaded(): boolean {
+    return this.videoUploaded;
   }
 
   private mapVideo(video: Video): VideoUploadInfo {

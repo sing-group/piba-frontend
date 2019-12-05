@@ -67,9 +67,6 @@
                       <div class="col-md-12 col-lg-8">
                         <input type="text" id="video-title-{{video.id}}" name="title-{{video.id}}" size="50"
                                [readonly]="editingVideo == video.id ? null : true" [(ngModel)]="video.title"/>
-                        <div *ngIf="editingVideo == video.id && titleIsUsed(video)"
-                             class="alert alert-danger">This title is already being used
-                        </div>
                       </div>
                     </div>
                     <div class="form-group row">
@@ -100,7 +97,7 @@
                         Edit information
                       </button>
                       <button type="button" class="btn btn-primary" *ngIf="!isReadonly && video.id == editingVideo"
-                              (click)="editVideo(video)" [disabled]="titleIsUsed(video)">
+                              (click)="editVideo(video)" [disabled]="isTitleUsed(video)">
                         <clr-icon shape="cog"></clr-icon>
                         Save information
                       </button>
@@ -132,17 +129,15 @@
       </clr-tabs>
     </div>
   </div>
-  <form enctype="multipart/form-data" ngNativeValidate (submit)="uploadVideo(); uploadingVideo = true">
-    <clr-modal [(clrModalOpen)]="userUploadingVideo">
+  <form enctype="multipart/form-data" #videoForm="ngForm" (submit)="uploadVideo(); uploadingVideo = true">
+    <clr-modal [(clrModalOpen)]="userUploadingVideo" [clrModalClosable]="false">
       <h3 class="modal-title">Upload Video</h3>
       <div class="modal-body">
         <section class="form-block">
           <div class="form-group">
             <label for="video-form-title">Title</label>
-            <input type="text" id="video-form-title" [(ngModel)]="video.title" name="title"/>
-            <div *ngIf="titleIsUsed(video)"
-                 class="alert alert-danger">This title is already being used
-            </div>
+            <input type="text" id="video-form-title" [(ngModel)]="video.title" name="title"
+                   pattern="[a-zA-ZñÑ0-9_\s\(\)-]+" title="Must be a alphanumeric" #videoTitleExploration="ngModel"/>
           </div>
           <div class="form-group">
             <label for="video-form-observations">Observations</label>
@@ -151,7 +146,7 @@
           </div>
           <div class="form-group">
             <label for="video-form-file" class="required">File</label>
-            <input *ngIf="userUploadingVideo" type="file" id="video-form-file" required/>
+            <input *ngIf="userUploadingVideo" type="file" id="video-form-file" (change)="videoUploaded = true"/>
           </div>
           <div class="form-group">
             <clr-checkbox name="withText" id="video-form-withText" [(ngModel)]="video.withText">
@@ -162,7 +157,9 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
-        <button type="submit" class="btn btn-primary" [disabled]="titleIsUsed(video)">Ok</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isTitleUsed(video) || !isVideoUploaded() ||
+        videoForm.invalid">Ok
+        </button>
       </div>
     </clr-modal>
   </form>
@@ -184,7 +181,8 @@
       <div *ngIf="uploadTimeRemaining <= 60" class="col-md-8">Remaining time: {{uploadTimeRemaining | number:'.1-2'}}
         second(s)
       </div>
-      <div *ngIf="uploadTimeRemaining > 60" class="col-md-8">Remaining time: {{uploadTimeRemaining/60 | number:'.1-2'}}
+      <div *ngIf="uploadTimeRemaining > 60" class="col-md-8">Remaining
+        time: {{uploadTimeRemaining / 60 | number:'.1-2'}}
         minute(s)
       </div>
       <div class="col-md-4">Upload speed: {{uploadSpeed | number:'.1-2'}} MB/s</div>

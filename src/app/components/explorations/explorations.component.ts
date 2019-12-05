@@ -207,18 +207,12 @@ export class ExplorationsComponent implements OnInit {
     this.exploration = this.explorations.find((exploration) => exploration.id === id);
   }
 
-  public patientIdAreCorrect(): Boolean {
-    if (this.editingExploration || (this.patientId != null || this.patientId !== undefined)) {
-      return true;
-    }
-    return false;
+  public isPatientIdCorrect(): boolean {
+    return this.editingExploration || (this.patientId != null || this.patientId !== undefined);
   }
 
-  public IdSpaceAreCorrect(): Boolean {
-    if (this.editingExploration || this.idSpace != null || this.idSpace !== undefined) {
-      return true;
-    }
-    return false;
+  public isIdSpaceCorrect(): boolean {
+    return this.editingExploration || this.idSpace != null || this.idSpace !== undefined;
   }
 
   searchPatient() {
