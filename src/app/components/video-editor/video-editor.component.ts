@@ -66,7 +66,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
   galleries: Gallery[] = [];
   gallery: Gallery = new Gallery();
   galleryInputModel: string;
-  imageObservation = null;
+  imageObservation = '';
   fileName: string;
   private polypForSnapshot: Polyp = new Polyp();
   private downloadButton: HTMLLinkElement;
@@ -367,7 +367,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     this.galleryInputModel = '';
     this.polypForSnapshot = new Polyp();
     this.snapshotPolypInputModel = '';
-    this.imageObservation = null;
+    this.imageObservation = '';
     this.showPolypsInFrame = true;
   }
 
