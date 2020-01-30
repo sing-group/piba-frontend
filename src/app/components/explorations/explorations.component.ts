@@ -65,19 +65,20 @@ export class ExplorationsComponent implements OnInit {
       this.pageLength = page.length;
     });
 
+    this.idSpacesService.getIdSpaces().subscribe(idSpaces => this.idSpaces = idSpaces);
+
     const patient = this.route.snapshot.paramMap.get('id');
     const publicPatient = this.route.snapshot.paramMap.get('patientId');
-    if (patient != null) {
+    if (patient !== null) {
       this.patientsService.getPatient(patient).subscribe(patientFound => {
-        this.idSpace = patientFound.idSpace;
         this.patientToFind = publicPatient;
+        this.idSpaceToFind = this.idSpaces.find(idspace => idspace.id === patientFound.idSpace.id);
         this.searchPatient();
       });
     } else {
       this.pagination.page.current = 1;
       this.getPageExplorations();
     }
-    this.idSpacesService.getIdSpaces().subscribe(idSpaces => this.idSpaces = idSpaces);
   }
 
   edit(id: string) {
@@ -227,8 +228,7 @@ export class ExplorationsComponent implements OnInit {
     if (this.idSpaceToFind.id === undefined && this.patientToFind === '') {
       return;
     }
-    (<HTMLInputElement>document.getElementById('page-to-go')).value = '1';
-    this.pagination.page.current = 1;
+    this.goToFirstPage();
     this.paginatePatientExplorations = true;
     this.getPageExplorations();
   }
@@ -238,9 +238,15 @@ export class ExplorationsComponent implements OnInit {
     this.idSpace = new IdSpace();
     this.idSpaceToFind = new IdSpace();
     this.paginatePatientExplorations = false;
-    (<HTMLInputElement>document.getElementById('page-to-go')).value = '1';
-    this.pagination.page.current = 1;
+    this.goToFirstPage();
     this.getPageExplorations();
+  }
+
+  goToFirstPage() {
+    if (<HTMLInputElement>document.getElementById('page-to-go') !== null) {
+      (<HTMLInputElement>document.getElementById('page-to-go')).value = '1';
+    }
+    this.pagination.page.current = 1;
   }
 }
 
