@@ -208,12 +208,12 @@ export class ExplorationsComponent implements OnInit {
     this.exploration = this.explorations.find((exploration) => exploration.id === id);
   }
 
-  public isPatientIdCorrect(): boolean {
-    return this.editingExploration || (this.patientId != null || this.patientId !== undefined);
+  public isPatientIdCorrect(): Boolean {
+    return this.editingExploration || (this.patientId !== null && this.patientId !== undefined && this.patientId !== '');
   }
 
-  public isIdSpaceCorrect(): boolean {
-    return this.editingExploration || this.idSpace != null || this.idSpace !== undefined;
+  public isIdSpaceCorrect(): Boolean {
+    return this.editingExploration || (this.idSpace !== null && this.idSpace !== undefined && this.idSpace.id !== undefined);
   }
 
   searchPatient() {
