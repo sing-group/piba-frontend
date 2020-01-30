@@ -39,23 +39,12 @@
   color: white;
 }
 
-.btn-link:hover {
-  opacity: 0.8;
-  color: white;
-}
-
 .complete-space {
   width: 100%;
 }
 
 .alert {
   padding: 1%;
-}
-
-@media (min-width: 768px) {
-  .card-button {
-    float: right;
-  }
 }
 
 .clear-select {
@@ -65,3 +54,8 @@
   top: .15rem;
   right: .90rem;
 }
+
+.card-header {
+  padding: 0rem .5rem;
+}
+
