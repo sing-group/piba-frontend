@@ -137,12 +137,11 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
 
     let background = '';
 
-    if (this.video !== undefined && !isNaN(this.videoHTML.duration)) {
+    if (this.hasVideo() && !isNaN(this.videoHTML.duration)) {
       // assign the width of the video to the legends and checkboxes container
       legendCheckboxContainer.style.width = this.videoHTML.offsetWidth + 'px';
-
       const duration = Math.trunc(this.videoHTML.duration);
-      if (this.showPolyp) {
+      if (this.video.polypRecording.length > 0 && this.showPolyp) {
         background += 'linear-gradient(to right, transparent';
         this.video.polypRecording.sort((p1, p2) => p1.start - p2.start).forEach(polypRecording => {
           const start = (polypRecording.start * 100 / duration).toFixed(4);
@@ -154,7 +153,8 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
         background += ')';
       }
 
-      background += this.showPolyp && this.showModification && this.video.modifications.length > 0 ? ', ' : '';
+      background += this.showPolyp && this.video.polypRecording.length > 0 && this.showModification &&
+      this.video.modifications.length > 0 ? ', ' : '';
 
       if (this.video.modifications.length > 0 && this.showModification) {
         background += 'linear-gradient(to right, transparent';
@@ -169,6 +169,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
 
       progressbar.style.background = background;
       progressbar.style.height = '100%';
+
     }
 
   }
