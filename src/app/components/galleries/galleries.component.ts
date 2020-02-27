@@ -133,10 +133,13 @@ export class GalleriesComponent implements OnInit {
   }
 
   getPercentageOfLocatedPolyps(gallery: Gallery): number {
-    if (this.getImagesInGalleryInfo(gallery) === undefined || this.getImagesInGalleryInfo(gallery).imagesWithPolyp === 0) {
+    const imagesInGallery = this.getImagesInGalleryInfo(gallery);
+
+    if (imagesInGallery === undefined || imagesInGallery.imagesWithPolyp === 0) {
       return 100;
     } else {
-      return (this.getImagesInGalleryInfo(gallery).locatedImages * 100) / this.getImagesInGalleryInfo(gallery).imagesWithPolyp;
+      return ((imagesInGallery.imagesWithPolyp + imagesInGallery.locatedImages - imagesInGallery.imagesWithPolyp)
+        / imagesInGallery.totalItems) * 100;
     }
   }
 
