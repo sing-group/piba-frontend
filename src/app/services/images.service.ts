@@ -64,7 +64,9 @@ export class ImagesService {
     formData.append('image', image.image);
     formData.append('gallery', image.gallery);
     formData.append('video', image.video);
-    formData.append('polyp', image.polyp);
+    if (image.polyp !== null) {
+      formData.append('polyp', image.polyp);
+    }
     formData.append('numFrame', image.numFrame.toString());
     formData.append('observation', image.observation);
     formData.append('manuallySelected', image.manuallySelected.toString());

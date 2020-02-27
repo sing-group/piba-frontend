@@ -7,7 +7,7 @@ export class ImageInfo {
   base64contents: string;
   gallery: string | IdAndUri;
   video: string | IdAndUri;
-  polyp: string | IdAndUri;
+  polyp?: string | IdAndUri;
   observation: string;
   manuallySelected: boolean;
 }
