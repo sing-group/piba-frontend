@@ -72,8 +72,6 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
   private downloadButton: HTMLLinkElement;
 
   // Internal attributes
-  private progress: HTMLInputElement;
-
   private moveProgress = false;
 
   private pauseWatcher: number;
@@ -101,7 +99,8 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     private galleriesService: GalleriesService,
     private imagesService: ImagesService,
     private notificationService: NotificationService,
-    private authenticationService: AuthenticationService
+    private authenticationService: AuthenticationService,
+    private elementRef: ElementRef
   ) {
   }
 
@@ -246,8 +245,16 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
       && interval.end <= this.videoHTML.duration;
   }
 
+  private scrollToTop() {
+    const parent: HTMLElement = this.elementRef.nativeElement.parentElement;
+
+    if (parent !== undefined) {
+      parent.scrollTo({left: 0, top: 0, behavior: 'smooth'});
+    }
+  }
+
   playInterval(interval: Interval) {
-    this.progress = document.getElementById('progress') as HTMLInputElement;
+    this.scrollToTop();
     this.videoHTML.currentTime = interval.start;
     this.videoHTML.play();
 
@@ -256,7 +263,8 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     }
     this.pauseWatcher = setInterval(() => {
       if (!this.moveProgress) {
-        this.progress.value = this.videoHTML.currentTime.toString();
+        const progress: HTMLInputElement = document.getElementById('progress') as HTMLInputElement;
+        progress.value = this.videoHTML.currentTime.toString();
       }
       if (this.videoHTML.currentTime >= interval.end) {
         this.videoHTML.pause();
