@@ -239,7 +239,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
   }
 
   isValidInterval(interval: Interval): boolean {
-    return interval.start < interval.end
+    return interval.start <= interval.end
       && this.videoHTML.duration !== undefined
       && interval.start >= 0
       && interval.end <= this.videoHTML.duration;

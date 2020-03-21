@@ -124,7 +124,7 @@ export class VideoZoneEditorComponent implements DoCheck {
   }
 
   isCurrentIntervalValid(): boolean {
-    if (this.start === undefined || this.start === null || this.end === undefined || this.end === null || this.start >= this.end) {
+    if (!TimeToNumberPipe.isValidTime(this.start) || !TimeToNumberPipe.isValidTime(this.end)) {
       return false;
     }
 

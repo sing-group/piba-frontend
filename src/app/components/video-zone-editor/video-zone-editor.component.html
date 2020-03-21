@@ -24,7 +24,7 @@
     </div>
     <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
       <input id="element-start" type="text" name="start" [(ngModel)]="start" class="input-timer"
-             required #inputStart="ngModel"/>
+             required pattern="^[0-9]{2,}:[0-5][0-9]$" #inputStart="ngModel"/>
     </div>
     <div class="col-xs-2 col-sm-1 col-md-2">
       <button type="button" (click)="onSetCurrentAsStart()" class="btn btn-icon">
@@ -39,8 +39,7 @@
     </div>
     <div class="col-lg-8 col-md-6 col-sm-6 col-xs-5">
       <input id="element-end" type="text" name="end" [(ngModel)]="end" class="input-timer" required
-             #inputEnd="ngModel"/>
-
+             pattern="^[0-9]{2,}:[0-5][0-9]$" #inputEnd="ngModel"/>
     </div>
     <div class="col-xs-2 col-sm-1 col-md-2">
       <button type="button" (click)="onSetCurrentAsEnd()" class="btn btn-icon">
@@ -51,7 +50,7 @@
 
   <button type="submit" class="btn btn-primary"
           [disabled]="!isCurrentIntervalValid() || selectZoneType.invalid || inputStart.invalid || inputEnd.invalid"
-          (click)="onCreateZone();elementRecordingForm.submitted">
+          (click)="onCreateZone(); elementRecordingForm.submitted">
     <clr-icon shape="plus"></clr-icon>
     Add
   </button>
