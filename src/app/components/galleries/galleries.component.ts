@@ -7,7 +7,16 @@ import {AuthenticationService} from '../../services/authentication.service';
 import {ImagesService} from '../../services/images.service';
 import {ImagesInGalleryInfo} from '../../services/entities/ImagesInGalleryInfo';
 import {environment} from '../../../environments/environment';
+import {ClrDatagridSortOrder} from '@clr/angular';
 
+class GallerySummary {
+  id: string;
+  title: string;
+  description: string;
+  imagesWithPolyp: number;
+  locatedPercentage: number;
+  totalImages: number;
+}
 
 @Component({
   selector: 'app-galleries',
@@ -15,7 +24,6 @@ import {environment} from '../../../environments/environment';
   styleUrls: ['./galleries.component.css']
 })
 export class GalleriesComponent implements OnInit {
-
   creatingGallery = false;
   editingGallery = false;
   downloadingGallery = false;
@@ -30,10 +38,23 @@ export class GalleriesComponent implements OnInit {
   galleries: Gallery[] = [];
   role = Role;
 
+  readonly ascOrder = ClrDatagridSortOrder.ASC;
+
   constructor(private galleriesService: GalleriesService,
               private imagesService: ImagesService,
               private notificationService: NotificationService,
               public authenticationService: AuthenticationService) {
+  }
+
+  get galleriesData(): GallerySummary[] {
+    return this.galleries.map(gallery => ({
+      id: gallery.id,
+      title: gallery.title,
+      description: gallery.description,
+      imagesWithPolyp: this.getImagesInGalleryInfo(gallery) !== undefined ? this.getImagesInGalleryInfo(gallery).imagesWithPolyp : 0,
+      locatedPercentage: this.getPercentageOfLocatedPolyps(gallery),
+      totalImages: this.getImagesInGalleryInfo(gallery) !== undefined ? this.getImagesInGalleryInfo(gallery).totalItems : 0
+    }));
   }
 
   ngOnInit() {
@@ -50,6 +71,14 @@ export class GalleriesComponent implements OnInit {
           }
         });
       });
+    });
+  }
+
+  get sortedGalleries() {
+    return this.galleries.sort((g1, g2) => {
+      const compare = g1.title.localeCompare(g2.title);
+
+      return this.ascOrder === ClrDatagridSortOrder.ASC ? compare : -compare;
     });
   }
 

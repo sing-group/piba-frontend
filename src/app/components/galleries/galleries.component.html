@@ -38,22 +38,20 @@
 
   <clr-dg-placeholder>We couldn't find any galleries!</clr-dg-placeholder>
 
-  <clr-dg-column>Title</clr-dg-column>
+  <clr-dg-column [clrDgField]="'title'" [clrDgSortOrder]="ascOrder">Title</clr-dg-column>
   <clr-dg-column>Description</clr-dg-column>
-  <clr-dg-column>Images with polyp</clr-dg-column>
-  <clr-dg-column>Percentage of located polyps</clr-dg-column>
-  <clr-dg-column>Total images</clr-dg-column>
+  <clr-dg-column [clrDgField]="'imagesWithPolyp'">Images with polyp</clr-dg-column>
+  <clr-dg-column [clrDgField]="'locatedPercentage'">Percentage of located polyps</clr-dg-column>
+  <clr-dg-column [clrDgField]="'totalImages'">Total images</clr-dg-column>
   <clr-dg-column>Actions</clr-dg-column>
 
-  <clr-dg-row *clrDgItems="let gallery of galleries" [clrDgItem]="gallery">
+  <clr-dg-row *clrDgItems="let gallery of galleriesData" [clrDgItem]="gallery">
 
     <clr-dg-cell>{{gallery.title}}</clr-dg-cell>
     <clr-dg-cell>{{gallery.description}}</clr-dg-cell>
-    <clr-dg-cell>{{getImagesInGalleryInfo(gallery) !== undefined ?
-      getImagesInGalleryInfo(gallery).imagesWithPolyp : 0}}</clr-dg-cell>
-    <clr-dg-cell>{{getPercentageOfLocatedPolyps(gallery) | number:'.0-1'}}%</clr-dg-cell>
-    <clr-dg-cell>{{getImagesInGalleryInfo(gallery) !== undefined ?
-      getImagesInGalleryInfo(gallery).totalItems : 0}}</clr-dg-cell>
+    <clr-dg-cell>{{gallery.imagesWithPolyp}}</clr-dg-cell>
+    <clr-dg-cell>{{gallery.locatedPercentage | number:'.0-1'}}%</clr-dg-cell>
+    <clr-dg-cell>{{gallery.totalImages}}</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-link btn-icon">
         <button class="btn" routerLink="/gallery/{{gallery.id}}">
@@ -64,8 +62,7 @@
           <clr-icon shape="cog"></clr-icon>
           <span class="clr-icon-title">Settings</span>
         </button>
-        <button class="btn" (click)="download(gallery.id)"
-                *ngIf="getImagesInGalleryInfo(gallery) !== undefined && getImagesInGalleryInfo(gallery).totalItems > 0">
+        <button class="btn" (click)="download(gallery.id)" *ngIf="gallery.totalImages > 0">
           <clr-icon shape="download"></clr-icon>
           <span class="clr-icon-title">Download</span>
         </button>
