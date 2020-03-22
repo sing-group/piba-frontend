@@ -46,8 +46,8 @@ export class PolypRecordingsService {
               private videosService: VideosService) {
   }
 
-  getPolypRecordingsByVideo(video_id: string): Observable<PolypRecording[]> {
-    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording/video/${video_id}`)
+  getPolypRecordingsByVideo(videoId: string): Observable<PolypRecording[]> {
+    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording/video/${videoId}`)
       .pipe(
         concatMap(polypRecordingInfos =>
           forkJoin(polypRecordingInfos.map(polypRecordingInfo =>
@@ -64,8 +64,8 @@ export class PolypRecordingsService {
       );
   }
 
-  getPolypRecordingsByPolyp(polyp_id: string): Observable<PolypRecording[]> {
-    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording/polyp/${polyp_id}`)
+  getPolypRecordingsByPolyp(polypId: string): Observable<PolypRecording[]> {
+    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording/polyp/${polypId}`)
       .pipe(
         concatMap(polypRecordingInfos =>
           forkJoin(polypRecordingInfos.map(polypRecordingInfo =>
@@ -80,6 +80,17 @@ export class PolypRecordingsService {
           )
         )
       );
+  }
+
+  addRecordingsToPolyps(polyps: Polyp[]): Observable<Polyp[]> {
+    return forkJoin(
+      polyps.map(polyp => this.getPolypRecordingsByPolyp(polyp.id))
+    ).pipe(
+      map(recordings => polyps.map((polyp, index) => {
+        polyp.polypRecordings = recordings[index];
+        return polyp;
+      }))
+    );
   }
 
   createPolypRecording(polypRecording: PolypRecording): Observable<PolypRecording> {

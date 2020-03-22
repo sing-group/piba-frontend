@@ -40,7 +40,7 @@ export class Polyp implements VideoZoneType {
   histology: PolypHistology;
   observation: string;
   polypRecordings: PolypRecording[];
-  exploration: Exploration;
+  exploration: Exploration | string;
   confirmed: boolean;
 }
 

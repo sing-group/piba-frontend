@@ -37,6 +37,7 @@ import {ImageComponent} from './components/image/image.component';
 import {ProfileComponent} from './components/profile/profile.component';
 import {GalleriesComponent} from './components/galleries/galleries.component';
 import {ModifiersComponent} from './components/modifiers/modifiers.component';
+import {PolypsComponent} from './components/polyps/polyps.component';
 
 const routes: Routes = [
   {
@@ -44,6 +45,9 @@ const routes: Routes = [
   },
   {
     path: 'galleries', component: GalleriesComponent, canActivate: [AuthGuard]
+  },
+  {
+    path: 'polyps', component: PolypsComponent, canActivate: [AuthGuard]
   },
   {
     path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]

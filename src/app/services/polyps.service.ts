@@ -24,7 +24,7 @@
 
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {LOCATION, LST, NICE, PARIS, Polyp, WASP} from '../models/Polyp';
 import {environment} from '../../environments/environment';
 import {PolypInfo} from './entities/PolypInfo';
@@ -55,12 +55,14 @@ import {
   isNoHistologyInfo,
   isNonEpithelialNeoplasticInfo,
   isSSAInfo,
-  isTSAInfo, NoHistologyInfo,
+  isTSAInfo,
+  NoHistologyInfo,
   NonEpithelialNeoplasticInfo,
   PolypHistologyInfo,
   SSAInfo,
   TSAInfo
 } from './entities/PolypHistologyInfo';
+import {PolypPage} from './entities/PolypPage';
 
 @Injectable()
 export class PolypsService {
@@ -100,6 +102,20 @@ export class PolypsService {
       );
   }
 
+  getPolyps(page: number, pageSize: number): Observable<PolypPage> {
+    const params = new HttpParams()
+      .append('page', page.toString())
+      .append('pageSize', pageSize.toString());
+
+    return this.http.get<PolypInfo[]>(`${environment.restApi}/polyp`, {params, observe: 'response'})
+      .pipe(
+        map(response => ({
+          totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
+          polyps: response.body.map(polypInfo => this.mapPolypInfo(polypInfo))
+        }))
+      );
+  }
+
   delete(uuid: string) {
     return this.http.delete((`${environment.restApi}/polyp/` + uuid));
   }
@@ -126,7 +142,7 @@ export class PolypsService {
       histology: this.mapPolypHistologyInfo(polypInfo.histology),
       observation: polypInfo.observation,
       polypRecordings: [],
-      exploration: null,
+      exploration: typeof polypInfo.exploration === 'string' ? polypInfo.exploration : polypInfo.exploration.id,
       confirmed: polypInfo.confirmed
     };
   }
@@ -181,7 +197,7 @@ export class PolypsService {
       parisSecondary: EnumUtils.findKeyForValue(PARIS, polyp.parisSecondary),
       histology: this.toPolypHistologyInfo(polyp.histology),
       observation: polyp.observation,
-      exploration: polyp.exploration.id,
+      exploration: typeof polyp.exploration === 'string' ? polyp.exploration : polyp.exploration.id,
       confirmed: polyp.confirmed
     };
   }

@@ -57,7 +57,6 @@ export class ExplorationsComponent implements OnInit {
   exploration: Exploration = new Exploration();
   paginationTotalItems = 0;
   pageSize = 15;
-  pageLength = 0;
 
   patientId: string;
   patientError: string;
@@ -81,12 +80,11 @@ export class ExplorationsComponent implements OnInit {
     this.pageChangeEvent.pipe(
       debounceTime(500),
       distinctUntilChanged()).subscribe(page => {
-      if (Number(page) > 0 && Number(page) <= Math.ceil(this.paginationTotalItems / this.pageSize)) {
+      if (this.isValidPage(page)) {
         this.pagination.page.current = Number(page);
-      } else if (page.trim() !== '' && page.length >= this.pageLength) {
+      } else {
         this.notificationService.error('Invalid page entered.', 'Invalid page.');
       }
-      this.pageLength = page.length;
     });
 
     this.idSpacesService.getIdSpaces().subscribe(idSpaces => this.idSpaces = idSpaces);
@@ -103,6 +101,13 @@ export class ExplorationsComponent implements OnInit {
       this.pagination.page.current = 1;
       this.getPageExplorations();
     }
+  }
+
+  private isValidPage(page: string): boolean {
+    const pageNumber = Number(page);
+
+    return !isNaN(pageNumber) && pageNumber > 0
+      && pageNumber <= Math.ceil(this.paginationTotalItems / this.pageSize);
   }
 
   edit(id: string) {

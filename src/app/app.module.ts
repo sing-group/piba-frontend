@@ -65,6 +65,7 @@ import {GalleriesComponent} from './components/galleries/galleries.component';
 import {ModifiersComponent} from './components/modifiers/modifiers.component';
 import {VideoZoneEditorComponent} from './components/video-zone-editor/video-zone-editor.component';
 import {ConfirmationModalComponent} from './components/confirmation-modal/confirmation-modal.component';
+import {PolypsComponent} from './components/polyps/polyps.component';
 
 @NgModule({
   declarations: [
@@ -90,7 +91,8 @@ import {ConfirmationModalComponent} from './components/confirmation-modal/confir
     ModifiersComponent,
     DropdownFilterPipe,
     VideoZoneEditorComponent,
-    ConfirmationModalComponent
+    ConfirmationModalComponent,
+    PolypsComponent
   ],
   imports: [
     BrowserModule,

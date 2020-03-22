@@ -1,0 +1,36 @@
+<clr-datagrid (clrDgRefresh)="refreshPage($event)" [clrDgLoading]="loading">
+
+  <clr-dg-placeholder>We couldn't find any polyps!</clr-dg-placeholder>
+
+  <clr-dg-column>Exploration</clr-dg-column>
+  <clr-dg-column>Name</clr-dg-column>
+  <clr-dg-column>Size</clr-dg-column>
+  <clr-dg-column>Location</clr-dg-column>
+  <clr-dg-column>Histology</clr-dg-column>
+  <clr-dg-column>Num. Recordings</clr-dg-column>
+
+  <clr-dg-row *ngFor="let polyp of polyps" clrDgItem="polyp">
+    <clr-dg-cell>{{polyp.exploration.title}}</clr-dg-cell>
+    <clr-dg-cell>{{polyp.name}}</clr-dg-cell>
+    <clr-dg-cell>{{polyp.size}}</clr-dg-cell>
+    <clr-dg-cell>{{polyp.location}}</clr-dg-cell>
+    <clr-dg-cell>{{polyp.histology.polypType}}</clr-dg-cell>
+    <clr-dg-cell>{{polyp.polypRecordings.length}}</clr-dg-cell>
+  </clr-dg-row>
+  <clr-dg-footer>
+    <div class="datagrid-foot-description" *ngIf="paginationTotalItems > 0">
+      <label for="page-to-go">Go to page: </label>
+      <input type="text" class="input-page" id="page-to-go" name="pageToGo"
+             (keyup)="pageChangeEvent.next($event.target.value)"
+             [(ngModel)]="currentPage" #pageToGoPagination="ngModel"
+             [readonly]="loading"/>
+    </div>
+
+    <clr-dg-pagination #pagination [clrDgPageSize]="(pageSize > paginationTotalItems) ? paginationTotalItems : pageSize"
+                       [clrDgTotalItems]="paginationTotalItems" [(clrDgPage)]="currentPage">
+      <label *ngIf="paginationTotalItems > 0">
+        {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{paginationTotalItems}} polyps
+      </label>
+    </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>
