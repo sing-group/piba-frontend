@@ -28,6 +28,8 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+.npmrc
+/bak
 
 # e2e
 /e2e/*.js

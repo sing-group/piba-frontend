@@ -1,7 +1,7 @@
 {
   "name": "@piba/frontend",
   "description": "PIBA - Polyp Image Bank",
-  "version": "0.1.0-alpha.274",
+  "version": "0.1.0-alpha.275",
   "license": "GPLv3",
   "author": {
     "name": "Miguel Reboiro-Jato",
@@ -16,18 +16,23 @@
     "Eloy Sánchez Hernández",
     "Laura Rivas Moral",
     "Manuel Puga Jiménez de Azcárate",
-    "Joaquín Cubiella Fernández"
+    "Joaquín Cubiella Fernández",
+    "Hugo López-Fernández",
+    "Silvia Rodríguez Iglesias",
+    "Fernando Campos Tato"
   ],
   "repository": "https://dev.sing-group.org/gitlab/polydeep/piba-frontend",
-  "scripts": {
-    "ng": "./node_modules/@angular/cli/bin/ng",
-    "start": "./node_modules/@angular/cli/bin/ng serve --open",
-    "build": "./node_modules/@angular/cli/bin/ng build --prod",
-    "test": "./node_modules/@angular/cli/bin/ng test",
-    "lint": "./node_modules/@angular/cli/bin/ng lint",
-    "e2e": "./node_modules/@angular/cli/bin/ng e2e"
+  "publishConfig": {
+    "registry": "https://maven.sing-group.org/repository/npm-snapshots/"
   },
-  "private": true,
+  "scripts": {
+    "ng": "./node_modules/.bin/ng",
+    "start": "./node_modules/.bin/ng serve --open",
+    "build-prod": "./node_modules/.bin/ng build --prod /piba/",
+    "test": "./node_modules/.bin/ng test",
+    "lint": "./node_modules/.bin/ng lint",
+    "e2e": "./node_modules/.bin/ng e2e"
+  },
   "files": [
     "dist"
   ],
