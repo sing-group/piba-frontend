@@ -40,6 +40,7 @@ import {ImageUploadInfo} from './entities/ImageUploadInfo';
 import {PolypsService} from './polyps.service';
 import {Polyp} from '../models/Polyp';
 import {ImagesInGalleryInfo} from './entities/ImagesInGalleryInfo';
+import {ImageFilter} from '../models/ImageFilter';
 
 @Injectable({
   providedIn: 'root'
@@ -126,10 +127,10 @@ export class ImagesService {
     return this.http.delete(`${environment.restApi}/image/${id}/polyplocation`);
   }
 
-  getImagesByGallery(gallery: Gallery, page: number, pageSize: number, filter: string): Observable<ImagePage> {
-    const withLocation = filter !== 'not_located';
+  getImagesByGallery(gallery: Gallery, page: number, pageSize: number, filter: ImageFilter = ImageFilter.ALL): Observable<ImagePage> {
+    const withLocation = filter !== ImageFilter.UNLOCATED;
     return this.http.get<ImageInfo[]>
-    (`${environment.restApi}/image?gallery_id=${gallery.id}&page=${page}&pageSize=${pageSize}&filter=${filter}`,
+    (`${environment.restApi}/image?gallery_id=${gallery.id}&page=${page}&pageSize=${pageSize}&filter=${ImageFilter[filter]}`,
       {observe: 'response'})
       .pipe(
         concatMap(response => {
@@ -157,9 +158,9 @@ export class ImagesService {
       );
   }
 
-  getImagesIdentifiersByGallery(gallery: Gallery, filter: string): Observable<ImagesInGalleryInfo> {
+  getImagesIdentifiersByGallery(gallery: Gallery, filter: ImageFilter = ImageFilter.ALL): Observable<ImagesInGalleryInfo> {
     return this.http.get<IdAndUri[]>
-    (`${environment.restApi}/image/id?gallery_id=${gallery.id}&filter=${filter}`, {observe: 'response'})
+    (`${environment.restApi}/image/id?gallery_id=${gallery.id}&filter=${ImageFilter[filter]}`, {observe: 'response'})
       .pipe(
         concatMap(response => {
             const ids = [];

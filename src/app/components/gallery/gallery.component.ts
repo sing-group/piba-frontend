@@ -34,6 +34,7 @@ import {NotificationService} from '../../modules/notification/services/notificat
 import {Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 import {Location} from '@angular/common';
+import {ImageFilter} from '../../models/ImageFilter';
 
 @Component({
   selector: 'app-gallery',
@@ -48,7 +49,7 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
   pageSize = 12;
   pageLength = 0;
   totalImages = -1;
-  filter = 'all';
+  filter = ImageFilter.ALL;
   locatedImages: number;
   imagesWithPolyp: number;
   loading = false;
@@ -88,7 +89,8 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
       this.getImages();
     });
 
-    this.filter = this.route.snapshot.queryParamMap.get('filter') == null ? 'all' : this.route.snapshot.queryParamMap.get('filter');
+    this.filter = this.route.snapshot.queryParamMap.get('filter') == null
+      ? ImageFilter.ALL : ImageFilter[this.route.snapshot.queryParamMap.get('filter')];
     this.showPolypLocation = this.route.snapshot.queryParamMap.get('show_location') == null ? true :
       this.route.snapshot.queryParamMap.get('show_location') === 'true';
   }

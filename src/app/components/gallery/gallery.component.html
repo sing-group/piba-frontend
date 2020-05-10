@@ -46,7 +46,7 @@
 
   <div *ngIf="imagesWithPolyp > 0" class="row progress-margin">
     <div class="col-xs-12">
-      <h5>Polyp location progress: {{locatedImages}} of {{imagesWithPolyp}} ({{(locatedImages*100)/imagesWithPolyp |
+      <h5>Polyp location progress: {{locatedImages}} of {{totalImages}} ({{(locatedImages*100)/totalImages |
         number:'.0-1'}}%)</h5>
       <div class="progress success">
         <progress max="{{imagesWithPolyp}}" value="{{locatedImages}}"></progress>
@@ -62,10 +62,10 @@
       </clr-checkbox>
       <div class="clr-select-wrapper">
         <select class="clr-select select-margin" [(ngModel)]="filter" (change)="filterChange()">
-          <option value="all">All</option>
-          <option value="located">Located</option>
-          <option value="not_located">Not Located</option>
-          <option value="not_located_with_polyp">Not Located With Polyp</option>
+          <option value="ALL">All</option>
+          <option value="LOCATED">Located</option>
+          <option value="UNLOCATED">Not Located</option>
+          <option value="UNLOCATED_WITH_POLYP">Not Located With Polyp</option>
         </select>
       </div>
     </div>

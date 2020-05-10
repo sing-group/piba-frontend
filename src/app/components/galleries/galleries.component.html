@@ -64,18 +64,17 @@
 
   <clr-dg-column [clrDgField]="'title'" [clrDgSortOrder]="ascOrder">Title</clr-dg-column>
   <clr-dg-column>Description</clr-dg-column>
-  <clr-dg-column [clrDgField]="'imagesWithPolyp'">Images with polyp</clr-dg-column>
-  <clr-dg-column [clrDgField]="'locatedPercentage'">Percentage of located polyps</clr-dg-column>
+  <clr-dg-column [clrDgField]="'imagesLocated'">Images located</clr-dg-column>
   <clr-dg-column [clrDgField]="'totalImages'">Total images</clr-dg-column>
+  <clr-dg-column [clrDgField]="'locatedPercentage'">% of images located</clr-dg-column>
   <clr-dg-column>Actions</clr-dg-column>
 
   <clr-dg-row *clrDgItems="let gallery of galleriesData" [clrDgItem]="gallery">
-
     <clr-dg-cell>{{gallery.title}}</clr-dg-cell>
     <clr-dg-cell>{{gallery.description}}</clr-dg-cell>
-    <clr-dg-cell>{{gallery.imagesWithPolyp}}</clr-dg-cell>
-    <clr-dg-cell>{{gallery.locatedPercentage | number:'.0-1'}}%</clr-dg-cell>
+    <clr-dg-cell>{{gallery.imagesLocated}}</clr-dg-cell>
     <clr-dg-cell>{{gallery.totalImages}}</clr-dg-cell>
+    <clr-dg-cell>{{gallery.locatedPercentage | number:'.0-1'}}%</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-link btn-icon">
         <button class="btn" routerLink="/gallery/{{gallery.id}}">
@@ -110,10 +109,10 @@
           <label class="required">Filter</label>
           <div class="select">
             <select id="filter" name="filter" [(ngModel)]="filter">
-              <option value="all">All</option>
-              <option value="located">Located</option>
-              <option value="not_located">Not Located</option>
-              <option value="not_located_with_polyp">Not Located With Polyp</option>
+              <option value="ALL">All</option>
+              <option value="LOCATED">Located</option>
+              <option value="UNLOCATED">Not Located</option>
+              <option value="UNLOCATED_WITH_POLYP">Not Located With Polyp</option>
             </select>
           </div>
           <div *ngIf="getNumberOfImagesAccordingToFilter() == 0" class="alert alert-danger not-margin-top">
@@ -131,7 +130,7 @@
       <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
       <a type="button" class="btn btn-primary" id="download-zip" target="_blank" href=""
          [class.disabled]="getNumberOfImagesAccordingToFilter() == 0"
-         [class.not-allowed]="getNumberOfImagesAccordingToFilter() == 0" (click)="downloadGalley()">
+         [class.not-allowed]="getNumberOfImagesAccordingToFilter() == 0" (click)="downloadGallery()">
         Download
       </a>
     </div>

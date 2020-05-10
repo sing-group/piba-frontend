@@ -34,6 +34,7 @@ import {Location} from '@angular/common';
 import {Adenoma, PolypType, SSA, TSA} from '../../models/PolypHistology';
 import {AuthenticationService} from '../../services/authentication.service';
 import {Role} from '../../models/User';
+import {ImageFilter} from '../../models/ImageFilter';
 
 @Component({
   selector: 'app-image',
@@ -76,7 +77,7 @@ export class ImageComponent implements OnInit {
   type: string;
   dysplasingGrade: string;
 
-  filter: string;
+  filter: ImageFilter;
   showPolypLocation: boolean;
 
   private downloadButton: HTMLLinkElement;
@@ -104,7 +105,7 @@ export class ImageComponent implements OnInit {
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     const gallery_id = this.route.snapshot.paramMap.get('gallery_id');
-    this.filter = this.route.snapshot.queryParamMap.get('filter');
+    this.filter = ImageFilter[this.route.snapshot.queryParamMap.get('filter')];
     this.showPolypLocation = this.route.snapshot.queryParamMap.get('show_location') === 'true';
 
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -294,8 +295,8 @@ export class ImageComponent implements OnInit {
   }
 
   private changeURLToCurrentImage() {
-    this.location.go('gallery/' + this.gallery.id + '/image/' + this.image.id + '?filter=' + this.filter + '&show_location='
-      + this.showPolypLocation);
+    this.location.go(`gallery/${this.gallery.id}/image/${this.image.id}?filter=${ImageFilter[this.filter]}` +
+      `&show_location=${this.showPolypLocation}`);
   }
 
   private paintLocationIfAvailable() {
@@ -431,8 +432,8 @@ export class ImageComponent implements OnInit {
     if (isNaN(page)) {
       page = 1;
     }
-    this.router.navigateByUrl('gallery/' + this.gallery.id + '?page=' + page + '&filter=' + this.filter + '&show_location='
-      + this.showPolypLocation);
+    this.router.navigateByUrl(`gallery/${this.gallery.id}?page=${page}&filter=${ImageFilter[this.filter]}` +
+      `&show_location=${this.showPolypLocation}`);
   }
 
   continueWithoutSavingLocation() {

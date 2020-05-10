@@ -1,7 +1,7 @@
 {
   "name": "@piba/frontend",
   "description": "PIBA - Polyp Image Bank",
-  "version": "0.1.0-alpha.275",
+  "version": "0.1.0-alpha.276",
   "license": "GPLv3",
   "author": {
     "name": "Miguel Reboiro-Jato",
@@ -28,7 +28,7 @@
   "scripts": {
     "ng": "./node_modules/.bin/ng",
     "start": "./node_modules/.bin/ng serve --open",
-    "build-prod": "./node_modules/.bin/ng build --prod /piba/",
+    "build-prod": "./node_modules/.bin/ng build --prod --base-href /piba/",
     "test": "./node_modules/.bin/ng test",
     "lint": "./node_modules/.bin/ng lint",
     "e2e": "./node_modules/.bin/ng e2e"
