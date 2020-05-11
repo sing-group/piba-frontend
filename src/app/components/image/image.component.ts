@@ -68,7 +68,7 @@ export class ImageComponent implements OnInit {
   warningMessageWithoutSavingLocation = false;
   warningMessageRemovingLocation = false;
   selectedToRight = true;
-  options = ['Not polyp', 'Bad quality', 'Others'];
+  options = ['Not dataset', 'Bad quality', 'Others'];
   selected: string;
   observationToRemove = null;
   observationToRemoveStartsWith = null;
@@ -165,8 +165,8 @@ export class ImageComponent implements OnInit {
         this.height = mousey - this.last_mousey;
         this.draw();
       } else if (this.mousedown && this.isPolypEmpty() && this.isEndoscopist()) {
-        this.notificationService.error('Impossible to draw a location on an image that does not have an associated polyp',
-          'Image without polyp');
+        this.notificationService.error('Impossible to draw a location on an image that does not have an associated dataset',
+          'Image without dataset');
       }
     });
 
@@ -186,7 +186,7 @@ export class ImageComponent implements OnInit {
     this.imagesService.createLocation(this.image.id, polypLocation).subscribe((location) => {
       this.isLoading = false;
       this.image.polypLocation = location;
-      this.notificationService.success('Location of the polyp stored correctly', 'Location of the polyp stored');
+      this.notificationService.success('Location of the dataset stored correctly', 'Location of the dataset stored');
       this.reset();
       this.checkIfIsLastImage();
       if (this.isLastImage) {
@@ -265,7 +265,7 @@ export class ImageComponent implements OnInit {
     this.imagesService.deleteLocation(id).subscribe(() => {
         this.isLoading = false;
         this.image.polypLocation = null;
-        this.notificationService.success('The location of the polyp has been correctly removed ', 'Polyp location removed');
+        this.notificationService.success('The location of the dataset has been correctly removed ', 'Polyp location removed');
       }
     );
   }
@@ -353,10 +353,10 @@ export class ImageComponent implements OnInit {
 
   isLocationSaved(): boolean {
     const locationSaved = this.image.polypLocation;
-    // if polyp is selected
+    // if dataset is selected
     if (this.isEndoscopist() && (this.last_mousex != null || this.last_mousey != null ||
       this.width != null || this.height != null) && !this.isPolypEmpty() && this.showPolypLocation) {
-      // if polyp wasn't saved
+      // if dataset wasn't saved
       if (locationSaved == null || (this.last_mousex !== locationSaved.x || this.last_mousey !== locationSaved.y ||
         this.width !== locationSaved.width || this.height !== locationSaved.height)) {
         return false;
@@ -465,7 +465,7 @@ export class ImageComponent implements OnInit {
   }
 
   private repaintImage() {
-    // It allows/does not allow to use the cursor if the image has/does not have a polyp
+    // It allows/does not allow to use the cursor if the image has/does not have a dataset
     if (this.isPolypEmpty() || !this.isEndoscopist()) {
       this.canvas.style.cursor = 'not-allowed';
     } else {

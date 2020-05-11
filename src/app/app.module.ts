@@ -63,9 +63,12 @@ import {ImageComponent} from './components/image/image.component';
 import {ProfileComponent} from './components/profile/profile.component';
 import {GalleriesComponent} from './components/galleries/galleries.component';
 import {ModifiersComponent} from './components/modifiers/modifiers.component';
-import {VideoZoneEditorComponent} from './components/video-zone-editor/video-zone-editor.component';
 import {ConfirmationModalComponent} from './components/confirmation-modal/confirmation-modal.component';
+import {VideoZoneEditorComponent} from './components/video-zone-editor/video-zone-editor.component';
 import {PolypsComponent} from './components/polyps/polyps.component';
+import {PolypDatasetsComponent} from './components/polyp-datasets/polyp-datasets.component';
+import {PolypDatasetsService} from './services/polyp-datasets.service';
+import { PolypDatasetComponent } from './components/polyp-dataset/polyp-dataset.component';
 
 @NgModule({
   declarations: [
@@ -92,7 +95,9 @@ import {PolypsComponent} from './components/polyps/polyps.component';
     DropdownFilterPipe,
     VideoZoneEditorComponent,
     ConfirmationModalComponent,
-    PolypsComponent
+    PolypsComponent,
+    PolypDatasetsComponent,
+    PolypDatasetComponent
   ],
   imports: [
     BrowserModule,
@@ -110,6 +115,7 @@ import {PolypsComponent} from './components/polyps/polyps.component';
   ],
   providers: [
     PolypsService,
+    PolypDatasetsService,
     VideosService,
     TimePipe,
     ExplorationsService,

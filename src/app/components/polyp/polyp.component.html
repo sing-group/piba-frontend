@@ -356,7 +356,7 @@
 </form>
 <!-- Delete confirmation modal -->
 <app-delete-confirmation *ngIf="deletingPolyp"
-                         [modelName]="'polyp'" [id]="polyp.id" [name]="polyp.name"
+                         [modelName]="'dataset'" [id]="polyp.id" [name]="polyp.name"
                          [message]="'Are you sure you want to confirm <b>' + polyp.name + '</b>? All polyp ' +
                          'recordings and images associated with this polyp will also be deleted.' +
                          '<div class=\'warning\'>This action is permanent and cannot be undone.</div>'"

@@ -22,6 +22,28 @@
   ~  along with this program. If not, see <http://www.gnu.org/licenses/>.
   -->
 
+<div class="card" *ngIf="polypDataset">
+  <div class="card-header">
+    Polyp dataset data
+  </div>
+  <div class="card-block">
+    <section class="form-block">
+      <table class="table">
+        <tbody>
+        <tr>
+          <td class="left">Title</td>
+          <td class="left">{{polypDataset.title}}</td>
+        </tr>
+        <tr>
+          <td class="left">Polyps</td>
+          <td class="left">{{polypDataset.polyps.length}}</td>
+        </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</div>
+
 <clr-datagrid (clrDgRefresh)="refreshPage($event)" [clrDgLoading]="loading">
 
   <clr-dg-placeholder>We couldn't find any polyps!</clr-dg-placeholder>

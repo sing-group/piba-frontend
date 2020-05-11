@@ -20,6 +20,7 @@
 .vscode
 
 # misc
+/bak
 /.sass-cache
 /connect.lock
 /coverage

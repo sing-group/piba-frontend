@@ -70,65 +70,7 @@ export class PolypsService {
   constructor(private http: HttpClient) {
   }
 
-  createPolyp(polyp: Polyp): Observable<Polyp> {
-    const polypInfo: PolypInfo = this.toPolypInfo(polyp);
-
-    return this.http.post<PolypInfo>(`${environment.restApi}/polyp`, polypInfo)
-      .pipe(
-        map(this.mapPolypInfo.bind(this))
-      );
-  }
-
-  getPolyp(uuid: string): Observable<Polyp> {
-    return this.http.get<PolypInfo>(`${environment.restApi}/polyp/${uuid}`)
-      .pipe(
-        map(this.mapPolypInfo.bind(this))
-      );
-  }
-
-  editPolyp(polyp: Polyp): Observable<Polyp> {
-    const polypInfo: PolypInfo = this.toPolypInfo(polyp);
-
-    return this.http.put<PolypInfo>(`${environment.restApi}/polyp/${polypInfo.id}`, polypInfo)
-      .pipe(
-        map(this.mapPolypInfo.bind(this))
-      );
-  }
-
-  getPolypsOfExploration(exploration_id: string): Observable<Polyp[]> {
-    return this.http.get<Polyp[]>(`${environment.restApi}/exploration/${exploration_id}/polyps`)
-      .pipe(
-        map(polypsInfo => polypsInfo.map(this.mapPolypInfo.bind(this)))
-      );
-  }
-
-  getPolyps(page: number, pageSize: number): Observable<PolypPage> {
-    const params = new HttpParams()
-      .append('page', page.toString())
-      .append('pageSize', pageSize.toString());
-
-    return this.http.get<PolypInfo[]>(`${environment.restApi}/polyp`, {params, observe: 'response'})
-      .pipe(
-        map(response => ({
-          totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
-          polyps: response.body.map(polypInfo => this.mapPolypInfo(polypInfo))
-        }))
-      );
-  }
-
-  delete(uuid: string) {
-    return this.http.delete((`${environment.restApi}/polyp/` + uuid));
-  }
-
-  editPolyps(polyps: Polyp[]): Observable<Polyp[]> {
-    const polypsInfo: PolypInfo[] = polyps.map(polyp => this.toPolypInfo(polyp));
-
-    return this.http.put<Polyp[]>(`${environment.restApi}/polyp/`, polypsInfo).pipe(
-      map(polypsInfoReturned => polypsInfoReturned.map(this.mapPolypInfo.bind(this)))
-    );
-  }
-
-  private mapPolypInfo(polypInfo: PolypInfo): Polyp {
+  public static mapPolypInfo(polypInfo: PolypInfo): Polyp {
     return {
       id: polypInfo.id,
       name: polypInfo.name,
@@ -139,7 +81,7 @@ export class PolypsService {
       lst: LST[polypInfo.lst],
       parisPrimary: PARIS[polypInfo.parisPrimary],
       parisSecondary: PARIS[polypInfo.parisSecondary],
-      histology: this.mapPolypHistologyInfo(polypInfo.histology),
+      histology: PolypsService.mapPolypHistologyInfo(polypInfo.histology),
       observation: polypInfo.observation,
       polypRecordings: [],
       exploration: typeof polypInfo.exploration === 'string' ? polypInfo.exploration : polypInfo.exploration.id,
@@ -147,7 +89,7 @@ export class PolypsService {
     };
   }
 
-  private mapPolypHistologyInfo(polypHistologyInfo: PolypHistologyInfo): PolypHistology {
+  private static mapPolypHistologyInfo(polypHistologyInfo: PolypHistologyInfo): PolypHistology {
     if (isAdenomaInfo(polypHistologyInfo)) {
       return new Adenoma(
         AdenomaType[polypHistologyInfo.adenomaType],
@@ -182,6 +124,64 @@ export class PolypsService {
       return new NoHistology();
     }
     return new PolypHistology(null);
+  }
+
+  createPolyp(polyp: Polyp): Observable<Polyp> {
+    const polypInfo: PolypInfo = this.toPolypInfo(polyp);
+
+    return this.http.post<PolypInfo>(`${environment.restApi}/polyp`, polypInfo)
+      .pipe(
+        map(PolypsService.mapPolypInfo)
+      );
+  }
+
+  getPolyp(uuid: string): Observable<Polyp> {
+    return this.http.get<PolypInfo>(`${environment.restApi}/polyp/${uuid}`)
+      .pipe(
+        map(PolypsService.mapPolypInfo)
+      );
+  }
+
+  editPolyp(polyp: Polyp): Observable<Polyp> {
+    const polypInfo: PolypInfo = this.toPolypInfo(polyp);
+
+    return this.http.put<PolypInfo>(`${environment.restApi}/polyp/${polypInfo.id}`, polypInfo)
+      .pipe(
+        map(PolypsService.mapPolypInfo)
+      );
+  }
+
+  editPolyps(polyps: Polyp[]): Observable<Polyp[]> {
+    const polypsInfo: PolypInfo[] = polyps.map(polyp => this.toPolypInfo(polyp));
+
+    return this.http.put<PolypInfo[]>(`${environment.restApi}/polyp/`, polypsInfo).pipe(
+      map(polypsInfoReturned => polypsInfoReturned.map(PolypsService.mapPolypInfo))
+    );
+  }
+
+  getPolypsOfExploration(explorationId: string): Observable<Polyp[]> {
+    return this.http.get<PolypInfo[]>(`${environment.restApi}/exploration/${explorationId}/polyps`)
+      .pipe(
+        map(polypsInfo => polypsInfo.map(PolypsService.mapPolypInfo))
+      );
+  }
+
+  getPolyps(page: number, pageSize: number): Observable<PolypPage> {
+    const params = new HttpParams()
+      .append('page', page.toString())
+      .append('pageSize', pageSize.toString());
+
+    return this.http.get<PolypInfo[]>(`${environment.restApi}/polyp`, {params, observe: 'response'})
+      .pipe(
+        map(response => ({
+          totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
+          polyps: response.body.map(PolypsService.mapPolypInfo)
+        }))
+      );
+  }
+
+  delete(uuid: string) {
+    return this.http.delete((`${environment.restApi}/polyp/` + uuid));
   }
 
   private toPolypInfo(polyp: Polyp): PolypInfo {
@@ -229,5 +229,4 @@ export class PolypsService {
       }
     }
   }
-
 }

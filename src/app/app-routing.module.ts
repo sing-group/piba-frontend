@@ -38,6 +38,8 @@ import {ProfileComponent} from './components/profile/profile.component';
 import {GalleriesComponent} from './components/galleries/galleries.component';
 import {ModifiersComponent} from './components/modifiers/modifiers.component';
 import {PolypsComponent} from './components/polyps/polyps.component';
+import {PolypDatasetsComponent} from './components/polyp-datasets/polyp-datasets.component';
+import {PolypDatasetComponent} from './components/polyp-dataset/polyp-dataset.component';
 
 const routes: Routes = [
   {
@@ -48,6 +50,12 @@ const routes: Routes = [
   },
   {
     path: 'polyps', component: PolypsComponent, canActivate: [AuthGuard]
+  },
+  {
+    path: 'polypdatasets', component: PolypDatasetsComponent, canActivate: [AuthGuard]
+  },
+  {
+    path: 'polypdatasets/:id', component: PolypDatasetComponent, canActivate: [AuthGuard]
   },
   {
     path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]

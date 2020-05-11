@@ -24,24 +24,31 @@
 
 <clr-datagrid (clrDgRefresh)="refreshPage($event)" [clrDgLoading]="loading">
 
-  <clr-dg-placeholder>We couldn't find any polyps!</clr-dg-placeholder>
+  <clr-dg-placeholder>We couldn't find any polyp datasets!</clr-dg-placeholder>
 
-  <clr-dg-column>Exploration</clr-dg-column>
-  <clr-dg-column>Name</clr-dg-column>
-  <clr-dg-column>Size</clr-dg-column>
-  <clr-dg-column>Location</clr-dg-column>
-  <clr-dg-column>Histology</clr-dg-column>
-  <clr-dg-column>Num. Recordings</clr-dg-column>
+  <clr-dg-column>Dataset</clr-dg-column>
+  <clr-dg-column>Polyps</clr-dg-column>
+  <clr-dg-column>Actions</clr-dg-column>
 
-  <clr-dg-row *ngFor="let polyp of polyps" clrDgItem="polyp">
-    <clr-dg-cell>
-      <a [routerLink]="'/explorations/' + polyp.exploration.id">{{polyp.exploration.title}}</a>
+  <clr-dg-row *ngFor="let dataset of polypDatasets" clrDgItem="dataset">
+    <clr-dg-cell>{{dataset.title}}</clr-dg-cell>
+    <clr-dg-cell>{{dataset.polyps.length}}</clr-dg-cell>
+    <clr-dg-cell class="btn-cell-datagrid">
+      <div class="btn-group btn-link btn-icon">
+        <button class="btn" routerLink="/polypdatasets/{{dataset.id}}">
+          <clr-icon shape="eye"></clr-icon>
+          <span class="clr-icon-title">View</span>
+        </button>
+        <button class="btn" (click)="edit(dataset)">
+          <clr-icon shape="cog"></clr-icon>
+          <span class="clr-icon-title">Settings</span>
+        </button>
+        <button class="btn" (click)="remove(dataset)">
+          <clr-icon shape="trash"></clr-icon>
+          <span class="clr-icon-title">Delete</span>
+        </button>
+      </div>
     </clr-dg-cell>
-    <clr-dg-cell>{{polyp.name}}</clr-dg-cell>
-    <clr-dg-cell>{{polyp.size}}</clr-dg-cell>
-    <clr-dg-cell>{{polyp.location}}</clr-dg-cell>
-    <clr-dg-cell>{{polyp.histology.polypType}}</clr-dg-cell>
-    <clr-dg-cell>{{polyp.polypRecordings.length}}</clr-dg-cell>
   </clr-dg-row>
   <clr-dg-footer>
     <div class="datagrid-foot-description" *ngIf="paginationTotalItems > 0">
@@ -55,7 +62,7 @@
     <clr-dg-pagination #pagination [clrDgPageSize]="(pageSize > paginationTotalItems) ? paginationTotalItems : pageSize"
                        [clrDgTotalItems]="paginationTotalItems" [(clrDgPage)]="currentPage">
       <label *ngIf="paginationTotalItems > 0">
-        {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{paginationTotalItems}} polyps
+        {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{paginationTotalItems}} polyp datasets
       </label>
     </clr-dg-pagination>
   </clr-dg-footer>

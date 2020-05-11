@@ -23,23 +23,26 @@
  */
 
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {PolypsService} from '../../services/polyps.service';
-import {ClrDatagridPagination, ClrDatagridStateInterface} from '@clr/angular';
 import {Polyp} from '../../models/Polyp';
+import {ClrDatagridPagination, ClrDatagridStateInterface} from '@clr/angular';
 import {Subject} from 'rxjs/internal/Subject';
-import {concatMap, debounceTime, distinctUntilChanged, map, tap} from 'rxjs/operators';
-import {NotificationService} from '../../modules/notification/services/notification.service';
-import {forkJoin} from 'rxjs/internal/observable/forkJoin';
+import {PolypDataset} from '../../models/PolypDataset';
 import {ExplorationsService} from '../../services/explorations.service';
+import {NotificationService} from '../../modules/notification/services/notification.service';
 import {PolypRecordingsService} from '../../services/polyprecordings.service';
+import {concatMap, debounceTime, distinctUntilChanged, map} from 'rxjs/operators';
+import {PolypDatasetsService} from '../../services/polyp-datasets.service';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
-  selector: 'app-polyps',
-  templateUrl: './polyps.component.html',
-  styleUrls: ['./polyps.component.css']
+  selector: 'app-polyp-dataset',
+  templateUrl: './polyp-dataset.component.html',
+  styleUrls: ['./polyp-dataset.component.css']
 })
-export class PolypsComponent implements OnInit {
+export class PolypDatasetComponent implements OnInit {
   // Data
+  polypDataset: PolypDataset;
+  id: string;
   polyps: Polyp[] = [];
 
   // Status
@@ -55,11 +58,17 @@ export class PolypsComponent implements OnInit {
   constructor(
     private readonly explorationsService: ExplorationsService,
     private readonly notificationService: NotificationService,
-    private readonly polypsService: PolypsService,
-    private readonly polypRecordingsService: PolypRecordingsService
+    private readonly polypDatasetsService: PolypDatasetsService,
+    private readonly polypRecordingsService: PolypRecordingsService,
+    private readonly route: ActivatedRoute,
   ) { }
 
   ngOnInit() {
+    this.id = this.route.snapshot.paramMap.get('id');
+
+    this.polypDatasetsService.getPolypDataset(this.id)
+      .subscribe(polypDataset => this.polypDataset = polypDataset);
+
     this.pageChangeEvent.pipe(
       debounceTime(500),
       distinctUntilChanged()
@@ -101,7 +110,7 @@ export class PolypsComponent implements OnInit {
 
   private getPagePolyps() {
     this.loading = true;
-    this.polypsService.getPolyps(this.currentPage, this.pageSize)
+    this.polypDatasetsService.getPolyps(this.id, this.currentPage, this.pageSize)
       .pipe(
         concatMap(polypPage => this.explorationsService.addExplorationsToPolyps(polypPage.polyps)
           .pipe(
@@ -120,12 +129,12 @@ export class PolypsComponent implements OnInit {
           )
         )
       )
-    .subscribe(polypsPage => {
-      console.log(polypsPage);
-      this.polyps = polypsPage.polyps;
-      this.paginationTotalItems = polypsPage.totalItems;
-      this.loading = false;
-    });
+      .subscribe(polypsPage => {
+        console.log(polypsPage);
+        this.polyps = polypsPage.polyps;
+        this.paginationTotalItems = polypsPage.totalItems;
+        this.loading = false;
+      });
   }
 
 }

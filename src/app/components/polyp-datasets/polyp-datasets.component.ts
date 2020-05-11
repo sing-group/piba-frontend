@@ -23,24 +23,21 @@
  */
 
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {PolypsService} from '../../services/polyps.service';
 import {ClrDatagridPagination, ClrDatagridStateInterface} from '@clr/angular';
-import {Polyp} from '../../models/Polyp';
 import {Subject} from 'rxjs/internal/Subject';
-import {concatMap, debounceTime, distinctUntilChanged, map, tap} from 'rxjs/operators';
 import {NotificationService} from '../../modules/notification/services/notification.service';
-import {forkJoin} from 'rxjs/internal/observable/forkJoin';
-import {ExplorationsService} from '../../services/explorations.service';
-import {PolypRecordingsService} from '../../services/polyprecordings.service';
+import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import {PolypDataset} from '../../models/PolypDataset';
+import {PolypDatasetsService} from '../../services/polyp-datasets.service';
 
 @Component({
-  selector: 'app-polyps',
-  templateUrl: './polyps.component.html',
-  styleUrls: ['./polyps.component.css']
+  selector: 'app-polyp-datasets',
+  templateUrl: './polyp-datasets.component.html',
+  styleUrls: ['./polyp-datasets.component.css']
 })
-export class PolypsComponent implements OnInit {
+export class PolypDatasetsComponent implements OnInit {
   // Data
-  polyps: Polyp[] = [];
+  polypDatasets: PolypDataset[] = [];
 
   // Status
   loading = false;
@@ -53,10 +50,8 @@ export class PolypsComponent implements OnInit {
   pageChangeEvent = new Subject<string>();
 
   constructor(
-    private readonly explorationsService: ExplorationsService,
     private readonly notificationService: NotificationService,
-    private readonly polypsService: PolypsService,
-    private readonly polypRecordingsService: PolypRecordingsService
+    private readonly polypDatasetsService: PolypDatasetsService
   ) { }
 
   ngOnInit() {
@@ -72,7 +67,7 @@ export class PolypsComponent implements OnInit {
     });
 
     this.pagination.page.current = 1;
-    this.getPagePolyps();
+    this.getPagePolypDatasets();
   }
 
   private isValidPage(page: string): boolean {
@@ -95,37 +90,25 @@ export class PolypsComponent implements OnInit {
   refreshPage(state: ClrDatagridStateInterface) {
     if (state.page !== undefined) {
       this.pagination.page.current = (state.page.from / state.page.size) + 1;
-      this.getPagePolyps();
+      this.getPagePolypDatasets();
     }
   }
 
-  private getPagePolyps() {
+  private getPagePolypDatasets() {
     this.loading = true;
-    this.polypsService.getPolyps(this.currentPage, this.pageSize)
-      .pipe(
-        concatMap(polypPage => this.explorationsService.addExplorationsToPolyps(polypPage.polyps)
-          .pipe(
-            map(polyps => {
-              polypPage.polyps = polyps;
-              return polypPage;
-            })
-          )
-        ),
-        concatMap(polypPage => this.polypRecordingsService.addRecordingsToPolyps(polypPage.polyps)
-          .pipe(
-            map(polyps => {
-              polypPage.polyps = polyps;
-              return polypPage;
-            })
-          )
-        )
-      )
-    .subscribe(polypsPage => {
-      console.log(polypsPage);
-      this.polyps = polypsPage.polyps;
-      this.paginationTotalItems = polypsPage.totalItems;
-      this.loading = false;
-    });
+    this.polypDatasetsService.getPolypDatasets(this.currentPage, this.pageSize)
+      .subscribe(polypsPage => {
+        this.polypDatasets = polypsPage.polypDatasets;
+        this.paginationTotalItems = polypsPage.totalItems;
+        this.loading = false;
+      });
   }
 
+  remove(dataset: PolypDataset) {
+
+  }
+
+  edit(dataset: PolypDataset) {
+
+  }
 }
