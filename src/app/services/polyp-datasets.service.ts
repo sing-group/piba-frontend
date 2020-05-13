@@ -25,7 +25,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {environment} from '../../environments/environment';
-import {map} from 'rxjs/operators';
+import {concatMap, map} from 'rxjs/operators';
 import {Observable} from 'rxjs/internal/Observable';
 import {PolypDatasetPage} from './entities/PolypDatasetPage';
 import {PolypDatasetInfo} from './entities/PolypDatasetInfo';
@@ -33,10 +33,18 @@ import {PolypDataset} from '../models/PolypDataset';
 import {PolypInfo} from './entities/PolypInfo';
 import {PolypsService} from './polyps.service';
 import {PibaError} from '../modules/notification/entities';
+import {PolypRecordingInfo} from './entities/PolypRecordingInfo';
+import {PolypRecordingsService} from './polyprecordings.service';
+import {PolypPage} from './entities/PolypPage';
+import {PolypRecordingPage} from './entities/PolypRecordingPage';
+import {of} from 'rxjs/internal/observable/of';
 
 @Injectable()
 export class PolypDatasetsService {
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private polypRecordingsService: PolypRecordingsService
+  ) { }
 
   private static mapPolypDatasetInfo(polypInfo: PolypDatasetInfo): PolypDataset {
     const polyps: string[] = [];
@@ -82,7 +90,7 @@ export class PolypDatasetsService {
       );
   }
 
-  getPolyps(id: string, page: number, pageSize: number) {
+  getPolyps(id: string, page: number, pageSize: number): Observable<PolypPage> {
     const params = new HttpParams()
       .append('page', page.toString())
       .append('pageSize', pageSize.toString());
@@ -96,6 +104,28 @@ export class PolypDatasetsService {
         PibaError.throwOnError(
           'Error retrieving polyps in dataset',
           `Polyps in dataset '${id}' in page ${page} (page size: ${pageSize}) could not be retrieved.`
+        )
+      );
+  }
+
+  getPolypRecordings(id: string, page: number, pageSize: number): Observable<PolypRecordingPage> {
+    const params = new HttpParams()
+      .append('page', page.toString())
+      .append('pageSize', pageSize.toString());
+
+    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polypdataset/${id}/polyprecording`, {params, observe: 'response'})
+      .pipe(
+        concatMap(response =>
+          this.polypRecordingsService.fillMultiplePolypAndVideo(of(response.body)).pipe(
+            map(polypRecordingInfos => ({
+              totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
+              polypRecordings: polypRecordingInfos
+            }))
+          )
+        ),
+        PibaError.throwOnError(
+          'Error retrieving polyp recordings in dataset',
+          `Polyps recordings in dataset '${id}' in page ${page} (page size: ${pageSize}) could not be retrieved.`
         )
       );
   }

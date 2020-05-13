@@ -22,11 +22,9 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-.detail {
-  padding: 0;
-  width: 100%;
-}
+import {PolypRecording} from '../../models/PolypRecording';
 
-.detail ::ng-deep .datagrid-body {
-  min-height: 0;
+export interface PolypRecordingPage {
+  totalItems: number;
+  polypRecordings: PolypRecording[];
 }

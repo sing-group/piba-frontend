@@ -36,7 +36,7 @@
         </tr>
         <tr>
           <td class="left">Polyps</td>
-          <td class="left">{{polypDataset.polyps.length}}</td>
+          <td class="left">{{countPolyps()}}</td>
         </tr>
         </tbody>
       </table>
@@ -44,41 +44,118 @@
   </div>
 </div>
 
-<clr-datagrid (clrDgRefresh)="refreshPage($event)" [clrDgLoading]="loading">
+<clr-tabs>
 
-  <clr-dg-placeholder>We couldn't find any polyps!</clr-dg-placeholder>
+  <clr-tab>
+    <button clrTabLink>
+      Polyps
+    </button>
+    <clr-tab-content>
+      <clr-datagrid (clrDgRefresh)="refreshPolypsPage($event)" [clrDgLoading]="polypsLoading">
 
-  <clr-dg-column>Exploration</clr-dg-column>
-  <clr-dg-column>Name</clr-dg-column>
-  <clr-dg-column>Size</clr-dg-column>
-  <clr-dg-column>Location</clr-dg-column>
-  <clr-dg-column>Histology</clr-dg-column>
-  <clr-dg-column>Num. Recordings</clr-dg-column>
+        <clr-dg-placeholder>We couldn't find any polyps!</clr-dg-placeholder>
 
-  <clr-dg-row *ngFor="let polyp of polyps" clrDgItem="polyp">
-    <clr-dg-cell>
-      <a [routerLink]="'/explorations/' + polyp.exploration.id">{{polyp.exploration.title}}</a>
-    </clr-dg-cell>
-    <clr-dg-cell>{{polyp.name}}</clr-dg-cell>
-    <clr-dg-cell>{{polyp.size}}</clr-dg-cell>
-    <clr-dg-cell>{{polyp.location}}</clr-dg-cell>
-    <clr-dg-cell>{{polyp.histology.polypType}}</clr-dg-cell>
-    <clr-dg-cell>{{polyp.polypRecordings.length}}</clr-dg-cell>
-  </clr-dg-row>
-  <clr-dg-footer>
-    <div class="datagrid-foot-description" *ngIf="paginationTotalItems > 0">
-      <label for="page-to-go">Go to page: </label>
-      <input type="text" class="input-page" id="page-to-go" name="pageToGo"
-             (keyup)="pageChangeEvent.next($event.target.value)"
-             [(ngModel)]="currentPage" #pageToGoPagination="ngModel"
-             [readonly]="loading"/>
-    </div>
+        <clr-dg-column>Exploration</clr-dg-column>
+        <clr-dg-column>Name</clr-dg-column>
+        <clr-dg-column>Size</clr-dg-column>
+        <clr-dg-column>Location</clr-dg-column>
+        <clr-dg-column>Histology</clr-dg-column>
+        <clr-dg-column>Num. Recordings</clr-dg-column>
 
-    <clr-dg-pagination #pagination [clrDgPageSize]="(pageSize > paginationTotalItems) ? paginationTotalItems : pageSize"
-                       [clrDgTotalItems]="paginationTotalItems" [(clrDgPage)]="currentPage">
-      <label *ngIf="paginationTotalItems > 0">
-        {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{paginationTotalItems}} polyps
-      </label>
-    </clr-dg-pagination>
-  </clr-dg-footer>
-</clr-datagrid>
+        <clr-dg-row *ngFor="let polyp of polyps" clrDgItem="polyp">
+          <clr-dg-cell>
+            <a [routerLink]="'/explorations/' + polyp.exploration.id">{{polyp.exploration.title}}</a>
+          </clr-dg-cell>
+          <clr-dg-cell>{{polyp.name}}</clr-dg-cell>
+          <clr-dg-cell>{{polyp.size}}</clr-dg-cell>
+          <clr-dg-cell>{{polyp.location}}</clr-dg-cell>
+          <clr-dg-cell>{{polyp.histology.polypType}}</clr-dg-cell>
+          <clr-dg-cell>{{polyp.polypRecordings.length}}</clr-dg-cell>
+
+          <clr-dg-row-detail *clrIfExpanded>
+            <clr-datagrid class="datagrid-compact detail" title="Polyp recordings">
+              <clr-dg-placeholder>We couldn't find any polyp recordings!</clr-dg-placeholder>
+
+              <clr-dg-column>Video</clr-dg-column>
+              <clr-dg-column>Start</clr-dg-column>
+              <clr-dg-column>End</clr-dg-column>
+              <clr-dg-column>Duration</clr-dg-column>
+
+              <clr-dg-row *ngFor="let polypRecording of polyp.polypRecordings">
+                <clr-dg-cell>{{polypRecording.video.title}}</clr-dg-cell>
+                <clr-dg-cell>{{polypRecording.start | time}}</clr-dg-cell>
+                <clr-dg-cell>{{polypRecording.end | time}}</clr-dg-cell>
+                <clr-dg-cell>{{polypRecording.end - polypRecording.start | time}}</clr-dg-cell>
+              </clr-dg-row>
+            </clr-datagrid>
+          </clr-dg-row-detail>
+        </clr-dg-row>
+        <clr-dg-footer>
+          <div class="datagrid-foot-description" *ngIf="polypsPaginationTotalItems > 0">
+            <label for="polyp-page-to-go">Go to page: </label>
+            <input type="text" class="input-page" id="polyp-page-to-go" name="pageToGo"
+                   (keyup)="polypsPageChangeEvent.next($event.target.value)"
+                   [(ngModel)]="currentPolypsPage" #pageToGoPagination="ngModel"
+                   [readonly]="polypsLoading"/>
+          </div>
+
+          <clr-dg-pagination #polypsPagination
+                             [clrDgPageSize]="(polypsPageSize > polypsPaginationTotalItems) ? polypsPaginationTotalItems : polypsPageSize"
+                             [clrDgTotalItems]="polypsPaginationTotalItems" [(clrDgPage)]="currentPolypsPage">
+            <label *ngIf="polypsPaginationTotalItems > 0">
+              {{polypsPagination.firstItem + 1}} - {{polypsPagination.lastItem + 1}} of {{polypsPaginationTotalItems}} polyps
+            </label>
+          </clr-dg-pagination>
+        </clr-dg-footer>
+      </clr-datagrid>
+    </clr-tab-content>
+  </clr-tab>
+
+  <clr-tab>
+    <button clrTabLink>
+      Polyp recordings
+    </button>
+    <clr-tab-content *clrIfActive>
+      <clr-datagrid (clrDgRefresh)="refreshPolypRecordingsPage($event)" [clrDgLoading]="polypRecordingsLoading">
+        <clr-dg-placeholder>We couldn't find any polyp recordings!</clr-dg-placeholder>
+
+        <clr-dg-column>Exploration</clr-dg-column>
+        <clr-dg-column>Polyp</clr-dg-column>
+        <clr-dg-column>Video</clr-dg-column>
+        <clr-dg-column>Start</clr-dg-column>
+        <clr-dg-column>End</clr-dg-column>
+        <clr-dg-column>Duration</clr-dg-column>
+
+        <clr-dg-row *ngFor="let polypRecording of polypRecordings" clrDgItem="polypRecording">
+          <clr-dg-cell>
+            <a [routerLink]="'/explorations/' + polypRecording.polyp.exploration.id">
+              {{polypRecording.polyp.exploration.title}}
+            </a>
+          </clr-dg-cell>
+          <clr-dg-cell>{{polypRecording.polyp.name}}</clr-dg-cell>
+          <clr-dg-cell>{{polypRecording.video.title}}</clr-dg-cell>
+          <clr-dg-cell>{{polypRecording.start | time}}</clr-dg-cell>
+          <clr-dg-cell>{{polypRecording.end | time}}</clr-dg-cell>
+          <clr-dg-cell>{{polypRecording.end - polypRecording.start | time}}</clr-dg-cell>
+        </clr-dg-row>
+        <clr-dg-footer>
+          <div class="datagrid-foot-description" *ngIf="polypRecordingsPaginationTotalItems > 0">
+            <label for="polyp-recording-page-to-go">Go to page: </label>
+            <input type="text" class="input-page" id="polyp-recording-page-to-go" name="pageToGo"
+                   (keyup)="polypRecordingsPageChangeEvent.next($event.target.value)"
+                   [(ngModel)]="currentPolypRecordingsPage" #pageToGoPagination="ngModel"
+                   [readonly]="polypRecordingsLoading"/>
+          </div>
+
+          <clr-dg-pagination #polypRecordingsPagination
+                             [clrDgPageSize]="(polypRecordingsPageSize > polypRecordingsPaginationTotalItems) ? polypRecordingsPaginationTotalItems : polypRecordingsPageSize"
+                             [clrDgTotalItems]="polypRecordingsPaginationTotalItems" [(clrDgPage)]="currentPolypRecordingsPage">
+            <label *ngIf="polypRecordingsPaginationTotalItems > 0">
+              {{polypRecordingsPagination.firstItem + 1}} - {{polypRecordingsPagination.lastItem + 1}} of {{polypRecordingsPaginationTotalItems}} polyp recordings
+            </label>
+          </clr-dg-pagination>
+        </clr-dg-footer>
+      </clr-datagrid>
+    </clr-tab-content>
+  </clr-tab>
+</clr-tabs>

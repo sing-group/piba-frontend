@@ -34,9 +34,7 @@ import {Polyp} from '../models/Polyp';
 import {Video} from '../models/Video';
 import {concatMap, map} from 'rxjs/operators';
 import {IdAndUri} from './entities/IdAndUri';
-import {PolypInfo} from './entities/PolypInfo';
-import {VideoModification} from '../models/VideoModification';
-import {VideoModificationInfo} from './entities/VideoModificationInfo';
+import {OperatorFunction} from 'rxjs/internal/types';
 
 @Injectable()
 export class PolypRecordingsService {
@@ -46,40 +44,63 @@ export class PolypRecordingsService {
               private videosService: VideosService) {
   }
 
-  getPolypRecordingsByVideo(videoId: string): Observable<PolypRecording[]> {
-    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording/video/${videoId}`)
-      .pipe(
-        concatMap(polypRecordingInfos =>
-          forkJoin(polypRecordingInfos.map(polypRecordingInfo =>
-            forkJoin(
-              this.videosService.getVideo((<IdAndUri>polypRecordingInfo.video).id),
-              this.polypsService.getPolyp((<IdAndUri>polypRecordingInfo.polyp).id))
-          )).pipe(
-            map(videosAndPolyps =>
-              polypRecordingInfos.map((polypRecordingInfo, index) =>
-                this.mapPolypRecordingInfo(polypRecordingInfo, videosAndPolyps[index][0], videosAndPolyps[index][1]))
-            )
+  public static mapPolypRecordingInfo(polypRecordingInfo: PolypRecordingInfo, video: Video, polyp: Polyp): PolypRecording {
+    return {
+      id: polypRecordingInfo.id,
+      video: video,
+      polyp: polyp,
+      start: polypRecordingInfo.start,
+      end: polypRecordingInfo.end,
+      confirmed: polypRecordingInfo.confirmed
+    };
+  }
+
+  fillMultiplePolypAndVideo(polypRecording: Observable<PolypRecordingInfo[]>): Observable<PolypRecording[]> {
+    return polypRecording.pipe(
+      this.createFillMultiplePolypAndVideoOperator()
+    );
+  }
+
+  private createFillPolypAndVideoOperator():
+    OperatorFunction<PolypRecordingInfo, PolypRecording> {
+    return concatMap(polypRecordingInfo =>
+      forkJoin(
+        this.videosService.getVideo((<IdAndUri>polypRecordingInfo.video).id),
+        this.polypsService.getPolyp((<IdAndUri>polypRecordingInfo.polyp).id)
+      ).pipe(
+        map(videoAndPolyp =>
+          PolypRecordingsService.mapPolypRecordingInfo(polypRecordingInfo, videoAndPolyp[0], videoAndPolyp[1])
+        )
+      )
+    );
+  }
+
+  private createFillMultiplePolypAndVideoOperator():
+    OperatorFunction<PolypRecordingInfo[], PolypRecording[]> {
+    return concatMap(polypRecordingInfos =>
+      forkJoin(polypRecordingInfos.map(polypRecordingInfo =>
+        forkJoin(
+          this.videosService.getVideo((<IdAndUri>polypRecordingInfo.video).id),
+          this.polypsService.getPolyp((<IdAndUri>polypRecordingInfo.polyp).id)
+        )
+      )).pipe(
+        map(videoAndPolyps =>
+          polypRecordingInfos.map((polypRecordingInfo, index) =>
+            PolypRecordingsService.mapPolypRecordingInfo(polypRecordingInfo, videoAndPolyps[index][0], videoAndPolyps[index][1])
           )
         )
-      );
+      )
+    );
+  }
+
+  getPolypRecordingsByVideo(videoId: string): Observable<PolypRecording[]> {
+    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording/video/${videoId}`)
+      .pipe(this.createFillMultiplePolypAndVideoOperator());
   }
 
   getPolypRecordingsByPolyp(polypId: string): Observable<PolypRecording[]> {
     return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording/polyp/${polypId}`)
-      .pipe(
-        concatMap(polypRecordingInfos =>
-          forkJoin(polypRecordingInfos.map(polypRecordingInfo =>
-            forkJoin(
-              this.videosService.getVideo((<IdAndUri>polypRecordingInfo.video).id),
-              this.polypsService.getPolyp((<IdAndUri>polypRecordingInfo.polyp).id))
-          )).pipe(
-            map(videosAndPolyps =>
-              polypRecordingInfos.map((polypRecordingInfo, index) =>
-                this.mapPolypRecordingInfo(polypRecordingInfo, videosAndPolyps[index][0], videosAndPolyps[index][1]))
-            )
-          )
-        )
-      );
+      .pipe(this.createFillMultiplePolypAndVideoOperator());
   }
 
   addRecordingsToPolyps(polyps: Polyp[]): Observable<Polyp[]> {
@@ -97,19 +118,7 @@ export class PolypRecordingsService {
     const newPolypRecordingInfo = this.toPolypRecordingInfo(polypRecording);
 
     return this.http.post<PolypRecordingInfo>(`${environment.restApi}/polyprecording`, newPolypRecordingInfo)
-      .pipe(
-        concatMap((polypRecordingInfo) =>
-          forkJoin(
-            this.videosService.getVideo((<IdAndUri>polypRecordingInfo.video).id),
-            this.polypsService.getPolyp((<IdAndUri>polypRecordingInfo.polyp).id)
-          ).pipe(
-            map(videoAndPolyp =>
-              this.mapPolypRecordingInfo(polypRecordingInfo, videoAndPolyp[0], videoAndPolyp[1]
-              )
-            )
-          )
-        )
-      );
+      .pipe(this.createFillPolypAndVideoOperator());
   }
 
   removePolypRecording(polypRecording: PolypRecording | number) {
@@ -121,49 +130,13 @@ export class PolypRecordingsService {
   editPolypRecording(polypRecording: PolypRecording): Observable<PolypRecording> {
     const newPolypRecordingInfo = this.toPolypRecordingInfo(polypRecording);
     return this.http.put<PolypRecordingInfo>(`${environment.restApi}/polyprecording/${newPolypRecordingInfo.id}`, newPolypRecordingInfo)
-      .pipe(
-        concatMap((polypRecordingInfo) =>
-          forkJoin(
-            this.videosService.getVideo((<IdAndUri>polypRecordingInfo.video).id),
-            this.polypsService.getPolyp((<IdAndUri>polypRecordingInfo.polyp).id)
-          ).pipe(
-            map(videoAndPolyp =>
-              this.mapPolypRecordingInfo(polypRecordingInfo, videoAndPolyp[0], videoAndPolyp[1]
-              )
-            )
-          )
-        )
-      );
+      .pipe(this.createFillPolypAndVideoOperator());
   }
 
   editPolypRecordings(polypRecordings: PolypRecording[]): Observable<PolypRecording[]> {
     const newPolypRecordingsInfo: PolypRecordingInfo[] = polypRecordings.map(polypRecording => this.toPolypRecordingInfo(polypRecording));
     return this.http.put<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording`, newPolypRecordingsInfo)
-      .pipe(
-        concatMap(polypRecordingInfos =>
-          forkJoin(polypRecordingInfos.map(polypRecordingInfo =>
-            forkJoin(
-              this.videosService.getVideo((<IdAndUri>polypRecordingInfo.video).id),
-              this.polypsService.getPolyp((<IdAndUri>polypRecordingInfo.polyp).id))
-          )).pipe(
-            map(videoAndPolyp =>
-              polypRecordingInfos.map((polypRecordingInfo, index) =>
-                this.mapPolypRecordingInfo(polypRecordingInfo, videoAndPolyp[index][0], videoAndPolyp[index][1]))
-            )
-          )
-        )
-      );
-  }
-
-  private mapPolypRecordingInfo(polypRecordingInfo: PolypRecordingInfo, video: Video, polyp: Polyp): PolypRecording {
-    return {
-      id: polypRecordingInfo.id,
-      video: video,
-      polyp: polyp,
-      start: polypRecordingInfo.start,
-      end: polypRecordingInfo.end,
-      confirmed: polypRecordingInfo.confirmed
-    };
+      .pipe(this.createFillMultiplePolypAndVideoOperator());
   }
 
   private toPolypRecordingInfo(polypRecording: PolypRecording): PolypRecordingInfo {
