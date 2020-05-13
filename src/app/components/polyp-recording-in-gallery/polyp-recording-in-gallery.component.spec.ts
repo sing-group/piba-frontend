@@ -22,13 +22,28 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Video} from './Video';
-import {Polyp} from './Polyp';
-import {Interval} from './Interval';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-export interface PolypRecording extends Interval {
-  id: number;
-  video: Video;
-  polyp: Polyp;
-  confirmed: boolean;
-}
+import { PolypRecordingInGalleryComponent } from './polyp-recording-in-gallery.component';
+
+describe('PolypRecordingInGalleryComponent', () => {
+  let component: PolypRecordingInGalleryComponent;
+  let fixture: ComponentFixture<PolypRecordingInGalleryComponent>;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ PolypRecordingInGalleryComponent ]
+    })
+    .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(PolypRecordingInGalleryComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

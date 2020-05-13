@@ -35,6 +35,7 @@ import {Video} from '../models/Video';
 import {concatMap, map} from 'rxjs/operators';
 import {IdAndUri} from './entities/IdAndUri';
 import {OperatorFunction} from 'rxjs/internal/types';
+import {PibaError} from '../modules/notification/entities';
 
 @Injectable()
 export class PolypRecordingsService {
@@ -93,6 +94,17 @@ export class PolypRecordingsService {
     );
   }
 
+  public getPolypRecording(id: string): Observable<PolypRecording> {
+    return this.http.get<PolypRecordingInfo>(`${environment.restApi}/polyprecording/${id}`)
+      .pipe(
+        this.createFillPolypAndVideoOperator(),
+        PibaError.throwOnError(
+          'Error retrieving polyp recording',
+          'Polyp recording ${id} could not be retrieved.'
+        )
+      );
+  }
+
   getPolypRecordingsByVideo(videoId: string): Observable<PolypRecording[]> {
     return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording/video/${videoId}`)
       .pipe(this.createFillMultiplePolypAndVideoOperator());
@@ -149,5 +161,4 @@ export class PolypRecordingsService {
       confirmed: polypRecording.confirmed
     };
   }
-
 }

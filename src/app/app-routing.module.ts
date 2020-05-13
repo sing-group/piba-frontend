@@ -40,6 +40,7 @@ import {ModifiersComponent} from './components/modifiers/modifiers.component';
 import {PolypsComponent} from './components/polyps/polyps.component';
 import {PolypDatasetsComponent} from './components/polyp-datasets/polyp-datasets.component';
 import {PolypDatasetComponent} from './components/polyp-dataset/polyp-dataset.component';
+import {PolypRecordingInGalleryComponent} from './components/polyp-recording-in-gallery/polyp-recording-in-gallery.component';
 
 const routes: Routes = [
   {
@@ -56,6 +57,9 @@ const routes: Routes = [
   },
   {
     path: 'polypdatasets/:id', component: PolypDatasetComponent, canActivate: [AuthGuard]
+  },
+  {
+    path: 'polypdatasets/:datasetId/polyprecording/:id', component: PolypRecordingInGalleryComponent, canActivate: [AuthGuard]
   },
   {
     path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]

@@ -125,6 +125,7 @@
         <clr-dg-column>Start</clr-dg-column>
         <clr-dg-column>End</clr-dg-column>
         <clr-dg-column>Duration</clr-dg-column>
+        <clr-dg-column>Actions</clr-dg-column>
 
         <clr-dg-row *ngFor="let polypRecording of polypRecordings" clrDgItem="polypRecording">
           <clr-dg-cell>
@@ -137,6 +138,14 @@
           <clr-dg-cell>{{polypRecording.start | time}}</clr-dg-cell>
           <clr-dg-cell>{{polypRecording.end | time}}</clr-dg-cell>
           <clr-dg-cell>{{polypRecording.end - polypRecording.start | time}}</clr-dg-cell>
+          <clr-dg-cell class="btn-cell-datagrid">
+            <div class="btn-group btn-link btn-icon">
+              <button class="btn" routerLink="/polypdatasets/{{polypDataset.id}}/polyprecording/{{polypRecording.id}}">
+                <clr-icon shape="eye"></clr-icon>
+                <span class="clr-icon-title">View</span>
+              </button>
+            </div>
+          </clr-dg-cell>
         </clr-dg-row>
         <clr-dg-footer>
           <div class="datagrid-foot-description" *ngIf="polypRecordingsPaginationTotalItems > 0">

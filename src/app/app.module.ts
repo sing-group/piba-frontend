@@ -68,7 +68,8 @@ import {VideoZoneEditorComponent} from './components/video-zone-editor/video-zon
 import {PolypsComponent} from './components/polyps/polyps.component';
 import {PolypDatasetsComponent} from './components/polyp-datasets/polyp-datasets.component';
 import {PolypDatasetsService} from './services/polyp-datasets.service';
-import { PolypDatasetComponent } from './components/polyp-dataset/polyp-dataset.component';
+import {PolypDatasetComponent} from './components/polyp-dataset/polyp-dataset.component';
+import {PolypRecordingInGalleryComponent} from './components/polyp-recording-in-gallery/polyp-recording-in-gallery.component';
 
 @NgModule({
   declarations: [
@@ -97,7 +98,8 @@ import { PolypDatasetComponent } from './components/polyp-dataset/polyp-dataset.
     ConfirmationModalComponent,
     PolypsComponent,
     PolypDatasetsComponent,
-    PolypDatasetComponent
+    PolypDatasetComponent,
+    PolypRecordingInGalleryComponent
   ],
   imports: [
     BrowserModule,

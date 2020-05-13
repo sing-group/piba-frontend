@@ -26,6 +26,7 @@
   <video crossorigin="anonymous" #video id="video-exploration">
     <ng-content></ng-content>
   </video>
+
   <div class="controls">
     <button class="play" aria-label="play pause toggle" (click)="playVideo()">
       <clr-icon *ngIf="!paused" shape="pause"></clr-icon>
@@ -39,9 +40,7 @@
              (mousedown)="mouseDownProgress()" (mouseup)="mouseUpProgress()">
       <span>{{displayTime | time}}/{{duration | time}}</span>
     </div>
-
-    <button class="snapshot" aria-label="snapshot"
-            (click)="getSnapshot()">
+    <button class="snapshot" aria-label="snapshot" (click)="getSnapshot()">
       <clr-icon shape="camera"></clr-icon>
     </button>
     <button class="backward" aria-label="backward" (click)="backwardVideo()">

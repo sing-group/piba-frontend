@@ -22,13 +22,3 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Video} from './Video';
-import {Polyp} from './Polyp';
-import {Interval} from './Interval';
-
-export interface PolypRecording extends Interval {
-  id: number;
-  video: Video;
-  polyp: Polyp;
-  confirmed: boolean;
-}

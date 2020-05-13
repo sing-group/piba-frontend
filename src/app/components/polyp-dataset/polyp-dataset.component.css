@@ -30,3 +30,7 @@
 .detail ::ng-deep .datagrid-body {
   min-height: 0;
 }
+
+.btn-cell-datagrid {
+  padding: 0%;
+}

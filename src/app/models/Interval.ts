@@ -26,3 +26,13 @@ export interface Interval {
   start: number;
   end: number;
 }
+
+export function areOverlappingIntervals(intervalA: Interval, intervalB: Interval) {
+  return intervalA !== null && intervalA !== undefined
+    && intervalB !== null && intervalB !== undefined
+    && (
+      (intervalA.start >= intervalB.start && intervalA.start <= intervalB.end)
+      || (intervalA.end >= intervalB.start && intervalA.end <= intervalB.end)
+      || (intervalA.start <= intervalB.start && intervalA.end >= intervalB.end)
+    );
+}
