@@ -47,6 +47,9 @@ import {Interval} from '../../models/Interval';
 import {ElementInVideoZone} from '../../models/ElementInVideoZone';
 import {PolypRecording} from '../../models/PolypRecording';
 import {VideoModification} from '../../models/VideoModification';
+import {VideoSnapshot} from '../video/VideoSnapshot';
+import {VideoComponent} from '../video/video.component';
+import {VideoIntervalHighlight} from '../video/VideoIntervalHighlight';
 
 @Pipe({
   name: 'dropdownFilter',
@@ -93,14 +96,10 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
   gallery: Gallery = new Gallery();
   galleryInputModel: string;
   imageObservation = '';
-  fileName: string;
+  snapshotFileName: string;
   private polypForSnapshot: Polyp = new Polyp();
-  private downloadButton: HTMLLinkElement;
 
   // Internal attributes
-  private moveProgress = false;
-
-  private pauseWatcher: number;
   private image: Image = new Image();
 
   private currentTime: number;
@@ -110,7 +109,10 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
   private readonly modificationColor = 'rgba(241, 213, 117, 1)';
   private readonly polypColor = 'rgba(0, 198, 194, 0.5)';
 
-  @ViewChild('canvas') canvas: ElementRef;
+  @ViewChild('canvas') private canvas: ElementRef<HTMLCanvasElement>;
+  @ViewChild('videoComponent') private videoComponent: VideoComponent;
+  @ViewChild('legendCheckboxContainer') private legendCheckboxContainer: ElementRef<HTMLDivElement>;
+  @ViewChild('downloadImageButton') private downloadImageButton: ElementRef<HTMLLinkElement>;
 
   constructor(
     private videosService: VideosService,
@@ -128,6 +130,30 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     private authenticationService: AuthenticationService,
     private elementRef: ElementRef
   ) {
+  }
+
+  private static mapImage(image: Image): ImageUploadInfo {
+    return {
+      image: null,
+      gallery: image.gallery.id,
+      video: image.video.id,
+      polyp: null,
+      numFrame: image.numFrame,
+      observation: image.observation,
+      manuallySelected: image.manuallySelected
+    };
+  }
+
+  private static mapImageWithPolyp(image: Image): ImageUploadInfo {
+    return {
+      image: null,
+      gallery: image.gallery.id,
+      video: image.video.id,
+      polyp: image.polyp.id,
+      numFrame: image.numFrame,
+      observation: image.observation,
+      manuallySelected: image.manuallySelected
+    };
   }
 
   ngOnInit() {
@@ -159,51 +185,39 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
 
   }
 
-  ngAfterViewChecked() {
-    const progressbar = document.getElementById('progress') as HTMLInputElement;
-    const legendCheckboxContainer = document.getElementById('legend-checkbox-container') as HTMLElement;
+  get highlightZones(): VideoIntervalHighlight[] {
+    const highlightZones: VideoIntervalHighlight[] = [];
 
-    let background = '';
-
-    if (this.hasVideo() && !isNaN(this.videoHTML.duration)) {
-      // assign the width of the video to the legends and checkboxes container
-      legendCheckboxContainer.style.width = this.videoHTML.offsetWidth + 'px';
-      const duration = Math.trunc(this.videoHTML.duration);
-      if (this.video.polypRecording.length > 0 && this.showPolyp) {
-        background += 'linear-gradient(to right, transparent';
-        this.video.polypRecording.sort((p1, p2) => p1.start - p2.start).forEach(polypRecording => {
-          const start = (polypRecording.start * 100 / duration).toFixed(4);
-          const end = (polypRecording.end * 100 / duration).toFixed(4);
-
-          background += `,transparent ${start}%, ${this.polypColor} ${start}%, ${this.polypColor} ${end}%, transparent ${end}%`;
-        });
-
-        background += ')';
+    if (this.hasVideo()) {
+      if (this.showPolyp) {
+        this.video.polypRecording.map(polypRecording => ({
+          color: this.polypColor,
+          interval: {
+            start: polypRecording.start,
+            end: polypRecording.end
+          }
+        })).forEach(zone => highlightZones.push(zone));
       }
 
-      background += this.showPolyp && this.video.polypRecording.length > 0 && this.showModification &&
-      this.video.modifications.length > 0 ? ', ' : '';
-
-      if (this.video.modifications.length > 0 && this.showModification) {
-        background += 'linear-gradient(to right, transparent';
-        this.video.modifications.sort((p1, p2) => p1.start - p2.start).forEach(modification => {
-          const start = (modification.start * 100 / duration).toFixed(4);
-          const end = (modification.end * 100 / duration).toFixed(4);
-          background += `,transparent ${start}%,${this.modificationColor} ${start}%, ${this.modificationColor} ${end}%,transparent ${end}%`;
-        });
-
-        background += ')';
+      if (this.showModification) {
+        this.video.modifications.map(modification => ({
+          color: this.modificationColor,
+          interval: {
+            start: modification.start,
+            end: modification.end
+          }
+        })).forEach(zone => highlightZones.push(zone));
       }
-
-      progressbar.style.background = background;
-      progressbar.style.height = '100%';
-
     }
 
+    return highlightZones;
   }
 
-  private get videoHTML(): HTMLVideoElement {
-    return document.getElementById('video-exploration') as HTMLVideoElement;
+  ngAfterViewChecked() {
+    if (this.hasVideo() && !isNaN(this.videoComponent.duration)) {
+      // assign the width of the video to the legends and checkboxes container
+      this.legendCheckboxContainer.nativeElement.style.width = this.videoComponent.offsetWidth + 'px';
+    }
   }
 
   private updatePolypRecordingZones() {
@@ -238,17 +252,15 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     return this.authenticationService.getRole() === Role.ENDOSCOPIST;
   }
 
-  startInterval(): string {
-    this.videoHTML.pause();
-    this.videoHTML.currentTime = Math.floor(this.videoHTML.currentTime);
-    this.currentTime = this.videoHTML.currentTime;
+  stopAtSecondStart(): string {
+    this.currentTime = this.videoComponent.stopAtSecondStart();
+
     return this.transformToTimePipe();
   }
 
-  endInterval(): string {
-    this.videoHTML.pause();
-    this.videoHTML.currentTime = Math.floor(this.videoHTML.currentTime) + 0.999;
-    this.currentTime = this.videoHTML.currentTime;
+  stopAtSecondEnd(): string {
+    this.currentTime = this.videoComponent.stopAtSecondEnd();
+
     return this.transformToTimePipe();
   }
 
@@ -260,19 +272,12 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     }
   }
 
-  onCurrentTimeUpdate(time: number) {
+  onTimeUpdate(time: number) {
     this.currentTime = time;
   }
 
-  mouseInProgress(move: boolean) {
-    this.moveProgress = move;
-  }
-
   isValidInterval(interval: Interval): boolean {
-    return interval.start <= interval.end
-      && this.videoHTML.duration !== undefined
-      && interval.start >= 0
-      && interval.end <= this.videoHTML.duration;
+    return this.videoComponent.isValidInterval(interval);
   }
 
   private scrollToTop() {
@@ -285,43 +290,26 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
 
   playInterval(interval: Interval) {
     this.scrollToTop();
-    this.videoHTML.currentTime = interval.start;
-    this.videoHTML.play();
-
-    if (this.pauseWatcher !== undefined && this.pauseWatcher !== null) {
-      clearInterval(this.pauseWatcher);
-    }
-    this.pauseWatcher = setInterval(() => {
-      if (!this.moveProgress) {
-        const progress: HTMLInputElement = document.getElementById('progress') as HTMLInputElement;
-        progress.value = this.videoHTML.currentTime.toString();
-      }
-      if (this.videoHTML.currentTime >= interval.end) {
-        this.videoHTML.pause();
-        clearInterval(this.pauseWatcher);
-      }
-    }, 100);
+    this.videoComponent.playInterval(interval);
   }
 
-  getSnapshot() {
-    this.snapshotTime = this.currentTime === undefined ? 0 : this.currentTime;
-    this.videoHTML.pause();
-    this.canvas.nativeElement.width = this.videoHTML.videoWidth;
-    this.canvas.nativeElement.height = this.videoHTML.videoHeight;
-    this.canvas.nativeElement.getContext('2d').drawImage(this.videoHTML, 0, 0,
-      this.videoHTML.videoWidth, this.videoHTML.videoHeight);
+  onSnapshot(snapshot: VideoSnapshot) {
+    this.snapshotTime = snapshot.time;
+
+    const canvas = this.canvas.nativeElement;
+    canvas.height = snapshot.height;
+    canvas.width = snapshot.width;
+    canvas.getContext('2d').drawImage(
+      snapshot.video, 0, 0, snapshot.width, snapshot.height
+    );
+
     this.showPolypCheckbox = this.getPolypsForSnapshot().length !== this.polyps.length;
-    this.getFileName();
+    this.snapshotFileName = this.video.id + '_' + Math.round(this.video.fps * this.snapshotTime) + '.png';
     this.openSnapshotModal = true;
   }
 
-  getFileName() {
-    this.fileName = this.video.id + '_' + Math.round(this.video.fps * this.snapshotTime) + '.png';
-  }
-
   downloadSnapshot() {
-    this.downloadButton = document.getElementById('download-image-button') as HTMLLinkElement;
-    this.downloadButton.href = this.canvas.nativeElement.toDataURL();
+    this.downloadImageButton.nativeElement.href = this.canvas.nativeElement.toDataURL();
     this.discardSnapshot();
   }
 
@@ -337,9 +325,9 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
 
     let imageUploadInfo;
     if (this.snapshotPolypInputModel !== '' && this.snapshotPolypInputModel !== undefined) {
-      imageUploadInfo = this.mapImageWithPolyp(this.image);
+      imageUploadInfo = VideoEditorComponent.mapImageWithPolyp(this.image);
     } else {
-      imageUploadInfo = this.mapImage(this.image);
+      imageUploadInfo = VideoEditorComponent.mapImage(this.image);
     }
     imageUploadInfo.image = this.base64toFile(this.image.base64contents);
 
@@ -571,29 +559,5 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
       this.updateVideoModificationZones();
       this.notificationService.success('All video modifications were confirmed.', 'Video modifications confirmed');
     });
-  }
-
-  private mapImage(image: Image): ImageUploadInfo {
-    return {
-      image: null,
-      gallery: image.gallery.id,
-      video: image.video.id,
-      polyp: null,
-      numFrame: image.numFrame,
-      observation: image.observation,
-      manuallySelected: image.manuallySelected
-    };
-  }
-
-  private mapImageWithPolyp(image: Image): ImageUploadInfo {
-    return {
-      image: null,
-      gallery: image.gallery.id,
-      video: image.video.id,
-      polyp: image.polyp.id,
-      numFrame: image.numFrame,
-      observation: image.observation,
-      manuallySelected: image.manuallySelected
-    };
   }
 }

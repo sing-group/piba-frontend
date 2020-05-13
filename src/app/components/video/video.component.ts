@@ -22,59 +22,116 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {VideoSnapshot} from './VideoSnapshot';
+import {Interval} from '../../models/Interval';
+import {VideoIntervalHighlight} from './VideoIntervalHighlight';
 
 @Component({
   selector: 'app-video',
   templateUrl: './video.component.html',
   styleUrls: ['./video.component.css']
 })
-export class VideoComponent implements OnInit {
+export class VideoComponent implements AfterViewChecked, OnInit {
+  @Input() interval: Interval = null;
+  @Input() highlightZones: VideoIntervalHighlight[] = [];
+
   // tslint:disable-next-line:no-output-rename
-  @Output('currentTime') timeEmitter = new EventEmitter<number>();
+  @Output('time') timeEmitter = new EventEmitter<number>();
+  // tslint:disable-next-line:no-output-rename
+  @Output('snapshot') snapshotEmitter = new EventEmitter<VideoSnapshot>();
 
   @ViewChild('container') containerElement: ElementRef;
-  @ViewChild('video') videoElement: ElementRef;
+  @ViewChild('video') videoElement: ElementRef<HTMLVideoElement>;
+  @ViewChild('progressbar') progressbarElement: ElementRef<HTMLInputElement>;
 
   fullscreen = false;
-  playWatcher: any;
-
-  progress: HTMLInputElement;
-  moveProgress = false;
-  // tslint:disable-next-line:no-output-rename
-  @Output('mouseInProgress') mouseInProgress = new EventEmitter<boolean>();
-  // tslint:disable-next-line:no-output-rename
-  @Output('doSnapshot') snapshot = new EventEmitter<boolean>();
-
   videoSpeed = 3;
+
+  private playWatcher: number = undefined;
+  private intervalWatcher: number = undefined;
+  private updateProgressWithTime = true;
 
   constructor() {
   }
 
   ngOnInit() {
     this.video.addEventListener('timeupdate', () => this.timeEmitter.emit(this.video.currentTime));
+    this.video.addEventListener('loadedmetadata', () => this.progress.max = String(this.video.duration));
 
     const updateFullscreen = this.updateFullscreen.bind(this);
     document.addEventListener('fullscreenchange', updateFullscreen);
     document.addEventListener('mozfullscreenchange', updateFullscreen);
     document.addEventListener('webkitfullscreenchange', updateFullscreen);
 
-    this.progress = document.getElementById('progress') as HTMLInputElement;
     this.progress.valueAsNumber = 0;
-
-    this.videoElement.nativeElement.addEventListener('loadedmetadata', () => this.progress.max = this.video.duration);
   }
 
-  private get video() {
+  ngAfterViewChecked() {
+    let background = '';
+
+    for (const zone of this.highlightZones) {
+      const start = (zone.interval.start * 100 / this.duration).toFixed(4);
+      const end = (zone.interval.end * 100 / this.duration).toFixed(4);
+
+      if (background !== '') {
+        background += ', ';
+      }
+
+      background += `linear-gradient(to right, transparent
+        ,transparent ${start}%, ${zone.color} ${start}%,
+          ${zone.color} ${end}%, transparent ${end}%
+      )`;
+    }
+
+    this.progressbarElement.nativeElement.style.background = background;
+    this.progressbarElement.nativeElement.style.height = '100%';
+  }
+
+  private get progress(): HTMLInputElement {
+    return this.progressbarElement.nativeElement;
+  }
+
+  private get video(): HTMLVideoElement {
     return this.videoElement.nativeElement;
   }
 
-  get paused() {
+  public stopAtSecondStart(): number {
+    this.video.pause();
+    this.video.currentTime = Math.floor(this.video.currentTime);
+
+    return this.video.currentTime;
+  }
+
+  public stopAtSecondEnd(): number {
+    this.video.pause();
+    this.video.currentTime = Math.floor(this.video.currentTime) + 0.999;
+
+    return this.video.currentTime;
+  }
+
+  get paused(): boolean {
     return this.video.paused;
   }
 
-  get currentTime() {
+  get currentTime(): number {
     return this.video.currentTime;
+  }
+
+  get offsetWidth(): number {
+    return this.video.offsetWidth;
+  }
+
+  get duration(): number {
+    return this.video.duration;
+  }
+
+  get displayTime(): number {
+    if (this.updateProgressWithTime) {
+      return this.currentTime;
+    } else {
+      return this.progress.valueAsNumber;
+    }
   }
 
   playVideo() {
@@ -120,8 +177,8 @@ export class VideoComponent implements OnInit {
       clearInterval(this.playWatcher);
     }
     this.playWatcher = setInterval(() => {
-      if (!this.moveProgress) {
-        this.progress.value = this.video.currentTime;
+      if (this.updateProgressWithTime) {
+        this.progress.value = String(this.video.currentTime);
       }
     }, 100);
   }
@@ -154,6 +211,45 @@ export class VideoComponent implements OnInit {
     }
   }
 
+  isValidInterval(interval: Interval): boolean {
+    return interval.start <= interval.end
+      && this.duration !== undefined
+      && interval.start >= 0
+      && interval.end <= this.duration;
+  }
+
+  playInterval(interval: Interval): void {
+    if (this.isValidInterval(interval)) {
+      this.video.pause();
+
+      this.clearInterval();
+
+      this.interval = interval;
+      this.video.currentTime = interval.start;
+      this.progress.valueAsNumber = this.video.currentTime;
+      this.intervalWatcher = setInterval(() => {
+        if (this.currentTime >= interval.end) {
+          this.video.pause();
+          this.video.currentTime = interval.end;
+          this.clearInterval();
+        }
+      }, 100);
+
+      this.video.play();
+    }
+  }
+
+  private clearInterval() {
+    if (this.interval !== null) {
+      this.interval = null;
+
+      if (this.intervalWatcher !== undefined) {
+        clearInterval(this.intervalWatcher);
+        this.intervalWatcher = undefined;
+      }
+    }
+  }
+
   private updateFullscreen() {
     const document: any = window.document;
 
@@ -164,17 +260,25 @@ export class VideoComponent implements OnInit {
   }
 
   mouseDownProgress() {
-    this.moveProgress = true;
-    this.mouseInProgress.emit(this.moveProgress);
+    this.updateProgressWithTime = false;
   }
 
   mouseUpProgress() {
-    this.moveProgress = false;
+    if (this.interval !== null && this.progress.valueAsNumber >= this.interval.end) {
+      this.clearInterval();
+    }
     this.video.currentTime = this.progress.valueAsNumber;
-    this.mouseInProgress.emit(this.moveProgress);
+    this.updateProgressWithTime = true;
   }
 
   getSnapshot() {
-    this.snapshot.emit(true);
+    this.video.pause();
+
+    this.snapshotEmitter.emit({
+      time: this.currentTime,
+      width: this.video.videoWidth,
+      height: this.video.videoHeight,
+      video: this.video
+    });
   }
 }

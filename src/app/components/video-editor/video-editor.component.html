@@ -30,14 +30,13 @@
 </div>
 
 <div class="row video-container" *ngIf="hasVideo()">
-  <app-video (currentTime)="onCurrentTimeUpdate($event)" (mouseInProgress)="mouseInProgress($event)"
-             (doSnapshot)="getSnapshot()">
+  <app-video #videoComponent [highlightZones]="highlightZones" (time)="onTimeUpdate($event)" (snapshot)="onSnapshot($event)">
     <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}"/>
     <p>Your browser does not support the video tag.</p>
   </app-video>
 </div>
 
-<div class="clr-row video-container col-xs-12" id="legend-checkbox-container">
+<div #legendCheckboxContainer class="clr-row video-container col-xs-12">
   <div class="clr-row legends-container">
     <div class="square polyp-square"></div>
     <label>Polyp</label>
@@ -65,8 +64,8 @@
         <app-video-zone-editor [elementName]="'Polyp'" [canBeCreated]="true"
                                [elements]="polypRecordingZones" [videoZoneTypes]="polyps"
                                [isValidInterval]="isValidInterval.bind(this)"
-                               [getCurrentTimeStart]="startInterval.bind(this)"
-                               [getCurrentTimeEnd]="endInterval.bind(this)"
+                               [getCurrentTimeStart]="stopAtSecondStart.bind(this)"
+                               [getCurrentTimeEnd]="stopAtSecondEnd.bind(this)"
                                (playInterval)="playInterval($event)" (addZoneType)="onAddPolyp($event)"
                                (createElement)="onAddPolypRecording($event)"
                                (removeElement)="onRemovePolypRecording($event)"
@@ -85,8 +84,8 @@
         <app-video-zone-editor [elementName]="'Modifier'" [canBeCreated]="false"
                                [elements]="videoModificationZones" [videoZoneTypes]="modifiers"
                                [isValidInterval]="isValidInterval.bind(this)"
-                               [getCurrentTimeStart]="startInterval.bind(this)"
-                               [getCurrentTimeEnd]="endInterval.bind(this)"
+                               [getCurrentTimeStart]="stopAtSecondStart.bind(this)"
+                               [getCurrentTimeEnd]="stopAtSecondEnd.bind(this)"
                                (playInterval)="playInterval($event)"
                                (createElement)="onAddVideoModification($event)"
                                (removeElement)="onRemoveVideoModification($event)"
@@ -163,8 +162,8 @@
             (click)="saveSnapshot()" [disabled]="doesGalleryNotExists() || !isPolypCorrect()">
       Save to gallery
     </button>
-    <a class="btn btn-info-outline" id="download-image-button" href="#"
-       (click)="downloadSnapshot()" download="{{fileName}}">Download</a>
+    <a #downloadImageButton class="btn btn-info-outline" href="#"
+       (click)="downloadSnapshot()" download="{{snapshotFileName}}">Download</a>
   </div>
 </clr-modal>
 
