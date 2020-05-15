@@ -39,7 +39,7 @@
     </div>
     <div class="clr-col-10">
       <div align="center">
-        <app-video [interval]="polypRecording" limitToInterval="true"
+        <app-video [video]="polypRecording.video" [interval]="polypRecording" limitToInterval="true"
                    (time)="onCurrentTimeUpdate($event)" (snapshot)="onSnapshot($event)">
           <source *ngFor="let source of polypRecording.video.sources" src="{{source.url}}" type="{{source.mediaType}}"/>
           <p>Your browser does not support the video tag.</p>

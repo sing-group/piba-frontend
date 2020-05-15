@@ -22,21 +22,12 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  AfterViewChecked,
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewChild
-} from '@angular/core';
+import {AfterViewChecked, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {VideoSnapshot} from './VideoSnapshot';
 import {areOverlappingIntervals, Interval} from '../../models/Interval';
 import {VideoIntervalHighlight} from './VideoIntervalHighlight';
+import {VIDEO_STEP_TYPE_ABBREVIATIONS, VideoStepType} from './VideoStepType';
+import {Video} from '../../models/Video';
 
 @Component({
   selector: 'app-video',
@@ -44,6 +35,7 @@ import {VideoIntervalHighlight} from './VideoIntervalHighlight';
   styleUrls: ['./video.component.css']
 })
 export class VideoComponent implements AfterViewChecked, OnInit {
+  @Input() video: Video;
   @Input() interval: Interval = null;
   @Input() limitToInterval = false;
   private _highlightZones: VideoIntervalHighlight[] = [];
@@ -53,18 +45,22 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   // tslint:disable-next-line:no-output-rename
   @Output('snapshot') snapshotEmitter = new EventEmitter<VideoSnapshot>();
 
-  @ViewChild('container') containerElement: ElementRef;
-  @ViewChild('video') videoElement: ElementRef<HTMLVideoElement>;
-  @ViewChild('progressbar') progressbarElement: ElementRef<HTMLInputElement>;
+  @ViewChild('container') containerElementRef: ElementRef;
+  @ViewChild('videoElement') videoElementRef: ElementRef<HTMLVideoElement>;
+  @ViewChild('progressElement') progressElementRef: ElementRef<HTMLInputElement>;
 
   fullscreen = false;
   videoSpeed = 3;
+  videoStep = VideoStepType.SECONDS;
+
+  readonly videoStepTypes = Array.from(VIDEO_STEP_TYPE_ABBREVIATIONS);
 
   private playWatcher: number = undefined;
   private intervalWatcher: number = undefined;
   private updateProgressWithTime = true;
   private progressbarBackground = '';
   private _displayTime: number = undefined;
+  private secondsPerFrame: number;
 
   constructor(
     private cdRef: ChangeDetectorRef
@@ -72,15 +68,21 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   }
 
   ngOnInit() {
+    if (this.video === null || this.video === undefined) {
+      throw new Error('video is required');
+    }
+
     if (this.limitToInterval && (this.interval === null || this.interval.start > this.interval.end)) {
       throw new Error('limitToInterval can only be used with a valid interval');
     }
 
-    this.video.addEventListener('timeupdate', () => this.timeEmitter.emit(this.currentTime));
-    this.video.addEventListener('loadedmetadata', () => {
-      this.progressbar.max = String(this.duration);
-      this.progressbar.valueAsNumber = 0;
-      this.video.currentTime = this.startTime;
+    this.secondsPerFrame = 1 / this.video.fps;
+
+    this.videoElement.addEventListener('timeupdate', () => this.timeEmitter.emit(this.currentTime));
+    this.videoElement.addEventListener('loadedmetadata', () => {
+      this.progressElement.max = String(this.duration);
+      this.progressElement.valueAsNumber = 0;
+      this.currentTime = this.startTime;
     });
 
     const updateFullscreen = this.updateFullscreen.bind(this);
@@ -91,11 +93,11 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   }
 
   ngAfterViewChecked() {
-    this.progressbar.style.background = this.progressbarBackground;
-    this.progressbar.style.height = '100%';
+    this.progressElement.style.background = this.progressbarBackground;
+    this.progressElement.style.height = '100%';
     this._displayTime = this.updateProgressWithTime
       ? this.currentTime - this.startTime
-      : this.progressbar.valueAsNumber;
+      : this.progressElement.valueAsNumber;
 
     this.cdRef.detectChanges();
   }
@@ -127,42 +129,42 @@ export class VideoComponent implements AfterViewChecked, OnInit {
     }
   }
 
-  private get progressbar(): HTMLInputElement {
-    return this.progressbarElement.nativeElement;
+  private get progressElement(): HTMLInputElement {
+    return this.progressElementRef.nativeElement;
   }
 
-  private get video(): HTMLVideoElement {
-    return this.videoElement.nativeElement;
+  private get videoElement(): HTMLVideoElement {
+    return this.videoElementRef.nativeElement;
   }
 
   public stopAtSecondStart(): number {
-    this.video.pause();
-    this.video.currentTime = Math.floor(this.video.currentTime);
+    this.videoElement.pause();
+    this.currentTime = Math.floor(this.videoElement.currentTime);
 
     return this.currentTime;
   }
 
   public stopAtSecondEnd(): number {
-    this.video.pause();
-    this.video.currentTime = Math.floor(this.video.currentTime) + 0.999;
-
-    if (this.video.currentTime > this.endTime) {
-      this.video.currentTime = this.endTime;
-    }
+    this.videoElement.pause();
+    this.currentTime = Math.floor(this.videoElement.currentTime) + 0.999;
 
     return this.currentTime;
   }
 
   get paused(): boolean {
-    return this.video.paused;
+    return this.videoElement.paused;
   }
 
   get currentTime(): number {
-    return this.video.currentTime;
+    return this.videoElement.currentTime;
+  }
+
+  set currentTime(time: number) {
+    this.videoElement.currentTime = Math.min(this.endTime, Math.max(this.startTime, time));
   }
 
   get offsetWidth(): number {
-    return this.video.offsetWidth;
+    return this.videoElement.offsetWidth;
   }
 
   get duration(): number {
@@ -174,7 +176,7 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   }
 
   private get endTime(): number {
-    return this.limitToInterval ? this.interval.end : this.video.duration;
+    return this.limitToInterval ? this.interval.end : this.videoElement.duration;
   }
 
   private get startTime(): number {
@@ -184,46 +186,64 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   playVideo() {
     if (this.paused) {
       if (this.currentTime === this.endTime) {
-        this.video.currentTime = this.startTime;
+        this.currentTime = this.startTime;
       }
-      this.video.play();
+      this.videoElement.play();
     } else {
-      this.video.pause();
+      this.videoElement.pause();
     }
     this.initializePlayWatcher();
   }
 
   stopVideo() {
-    this.video.pause();
-    this.video.currentTime = this.startTime;
-    this.progressbar.valueAsNumber = 0;
+    this.videoElement.pause();
+    this.currentTime = this.startTime;
+    this.progressElement.valueAsNumber = 0;
     clearInterval(this.playWatcher);
     this.playWatcher = undefined;
   }
 
   forwardVideo() {
     this.initializePlayWatcher();
-    if (this.currentTime % 1 >= 0.99 || Number(this.videoSpeed) > 1) {
-      this.video.currentTime = Math.min(this.endTime, Math.floor(this.currentTime) + 0.999 + Number(this.videoSpeed));
-    } else {
-      this.video.currentTime = Math.min(this.endTime, Math.floor(this.currentTime) + 0.999);
+
+    switch (this.videoStep) {
+      case VideoStepType.FRAMES:
+        this.currentTime = this.currentTime + this.secondsPerFrame;
+
+        break;
+      case VideoStepType.SECONDS:
+        if (this.currentTime % 1 >= 0.99 || Number(this.videoSpeed) > 1) {
+          this.currentTime = Math.floor(this.currentTime) + 0.999 + Number(this.videoSpeed);
+        } else {
+          this.currentTime = Math.floor(this.currentTime) + 0.999;
+        }
+        break;
     }
 
     if (this.currentTime === this.endTime) {
-      this.video.pause();
+      this.videoElement.pause();
     }
   }
 
   backwardVideo() {
     this.initializePlayWatcher();
-    if (this.currentTime % 1 < 0.01 || Number(this.videoSpeed) > 1 || (!this.paused && Number(this.videoSpeed) === 1)) {
-      this.video.currentTime = Math.max(this.startTime, Math.floor(this.currentTime) - Number(this.videoSpeed));
-    } else {
-      this.video.currentTime = Math.max(this.startTime, Math.floor(this.currentTime));
+
+
+    switch (this.videoStep) {
+      case VideoStepType.FRAMES:
+        this.currentTime = this.currentTime - this.secondsPerFrame;
+        break;
+      case VideoStepType.SECONDS:
+        if (this.currentTime % 1 < 0.01 || Number(this.videoSpeed) > 1 || (!this.paused && Number(this.videoSpeed) === 1)) {
+          this.currentTime = Math.floor(this.currentTime) - Number(this.videoSpeed);
+        } else {
+          this.currentTime = Math.floor(this.currentTime);
+        }
+        break;
     }
 
-    if (this.video.currentTime === this.startTime) {
-      this.video.pause();
+    if (this.currentTime === this.startTime) {
+      this.videoElement.pause();
     }
   }
 
@@ -235,13 +255,13 @@ export class VideoComponent implements AfterViewChecked, OnInit {
     this.playWatcher = setInterval(() => {
       if (this.updateProgressWithTime) {
         if (this.limitToInterval && this.currentTime >= this.endTime) {
-          this.video.currentTime = this.endTime;
-          this.video.pause();
+          this.currentTime = this.endTime;
+          this.videoElement.pause();
           clearInterval(this.playWatcher);
           this.playWatcher = undefined;
         }
 
-        this.progressbar.value = String(this.currentTime - this.startTime);
+        this.progressElement.value = String(this.currentTime - this.startTime);
       }
     }, 100);
   }
@@ -260,7 +280,7 @@ export class VideoComponent implements AfterViewChecked, OnInit {
         document.msExitFullscreen();
       }
     } else {
-      const container = this.containerElement.nativeElement;
+      const container = this.containerElementRef.nativeElement;
 
       if (container.requestFullscreen) {
         container.requestFullscreen();
@@ -287,22 +307,22 @@ export class VideoComponent implements AfterViewChecked, OnInit {
     }
 
     if (this.isValidInterval(interval)) {
-      this.video.pause();
+      this.videoElement.pause();
 
       this.clearInterval();
 
       this.interval = interval;
-      this.video.currentTime = interval.start;
-      this.progressbar.valueAsNumber = this.video.currentTime;
+      this.currentTime = interval.start;
+      this.progressElement.valueAsNumber = this.videoElement.currentTime;
       this.intervalWatcher = setInterval(() => {
         if (this.currentTime >= interval.end) {
-          this.video.pause();
-          this.video.currentTime = interval.end;
+          this.videoElement.pause();
+          this.currentTime = interval.end;
           this.clearInterval();
         }
       }, 100);
 
-      this.video.play();
+      this.videoElement.play();
     }
   }
 
@@ -331,21 +351,21 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   }
 
   mouseUpProgress() {
-    if (!this.limitToInterval && this.interval !== null && this.progressbar.valueAsNumber >= this.interval.end) {
+    if (!this.limitToInterval && this.interval !== null && this.progressElement.valueAsNumber >= this.interval.end) {
       this.clearInterval();
     }
-    this.video.currentTime = this.startTime + this.progressbar.valueAsNumber;
+    this.currentTime = this.startTime + this.progressElement.valueAsNumber;
     this.updateProgressWithTime = true;
   }
 
   getSnapshot() {
-    this.video.pause();
+    this.videoElement.pause();
 
     this.snapshotEmitter.emit({
       time: this.currentTime,
-      width: this.video.videoWidth,
-      height: this.video.videoHeight,
-      video: this.video
+      width: this.videoElement.videoWidth,
+      height: this.videoElement.videoHeight,
+      video: this.videoElement
     });
   }
 }

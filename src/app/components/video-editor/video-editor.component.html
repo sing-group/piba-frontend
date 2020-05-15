@@ -30,10 +30,8 @@
 </div>
 
 <div class="row video-container" *ngIf="hasVideo()">
-  <app-video #videoComponent [highlightZones]="highlightZones" (time)="onTimeUpdate($event)" (snapshot)="onSnapshot($event)">
-    <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}"/>
-    <p>Your browser does not support the video tag.</p>
-  </app-video>
+  <app-video #videoComponent [video]="video" [highlightZones]="highlightZones" (time)="onTimeUpdate($event)"
+             (snapshot)="onSnapshot($event)"></app-video>
 </div>
 
 <div #legendCheckboxContainer class="clr-row video-container col-xs-12">

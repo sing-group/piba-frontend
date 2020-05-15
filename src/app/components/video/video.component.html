@@ -23,8 +23,9 @@
   -->
 
 <div #container class="video-container">
-  <video crossorigin="anonymous" #video id="video-exploration">
-    <ng-content></ng-content>
+  <video #videoElement crossorigin="anonymous" >
+    <source *ngFor="let source of video.sources" src="{{source.url}}" type="{{source.mediaType}}"/>
+    <p>Your browser does not support the video tag.</p>
   </video>
 
   <div class="controls">
@@ -36,7 +37,7 @@
       <clr-icon shape="stop"></clr-icon>
     </button>
     <div class="timer">
-      <input #progressbar id="progress" type="range" class="margin-progress"
+      <input #progressElement id="progress" type="range" class="margin-progress"
              (mousedown)="mouseDownProgress()" (mouseup)="mouseUpProgress()">
       <span>{{displayTime | time}}/{{duration | time}}</span>
     </div>
@@ -49,6 +50,9 @@
     <button class="forward" aria-label="fast forward" (click)="forwardVideo()">
       <clr-icon shape="fast-forward"></clr-icon>
     </button>
+    <select aria-label="video movement" [(ngModel)]='videoStep'>
+      <option *ngFor="let entry of videoStepTypes" [value]="entry[0]">{{entry[1]}}</option>
+    </select>
     <select aria-label="video speed" [(ngModel)]='videoSpeed'>
       <option value="1">x1</option>
       <option value="3">x3</option>
