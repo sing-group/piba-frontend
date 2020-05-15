@@ -73,6 +73,9 @@ export class DropdownFilterPipe implements PipeTransform {
   styleUrls: ['./video-editor.component.css']
 })
 export class VideoEditorComponent implements AfterViewChecked, OnInit {
+  private static readonly MODIFICATION_COLOR = 'rgba(241, 213, 117, 1)';
+  private static readonly POLYP_COLOR = 'rgba(0, 198, 194, 0.5)';
+
   video: Video;
 
   start: string;
@@ -105,9 +108,6 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
   private currentTime: number;
 
   private snapshotTime: number;
-
-  private readonly modificationColor = 'rgba(241, 213, 117, 1)';
-  private readonly polypColor = 'rgba(0, 198, 194, 0.5)';
 
   @ViewChild('canvas') private canvas: ElementRef<HTMLCanvasElement>;
   @ViewChild('videoComponent') private videoComponent: VideoComponent;
@@ -191,7 +191,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     if (this.hasVideo()) {
       if (this.showPolyp) {
         this.video.polypRecording.map(polypRecording => ({
-          color: this.polypColor,
+          color: VideoEditorComponent.POLYP_COLOR,
           interval: {
             start: polypRecording.start,
             end: polypRecording.end
@@ -201,7 +201,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
 
       if (this.showModification) {
         this.video.modifications.map(modification => ({
-          color: this.modificationColor,
+          color: VideoEditorComponent.MODIFICATION_COLOR,
           interval: {
             start: modification.start,
             end: modification.end
@@ -402,7 +402,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     const newPolyp = new Polyp();
     newPolyp.name = newPolypName;
 
-    this.explorationsService.addPolypToExploration(newPolyp, this.video.exploration)
+    this.explorationsService.addPolypToExploration(newPolyp, this.video.exploration as string)
       .subscribe(polyp => {
         this.polyps.push(polyp);
         this.notificationService.success('Polyp registered successfully.', 'Polyp registered.');

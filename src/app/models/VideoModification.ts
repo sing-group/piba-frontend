@@ -24,8 +24,9 @@
 
 import {Video} from './Video';
 import {Modifier} from './Modifier';
+import {Interval} from './Interval';
 
-export class VideoModification {
+export class VideoModification implements Interval {
   id: number;
   video: Video;
   modifier: Modifier;

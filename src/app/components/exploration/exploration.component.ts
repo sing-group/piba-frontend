@@ -260,7 +260,7 @@ export class ExplorationComponent implements OnInit, OnDestroy {
       observations: video.observations,
       file: null,
       withText: String(video.withText),
-      exploration: video.exploration
+      exploration: typeof video.exploration === 'string' ? video.exploration : video.exploration.id
     };
   }
 

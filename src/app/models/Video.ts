@@ -25,6 +25,7 @@
 import {VideoSource} from './VideoUrl';
 import {PolypRecording} from './PolypRecording';
 import {VideoModification} from './VideoModification';
+import {Exploration} from './Exploration';
 
 export class Video {
   id: string;
@@ -36,5 +37,5 @@ export class Video {
   isProcessing: boolean;
   withText: boolean;
   fps: number;
-  exploration: string;
+  exploration: string | Exploration;
 }

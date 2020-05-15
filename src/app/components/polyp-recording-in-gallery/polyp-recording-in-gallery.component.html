@@ -40,7 +40,7 @@
     <div class="clr-col-10">
       <div align="center">
         <app-video [video]="polypRecording.video" [interval]="polypRecording" limitToInterval="true"
-                   (time)="onCurrentTimeUpdate($event)" (snapshot)="onSnapshot($event)">
+                   [highlightZones]="highlightZones" (time)="onCurrentTimeUpdate($event)" (snapshot)="onSnapshot($event)">
           <source *ngFor="let source of polypRecording.video.sources" src="{{source.url}}" type="{{source.mediaType}}"/>
           <p>Your browser does not support the video tag.</p>
         </app-video>
@@ -50,6 +50,76 @@
       <button class="btn btn-link">
         <i class="arrow-right"></i>
       </button>
+    </div>
+  </div>
+</div>
+
+<div class="card card-size" *ngIf="polypRecording">
+  <div class="card-header">Polyp recording info</div>
+  <div class="clr-row margin-row">
+    <div class="col-lg-2 col-sm-3 col-xs-4">
+      Exploration
+    </div>
+    <div class="col-lg-4 col-sm-3 col-xs-8">
+      <a routerLink="/explorations/{{polypRecording.polyp.exploration.id}}">
+        {{polypRecording.polyp.exploration.title}}
+      </a>
+    </div>
+    <div class="col-lg-2 col-sm-3 col-xs-4">
+      Start
+    </div>
+    <div class="col-lg-4 col-sm-3 col-xs-8">
+      {{polypRecording.start | time}}
+    </div>
+  </div>
+  <div class="clr-row margin-row">
+    <div class="col-lg-2 col-sm-3 col-xs-4">
+      Polyp
+    </div>
+    <div class="col-lg-4 col-sm-3 col-xs-8">
+      {{polypRecording.polyp.name}}"
+    </div>
+    <div class="col-lg-2 col-sm-3 col-xs-4">
+      End time
+    </div>
+    <div class="col-lg-4 col-sm-3 col-xs-8">
+      {{polypRecording.end | time}}
+    </div>
+  </div>
+  <div class="clr-row margin-row">
+    <div class="col-lg-2 col-sm-3 col-xs-4">
+      Video
+    </div>
+    <div class="col-lg-4 col-sm-3 col-xs-8">
+      {{polypRecording.video.title}}
+    </div>
+    <div class="col-lg-2 col-sm-3 col-xs-4">
+      Duration
+    </div>
+    <div class="col-lg-4 col-sm-3 col-xs-8">
+      {{polypRecording.end - polypRecording.start | time}}
+    </div>
+  </div>
+  <div class="clr-row margin-row">
+    <div class="col-lg-2 col-sm-3 col-xs-4">
+      Modifications
+    </div>
+    <div class="col-lg-2 col-sm-2 col-xs-4">
+      Start
+    </div>
+    <div class="col-lg-2 col-sm-2 col-xs-4">
+      End
+    </div>
+  </div>
+  <div class="clr-row margin-row" *ngFor="let modification of modifications">
+    <div class="col-lg-2 col-sm-3 col-xs-4">
+      {{modification.modifier.name}}
+    </div>
+    <div class="col-lg-2 col-sm-2 col-xs-4">
+      {{modification.start | time}}
+    </div>
+    <div class="col-lg-2 col-sm-2 col-xs-4">
+      {{modification.end | time}}
     </div>
   </div>
 </div>

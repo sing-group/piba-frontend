@@ -22,11 +22,17 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {PolypRecording} from '../../models/PolypRecording';
 import {PolypRecordingsService} from '../../services/polyprecordings.service';
 import {VideoSnapshot} from '../video/VideoSnapshot';
+import {VideoIntervalHighlight} from '../video/VideoIntervalHighlight';
+import {areOverlappingIntervals} from '../../models/Interval';
+import {forkJoin} from 'rxjs/internal/observable/forkJoin';
+import {ExplorationsService} from '../../services/explorations.service';
+import {concatMap, map} from 'rxjs/operators';
+import {VideoModificationsService} from '../../services/video-modifications.service';
 
 @Component({
   selector: 'app-polyp-recording-in-gallery',
@@ -34,11 +40,17 @@ import {VideoSnapshot} from '../video/VideoSnapshot';
   styleUrls: ['./polyp-recording-in-gallery.component.css']
 })
 export class PolypRecordingInGalleryComponent implements OnInit {
+  private static readonly MODIFICATION_COLOR = 'rgba(241, 213, 117, 1)';
+
   polypRecording: PolypRecording;
   datasetId: string;
 
+  highlightZones: VideoIntervalHighlight[] = [];
+
   constructor(
     private readonly route: ActivatedRoute,
+    private readonly explorationsService: ExplorationsService,
+    private readonly modificationsService: VideoModificationsService,
     private readonly polypRecordingsService: PolypRecordingsService
   ) { }
 
@@ -47,7 +59,30 @@ export class PolypRecordingInGalleryComponent implements OnInit {
     this.datasetId = this.route.snapshot.paramMap.get('datasetId');
 
     this.polypRecordingsService.getPolypRecording(id)
-      .subscribe(polypRecording => this.polypRecording = polypRecording);
+      .pipe(
+        concatMap(polypRecording =>
+          forkJoin(
+            this.explorationsService.getExploration((polypRecording.video.exploration as string)),
+            this.modificationsService.getVideoModifications(polypRecording.video.id)
+          )
+          .pipe(
+            map(explorationAndModifications => {
+              polypRecording.polyp.exploration = explorationAndModifications[0];
+              polypRecording.video.exploration = explorationAndModifications[0];
+              polypRecording.video.modifications = explorationAndModifications[1];
+
+              return polypRecording;
+            })
+          )
+        )
+      )
+      .subscribe(polypRecording => {
+        this.polypRecording = polypRecording;
+        this.highlightZones = this.modifications.map(modification => ({
+          interval: modification,
+          color: PolypRecordingInGalleryComponent.MODIFICATION_COLOR
+        }));
+      });
   }
 
   onCurrentTimeUpdate(currentTime: number): void {
@@ -56,5 +91,10 @@ export class PolypRecordingInGalleryComponent implements OnInit {
 
   onSnapshot(snapshot: VideoSnapshot): void {
 
+  }
+
+  get modifications() {
+    return this.polypRecording.video.modifications
+      .filter(modification => areOverlappingIntervals(modification, this.polypRecording));
   }
 }

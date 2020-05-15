@@ -145,7 +145,7 @@ export class VideosService {
       processing: video.isProcessing,
       withText: video.withText,
       fps: video.fps,
-      exploration: video.exploration
+      exploration: typeof video.exploration === 'string' ? video.exploration : video.exploration.id
     };
   }
 }
