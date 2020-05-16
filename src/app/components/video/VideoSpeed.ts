@@ -22,32 +22,27 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-.margin-row {
-  margin: 1%;
+export enum VideoSpeed {
+  SECONDS_1 = '1s',
+  SECONDS_3 = '3s',
+  SECONDS_5 = '5s',
+  FRAMES_1 = '1fr',
+  FRAMES_3 = '3fr',
+  FRAMES_5 = '5fr'
 }
 
-i {
-  border: solid black;
-  border-width: 0 5px 5px 0;
-  display: inline-block;
-  padding: 5px;
-}
-
-.arrow-right {
-  transform: rotate(-45deg);
-  -webkit-transform: rotate(-45deg);
-}
-
-.arrow-left {
-  transform: rotate(135deg);
-  -webkit-transform: rotate(135deg);
-}
-
-.spinner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
+export function speedIncrement(speed: VideoSpeed): number {
+  switch (speed) {
+    case VideoSpeed.FRAMES_1:
+    case VideoSpeed.SECONDS_1:
+      return 1;
+    case VideoSpeed.FRAMES_3:
+    case VideoSpeed.SECONDS_3:
+      return 3;
+    case VideoSpeed.FRAMES_5:
+    case VideoSpeed.SECONDS_5:
+      return 5;
+    default:
+      throw new Error('Invalid speed value: ' + speed);
+  }
 }

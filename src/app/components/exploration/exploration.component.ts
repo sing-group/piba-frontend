@@ -88,6 +88,19 @@ export class ExplorationComponent implements OnInit, OnDestroy {
   ) {
   }
 
+  private static mapVideo(video: Video): VideoUploadInfo {
+    if (video.observations === undefined) {
+      video.observations = '';
+    }
+    return {
+      title: video.title,
+      observations: video.observations,
+      file: null,
+      withText: String(video.withText),
+      exploration: typeof video.exploration === 'string' ? video.exploration : video.exploration.id
+    };
+  }
+
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
 
@@ -99,7 +112,7 @@ export class ExplorationComponent implements OnInit, OnDestroy {
       });
       exploration.videos.forEach((video) => {
         this.videoClones.push({...video});
-        this.videoModificationsService.getVideoModifications(video.id).subscribe(modifications => {
+        this.videoModificationsService.listVideoModifications(video.id).subscribe(modifications => {
           this.videoModificationsInExploration = this.videoModificationsInExploration.concat(modifications);
           video.modifications = modifications;
           this.videoClones.find(clone => clone.id === video.id).modifications = modifications.map(m => ({...m}));
@@ -147,7 +160,7 @@ export class ExplorationComponent implements OnInit, OnDestroy {
     const fileElement = document.getElementById('video-form-file') as HTMLInputElement;
     const file = fileElement.files[0];
     this.video.exploration = this.exploration.id;
-    const videoUploadInfo = this.mapVideo(this.video);
+    const videoUploadInfo = ExplorationComponent.mapVideo(this.video);
     videoUploadInfo.file = file;
     let startTime = Date.now();
 
@@ -249,19 +262,6 @@ export class ExplorationComponent implements OnInit, OnDestroy {
 
   isVideoUploaded(): boolean {
     return this.videoUploaded;
-  }
-
-  private mapVideo(video: Video): VideoUploadInfo {
-    if (video.observations === undefined) {
-      video.observations = '';
-    }
-    return {
-      title: video.title,
-      observations: video.observations,
-      file: null,
-      withText: String(video.withText),
-      exploration: typeof video.exploration === 'string' ? video.exploration : video.exploration.id
-    };
   }
 
   private assignVideoName() {

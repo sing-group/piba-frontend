@@ -22,32 +22,13 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-.margin-row {
-  margin: 1%;
-}
-
-i {
-  border: solid black;
-  border-width: 0 5px 5px 0;
-  display: inline-block;
-  padding: 5px;
-}
-
-.arrow-right {
-  transform: rotate(-45deg);
-  -webkit-transform: rotate(-45deg);
-}
-
-.arrow-left {
-  transform: rotate(135deg);
-  -webkit-transform: rotate(135deg);
-}
-
-.spinner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
+export class CollectionUtils {
+  public static mapToUniques<T, U>(
+    values: T[],
+    callbackfn: (value: T, index: number, array: T[]) => U
+  ): U[] {
+    return Array.from(new Set<U>(
+      values.map(callbackfn)
+    ));
+  }
 }

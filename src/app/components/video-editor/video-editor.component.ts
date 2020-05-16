@@ -170,7 +170,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
           this.video.polypRecording = polypRecordings;
           this.updatePolypRecordingZones();
         });
-        this.videoModificationsService.getVideoModifications(this.video.id)
+        this.videoModificationsService.listVideoModifications(this.video.id)
           .subscribe(videoModifications => {
             this.video.modifications = videoModifications;
             this.updateVideoModificationZones();

@@ -22,11 +22,11 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export enum VideoStepType {
-  SECONDS= 'Seconds', FRAMES = 'Frames'
-}
+import {Interval} from './Interval';
 
-export const VIDEO_STEP_TYPE_ABBREVIATIONS = new Map<VideoStepType, string>([
-  [VideoStepType.SECONDS, 'Sec'],
-  [VideoStepType.FRAMES, 'Fr']
-]);
+export interface PolypRecordingBasicData extends Interval {
+  id: number;
+  video: string;
+  polyp: string;
+  confirmed: boolean;
+}

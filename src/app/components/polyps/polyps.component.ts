@@ -27,9 +27,8 @@ import {PolypsService} from '../../services/polyps.service';
 import {ClrDatagridPagination, ClrDatagridStateInterface} from '@clr/angular';
 import {Polyp} from '../../models/Polyp';
 import {Subject} from 'rxjs/internal/Subject';
-import {concatMap, debounceTime, distinctUntilChanged, map, tap} from 'rxjs/operators';
+import {concatMap, debounceTime, distinctUntilChanged, map} from 'rxjs/operators';
 import {NotificationService} from '../../modules/notification/services/notification.service';
-import {forkJoin} from 'rxjs/internal/observable/forkJoin';
 import {ExplorationsService} from '../../services/explorations.service';
 import {PolypRecordingsService} from '../../services/polyprecordings.service';
 
@@ -121,7 +120,6 @@ export class PolypsComponent implements OnInit {
         )
       )
     .subscribe(polypsPage => {
-      console.log(polypsPage);
       this.polyps = polypsPage.polyps;
       this.paginationTotalItems = polypsPage.totalItems;
       this.loading = false;

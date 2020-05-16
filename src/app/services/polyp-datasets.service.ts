@@ -38,6 +38,7 @@ import {PolypRecordingsService} from './polyprecordings.service';
 import {PolypPage} from './entities/PolypPage';
 import {PolypRecordingPage} from './entities/PolypRecordingPage';
 import {of} from 'rxjs/internal/observable/of';
+import {PolypRecordingBasicData} from '../models/PolypRecordingBasicData';
 
 @Injectable()
 export class PolypDatasetsService {
@@ -108,7 +109,7 @@ export class PolypDatasetsService {
       );
   }
 
-  getPolypRecordings(id: string, page: number, pageSize: number): Observable<PolypRecordingPage> {
+  listPolypRecordings(id: string, page?: number, pageSize?: number): Observable<PolypRecordingPage> {
     const params = new HttpParams()
       .append('page', page.toString())
       .append('pageSize', pageSize.toString());
@@ -128,5 +129,16 @@ export class PolypDatasetsService {
           `Polyps recordings in dataset '${id}' in page ${page} (page size: ${pageSize}) could not be retrieved.`
         )
       );
+  }
+
+  listAllPolypRecordingBasicData(id: string): Observable<PolypRecordingBasicData[]> {
+    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polypdataset/${id}/polyprecording`)
+    .pipe(
+      map(infos => infos.map(PolypRecordingsService.mapPolypRecordingBasicData)),
+      PibaError.throwOnError(
+        'Error retrieving polyp recordings in dataset',
+        `Polyps recordings in dataset '${id}' could not be retrieved.`
+      )
+    );
   }
 }

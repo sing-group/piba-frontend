@@ -25,7 +25,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {VideoModification} from '../models/VideoModification';
-import {forkJoin, Observable} from 'rxjs';
+import {forkJoin, Observable, OperatorFunction} from 'rxjs';
 import {VideoModificationInfo} from './entities/VideoModificationInfo';
 import {environment} from '../../environments/environment';
 import {concatMap, map} from 'rxjs/operators';
@@ -34,98 +34,22 @@ import {VideosService} from './videos.service';
 import {IdAndUri} from './entities/IdAndUri';
 import {Modifier} from '../models/Modifier';
 import {Video} from '../models/Video';
+import {PibaError} from '../modules/notification/entities';
+import {CollectionUtils} from '../utils/collection.utils';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VideoModificationsService {
 
-  constructor(private http: HttpClient, private modifiersService: ModifiersService, private videosService: VideosService) {
+  constructor(
+    private readonly http: HttpClient,
+    private readonly modifiersService: ModifiersService,
+    private readonly videosService: VideosService
+  ) {
   }
 
-  createVideoModification(videoModification: VideoModification): Observable<VideoModification> {
-    const newVideoModificationInfo = this.toVideoModificationInfo(videoModification);
-
-    return this.http.post<VideoModificationInfo>(`${environment.restApi}/videomodification`, newVideoModificationInfo)
-      .pipe(
-        concatMap((videoModificationInfo) =>
-          forkJoin(
-            this.videosService.getVideo((<IdAndUri>videoModificationInfo.video).id),
-            this.modifiersService.getModifier((<IdAndUri>videoModificationInfo.modifier).id)
-          ).pipe(
-            map(videoAndModifier =>
-              this.mapVideoModificationInfo(videoModificationInfo, videoAndModifier[0], videoAndModifier[1]
-              )
-            )
-          )
-        )
-      );
-  }
-
-  getVideoModifications(video_id: string): Observable<VideoModification[]> {
-    let params = new HttpParams();
-    params = params.append('id', video_id);
-
-    return this.http.get<VideoModificationInfo[]>(`${environment.restApi}/videomodification`, {params})
-      .pipe(
-        concatMap(videoModificationInfos =>
-          forkJoin(videoModificationInfos.map(videoModificationInfo =>
-            forkJoin(
-              this.videosService.getVideo((<IdAndUri>videoModificationInfo.video).id),
-              this.modifiersService.getModifier((<IdAndUri>videoModificationInfo.modifier).id))
-          )).pipe(
-            map(videosAndModifiers =>
-              videoModificationInfos.map((videoModificationInfo, index) =>
-                this.mapVideoModificationInfo(videoModificationInfo, videosAndModifiers[index][0], videosAndModifiers[index][1]))
-            )
-          )
-        )
-      );
-  }
-
-  removeVideoModification(id: number) {
-    return this.http.delete(`${environment.restApi}/videomodification/${id}`);
-  }
-
-  editVideoModification(videoModification: VideoModification): Observable<VideoModification> {
-    const newVideoModificationInfo = this.toVideoModificationInfo(videoModification);
-    return this.http.put<VideoModificationInfo>(`${environment.restApi}/videomodification/${newVideoModificationInfo.id}`,
-      newVideoModificationInfo)
-      .pipe(
-        concatMap((videoModificationInfo) =>
-          forkJoin(
-            this.videosService.getVideo((<IdAndUri>videoModificationInfo.video).id),
-            this.modifiersService.getModifier((<IdAndUri>videoModificationInfo.modifier).id)
-          ).pipe(
-            map(videoAndModifier =>
-              this.mapVideoModificationInfo(videoModificationInfo, videoAndModifier[0], videoAndModifier[1]
-              )
-            )
-          )
-        )
-      );
-  }
-
-  editVideoModifications(modifications: VideoModification[]): Observable<VideoModification[]> {
-    const modificationsInfo: VideoModificationInfo[] = modifications.map(modification => this.toVideoModificationInfo(modification));
-
-    return this.http.put<VideoModificationInfo[]>(`${environment.restApi}/videomodification`, modificationsInfo).pipe(
-      concatMap(videoModificationInfos =>
-        forkJoin(videoModificationInfos.map(videoModificationInfo =>
-          forkJoin(
-            this.videosService.getVideo((<IdAndUri>videoModificationInfo.video).id),
-            this.modifiersService.getModifier((<IdAndUri>videoModificationInfo.modifier).id))
-        )).pipe(
-          map(videosAndModifiers =>
-            videoModificationInfos.map((videoModificationInfo, index) =>
-              this.mapVideoModificationInfo(videoModificationInfo, videosAndModifiers[index][0], videosAndModifiers[index][1]))
-          )
-        )
-      )
-    );
-  }
-
-  private toVideoModificationInfo(videoModification: VideoModification): VideoModificationInfo {
+  private static toVideoModificationInfo(videoModification: VideoModification): VideoModificationInfo {
     return {
       id: videoModification.id,
       video: videoModification.video.id,
@@ -136,7 +60,9 @@ export class VideoModificationsService {
     };
   }
 
-  private mapVideoModificationInfo(videoModificationInfo: VideoModificationInfo, video: Video, modifier: Modifier): VideoModification {
+  private static mapVideoModificationInfo(
+    videoModificationInfo: VideoModificationInfo, video: Video, modifier: Modifier
+  ): VideoModification {
     return {
       id: videoModificationInfo.id,
       video: video,
@@ -145,5 +71,119 @@ export class VideoModificationsService {
       end: videoModificationInfo.end,
       confirmed: videoModificationInfo.confirmed
     };
+  }
+
+  private createFillVideoModificationOperation(): OperatorFunction<VideoModificationInfo, VideoModification> {
+    return concatMap((videoModificationInfo: VideoModificationInfo) =>
+      forkJoin(
+        this.videosService.getVideo((<IdAndUri>videoModificationInfo.video).id),
+        this.modifiersService.getModifier((<IdAndUri>videoModificationInfo.modifier).id)
+      ).pipe(
+        map(videoAndModifier =>
+          VideoModificationsService.mapVideoModificationInfo(
+            videoModificationInfo, videoAndModifier[0], videoAndModifier[1]
+          )
+        )
+      )
+    );
+  }
+
+  private createFillMultipleVideoModificationOperation(videoId?: string): OperatorFunction<VideoModificationInfo[], VideoModification[]> {
+    let listVideos: (modifications: VideoModificationInfo[]) => Observable<Video[]>;
+    if (videoId !== null && videoId !== undefined) {
+      listVideos = () => forkJoin(this.videosService.getVideo(videoId));
+    } else {
+      listVideos = videoModificationInfos => {
+        const videoIds = CollectionUtils.mapToUniques(
+          videoModificationInfos,
+          info => (info.video as IdAndUri).id
+        );
+
+        return forkJoin(videoIds.map(id => this.videosService.getVideo(id)));
+      };
+    }
+
+    return concatMap(videoModificationInfos => {
+      const modifierIds = CollectionUtils.mapToUniques(
+        videoModificationInfos,
+        info => (info.modifier as IdAndUri).id
+      );
+
+      return forkJoin(
+        listVideos(videoModificationInfos),
+        forkJoin(modifierIds.map(modifierId => this.modifiersService.getModifier(modifierId)))
+      ).pipe(
+        map(videosAndModifiers => videoModificationInfos.map(videoModificationInfo => {
+          return VideoModificationsService.mapVideoModificationInfo(
+            videoModificationInfo,
+            videosAndModifiers[0].find(video => video.id === (videoModificationInfo.video as IdAndUri).id),
+            videosAndModifiers[1].find(modifier => modifier.id === (videoModificationInfo.modifier as IdAndUri).id));
+        }))
+      );
+    });
+  }
+
+  createVideoModification(videoModification: VideoModification): Observable<VideoModification> {
+    const newVideoModificationInfo = VideoModificationsService.toVideoModificationInfo(videoModification);
+
+    return this.http.post<VideoModificationInfo>(`${environment.restApi}/videomodification`, newVideoModificationInfo)
+      .pipe(
+        this.createFillVideoModificationOperation(),
+        PibaError.throwOnError(
+          'Error creating video modification',
+          'Video modification could not be created.'
+        )
+      );
+  }
+
+  listVideoModifications(videoId: string): Observable<VideoModification[]> {
+    let params = new HttpParams();
+    params = params.append('id', videoId);
+
+    return this.http.get<VideoModificationInfo[]>(`${environment.restApi}/videomodification`, {params})
+      .pipe(
+        this.createFillMultipleVideoModificationOperation(videoId),
+        PibaError.throwOnError(
+          'Error listing video modifications',
+          `Video modifications of video '${videoId}' could not be created.`
+        )
+      );
+  }
+
+  removeVideoModification(id: number) {
+    return this.http.delete(`${environment.restApi}/videomodification/${id}`)
+      .pipe(
+        PibaError.throwOnError(
+          'Error removing video modification',
+          `Video modification '${id}' could not be removed.`
+        )
+      );
+  }
+
+  editVideoModification(videoModification: VideoModification): Observable<VideoModification> {
+    const newVideoModificationInfo = VideoModificationsService.toVideoModificationInfo(videoModification);
+    return this.http.put<VideoModificationInfo>(`${environment.restApi}/videomodification/${newVideoModificationInfo.id}`,
+      newVideoModificationInfo)
+      .pipe(
+        this.createFillVideoModificationOperation(),
+        PibaError.throwOnError(
+          'Error modifying video modification',
+          `Video modification '${videoModification.id}' could not be modified.`
+        )
+      );
+  }
+
+  editVideoModifications(modifications: VideoModification[]): Observable<VideoModification[]> {
+    const modificationsInfo: VideoModificationInfo[] = modifications.map(
+      VideoModificationsService.toVideoModificationInfo
+    );
+
+    return this.http.put<VideoModificationInfo[]>(`${environment.restApi}/videomodification`, modificationsInfo).pipe(
+      this.createFillMultipleVideoModificationOperation(),
+      PibaError.throwOnError(
+        'Error modifying multiple video modification',
+        `Video modifications could not be modified.`
+      )
+    );
   }
 }

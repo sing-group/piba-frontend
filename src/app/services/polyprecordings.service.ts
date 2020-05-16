@@ -36,6 +36,7 @@ import {concatMap, map} from 'rxjs/operators';
 import {IdAndUri} from './entities/IdAndUri';
 import {OperatorFunction} from 'rxjs/internal/types';
 import {PibaError} from '../modules/notification/entities';
+import {PolypRecordingBasicData} from '../models/PolypRecordingBasicData';
 
 @Injectable()
 export class PolypRecordingsService {
@@ -53,6 +54,28 @@ export class PolypRecordingsService {
       start: polypRecordingInfo.start,
       end: polypRecordingInfo.end,
       confirmed: polypRecordingInfo.confirmed
+    };
+  }
+
+  public static mapPolypRecordingBasicData(polypRecordingInfo: PolypRecordingInfo): PolypRecordingBasicData {
+    return {
+      id: polypRecordingInfo.id,
+      video: typeof polypRecordingInfo.video === 'string' ? polypRecordingInfo.video : polypRecordingInfo.video.id,
+      polyp: typeof polypRecordingInfo.polyp === 'string' ? polypRecordingInfo.polyp : polypRecordingInfo.polyp.id,
+      start: polypRecordingInfo.start,
+      end: polypRecordingInfo.end,
+      confirmed: polypRecordingInfo.confirmed
+    };
+  }
+
+  private static toPolypRecordingInfo(polypRecording: PolypRecording): PolypRecordingInfo {
+    return {
+      id: polypRecording.id,
+      video: polypRecording.video.id,
+      polyp: polypRecording.polyp.id,
+      start: polypRecording.start,
+      end: polypRecording.end,
+      confirmed: polypRecording.confirmed
     };
   }
 
@@ -94,7 +117,7 @@ export class PolypRecordingsService {
     );
   }
 
-  public getPolypRecording(id: string): Observable<PolypRecording> {
+  public getPolypRecording(id: number): Observable<PolypRecording> {
     return this.http.get<PolypRecordingInfo>(`${environment.restApi}/polyprecording/${id}`)
       .pipe(
         this.createFillPolypAndVideoOperator(),
@@ -127,7 +150,7 @@ export class PolypRecordingsService {
   }
 
   createPolypRecording(polypRecording: PolypRecording): Observable<PolypRecording> {
-    const newPolypRecordingInfo = this.toPolypRecordingInfo(polypRecording);
+    const newPolypRecordingInfo = PolypRecordingsService.toPolypRecordingInfo(polypRecording);
 
     return this.http.post<PolypRecordingInfo>(`${environment.restApi}/polyprecording`, newPolypRecordingInfo)
       .pipe(this.createFillPolypAndVideoOperator());
@@ -140,25 +163,16 @@ export class PolypRecordingsService {
   }
 
   editPolypRecording(polypRecording: PolypRecording): Observable<PolypRecording> {
-    const newPolypRecordingInfo = this.toPolypRecordingInfo(polypRecording);
+    const newPolypRecordingInfo = PolypRecordingsService.toPolypRecordingInfo(polypRecording);
     return this.http.put<PolypRecordingInfo>(`${environment.restApi}/polyprecording/${newPolypRecordingInfo.id}`, newPolypRecordingInfo)
       .pipe(this.createFillPolypAndVideoOperator());
   }
 
   editPolypRecordings(polypRecordings: PolypRecording[]): Observable<PolypRecording[]> {
-    const newPolypRecordingsInfo: PolypRecordingInfo[] = polypRecordings.map(polypRecording => this.toPolypRecordingInfo(polypRecording));
+    const newPolypRecordingsInfo: PolypRecordingInfo[] = polypRecordings
+      .map(polypRecording => PolypRecordingsService.toPolypRecordingInfo(polypRecording));
+
     return this.http.put<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording`, newPolypRecordingsInfo)
       .pipe(this.createFillMultiplePolypAndVideoOperator());
-  }
-
-  private toPolypRecordingInfo(polypRecording: PolypRecording): PolypRecordingInfo {
-    return {
-      id: polypRecording.id,
-      video: polypRecording.video.id,
-      polyp: polypRecording.polyp.id,
-      start: polypRecording.start,
-      end: polypRecording.end,
-      confirmed: polypRecording.confirmed
-    };
   }
 }

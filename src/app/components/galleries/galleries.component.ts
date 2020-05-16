@@ -87,7 +87,6 @@ export class GalleriesComponent implements OnInit {
     const newGalleries = this._galleries
       .filter(gallery => !this.imagesInGalleryInfoMap.has(gallery.id));
 
-    console.log(newGalleries);
     if (newGalleries.length > 0) {
       this.loadingImagesInGalleryInfo = true;
 

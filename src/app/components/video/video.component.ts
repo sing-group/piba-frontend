@@ -22,38 +22,55 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AfterViewChecked, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {
+  AfterViewChecked,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import {VideoSnapshot} from './VideoSnapshot';
-import {areOverlappingIntervals, Interval} from '../../models/Interval';
+import {areOverlappingIntervals, Interval, IntervalBoundaries, isValidInterval} from '../../models/Interval';
 import {VideoIntervalHighlight} from './VideoIntervalHighlight';
-import {VIDEO_STEP_TYPE_ABBREVIATIONS, VideoStepType} from './VideoStepType';
+import {speedIncrement, VideoSpeed} from './VideoSpeed';
 import {Video} from '../../models/Video';
+import {EnumUtils} from '../../utils/enum.utils';
 
 @Component({
   selector: 'app-video',
   templateUrl: './video.component.html',
-  styleUrls: ['./video.component.css']
+  styleUrls: ['./video.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VideoComponent implements AfterViewChecked, OnInit {
+  private static readonly PROGRESS_PRECISION = 1000;
+
   @Input() video: Video;
   @Input() interval: Interval = null;
   @Input() limitToInterval = false;
+  @Input() intervalBoundaries = IntervalBoundaries.BOTH_INCLUDED;
   private _highlightZones: VideoIntervalHighlight[] = [];
 
   // tslint:disable-next-line:no-output-rename
   @Output('time') timeEmitter = new EventEmitter<number>();
   // tslint:disable-next-line:no-output-rename
   @Output('snapshot') snapshotEmitter = new EventEmitter<VideoSnapshot>();
+  // tslint:disable-next-line:no-output-rename
+  @Output('ready') readyEmitter = new EventEmitter<boolean>();
 
   @ViewChild('container') containerElementRef: ElementRef;
   @ViewChild('videoElement') videoElementRef: ElementRef<HTMLVideoElement>;
   @ViewChild('progressElement') progressElementRef: ElementRef<HTMLInputElement>;
 
   fullscreen = false;
-  videoSpeed = 3;
-  videoStep = VideoStepType.SECONDS;
+  videoSpeed = VideoSpeed.SECONDS_3;
 
-  readonly videoStepTypes = Array.from(VIDEO_STEP_TYPE_ABBREVIATIONS);
+  readonly videoSpeedValues = EnumUtils.enumValues(VideoSpeed);
 
   private playWatcher: number = undefined;
   private intervalWatcher: number = undefined;
@@ -63,7 +80,7 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   private secondsPerFrame: number;
 
   constructor(
-    private cdRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef
   ) {
   }
 
@@ -72,7 +89,7 @@ export class VideoComponent implements AfterViewChecked, OnInit {
       throw new Error('video is required');
     }
 
-    if (this.limitToInterval && (this.interval === null || this.interval.start > this.interval.end)) {
+    if (this.limitToInterval && (this.interval === null || !isValidInterval(this.interval, this.intervalBoundaries))) {
       throw new Error('limitToInterval can only be used with a valid interval');
     }
 
@@ -80,16 +97,16 @@ export class VideoComponent implements AfterViewChecked, OnInit {
 
     this.videoElement.addEventListener('timeupdate', () => this.timeEmitter.emit(this.currentTime));
     this.videoElement.addEventListener('loadedmetadata', () => {
-      this.progressElement.max = String(this.duration);
-      this.progressElement.valueAsNumber = 0;
+      this.progressElement.max = String(this.duration * VideoComponent.PROGRESS_PRECISION);
+      this.currentProgressTime = 0;
       this.currentTime = this.startTime;
     });
+    this.videoElement.addEventListener('canplaythrough', () => this.readyEmitter.emit(true));
 
     const updateFullscreen = this.updateFullscreen.bind(this);
     document.addEventListener('fullscreenchange', updateFullscreen);
     document.addEventListener('mozfullscreenchange', updateFullscreen);
     document.addEventListener('webkitfullscreenchange', updateFullscreen);
-
   }
 
   ngAfterViewChecked() {
@@ -97,9 +114,9 @@ export class VideoComponent implements AfterViewChecked, OnInit {
     this.progressElement.style.height = '100%';
     this._displayTime = this.updateProgressWithTime
       ? this.currentTime - this.startTime
-      : this.progressElement.valueAsNumber;
+      : this.currentProgressTime;
 
-    this.cdRef.detectChanges();
+    this.changeDetectorRef.detectChanges();
   }
 
   @Input() set highlightZones(highlightZones: VideoIntervalHighlight[]) {
@@ -108,15 +125,37 @@ export class VideoComponent implements AfterViewChecked, OnInit {
     let visibleZones;
     if (this.limitToInterval) {
       visibleZones = this._highlightZones
-        .filter(zone => areOverlappingIntervals(zone.interval, this.interval));
+        .filter(zone => areOverlappingIntervals(zone.interval, this.interval, this.intervalBoundaries));
     } else {
       visibleZones = this._highlightZones;
     }
 
     this.progressbarBackground = '';
     for (const zone of visibleZones) {
-      const start = ((zone.interval.start - this.startTime) * 100 / this.duration).toFixed(4);
-      const end = ((zone.interval.end - this.startTime) * 100 / this.duration).toFixed(4);
+      let zoneStart;
+      let zoneEnd;
+
+      switch (this.intervalBoundaries) {
+        case IntervalBoundaries.BOTH_INCLUDED:
+          zoneStart = zone.interval.start;
+          zoneEnd = zone.interval.end + 0.999;
+          break;
+        case IntervalBoundaries.BOTH_EXCLUDED:
+          zoneStart = zone.interval.start + 1;
+          zoneEnd = zone.interval.end;
+          break;
+        case IntervalBoundaries.START_INCLUDED_END_EXCLUDED:
+          zoneStart = zone.interval.start;
+          zoneEnd = zone.interval.end;
+          break;
+        case IntervalBoundaries.START_EXCLUDED_END_INCLUDED:
+          zoneStart = zone.interval.start + 1;
+          zoneEnd = zone.interval.end + 0.999;
+          break;
+      }
+
+      const start = ((zoneStart - this.startTime) * 100 / this.duration).toFixed(4);
+      const end = ((zoneEnd - this.startTime) * 100 / this.duration).toFixed(4);
 
       if (this.progressbarBackground !== '') {
         this.progressbarBackground += ', ';
@@ -163,6 +202,14 @@ export class VideoComponent implements AfterViewChecked, OnInit {
     this.videoElement.currentTime = Math.min(this.endTime, Math.max(this.startTime, time));
   }
 
+  private set currentProgressTime(progress: number) {
+    this.progressElement.valueAsNumber = progress * VideoComponent.PROGRESS_PRECISION;
+  }
+
+  private get currentProgressTime(): number {
+    return this.progressElement.valueAsNumber / VideoComponent.PROGRESS_PRECISION;
+  }
+
   get offsetWidth(): number {
     return this.videoElement.offsetWidth;
   }
@@ -175,12 +222,46 @@ export class VideoComponent implements AfterViewChecked, OnInit {
     return this._displayTime;
   }
 
-  private get endTime(): number {
-    return this.limitToInterval ? this.interval.end : this.videoElement.duration;
+  private get startTime(): number {
+    if (this.limitToInterval) {
+      switch (this.intervalBoundaries) {
+        case IntervalBoundaries.BOTH_INCLUDED:
+        case IntervalBoundaries.START_INCLUDED_END_EXCLUDED:
+          return this.interval.start;
+        case IntervalBoundaries.BOTH_EXCLUDED:
+        case IntervalBoundaries.START_EXCLUDED_END_INCLUDED:
+          return this.interval.start + 1;
+        default:
+          throw new Error('Invalid interval boundaries: ' + this.intervalBoundaries);
+      }
+    } else {
+      return this.videoElement.duration;
+    }
   }
 
-  private get startTime(): number {
-    return this.limitToInterval ? this.interval.start : 0;
+  private get endTime(): number {
+    if (this.limitToInterval) {
+      return this.currentIntervalEnd;
+    } else {
+      return this.videoElement.duration;
+    }
+  }
+
+  private get currentIntervalEnd(): number {
+    if (this.interval === null) {
+      throw new Error('No interval is set');
+    } else {
+      switch (this.intervalBoundaries) {
+        case IntervalBoundaries.BOTH_INCLUDED:
+        case IntervalBoundaries.START_EXCLUDED_END_INCLUDED:
+          return this.interval.end + 0.999;
+        case IntervalBoundaries.BOTH_EXCLUDED:
+        case IntervalBoundaries.START_INCLUDED_END_EXCLUDED:
+          return this.interval.end;
+        default:
+          throw new Error('Invalid interval boundaries: ' + this.intervalBoundaries);
+      }
+    }
   }
 
   playVideo() {
@@ -198,7 +279,7 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   stopVideo() {
     this.videoElement.pause();
     this.currentTime = this.startTime;
-    this.progressElement.valueAsNumber = 0;
+    this.currentProgressTime = 0;
     clearInterval(this.playWatcher);
     this.playWatcher = undefined;
   }
@@ -206,14 +287,21 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   forwardVideo() {
     this.initializePlayWatcher();
 
-    switch (this.videoStep) {
-      case VideoStepType.FRAMES:
-        this.currentTime = this.currentTime + this.secondsPerFrame;
+    switch (this.videoSpeed) {
+      case VideoSpeed.FRAMES_1:
+      case VideoSpeed.FRAMES_3:
+      case VideoSpeed.FRAMES_5:
+        const framesIncrement = speedIncrement(this.videoSpeed);
+        this.currentTime = this.currentTime + this.secondsPerFrame * framesIncrement;
 
         break;
-      case VideoStepType.SECONDS:
-        if (this.currentTime % 1 >= 0.99 || Number(this.videoSpeed) > 1) {
-          this.currentTime = Math.floor(this.currentTime) + 0.999 + Number(this.videoSpeed);
+      case VideoSpeed.SECONDS_1:
+      case VideoSpeed.SECONDS_3:
+      case VideoSpeed.SECONDS_5:
+        const secondsIncrement = speedIncrement(this.videoSpeed);
+
+        if (this.currentTime % 1 >= 0.99 || secondsIncrement > 1) {
+          this.currentTime = Math.floor(this.currentTime) + 0.999 + secondsIncrement;
         } else {
           this.currentTime = Math.floor(this.currentTime) + 0.999;
         }
@@ -229,13 +317,21 @@ export class VideoComponent implements AfterViewChecked, OnInit {
     this.initializePlayWatcher();
 
 
-    switch (this.videoStep) {
-      case VideoStepType.FRAMES:
-        this.currentTime = this.currentTime - this.secondsPerFrame;
+    switch (this.videoSpeed) {
+      case VideoSpeed.FRAMES_1:
+      case VideoSpeed.FRAMES_3:
+      case VideoSpeed.FRAMES_5:
+        const framesDecrement = speedIncrement(this.videoSpeed);
+
+        this.currentTime = this.currentTime - this.secondsPerFrame * framesDecrement;
         break;
-      case VideoStepType.SECONDS:
-        if (this.currentTime % 1 < 0.01 || Number(this.videoSpeed) > 1 || (!this.paused && Number(this.videoSpeed) === 1)) {
-          this.currentTime = Math.floor(this.currentTime) - Number(this.videoSpeed);
+      case VideoSpeed.SECONDS_1:
+      case VideoSpeed.SECONDS_3:
+      case VideoSpeed.SECONDS_5:
+        const secondsDecrement = speedIncrement(this.videoSpeed);
+
+        if (this.currentTime % 1 < 0.01 || secondsDecrement > 1 || (!this.paused && secondsDecrement === 1)) {
+          this.currentTime = Math.floor(this.currentTime) - secondsDecrement;
         } else {
           this.currentTime = Math.floor(this.currentTime);
         }
@@ -261,7 +357,7 @@ export class VideoComponent implements AfterViewChecked, OnInit {
           this.playWatcher = undefined;
         }
 
-        this.progressElement.value = String(this.currentTime - this.startTime);
+        this.currentProgressTime = this.currentTime - this.startTime;
       }
     }, 100);
   }
@@ -295,7 +391,7 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   }
 
   isValidInterval(interval: Interval): boolean {
-    return interval.start <= interval.end
+    return isValidInterval(interval, this.intervalBoundaries)
       && this.duration !== undefined
       && interval.start >= 0
       && interval.end <= this.duration;
@@ -313,11 +409,11 @@ export class VideoComponent implements AfterViewChecked, OnInit {
 
       this.interval = interval;
       this.currentTime = interval.start;
-      this.progressElement.valueAsNumber = this.videoElement.currentTime;
+      this.currentProgressTime = this.videoElement.currentTime;
       this.intervalWatcher = setInterval(() => {
-        if (this.currentTime >= interval.end) {
+        if (this.currentTime >= this.currentIntervalEnd) {
           this.videoElement.pause();
-          this.currentTime = interval.end;
+          this.currentTime = this.currentIntervalEnd;
           this.clearInterval();
         }
       }, 100);
@@ -351,10 +447,10 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   }
 
   mouseUpProgress() {
-    if (!this.limitToInterval && this.interval !== null && this.progressElement.valueAsNumber >= this.interval.end) {
+    if (!this.limitToInterval && this.interval !== null && this.currentProgressTime >= this.currentIntervalEnd) {
       this.clearInterval();
     }
-    this.currentTime = this.startTime + this.progressElement.valueAsNumber;
+    this.currentTime = this.startTime + this.currentProgressTime;
     this.updateProgressWithTime = true;
   }
 

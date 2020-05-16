@@ -22,39 +22,41 @@
   ~  along with this program. If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<span class="spinner" *ngIf="!polypRecording">
+<span class="spinner" *ngIf="isLoading()">
     Loading...
 </span>
 
-<div *ngIf="polypRecording">
+<div *ngIf="!isLoading()">
   <div class="clr-row clr-justify-content-end">
     <button class="btn btn-primary" routerLink="/polypdatasets/{{datasetId}}">Back</button>
   </div>
 
   <div class="clr-row">
     <div class="clr-col-1 clr-align-self-center" align="center">
-      <button class="btn btn-link">
+      <button class="btn btn-link" [class.disabled]="!hasPrevious()" (click)="onGoToPrevious()">
         <i class="arrow-left"></i>
       </button>
     </div>
     <div class="clr-col-10">
       <div align="center">
+        <span class="spinner" [hidden]="isVideoReady()">
+          Loading...
+        </span>
         <app-video [video]="polypRecording.video" [interval]="polypRecording" limitToInterval="true"
-                   [highlightZones]="highlightZones" (time)="onCurrentTimeUpdate($event)" (snapshot)="onSnapshot($event)">
-          <source *ngFor="let source of polypRecording.video.sources" src="{{source.url}}" type="{{source.mediaType}}"/>
-          <p>Your browser does not support the video tag.</p>
+                   [intervalBoundaries]="intervalBoundaries" [highlightZones]="highlightZones" [hidden]="!isVideoReady()"
+                   (ready)="onReady()">
         </app-video>
       </div>
     </div>
     <div class="clr-col-1 clr-align-self-center" align="center">
-      <button class="btn btn-link">
+      <button class="btn btn-link" [class.disabled]="!hasNext()" (click)="onGoToNext()">
         <i class="arrow-right"></i>
       </button>
     </div>
   </div>
 </div>
 
-<div class="card card-size" *ngIf="polypRecording">
+<div class="card card-size" *ngIf="!isLoading()">
   <div class="card-header">Polyp recording info</div>
   <div class="clr-row margin-row">
     <div class="col-lg-2 col-sm-3 col-xs-4">
@@ -77,7 +79,7 @@
       Polyp
     </div>
     <div class="col-lg-4 col-sm-3 col-xs-8">
-      {{polypRecording.polyp.name}}"
+      {{polypRecording.polyp.name}}
     </div>
     <div class="col-lg-2 col-sm-3 col-xs-4">
       End time
@@ -97,10 +99,11 @@
       Duration
     </div>
     <div class="col-lg-4 col-sm-3 col-xs-8">
-      {{polypRecording.end - polypRecording.start | time}}
+      {{duration | time}}
     </div>
   </div>
-  <div class="clr-row margin-row">
+  <hr *ngIf="hasModifications()"/>
+  <div class="clr-row margin-row" *ngIf="hasModifications()">
     <div class="col-lg-2 col-sm-3 col-xs-4">
       Modifications
     </div>
@@ -109,6 +112,9 @@
     </div>
     <div class="col-lg-2 col-sm-2 col-xs-4">
       End
+    </div>
+    <div class="col-lg-2 col-sm-2 col-xs-4">
+      Duration
     </div>
   </div>
   <div class="clr-row margin-row" *ngFor="let modification of modifications">
@@ -120,6 +126,9 @@
     </div>
     <div class="col-lg-2 col-sm-2 col-xs-4">
       {{modification.end | time}}
+    </div>
+    <div class="col-lg-2 col-sm-2 col-xs-4">
+      {{calculateModificationDuration(modification) | time}}
     </div>
   </div>
 </div>

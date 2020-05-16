@@ -219,13 +219,13 @@ export class PolypDatasetComponent implements OnInit {
 
   private getPagePolypRecordings() {
     this.polypRecordingsLoading = true;
-    this.polypDatasetsService.getPolypRecordings(this.id, this.currentPolypRecordingsPage, this.polypRecordingsPageSize)
+    this.polypDatasetsService.listPolypRecordings(this.id, this.currentPolypRecordingsPage, this.polypRecordingsPageSize)
       .subscribe(polypRecordingsPage => {
         this.polypRecordings = polypRecordingsPage.polypRecordings;
         this.polypRecordingsPaginationTotalItems = polypRecordingsPage.totalItems;
         this.polypRecordingsLoading = false;
       });
-    this.polypDatasetsService.getPolypRecordings(this.id, this.currentPolypRecordingsPage, this.polypRecordingsPageSize)
+    this.polypDatasetsService.listPolypRecordings(this.id, this.currentPolypRecordingsPage, this.polypRecordingsPageSize)
       .pipe(
         concatMap(page =>
           forkJoin(
@@ -239,7 +239,7 @@ export class PolypDatasetComponent implements OnInit {
                 const currentExploration = polypRecording.polyp.exploration;
 
                 if (typeof currentExploration === 'string') {
-                  polypRecording.polyp.exploration = explorations.find(exploration => exploration.id === currentExploration)
+                  polypRecording.polyp.exploration = explorations.find(exploration => exploration.id === currentExploration);
                 }
               });
 
