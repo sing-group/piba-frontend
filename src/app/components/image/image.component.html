@@ -22,63 +22,74 @@
   ~  along with this program. If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<span class="spinner" *ngIf="!identifiers">
+<span class="spinner" *ngIf="isLoadingInitialData">
     Loading...
 </span>
-<div [hidden]="image.id == null">
+
+<div [hidden]="isLoadingInitialData">
   <div class="clr-row clr-justify-content-end">
-    <a class="btn btn-success" id="download-image-button" download="{{getFileName()}}"
-       href="#" (click)="checkIfLocationSavedAndDownloadImage()">Download</a>
-    <button class="btn btn-primary" (click)="back = true; checkIfLocationSavedAndRedirectToGallery()">Back</button>
+    <a class="btn btn-success" [download]="fileName" [href]="imageAnnotator.dataUrl">
+      Download
+    </a>
+    <button class="btn btn-primary" (click)="onNavigateToGallery()">
+      Back
+    </button>
   </div>
   <div class="clr-row">
     <div class="clr-col-1 clr-align-self-center" align="center">
-      <button class="btn btn-link" (click)="selectedToRight = false; checkIfLocationSavedAndScrollImage()"
-              [disabled]="isFirstImage || isLoading">
+      <button class="btn btn-link" [disabled]="!canGoToPreviousImage()" (click)="onNavigateToPrevious()">
         <i class="arrow-left"></i>
       </button>
     </div>
     <div class="clr-col-10">
       <div align="center">
-        <canvas id="canvas"></canvas>
+        <app-image-annotator #imageAnnotator [src]="imageUrl" [(polypLocation)]="polypLocation"
+                             [disabled]="!canLocatePolyp()" [showLocation]="showPolypLocation">
+        </app-image-annotator>
       </div>
     </div>
     <div class="clr-col-1 clr-align-self-center" align="center">
-      <button class="btn btn-link" (click)="selectedToRight = true; checkIfLocationSavedAndScrollImage()"
-              [disabled]="isLastImage || isLoading">
+      <button class="btn btn-link" [disabled]="!canGoToNextImage()" (click)="onNavigateToNext()">
         <i class="arrow-right"></i>
       </button>
     </div>
   </div>
+
   <div class="clr-row clr-justify-content-end polyp-checkbox" id="show-location-checkbox">
-    <clr-checkbox [(clrChecked)]="showPolypLocation" (change)="reloadImage()">
+    <clr-checkbox [(clrChecked)]="showPolypLocation">
       Show polyp location
     </clr-checkbox>
   </div>
-  <div class="clr-row clr-justify-content-center">
-    <div *ngIf="isEndoscopist()">
-      <button *ngIf="!isPolypEmpty()" class="btn btn-success" (click)="save()"
-              [disabled]="isLocationSaved()">
-        <clr-icon shape="plus"></clr-icon>
-        Save (s)
-      </button>
-      <button *ngIf="!isPolypEmpty()" class="btn btn-primary"
-              (click)="image.polypLocation != null ? this.warningMessageRemovingLocation = true : cleanCanvas();"
-              [disabled]="isLoading || !showPolypLocation">
-        <clr-icon shape="refresh"></clr-icon>
-        Clear
-      </button>
-      <button class="btn btn-danger btn-remove" (click)="deleting = true" [disabled]="isLoading">
-        <clr-icon shape="trash"></clr-icon>
-        Remove image
-      </button>
+  <div *ngIf="isEndoscopist()" class="clr-row clr-justify-content-center">
+    <button *ngIf="hasPolyp()" class="btn btn-success" (click)="onSave()" [disabled]="!canSaveLocation()">
+      <clr-icon shape="plus"></clr-icon>
+      Save (s)
+    </button>
+    <button *ngIf="hasPolyp()" class="btn btn-primary" (click)="onClear()" [disabled]="!canClearLocation()">
+      <clr-icon shape="refresh"></clr-icon>
+      Clear
+    </button>
+    <button class="btn btn-danger btn-remove" (click)="onTriggerDeletion()" [disabled]="!canRemoveImage()">
+      <clr-icon shape="trash"></clr-icon>
+      Remove image
+    </button>
+  </div>
+  <div *ngIf="isEndoscopist() && !hasPolyp()" class="clr-row clr-justify-content-center">
+    <div class="alert alert-danger">
+      <div class="alert-item static">
+        <div class="alert-icon-wrapper">
+          <clr-icon class="alert-icon" shape="exclamation-triangle"></clr-icon>
+        </div>
+        <span class="alert-text">Image does not have a polyp!</span>
+      </div>
     </div>
   </div>
 
-  <div *ngIf="!isImageObservationEmpty()" class="card card-size">
+  <div *ngIf="hasImageObservation()" class="card card-size">
       <div class="margin-row">{{image.observation}}</div>
   </div>
-  <div *ngIf="!isPolypEmpty() && !isEndoscopist()" class="card card-size">
+
+  <div *ngIf="hasPolyp() && !isEndoscopist()" class="card card-size">
     <div class="card-header">Polyp info</div>
       <div class="clr-row margin-row">
         <div class="col-lg-2 col-sm-3 col-xs-4">
@@ -154,7 +165,6 @@
         <div class="col-lg-2 col-sm-4 col-xs-4" *ngIf="dysplasingGrade">
           <label class="txt-strong" for="polyp-dyplasingGrade">Dyplasing drade</label>
         </div>
-
         <div class="col-lg-4 col-sm-8 col-xs-8" *ngIf="dysplasingGrade">
           <input type="text" id="polyp-dyplasingGrade" readonly value="{{dysplasingGrade}}"/>
         </div>
@@ -178,84 +188,21 @@
       </div>
   </div>
 
-  <clr-modal [(clrModalOpen)]="definingDeletion" [clrModalClosable]="false">
-    <h3 class="modal-title">Reason to delete this image</h3>
-    <div class="modal-body">
-      <form>
-        <section class="form-block">
-          <div class="form-group">
-            <label for="selectToRemove">Select a reason</label>
-            <div class="select select-style">
-              <select id="selectToRemove" name="selectedToRemove" required [(ngModel)]="selected">
-                <option *ngFor="let option of options" [ngValue]="option" (click)="observationToRemove = null">
-                  {{option}}
-                </option>
-              </select>
-            </div>
-          </div>
-          <div *ngIf="selected == 'Others'" class="form-group">
-            <label for="observationToRemove">Describe the reason </label>
-            <div class="autocomplete">
-              <input type="text" id="observationToRemove" (keyup)="searchObservations($event)"
-                     name="observationToRemove"
-                     [(ngModel)]="observationToRemoveStartsWith" autocomplete="off"/>
-              <div *ngIf="!observationToRemove" class="autocomplete-items">
-                <input class="inputAutocomplete" value="{{observation}}" *ngFor="let observation of observationsFound"
-                       (click)="selectedObservationToRemove(observation)" readonly
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
-      <button type="button" class="btn btn-danger-outline" (click)="remove()"
-              [disabled]="(!observationToRemove && selected == 'Others') || selected == null">Delete
-      </button>
-    </div>
-  </clr-modal>
+  <app-continue-without-saving-location-dialog
+    [(open)]="showContinueWithoutSavingLocation" (close)="onContinueWithoutSavingClose($event)">
+  </app-continue-without-saving-location-dialog>
 
-  <app-delete-confirmation *ngIf="deleting" [modelName]="'image'" [id]="image.id"
-                           [name]="'this image'" [cancel]="cancel.bind(this)" [delete]="delete.bind(this)"
-  >
+  <app-confirm-removing-location-dialog
+    [(open)]="showConfirmRemovingLocation" (close)="onConfirmRemovingLocationClose($event)">
+  </app-confirm-removing-location-dialog>
+
+  <app-delete-confirmation [(open)]="showDeleteConfirmation" [id]="image.id" [modelName]="'image'"
+                           [name]="'this image'" (confirm)="onDeleteConfirmed()" (cancel)="onDeleteCancelled()">
   </app-delete-confirmation>
 
-  <clr-modal [(clrModalOpen)]="warningMessageWithoutSavingLocation" [clrModalClosable]="false">
-    <h3 class="modal-title">Warning</h3>
-    <div class="modal-body">
-      The polyp location has not been saved. Are you sure you want to continue?
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-outline"
-              (click)="warningMessageWithoutSavingLocation = false; back = false;">Cancel
-      </button>
-      <button type="button" class="btn btn-danger-outline"
-              (click)="continueWithoutSavingLocation()">
-        Continue
-      </button>
-    </div>
-  </clr-modal>
-
-  <clr-modal [(clrModalOpen)]="warningMessageRemovingLocation" [clrModalClosable]="false">
-    <h3 class="modal-title">Warning</h3>
-    <div class="modal-body">
-      <div class="modal-body">
-        The polyp location will be removed. Are you sure you want to continue?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" (click)="warningMessageRemovingLocation = false;">Cancel</button>
-        <button type="button" class="btn btn-success-outline"
-                (click)="warningMessageRemovingLocation = false; cleanCanvas()">Only clear
-        </button>
-        <button type="button" class="btn btn-danger-outline"
-                (click)="warningMessageRemovingLocation = false; removeLocationAndCleanCanvas(); ">
-          Discard Location
-        </button>
-      </div>
-    </div>
-  </clr-modal>
+  <app-describe-polyp-deletion-dialog [(open)]="showDescribePolypDeletionReason"
+                                      (close)="onDescribePolypDeletionReason($event)">
+  </app-describe-polyp-deletion-dialog>
 </div>
 
 

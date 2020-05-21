@@ -1,0 +1,6 @@
+<canvas #canvasElement [class.disabled]="disabled"
+  (mousedown)="onMouseDown($event)" (mousemove)="onMouseMove($event)">
+</canvas>
+
+<img #imageElement [src]="src" alt="hidden-image" hidden="true"
+  (load)="onImageLoad()"/>

@@ -23,8 +23,43 @@
  */
 
 export class PolypLocation {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  constructor(
+    public x: number,
+    public y: number,
+    public width: number,
+    public height: number
+  ) {}
+
+  public static areEqual(locationA: PolypLocation, locationB: PolypLocation): boolean {
+    return locationA === locationB || (Boolean(locationA) && Boolean(locationB) && locationA.isEqualTo(locationB));
+  }
+
+  public isEqualTo(location: PolypLocation): boolean {
+    if (location === this) {
+      return true;
+    } else if (!Boolean(location)) {
+      return false;
+    } else {
+      const regularThis = this.regularize();
+      const regularLocation = location.regularize();
+
+      return regularThis.x === regularLocation.x
+        && regularThis.y === regularLocation.y
+        && regularThis.width === regularLocation.width
+        && regularThis.height === regularLocation.height;
+    }
+  }
+
+  public regularize(): PolypLocation {
+    return new PolypLocation(
+      Math.min(this.x, this.x + this.width),
+      Math.min(this.y, this.y + this.height),
+      Math.abs(this.width),
+      Math.abs(this.height)
+    );
+  }
+
+  public isValid(): boolean {
+    return this.width !== 0 && this.height !== 0;
+  }
 }

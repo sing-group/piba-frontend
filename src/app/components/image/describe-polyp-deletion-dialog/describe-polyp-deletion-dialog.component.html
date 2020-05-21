@@ -1,0 +1,40 @@
+<clr-modal [(clrModalOpen)]="open" [clrModalClosable]="false">
+  <h3 class="modal-title">Reason to delete this image</h3>
+  <div class="modal-body">
+    <form>
+      <section class="form-block">
+        <div class="form-group">
+          <label for="selectToRemove">Select a reason</label>
+          <div class="select select-style">
+            <select id="selectToRemove" name="selectedToRemove" required [(ngModel)]="selectedPredefinedReason">
+              <option *ngFor="let reason of predefinedReasons" [ngValue]="reason">
+                {{reason}}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div *ngIf="isOthersSelected()" class="form-group">
+          <label for="observationToRemove">Describe the reason</label>
+          <div class="autocomplete">
+            <input id="observationToRemove" name="observationToRemove" type="text" autocomplete="off"
+                   [(ngModel)]="newReasonPrefix" (keyup)="onFindSuggestedReasons($event)"/>
+            <div *ngIf="hasSuggestedReasons()" class="autocomplete-items">
+              <input class="inputAutocomplete" value="{{suggestedReason}}" *ngFor="let suggestedReason of suggestedReasons"
+                     (click)="onSelectSuggestedReason(suggestedReason)" readonly
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="onCancelDeletion()">
+      Cancel
+    </button>
+    <button type="button" class="btn btn-danger-outline" [disabled]="!this.isValid()" (click)="onConfirmDeletion()">
+      Delete
+    </button>
+  </div>
+</clr-modal>

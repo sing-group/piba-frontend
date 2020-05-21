@@ -85,7 +85,7 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   }
 
   ngOnInit() {
-    if (this.video === null || this.video === undefined) {
+    if (!Boolean(this.video)) {
       throw new Error('video is required');
     }
 
@@ -199,7 +199,8 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   }
 
   set currentTime(time: number) {
-    this.videoElement.currentTime = Math.min(this.endTime, Math.max(this.startTime, time));
+    time = Math.min(this.endTime, Math.max(this.startTime, time));
+    this.videoElement.currentTime = Number.isNaN(time) ? 0 : time;
   }
 
   private set currentProgressTime(progress: number) {
@@ -235,7 +236,7 @@ export class VideoComponent implements AfterViewChecked, OnInit {
           throw new Error('Invalid interval boundaries: ' + this.intervalBoundaries);
       }
     } else {
-      return this.videoElement.duration;
+      return 0;
     }
   }
 
@@ -316,7 +317,6 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   backwardVideo() {
     this.initializePlayWatcher();
 
-
     switch (this.videoSpeed) {
       case VideoSpeed.FRAMES_1:
       case VideoSpeed.FRAMES_3:
@@ -344,7 +344,7 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   }
 
   initializePlayWatcher() {
-    if (this.playWatcher !== undefined && this.playWatcher != null) {
+    if (Boolean(this.playWatcher)) {
       clearInterval(this.playWatcher);
     }
 

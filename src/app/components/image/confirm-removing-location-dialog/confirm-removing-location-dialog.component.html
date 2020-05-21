@@ -1,0 +1,19 @@
+<clr-modal [(clrModalOpen)]="open" [clrModalClosable]="false">
+  <h3 class="modal-title">Warning</h3>
+  <div class="modal-body">
+    <div class="modal-body">
+      The polyp location will be removed. Are you sure you want to continue?
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="onCancel()">
+        Cancel
+      </button>
+      <button type="button" class="btn btn-success-outline" (click)="onOnlyClear()">
+        Only clear
+      </button>
+      <button type="button" class="btn btn-danger-outline" (click)="onDiscard()">
+        Discard Location
+      </button>
+    </div>
+  </div>
+</clr-modal>

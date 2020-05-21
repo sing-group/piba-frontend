@@ -22,7 +22,7 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, OnInit, Input} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'app-delete-confirmation',
@@ -31,22 +31,34 @@ import {Component, OnInit, Input} from '@angular/core';
 })
 export class DeleteConfirmationComponent implements OnInit {
 
-  @Input() modelName: string;
   // id that is used to delete the object
   @Input() id: string;
   // identifying name that will be shown
   @Input() name: string;
+  // type of model to delete
+  @Input() modelName: string;
   @Input() message: string;
 
-  @Input() cancel: Function;
-  @Input() delete: Function;
+  @Input() open = false;
+  @Output() openChange = new EventEmitter<boolean>();
 
-  opened = true;
+  @Output() confirm = new EventEmitter<string>();
+  @Output() cancel = new EventEmitter<void>();
 
   ngOnInit() {
     if (this.message === undefined) {
       this.message = `Are you sure you want to delete <strong>${this.name}</strong>?` +
         '<div class="warning">This action is permanent and cannot be undone.</div>';
     }
+  }
+
+  onConfirm(): void {
+    this.confirm.emit(this.id);
+    this.open = false;
+  }
+
+  onCancel(): void {
+    this.cancel.emit();
+    this.open = false;
   }
 }

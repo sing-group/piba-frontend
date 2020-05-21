@@ -139,8 +139,8 @@
   </clr-dg-footer>
 </clr-datagrid>
 <!-- Delete confirmation modal -->
-<app-delete-confirmation *ngIf="deletingUser" [modelName]="'user'" [id]="user.login" [name]="user.login"
-                         [cancel]="cancel.bind(this)" [delete]="delete.bind(this)">
+<app-delete-confirmation [(open)]="deletingUser" [modelName]="'user'" [id]="user.login" [name]="user.login"
+                         (cancel)="cancel()" (confirm)="delete($event)">
 </app-delete-confirmation>
 
 

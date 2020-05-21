@@ -44,7 +44,7 @@
     </section>
   </div>
 
-  <div *ngIf="imagesWithPolyp > 0" class="row progress-margin">
+  <div *ngIf="totalImages > 0" class="row progress-margin">
     <div class="col-xs-12">
       <h5>Polyp location progress: {{locatedImages}} of {{totalImages}} ({{(locatedImages*100)/totalImages |
         number:'.0-1'}}%)</h5>
@@ -53,7 +53,6 @@
       </div>
     </div>
   </div>
-
 
   <clr-datagrid (clrDgRefresh)="refreshPage($event)" [clrDgLoading]="loading">
     <div class="clr-row clr-justify-content-lg-end not-margin-right">

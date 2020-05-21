@@ -41,6 +41,9 @@ import {PolypsService} from './polyps.service';
 import {Polyp} from '../models/Polyp';
 import {ImagesInGalleryInfo} from './entities/ImagesInGalleryInfo';
 import {ImageFilter} from '../models/ImageFilter';
+import {PibaError} from '../modules/notification/entities';
+import {iif} from 'rxjs/internal/observable/iif';
+import {defer} from 'rxjs/internal/observable/defer';
 
 @Injectable({
   providedIn: 'root'
@@ -52,20 +55,68 @@ export class ImagesService {
               private polypsService: PolypsService) {
   }
 
+  private static mapImageInfo(imageInfo: ImageInfo, video: Video, polypLocation: PolypLocation, polyp: Polyp): Image {
+    return {
+      id: imageInfo.id,
+      numFrame: imageInfo.numFrame,
+      isRemoved: imageInfo.isRemoved,
+      base64contents: imageInfo.base64contents,
+      video: video,
+      gallery: null,
+      polyp: polyp,
+      polypLocation: polypLocation,
+      observation: imageInfo.observation,
+      manuallySelected: imageInfo.manuallySelected
+    };
+  }
+
+  private static mapBasicImageInfo(imageInfo: ImageInfo): Image {
+    return {
+      id: imageInfo.id,
+      numFrame: imageInfo.numFrame,
+      isRemoved: imageInfo.isRemoved,
+      base64contents: imageInfo.base64contents,
+      video: null,
+      gallery: null,
+      polyp: null,
+      polypLocation: null,
+      observation: imageInfo.observation,
+      manuallySelected: imageInfo.manuallySelected
+    };
+  }
+
+  private static mapPolypLocationInfo(polypLocationInfo: PolypLocationInfo): PolypLocation {
+    return new PolypLocation(
+      polypLocationInfo.x,
+      polypLocationInfo.y,
+      polypLocationInfo.width,
+      polypLocationInfo.height
+    );
+  }
+
+  private static arrayBufferToBase64(buffer) {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+  }
+
   getImage(id: string): Observable<Image> {
     return this.http.get<ImageInfo>(`${environment.restApi}/image/${id}/metadata`).pipe(
       concatMap(imageInfo => {
           return forkJoin(
             this.videosService.getVideo((<IdAndUri>imageInfo.video).id),
-            this.getLocation(imageInfo.id).pipe(catchError((err) => err.status === 400 ? of(null) : throwError(err))),
+            this.getLocation(imageInfo.id).pipe(catchError(err => err.status === 400 ? of(null) : throwError(err))),
             this.getImageContents(imageInfo.id),
-            (<IdAndUri>imageInfo.polyp) !== null && (<IdAndUri>imageInfo.polyp) !== undefined ?
-              this.polypsService.getPolyp((<IdAndUri>imageInfo.polyp).id) : of(null)
+            iif(() => Boolean(imageInfo.polyp), defer(() => this.polypsService.getPolyp((<IdAndUri>imageInfo.polyp).id)), of(null))
           ).pipe(
             map(
               videoAndLocationAndImageContent => {
                 imageInfo.base64contents = videoAndLocationAndImageContent[2];
-                return this.mapImageInfo(imageInfo, videoAndLocationAndImageContent[0], videoAndLocationAndImageContent[1],
+                return ImagesService.mapImageInfo(imageInfo, videoAndLocationAndImageContent[0], videoAndLocationAndImageContent[1],
                   videoAndLocationAndImageContent[3]);
               })
           );
@@ -75,13 +126,8 @@ export class ImagesService {
   }
 
   getImageContents(id: string): Observable<string> {
-    return this.http.get(`${environment.restApi}/image/${id}`, {
-      responseType:
-        'arraybuffer'
-    })
-      .pipe(map((response) => {
-        return this.arrayBufferToBase64(response);
-      }));
+    return this.http.get(`${environment.restApi}/image/${id}`, { responseType: 'arraybuffer' })
+      .pipe(map(ImagesService.arrayBufferToBase64));
   }
 
   uploadImage(image: ImageUploadInfo): Observable<Image> {
@@ -97,26 +143,28 @@ export class ImagesService {
     formData.append('manuallySelected', image.manuallySelected.toString());
 
     return this.http.post<ImageInfo>(`${environment.restApi}/image`, formData)
-      .pipe(
-        map(this.mapImageInfo.bind(this))
-      );
+      .pipe(map(ImagesService.mapBasicImageInfo));
   }
 
   createLocation(id: string, polypLocation: PolypLocation): Observable<PolypLocation> {
-    return this.http.post<PolypLocationInfo>(`${environment.restApi}/image/${id}/polyplocation`, polypLocation).pipe(
-      map(
-        this.mapPolypLocationInfo.bind(this))
-    );
+    return this.http.post<PolypLocationInfo>(`${environment.restApi}/image/${id}/polyplocation`, polypLocation)
+      .pipe(
+        map(ImagesService.mapPolypLocationInfo),
+        PibaError.throwOnError(
+          'Error creating location',
+          `Location (x: ${polypLocation.x}, y: ${polypLocation.y}, width: ${polypLocation.width}, height: ${polypLocation.height}) ` +
+          `could not be created in image '${id}'`
+        )
+      );
   }
 
   getLocation(id: string): Observable<PolypLocation> {
     return this.http.get<PolypLocationInfo>(`${environment.restApi}/image/${id}/polyplocation`).pipe(
-      map(
-        this.mapPolypLocationInfo.bind(this))
+      map(ImagesService.mapPolypLocationInfo)
     );
   }
 
-  delete(id: string, observationsToRemove: string) {
+  delete(id: string, observationsToRemove: string): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({'X-ReasonToRemove': observationsToRemove})
     };
@@ -134,47 +182,44 @@ export class ImagesService {
       {observe: 'response'})
       .pipe(
         concatMap(response => {
-            // if images are not received
-            if (response.body.length === 0) {
-              return of({
+          // if images are not received
+          if (response.body.length === 0) {
+            return of({
+              totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
+              locatedImages: Number(response.headers.get('X-Located-Total-Items')),
+              imagesWithPolyp: Number(response.headers.get('X-With-Polyp-Total-Items')),
+              images: []
+            });
+          } else {
+            return this.videoAndImagesContentsAndGalleryAndOptionalLocation(of(response.body), gallery, withLocation).pipe(
+              map(images => ({
                 totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
                 locatedImages: Number(response.headers.get('X-Located-Total-Items')),
                 imagesWithPolyp: Number(response.headers.get('X-With-Polyp-Total-Items')),
-                images: []
-              });
-            }
-            return this.videoAndImagesContentsAndGalleryAndOptionalLocation(of(response.body), gallery, withLocation).pipe(
-              map(images => {
-                  return {
-                    totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
-                    locatedImages: Number(response.headers.get('X-Located-Total-Items')),
-                    imagesWithPolyp: Number(response.headers.get('X-With-Polyp-Total-Items')),
-                    images: images
-                  };
-                }
-              ));
+                images: images
+              }))
+            );
           }
-        )
+        })
       );
   }
 
   getImagesIdentifiersByGallery(gallery: Gallery, filter: ImageFilter = ImageFilter.ALL): Observable<ImagesInGalleryInfo> {
     return this.http.get<IdAndUri[]>
-    (`${environment.restApi}/image/id?gallery_id=${gallery.id}&filter=${ImageFilter[filter]}`, {observe: 'response'})
+    (`${environment.restApi}/image/id?gallery_id=${gallery.id}&filter=${filter}`, {observe: 'response'})
       .pipe(
         concatMap(response => {
-            const ids = [];
-            response.body.forEach(idAndUri => {
-              ids.push(idAndUri.id);
-            });
-            return of({
-              totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
-              locatedImages: Number(response.headers.get('X-Located-Total-Items')),
-              imagesWithPolyp: Number(response.headers.get('X-With-Polyp-Total-Items')),
-              imagesId: ids
-            });
-          }
-        )
+          const ids = [];
+          response.body.forEach(idAndUri => {
+            ids.push(idAndUri.id);
+          });
+          return of({
+            totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
+            locatedImages: Number(response.headers.get('X-Located-Total-Items')),
+            imagesWithPolyp: Number(response.headers.get('X-With-Polyp-Total-Items')),
+            imagesId: ids
+          });
+        })
       );
   }
 
@@ -182,16 +227,14 @@ export class ImagesService {
     let params = new HttpParams();
     params = params.append('observationStartsWith', observationToRemoveStartsWith);
 
-    return this.http.get<string[]>(`${environment.restApi}/image/observations`, {params})
-      .pipe(
-        map(observations => {
-          return observations;
-        })
-      );
+    return this.http.get<string[]>(`${environment.restApi}/image/observations`, {params});
   }
 
-  private videoAndImagesContentsAndGalleryAndOptionalLocation(imageInfoObservable: Observable<ImageInfo[]>,
-                                                              gallery: Gallery, withLocation: boolean): Observable<Image[]> {
+  private videoAndImagesContentsAndGalleryAndOptionalLocation(
+    imageInfoObservable: Observable<ImageInfo[]>,
+    gallery: Gallery,
+    withLocation: boolean
+  ): Observable<Image[]> {
     return imageInfoObservable.pipe(
       concatMap(imageInfos =>
         forkJoin(
@@ -205,9 +248,12 @@ export class ImagesService {
           map(videosAndLocationsAndImageContents =>
             imageInfos.map((imageInfo, index) => {
                 imageInfo.base64contents = videosAndLocationsAndImageContents[3][index];
-                const image: Image = this.mapImageInfo(
-                  imageInfo, videosAndLocationsAndImageContents[0][index], videosAndLocationsAndImageContents[2][index],
-                  videosAndLocationsAndImageContents[1][index]);
+                const image: Image = ImagesService.mapImageInfo(
+                  imageInfo,
+                  videosAndLocationsAndImageContents[0][index],
+                  videosAndLocationsAndImageContents[2][index],
+                  videosAndLocationsAndImageContents[1][index]
+                );
                 image.gallery = gallery;
                 return image;
               }
@@ -217,39 +263,4 @@ export class ImagesService {
       )
     );
   }
-
-  private mapImageInfo(imageInfo: ImageInfo, video: Video, polypLocation: PolypLocation, polyp: Polyp): Image {
-    return {
-      id: imageInfo.id,
-      numFrame: imageInfo.numFrame,
-      isRemoved: imageInfo.isRemoved,
-      base64contents: imageInfo.base64contents,
-      video: video,
-      gallery: null,
-      polyp: polyp,
-      polypLocation: polypLocation,
-      observation: imageInfo.observation,
-      manuallySelected: imageInfo.manuallySelected
-    };
-  }
-
-  private mapPolypLocationInfo(polypLocationInfo: PolypLocationInfo): PolypLocation {
-    return {
-      x: polypLocationInfo.x,
-      y: polypLocationInfo.y,
-      width: polypLocationInfo.width,
-      height: polypLocationInfo.height
-    };
-  }
-
-  private arrayBufferToBase64(buffer) {
-    let binary = '';
-    const bytes = new Uint8Array(buffer);
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return window.btoa(binary);
-  }
-
 }

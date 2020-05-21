@@ -306,7 +306,6 @@ export class ExplorationComponent implements OnInit, OnDestroy {
         this.cancel();
       });
     });
-
   }
 
   isEndoscopist(): boolean {
@@ -318,13 +317,17 @@ export class ExplorationComponent implements OnInit, OnDestroy {
   }
 
   getVideoDeletionMessage() {
-    const locationsCount = this.video.polypRecording.length;
-    const modificationsCount = this.video.modifications.length;
-    const polypsCount = new Set(this.video.polypRecording.map(pr => pr.polyp.id)).size; // Counts unique
+    if (Boolean(this.video) && Boolean(this.video.polypRecording)) {
+      const locationsCount = this.video.polypRecording.length;
+      const modificationsCount = this.video.modifications.length;
+      const polypsCount = new Set(this.video.polypRecording.map(pr => pr.polyp.id)).size; // Counts unique
 
-    return `Are you sure you want to delete the video <strong>${this.video.title}</strong>? This video has <strong>${polypsCount} polyps ` +
-        `</strong> located in <strong>${locationsCount} segments</strong> and <strong>${modificationsCount} zones annotated with ` +
+      return `Are you sure you want to delete the video <strong>${this.video.title}</strong>? This video has <strong>${polypsCount} ` +
+        `polyps </strong> located in <strong>${locationsCount} segments</strong> and <strong>${modificationsCount} zones annotated with ` +
         'modifications</strong>.' +
         '<div class="warning">This action is permanent and cannot be undone.</div>';
+    } else {
+      return null;
+    }
   }
 }

@@ -84,7 +84,7 @@
 </clr-datagrid>
 
 <!-- Delete confirmation modal -->
-<app-delete-confirmation *ngIf="deletingModifier" [modelName]="'modifier'" [id]="modifier.id" [name]="modifier.name"
-                         [cancel]="cancel.bind(this)" [delete]="delete.bind(this)"
+<app-delete-confirmation [(open)]="deletingModifier" [modelName]="'modifier'" [id]="modifier.id" [name]="modifier.name"
+                         (cancel)="cancel()" (confirm)="delete($event)"
 >
 </app-delete-confirmation>

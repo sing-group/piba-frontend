@@ -176,9 +176,8 @@
 </form>
 
 <!-- Delete confirmation modal -->
-<app-delete-confirmation *ngIf="deletingExploration" [modelName]="'exploration'" [id]="exploration.id"
+<app-delete-confirmation [(open)]="deletingExploration" [modelName]="'exploration'" [id]="exploration.id"
                          [name]="exploration.title"
-                         [cancel]="cancel.bind(this)" [delete]="delete.bind(this)"
->
+                         (cancel)="cancel()" (confirm)="delete($event)">
 </app-delete-confirmation>
 

@@ -70,6 +70,16 @@ import {PolypDatasetsComponent} from './components/polyp-datasets/polyp-datasets
 import {PolypDatasetsService} from './services/polyp-datasets.service';
 import {PolypDatasetComponent} from './components/polyp-dataset/polyp-dataset.component';
 import {PolypRecordingInGalleryComponent} from './components/polyp-recording-in-gallery/polyp-recording-in-gallery.component';
+import {ImageAnnotatorComponent} from './components/image-annotator/image-annotator.component';
+import {
+  ContinueWithoutSavingLocationDialogComponent
+} from './components/image/continue-without-saving-location-dialog/continue-without-saving-location-dialog.component';
+import {
+  ConfirmRemovingLocationDialogComponent
+} from './components/image/confirm-removing-location-dialog/confirm-removing-location-dialog.component';
+import {
+  DescribePolypDeletionDialogComponent
+} from './components/image/describe-polyp-deletion-dialog/describe-polyp-deletion-dialog.component';
 
 @NgModule({
   declarations: [
@@ -99,7 +109,11 @@ import {PolypRecordingInGalleryComponent} from './components/polyp-recording-in-
     PolypsComponent,
     PolypDatasetsComponent,
     PolypDatasetComponent,
-    PolypRecordingInGalleryComponent
+    PolypRecordingInGalleryComponent,
+    ImageAnnotatorComponent,
+    ContinueWithoutSavingLocationDialogComponent,
+    ConfirmRemovingLocationDialogComponent,
+    DescribePolypDeletionDialogComponent
   ],
   imports: [
     BrowserModule,

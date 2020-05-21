@@ -355,12 +355,12 @@
   </clr-modal>
 </form>
 <!-- Delete confirmation modal -->
-<app-delete-confirmation *ngIf="deletingPolyp"
+<app-delete-confirmation [(open)]="deletingPolyp"
                          [modelName]="'dataset'" [id]="polyp.id" [name]="polyp.name"
                          [message]="'Are you sure you want to confirm <b>' + polyp.name + '</b>? All polyp ' +
                          'recordings and images associated with this polyp will also be deleted.' +
                          '<div class=\'warning\'>This action is permanent and cannot be undone.</div>'"
-                         [cancel]="cancel.bind(this)" [delete]="delete.bind(this)">
+                         (cancel)="cancel()" (confirm)="delete($event)">
 </app-delete-confirmation>
 
 <!-- Polyp confirmation modal -->

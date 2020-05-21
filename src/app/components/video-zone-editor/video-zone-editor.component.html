@@ -148,10 +148,9 @@
 </form>
 
 <!-- Delete confirmation modal -->
-<app-delete-confirmation *ngIf="deleting" [modelName]="elementName.toLowerCase() + ' recording'"
-                         [id]="selectedElement.id"
-                         [name]="selectedElement.element.name"
-                         [cancel]="clearCreationForm.bind(this)" [delete]="onDeleteElement.bind(this)">
+<app-delete-confirmation [(open)]="deleting" [modelName]="elementName.toLowerCase() + ' recording'"
+                         [id]="selectedElement?.id" [name]="selectedElement?.element.name"
+                         (cancel)="clearCreationForm()" (confirm)="onDeleteElement($event)">
 </app-delete-confirmation>
 
 <!-- Element recording confirmation modal -->

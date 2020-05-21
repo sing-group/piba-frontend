@@ -156,10 +156,9 @@ export class VideoZoneEditorComponent implements DoCheck {
     this.confirmingAllElements = false;
   }
 
-  onDeleteElement() {
-    this.removeElement.emit(this.selectedElement.id);
+  onDeleteElement(id: string) {
+    this.removeElement.emit(Number(id));
     this.selectedElement = null;
-    this.deleting = false;
   }
 
   onSetCurrentAsStart() {

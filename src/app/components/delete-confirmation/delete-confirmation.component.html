@@ -22,12 +22,14 @@
   ~  along with this program. If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<clr-modal [(clrModalOpen)]="opened" [clrModalClosable]="false">
+<clr-modal [(clrModalOpen)]="open" [clrModalClosable]="false">
   <h3 class="modal-title">Delete {{modelName}}</h3>
   <div class="modal-body" [innerHTML]="message"></div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline" (click)="cancel();">Cancel</button>
-    <button type="button" class="btn btn-danger-outline" (click)="delete(id)">
+    <button type="button" class="btn btn-outline" (click)="onCancel()">
+      Cancel
+    </button>
+    <button type="button" class="btn btn-danger-outline" (click)="onConfirm()">
       Delete
     </button>
   </div>

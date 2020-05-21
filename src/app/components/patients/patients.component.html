@@ -160,7 +160,7 @@
     </tbody>
   </table>
   <!-- Delete confirmation modal -->
-  <app-delete-confirmation *ngIf="deletingPatient" [modelName]="'patient'" [name]="patient.patientID"
-                           [cancel]="cancel.bind(this)" [delete]="delete.bind(this)">
+  <app-delete-confirmation [(open)]="deletingPatient" [modelName]="'patient'" [name]="patient.patientID"
+                           (cancel)="cancel()" (confirm)="delete($event)">
   </app-delete-confirmation>
 </div>

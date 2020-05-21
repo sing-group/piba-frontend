@@ -208,9 +208,10 @@
     </clr-modal>
   </form>
 </div>
+
 <!-- Delete confirmation modal -->
-<app-delete-confirmation *ngIf="deletingVideo" [modelName]="'video'" [id]="video.id" [name]="video.title" [message]="getVideoDeletionMessage()"
-                         [cancel]="cancel.bind(this)" [delete]="delete.bind(this)">
+<app-delete-confirmation [(open)]="deletingVideo" [modelName]="'video'" [id]="video?.id" [name]="video?.title" [message]="getVideoDeletionMessage()"
+                         (cancel)="cancel()" (confirm)="delete($event)">
 </app-delete-confirmation>
 
 <!-- Progress bar modal -->

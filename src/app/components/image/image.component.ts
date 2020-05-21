@@ -22,7 +22,7 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Image} from '../../models/Image';
 import {GalleriesService} from '../../services/galleries.service';
@@ -35,6 +35,15 @@ import {Adenoma, PolypType, SSA, TSA} from '../../models/PolypHistology';
 import {AuthenticationService} from '../../services/authentication.service';
 import {Role} from '../../models/User';
 import {ImageFilter} from '../../models/ImageFilter';
+import {ImageAnnotatorComponent} from '../image-annotator/image-annotator.component';
+import {RemoveLocationAction} from './confirm-removing-location-dialog/confirm-removing-location-dialog.component';
+import {flatMap, tap} from 'rxjs/operators';
+import {forkJoin} from 'rxjs/internal/observable/forkJoin';
+import {of} from 'rxjs/internal/observable/of';
+
+enum NavigateTo {
+  PREVIOUS, NEXT, GALLERY
+}
 
 @Component({
   selector: 'app-image',
@@ -42,393 +51,430 @@ import {ImageFilter} from '../../models/ImageFilter';
   styleUrls: ['./image.component.css']
 })
 export class ImageComponent implements OnInit {
-
-  image: Image = new Image();
-  previousImage: Image = new Image();
-  followingImage: Image = new Image();
-  imageElement: HTMLImageElement;
-  identifiers: string[] = [];
-  isFirstImage = false;
-  isLastImage = false;
-  isLoading = false;
-  back = false;
+  polypLocation: PolypLocation = null;
+  showPolypLocation: boolean;
 
   private gallery: Gallery = new Gallery();
+  private identifiers: string[] = [];
+  private filter: ImageFilter;
 
-  private canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
-  private mousedown: boolean;
-  public last_mousex: number = null;
-  public last_mousey: number = null;
-  public width: number = null;
-  public height: number = null;
+  private _image: Image = new Image();
+  private currentImageId: string;
+  private currentImageIndex: number;
+  private previousImage: Image = new Image();
+  private nextImage: Image = new Image();
+  private navigationDirection: NavigateTo = null;
 
-  deleting = false;
-  definingDeletion = false;
-  warningMessageWithoutSavingLocation = false;
-  warningMessageRemovingLocation = false;
-  selectedToRight = true;
-  options = ['Not dataset', 'Bad quality', 'Others'];
-  selected: string;
-  observationToRemove = null;
-  observationToRemoveStartsWith = null;
-  observationsFound: string[] = [];
+  isLoadingInitialData = false;
+  private isStoringLocation = false;
+  private isDeletingLocation = false;
+  private isDeletingImage = false;
+  private isLoadingPrevious = false;
+  private isLoadingNext = false;
+
+  showDescribePolypDeletionReason = false;
+  showContinueWithoutSavingLocation = false;
+  showConfirmRemovingLocation = false;
+  showDeleteConfirmation = false;
 
   type: string;
   dysplasingGrade: string;
 
-  filter: ImageFilter;
-  showPolypLocation: boolean;
+  @ViewChild('imageAnnotator') private imageAnnotator: ImageAnnotatorComponent;
 
-  private downloadButton: HTMLLinkElement;
-
-  @HostListener('document:keypress', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
-    if (event.key === 's' && !this.isLocationSaved()) {
-      this.save();
-    }
-  }
-
-  constructor(private route: ActivatedRoute,
-              private galleriesService: GalleriesService,
-              private imagesService: ImagesService,
-              private notificationService: NotificationService,
-              private location: Location,
-              private router: Router,
-              private readonly authenticationService: AuthenticationService) {
-    this.imageElement = document.createElement('img');
-    // Needed for Chrome
-    document.body.appendChild(this.imageElement);
-    this.imageElement.classList.toggle('hidden-element');
+  constructor(
+    private route: ActivatedRoute,
+    private galleriesService: GalleriesService,
+    private imagesService: ImagesService,
+    private notificationService: NotificationService,
+    private location: Location,
+    private router: Router,
+    private readonly authenticationService: AuthenticationService
+  ) {
   }
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    const gallery_id = this.route.snapshot.paramMap.get('gallery_id');
-    this.filter = ImageFilter[this.route.snapshot.queryParamMap.get('filter')];
-    this.showPolypLocation = this.route.snapshot.queryParamMap.get('show_location') === 'true';
+    const routeSnapshot = this.route.snapshot;
+    const imageId = routeSnapshot.paramMap.get('id');
+    const galleryId = routeSnapshot.paramMap.get('gallery_id');
+    this.filter = ImageFilter[routeSnapshot.queryParamMap.get('filter')];
+    this.showPolypLocation = routeSnapshot.queryParamMap.get('show_location') === 'true';
 
-    this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
-    this.ctx = this.canvas.getContext('2d');
+    // This is required to make the isFirstImage, isLastImage, previousImageId and nextImageId properties work
+    this.currentImageId = imageId;
+    this.isLoadingInitialData = true;
 
-    this.downloadButton = document.getElementById('download-image-button') as HTMLLinkElement;
+    this.galleriesService.getGallery(galleryId)
+      .pipe(
+        tap(gallery => this.gallery = gallery),
+        flatMap(gallery => this.imagesService.getImagesIdentifiersByGallery(gallery, this.filter)
+          .pipe(
+            tap(imagesInGalleryInfo => {
+              this.identifiers = imagesInGalleryInfo.imagesId;
+              this.currentImageIndex = this.identifiers.findIndex(id => id === imageId);
+            }),
+            flatMap(() =>
+              forkJoin(
+                this.isFirstImage ? of(null) : this.imagesService.getImage(this.previousImageId),
+                this.imagesService.getImage(imageId),
+                this.isLastImage ? of(null) : this.imagesService.getImage(this.nextImageId)
+              )
+            )
+          )
+        )
+      )
+      .subscribe(images => {
+        this.previousImage = Boolean(images[0]) ? images[0] : null;
+        this.image = images[1];
+        this.nextImage = Boolean(images[2]) ? images[2] : null;
 
-    this.galleriesService.getGallery(gallery_id).subscribe(gallery => {
-      this.gallery = gallery;
-      this.isLoading = true;
-      this.imagesService.getImagesIdentifiersByGallery(gallery, this.filter).subscribe(imagesInGalleryInfo => {
-          this.isLoading = false;
-          this.identifiers = imagesInGalleryInfo.imagesId;
-          const index = this.identifiers.indexOf(
-            this.identifiers.find(
-              identifier =>
-                identifier === id
-            ));
-          if (index === 0) {
-            this.isFirstImage = true;
-          }
-          if (index === this.lastValidPosition()) {
-            this.isLastImage = true;
-          }
-          this.loadAsPreviousImage(this.identifiers[index - 1]);
-          this.loadAsFollowingImage(this.identifiers[index + 1]);
-          this.getImageAndLoad(id);
+        this.polypLocation = Boolean(this.image.polypLocation)
+          ? this.image.polypLocation.regularize() : null;
+        if (!this.isEndoscopist()) {
+          this.extractPolypInfo();
         }
-      );
-    });
 
-    // Mouseup
-    this.canvas.addEventListener('mouseup', () => {
-      this.mousedown = false;
-    });
-
-    // Mousedown
-    this.canvas.addEventListener('mousedown', (e: MouseEvent) => {
-      const canvasx: number = this.canvas.offsetLeft;
-      const canvasy: number = this.canvas.offsetTop;
-      this.last_mousex = e.clientX - canvasx;
-      this.last_mousey = e.clientY - canvasy;
-      this.mousedown = true;
-    });
-
-    // Mousemove
-    this.canvas.addEventListener('mousemove', (e: MouseEvent) => {
-      const canvasx: number = this.canvas.offsetLeft;
-      const canvasy: number = this.canvas.offsetTop;
-
-      const mousex = e.clientX - canvasx;
-      const mousey = e.clientY - canvasy;
-
-      if (this.mousedown && !this.isPolypEmpty() && this.showPolypLocation && this.isEndoscopist()) {
-        this.repaintImage();
-        this.width = mousex - this.last_mousex;
-        this.height = mousey - this.last_mousey;
-        this.draw();
-      } else if (this.mousedown && this.isPolypEmpty() && this.isEndoscopist()) {
-        this.notificationService.error('Impossible to draw a location on an image that does not have an associated dataset',
-          'Image without dataset');
-      }
-    });
-
-    this.downloadButton.addEventListener('click', () => {
-      this.downloadButton.href = this.canvas.toDataURL();
-    });
+        this.isLoadingInitialData = false;
+      });
   }
 
-  save() {
-    const polypLocation: PolypLocation = {
-      x: this.last_mousex,
-      y: this.last_mousey,
-      width: this.width,
-      height: this.height
-    };
-    this.isLoading = true;
-    this.imagesService.createLocation(this.image.id, polypLocation).subscribe((location) => {
-      this.isLoading = false;
-      this.image.polypLocation = location;
-      this.notificationService.success('Location of the dataset stored correctly', 'Location of the dataset stored');
-      this.reset();
-      this.checkIfIsLastImage();
-      if (this.isLastImage) {
-        this.notificationService.info('There are no more images in this gallery', 'No images remain');
+  get isLoading(): boolean {
+    return this.isLoadingInitialData ||
+      this.isStoringLocation ||
+      this.isDeletingLocation ||
+      this.isDeletingImage ||
+      this.isLoadingPrevious ||
+      this.isLoadingNext;
+  }
+
+  set image(image: Image) {
+    if (this._image !== image) {
+      this._image = image;
+
+      if (Boolean(this._image)) {
+        this.currentImageId = this._image.id;
+        this.currentImageIndex = this.identifiers.findIndex(id => id === this._image.id);
+        this.polypLocation = Boolean(this._image.polypLocation) ? this._image.polypLocation.regularize() : null;
       } else {
-        this.toRight();
+        this.currentImageId = null;
+        this.currentImageIndex = null;
+        this.polypLocation = null;
       }
-    });
-  }
-
-  delete() {
-    this.deleting = false;
-    this.definingDeletion = true;
-  }
-
-  remove() {
-    if (this.selected !== 'Others') {
-      this.observationToRemove = this.selected;
     }
-    this.isLoading = true;
-    this.imagesService.delete(this.image.id, this.observationToRemove).subscribe(() => {
-      this.isLoading = false;
-      this.notificationService.success('Image removed successfully.', 'Image removed.');
-      const position = this.getImagePositionInArray();
-      this.identifiers.splice(position, 1);
-      if (this.identifiers.length === 0) {
-        this.notificationService.info('No images in this gallery', 'No images');
-        this.checkIfLocationSavedAndRedirectToGallery();
-      } else {
-        // there is only one image
-        if (this.identifiers.length === 1) {
-          this.followingImage === null ? this.image = this.previousImage : this.image = this.followingImage;
-          this.followingImage = null;
-          this.previousImage = null;
-          this.isLastImage = true;
-          this.isFirstImage = true;
-        } else if (position === this.identifiers.length) {
-          // if is the last image it have to go a back position
-          this.image = this.previousImage;
-          this.isLastImage = true;
-          this.followingImage = null;
-          this.loadAsPreviousImage(this.identifiers[position - 2]);
-        } else {
-          this.image = this.followingImage;
-          if (this.identifiers[position + 1] === undefined) {
-            this.isLastImage = true;
-            this.followingImage = null;
-          }
-          this.loadAsFollowingImage(this.identifiers[position + 1]);
-        }
-        this.paintImageAndLocation();
-        this.cancel();
-      }
-    });
   }
 
-  isImageObservationEmpty() {
-    return this.image.observation === null || this.image.observation === '' || this.image.observation === undefined;
+  get image(): Image {
+    return this._image;
+  }
+
+  get imageUrl(): string {
+    return 'data:image/png;base64,' + this.image.base64contents;
+  }
+
+  get fileName(): string {
+    if (Boolean(this.image) && Boolean(this.image.video)) {
+      if (this.hasPolyp()) {
+        return this.image.polyp.id + '_' + this.image.video.id + '_' + this.image.numFrame + '.png';
+      } else {
+        return this.image.video.id + '_' + this.image.numFrame + '.png';
+      }
+    } else {
+      return 'none';
+    }
+  }
+
+  private get isFirstImage(): boolean {
+    return this.currentImageIndex === 0;
+  }
+
+  private get isLastImage(): boolean {
+    return this.currentImageIndex === this.imageCount - 1;
+  }
+
+  private get previousImageId(): string {
+    if (this.isFirstImage) {
+      return null;
+    } else {
+      return this.identifiers[this.currentImageIndex - 1];
+    }
+  }
+
+  private get nextImageId(): string {
+    if (this.isLastImage) {
+      return null;
+    } else {
+      return this.identifiers[this.currentImageIndex + 1];
+    }
+  }
+
+  private get imageCount(): number {
+    return this.identifiers.length;
   }
 
   isEndoscopist(): boolean {
     return this.authenticationService.getRole() === Role.ENDOSCOPIST;
   }
 
-  isPolypEmpty(): boolean {
-    return this.image.polyp === null || this.image.polyp === undefined;
+  hasPolyp(): boolean {
+    return Boolean(this.image.polyp);
   }
 
-  removeLocationAndCleanCanvas() {
-    this.deleteLocation(this.image.id);
-    this.cleanCanvas();
+  private hasPreviousImage(): boolean {
+    return !this.isFirstImage;
+  }
+
+  private hasNextImage(): boolean {
+    return !this.isLastImage;
+  }
+
+  canGoToPreviousImage(): boolean {
+    return !this.isLoadingPrevious && this.hasPreviousImage();
+  }
+
+  canGoToNextImage(): boolean {
+    return !this.isLoadingNext && this.hasNextImage();
+  }
+
+  canClearLocation(): boolean {
+    return !this.isLoading && this.showPolypLocation && this.isEndoscopist();
+  }
+
+  canRemoveImage() {
+    return !this.isLoading && this.isEndoscopist();
+  }
+
+  canLocatePolyp() {
+    return !this.isLoading && this.showPolypLocation && this.hasPolyp() && this.isEndoscopist();
+  }
+
+  canSaveLocation() {
+    return !this.isStoringLocation && !this.isLocationSaved() && this.isEndoscopist();
+  }
+
+  hasImageObservation(): boolean {
+    return Boolean(this.image.observation);
+  }
+
+  private isLocationSaved(): boolean {
+    return PolypLocation.areEqual(this.polypLocation, this.image.polypLocation);
+  }
+
+  @HostListener('document:keypress', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if ((event.key === 's' || event.key === 'S') && !this.isLocationSaved()) {
+      this.onSave();
+    }
+  }
+
+  onNavigateToGallery(): void {
+    this.navigateTo(NavigateTo.GALLERY);
+  }
+
+  onNavigateToPrevious(): void {
+    this.navigateTo(NavigateTo.PREVIOUS);
+  }
+
+  onNavigateToNext(): void {
+    this.navigateTo(NavigateTo.NEXT);
+  }
+
+  onSave(): void {
+    this.isStoringLocation = true;
+    if (!this.isLocationSaved()) {
+      if (Boolean(this.polypLocation)) {
+        this.imagesService.createLocation(this.currentImageId, this.polypLocation)
+          .subscribe(location => {
+            this.isStoringLocation = false;
+            this.image.polypLocation = location;
+            this.polypLocation = location.regularize();
+            this.notificationService.success(
+              'Polyp location correctly stored.', 'Polyp location stored'
+            );
+            if (this.isLastImage) {
+              this.notificationService.info(
+                'There are no more images in this gallery.', 'No images left'
+              );
+            } else {
+              this.navigateToNext();
+            }
+          });
+      } else {
+        this.imagesService.deleteLocation(this.currentImageId)
+          .subscribe(() => {
+            this.isStoringLocation = false;
+            this.image.polypLocation = null;
+            this.polypLocation = null;
+            this.notificationService.success(
+              'Polyp location correctly removed.', 'Polyp location removed'
+            );
+          });
+      }
+    }
+  }
+
+  onClear(): void {
+    if (Boolean(this.image.polypLocation)) {
+      this.showConfirmRemovingLocation = true;
+    } else {
+      this.polypLocation = null;
+    }
+  }
+
+  onTriggerDeletion(): void {
+    this.showDeleteConfirmation = true;
+  }
+
+  onDeleteConfirmed(): void {
+    this.showDeleteConfirmation = false;
+    this.showDescribePolypDeletionReason = true;
+  }
+
+  onDeleteCancelled(): void {
+    this.showDeleteConfirmation = false;
+  }
+
+  onContinueWithoutSavingClose(accepted: boolean): void {
+    if (accepted) {
+      this.navigate();
+    }
+
+    this.navigationDirection = null;
+  }
+
+  onConfirmRemovingLocationClose(action: RemoveLocationAction): void {
+    switch (action) {
+      case RemoveLocationAction.DISCARD:
+        this.deleteLocation(this.currentImageId);
+        break;
+      case RemoveLocationAction.ONLY_CLEAR:
+        this.polypLocation = null;
+        break;
+      case RemoveLocationAction.CANCEL:
+        break;
+      default:
+        throw new Error('Unknown action: ' + action);
+    }
+  }
+
+  onDescribePolypDeletionReason(reason: string): void {
+    if (reason !== null) {
+      this.isDeletingImage = true;
+      this.imagesService.delete(this.currentImageId, reason)
+        .subscribe(() => {
+          this.isDeletingImage = false;
+          this.notificationService.success('Image removed successfully.', 'Image removed.');
+
+          if (this.hasNextImage()) {
+            this.navigateToNext(true);
+          } else if (this.hasPreviousImage()) {
+            this.navigateToPrevious(true);
+          } else {
+            this.notificationService.info('No images in this gallery', 'No images');
+            this.redirectToGallery();
+          }
+        });
+    }
+  }
+
+  private navigateTo(direction: NavigateTo): void {
+    this.navigationDirection = direction;
+    if (this.isLocationSaved()) {
+      this.navigate();
+    } else {
+      this.showContinueWithoutSavingLocation = true;
+    }
   }
 
   private deleteLocation(id: string) {
-    this.isLoading = true;
-    this.imagesService.deleteLocation(id).subscribe(() => {
-        this.isLoading = false;
+    this.isDeletingLocation = true;
+    this.imagesService.deleteLocation(id)
+      .subscribe(() => {
+        this.isDeletingLocation = false;
+        this.polypLocation = null;
         this.image.polypLocation = null;
-        this.notificationService.success('The location of the dataset has been correctly removed ', 'Polyp location removed');
-      }
-    );
+        this.notificationService.success(
+          'The location of the dataset has been correctly removed ',
+          'Polyp location removed'
+        );
+      });
   }
 
-  private getImageAndLoad(id: string) {
-    this.isLoading = true;
-    this.imagesService.getImage(id).subscribe(img => {
-      this.isLoading = false;
-      this.image = img;
-      this.paintImageAndLocation();
-      if (!this.isEndoscopist()) {
-        this.getPolypInfo();
-      }
-    });
-  }
-
-  private paintImageAndLocation() {
-    this.imageElement.onload = () => {
-      this.canvas.width = this.imageElement.width;
-      this.canvas.height = this.imageElement.height;
-      (<HTMLInputElement>document.getElementById('show-location-checkbox')).style.maxWidth = this.canvas.width + 'px';
-      this.repaintImage();
-      this.paintLocationIfAvailable();
-    };
-    this.imageElement.src = 'data:image/png;base64,' + this.image.base64contents;
-    this.changeURLToCurrentImage();
-  }
-
-  private changeURLToCurrentImage() {
-    this.location.go(`gallery/${this.gallery.id}/image/${this.image.id}?filter=${ImageFilter[this.filter]}` +
+  private changeUrlToCurrentImage() {
+    this.location.go(`gallery/${this.gallery.id}/image/${this.currentImageId}?filter=${ImageFilter[this.filter]}` +
       `&show_location=${this.showPolypLocation}`);
   }
 
-  private paintLocationIfAvailable() {
-    if (this.image.polypLocation !== null && this.showPolypLocation) {
-      this.paintLocation(this.image.polypLocation);
-    } else {
-      this.reset();
-    }
-  }
-
-  reloadImage() {
-    this.repaintImage();
-    this.paintLocationIfAvailable();
-    this.changeURLToCurrentImage();
-  }
-
-  private paintLocation(polypLocation: PolypLocation) {
-    this.last_mousex = polypLocation.x;
-    this.last_mousey = polypLocation.y;
-    this.width = polypLocation.width;
-    this.height = polypLocation.height;
-    this.draw();
-  }
-
-  private loadAsFollowingImage(id: string) {
-    if (!this.isLastImage) {
-      this.isLoading = true;
-      this.imagesService.getImage(id).subscribe(image => {
-          this.isLoading = false;
-          this.followingImage = image;
-        }
-      );
-    }
-  }
-
   private loadAsPreviousImage(id: string) {
-    if (!this.isFirstImage) {
-      this.isLoading = true;
+    if (Boolean(id)) {
+      this.isLoadingPrevious = true;
       this.imagesService.getImage(id).subscribe(image => {
-          this.isLoading = false;
-          this.previousImage = image;
-        }
-      );
+        this.previousImage = image;
+        this.isLoadingPrevious = false;
+      });
     }
   }
 
-  getImagePositionInArray(): number {
-    return this.identifiers.indexOf(
-      this.identifiers.find(
-        id =>
-          id === this.image.id
-      ));
+  private loadAsNextImage(id: string) {
+    if (Boolean(id)) {
+      this.isLoadingNext = true;
+      this.imagesService.getImage(id).subscribe(image => {
+          this.nextImage = image;
+          this.isLoadingNext = false;
+      });
+    }
   }
 
-  isLocationSaved(): boolean {
-    const locationSaved = this.image.polypLocation;
-    // if dataset is selected
-    if (this.isEndoscopist() && (this.last_mousex != null || this.last_mousey != null ||
-      this.width != null || this.height != null) && !this.isPolypEmpty() && this.showPolypLocation) {
-      // if dataset wasn't saved
-      if (locationSaved == null || (this.last_mousex !== locationSaved.x || this.last_mousey !== locationSaved.y ||
-        this.width !== locationSaved.width || this.height !== locationSaved.height)) {
-        return false;
+  private navigateToPrevious(removeCurrentImage: boolean = false): void {
+    const isLastImage = this.isLastImage;
+
+    if (removeCurrentImage) {
+      const index = this.currentImageIndex;
+      this.identifiers.splice(index, 1);
+      if (isLastImage) {
+        this.nextImage = null;
+      } else {
+        this.loadAsNextImage(this.identifiers[index + 1]);
       }
-    }
-    return true;
-  }
-
-  checkIfLocationSavedAndScrollImage() {
-    if (this.isLocationSaved()) {
-      this.toLeftOrToRight();
     } else {
-      this.warningMessageWithoutSavingLocation = true;
+      this.nextImage = this.image;
     }
-  }
-
-  toLeftOrToRight() {
-    this.selectedToRight === true ? this.toRight() : this.toLeft();
-  }
-
-  protected toLeft() {
-    const position = this.getImagePositionInArray();
-    this.followingImage = this.image;
     this.image = this.previousImage;
-    this.actionsToScroll();
-    this.loadAsPreviousImage(this.identifiers[position - 2]);
-  }
+    this.changeUrlToCurrentImage();
 
-  protected toRight() {
-    const position = this.getImagePositionInArray();
-    this.previousImage = this.image;
-    this.image = this.followingImage;
-    this.actionsToScroll();
-    this.loadAsFollowingImage(this.identifiers[position + 2]);
-  }
-
-  private actionsToScroll() {
-    this.paintImageAndLocation();
-    this.checkIfIsFirstImage();
-    this.checkIfIsLastImage();
-  }
-
-  private checkIfIsFirstImage() {
-    this.getImagePositionInArray() <= 0 ? this.isFirstImage = true : this.isFirstImage = false;
-  }
-
-  private checkIfIsLastImage() {
-    this.getImagePositionInArray() >= this.lastValidPosition() ? this.isLastImage = true : this.isLastImage = false;
-  }
-
-  cleanCanvas() {
-    this.repaintImage();
-    this.reset();
-  }
-
-  checkIfLocationSavedAndRedirectToGallery() {
-    if (this.isLocationSaved()) {
-      this.redirectToGallery();
+    if (this.hasPreviousImage()) {
+      this.loadAsPreviousImage(this.identifiers[this.currentImageIndex - 1]);
     } else {
-      this.warningMessageWithoutSavingLocation = true;
+      this.previousImage = null;
     }
   }
 
-  checkIfLocationSavedAndDownloadImage() {
-    if (!this.isLocationSaved()) {
-      this.repaintImage();
-      this.paintLocationIfAvailable();
+  private navigateToNext(removeCurrentImage: boolean = false): void {
+    const isFirstImage = this.isFirstImage;
+
+    if (removeCurrentImage) {
+      const index = this.currentImageIndex;
+      this.identifiers.splice(index, 1);
+      if (isFirstImage) {
+        this.previousImage = null;
+      } else {
+        this.loadAsPreviousImage(this.identifiers[index - 1]);
+      }
+    } else {
+      this.previousImage = this.image;
+    }
+    this.image = this.nextImage;
+    this.changeUrlToCurrentImage();
+
+    if (this.hasNextImage()) {
+      this.loadAsNextImage(this.identifiers[this.currentImageIndex + 1]);
+    } else {
+      this.nextImage = null;
     }
   }
 
-  redirectToGallery() {
-    let page = Math.trunc(this.getImagePositionInArray() * (this.lastValidPosition() / 12) / this.lastValidPosition()) + 1;
+  private redirectToGallery() {
+    const imageCount = this.imageCount;
+    let page = Math.trunc(this.currentImageIndex * (imageCount / 12) / imageCount) + 1;
     if (isNaN(page)) {
       page = 1;
     }
@@ -436,74 +482,12 @@ export class ImageComponent implements OnInit {
       `&show_location=${this.showPolypLocation}`);
   }
 
-  continueWithoutSavingLocation() {
-    this.warningMessageWithoutSavingLocation = false;
-    this.back ? this.redirectToGallery() : this.toLeftOrToRight();
-  }
-
-  private lastValidPosition(): number {
-    return this.identifiers.length - 1;
-  }
-
-  cancel() {
-    this.deleting = false;
-    this.definingDeletion = false;
-    this.selected = null;
-    this.observationToRemove = null;
-    this.observationsFound = null;
-    this.observationToRemoveStartsWith = null;
-  }
-
-  getFileName(): string {
-    if (this.image.video !== undefined) {
-      if (this.isPolypEmpty()) {
-        return this.image.video.id + '_' + this.image.numFrame + '.png';
-      } else {
-        return this.image.polyp.id + '_' + this.image.video.id + '_' + this.image.numFrame + '.png';
-      }
-    }
-  }
-
-  private repaintImage() {
-    // It allows/does not allow to use the cursor if the image has/does not have a dataset
-    if (this.isPolypEmpty() || !this.isEndoscopist()) {
-      this.canvas.style.cursor = 'not-allowed';
-    } else {
-      this.canvas.style.cursor = '';
-    }
-
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // clear canvas
-    this.ctx.drawImage(this.imageElement, 0, 0, this.imageElement.width, this.imageElement.height);
-  }
-
-  private draw() {
-    this.ctx.beginPath();
-    // left, top, width, height
-    this.ctx.rect(this.last_mousex, this.last_mousey, this.width, this.height);
-    this.ctx.strokeStyle = 'red';
-    this.ctx.lineWidth = 2;
-    this.ctx.stroke();
-  }
-
-  private reset() {
-    this.last_mousex = null;
-    this.last_mousey = null;
-    this.width = null;
-    this.height = null;
-  }
-
-  private getPolypInfo() {
-    if (!this.isPolypEmpty()) {
+  private extractPolypInfo() {
+    if (this.hasPolyp()) {
       switch (this.image.polyp.histology.polypType) {
         case PolypType.ADENOMA:
           this.type = (<Adenoma>this.image.polyp.histology).type;
           this.dysplasingGrade = (<Adenoma>this.image.polyp.histology).dysplasingGrade;
-          break;
-        case PolypType.INVASIVE:
-        case PolypType.HYPERPLASTIC:
-        case PolypType.NON_EPITHELIAL_NEOPLASTIC:
-          this.type = null;
-          this.dysplasingGrade = null;
           break;
         case PolypType.SESSILE_SERRATED_ADENOMA:
           this.type = null;
@@ -520,28 +504,19 @@ export class ImageComponent implements OnInit {
     }
   }
 
-  searchObservations(event) {
-    this.observationToRemove = null;
-    this.observationsFound = null;
-    if (this.observationToRemoveStartsWith !== undefined && this.observationToRemoveStartsWith.length > 3) {
-      this.imagesService.searchObservations(this.observationToRemoveStartsWith)
-        .subscribe(observations => {
-          this.observationsFound = observations;
-          this.observationsFound = this.observationsFound.filter(item => this.options.indexOf(item) < 0);
-          if (this.observationsFound.length === 0) {
-            this.observationToRemove = this.observationToRemoveStartsWith;
-          }
-        });
+  private navigate() {
+    switch (this.navigationDirection) {
+      case NavigateTo.GALLERY:
+        this.redirectToGallery();
+        break;
+      case NavigateTo.PREVIOUS:
+        this.navigateToPrevious();
+        break;
+      case NavigateTo.NEXT:
+        this.navigateToNext();
+        break;
+      default:
+        throw new Error('Invalid navigation: ' + this.navigationDirection);
     }
-    if (event.key === 'Enter') {
-      this.observationToRemove = this.observationToRemoveStartsWith;
-      this.observationsFound = null;
-    }
-  }
-
-
-  selectedObservationToRemove(observation: string) {
-    this.observationToRemove = observation;
-    this.observationToRemoveStartsWith = observation;
   }
 }

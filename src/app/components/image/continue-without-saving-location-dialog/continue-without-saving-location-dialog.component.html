@@ -1,0 +1,13 @@
+<clr-modal [(clrModalOpen)]="open" [clrModalClosable]="false">
+  <h3 class="modal-title">Warning</h3>
+  <div class="modal-body">
+    The polyp location has not been saved. Are you sure you want to continue?
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="onCancel()">Cancel
+    </button>
+    <button type="button" class="btn btn-danger-outline" (click)="onContinue()">
+      Continue
+    </button>
+  </div>
+</clr-modal>
