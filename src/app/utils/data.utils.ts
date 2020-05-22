@@ -22,12 +22,19 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Polyp} from './Polyp';
-import {Gallery} from './Gallery';
+export class DataUtils {
+  public static imageUriToFile(dataURI: string): File {
+    // convert the data URL to a byte string
+    const binary = atob(dataURI.split(',')[1]);
 
-export class PolypDataset {
-  id: string;
-  title: string;
-  polyps: Polyp[] | string[];
-  defaultGallery: Gallery | string;
+    const array = [];
+    for (let i = 0; i < binary.length; i++) {
+      array.push(binary.charCodeAt(i));
+    }
+
+    const blob = new Blob([new Uint8Array(array)], {'type': 'image/png'});
+    blob['name'] = 'file';
+
+    return <File>blob;
+  }
 }

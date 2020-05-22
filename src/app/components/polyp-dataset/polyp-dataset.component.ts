@@ -35,6 +35,8 @@ import {PolypDatasetsService} from '../../services/polyp-datasets.service';
 import {ActivatedRoute} from '@angular/router';
 import {PolypRecording} from '../../models/PolypRecording';
 import {forkJoin} from 'rxjs/internal/observable/forkJoin';
+import {GalleriesService} from '../../services/galleries.service';
+import {Gallery} from '../../models/Gallery';
 
 @Component({
   selector: 'app-polyp-dataset',
@@ -47,6 +49,7 @@ export class PolypDatasetComponent implements OnInit {
   polypDataset: PolypDataset;
   polyps: Polyp[] = [];
   polypRecordings: PolypRecording[] = [];
+  galleries: Gallery[] = [];
 
   // Polyp Pagination
   private _polypsPagination: ClrDatagridPagination;
@@ -63,11 +66,12 @@ export class PolypDatasetComponent implements OnInit {
   polypRecordingsLoading = false;
 
   constructor(
+    private readonly route: ActivatedRoute,
     private readonly explorationsService: ExplorationsService,
+    private readonly galleriesService: GalleriesService,
     private readonly notificationService: NotificationService,
     private readonly polypDatasetsService: PolypDatasetsService,
-    private readonly polypRecordingsService: PolypRecordingsService,
-    private readonly route: ActivatedRoute,
+    private readonly polypRecordingsService: PolypRecordingsService
   ) { }
 
   ngOnInit() {
@@ -75,6 +79,8 @@ export class PolypDatasetComponent implements OnInit {
 
     this.polypDatasetsService.getPolypDataset(this.id)
       .subscribe(polypDataset => this.polypDataset = polypDataset);
+    this.galleriesService.listGalleries()
+      .subscribe(galleries => this.galleries = galleries);
   }
 
   @ViewChild(ClrDatagridPagination) set polypsPagination(polypsPagination: ClrDatagridPagination) {
@@ -105,6 +111,10 @@ export class PolypDatasetComponent implements OnInit {
     return this._polypsPagination !== undefined;
   }
 
+  countPolyps(): number {
+    return this.polypDataset.polyps.length;
+  }
+
   @ViewChild(ClrDatagridPagination) set polypRecordingsPagination(polypRecordingsPagination: ClrDatagridPagination) {
     if (this._polypRecordingsPagination !== polypRecordingsPagination) {
       this._polypRecordingsPagination = polypRecordingsPagination;
@@ -130,7 +140,7 @@ export class PolypDatasetComponent implements OnInit {
   }
 
   hasPolypRecordingsPagination(): boolean {
-    return this._polypRecordingsPagination !== undefined;
+    return Boolean(this._polypRecordingsPagination);
   }
 
   private isValidPolypsPage(page: string): boolean {
@@ -253,9 +263,5 @@ export class PolypDatasetComponent implements OnInit {
         this.polypRecordingsPaginationTotalItems = polypRecordingsPage.totalItems;
         this.polypRecordingsLoading = false;
       });
-  }
-
-  countPolyps(): number {
-    return this.polypDataset.polyps.length;
   }
 }

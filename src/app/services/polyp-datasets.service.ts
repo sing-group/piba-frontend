@@ -55,10 +55,36 @@ export class PolypDatasetsService {
         polyps.push(typeof polyp === 'string' ? polyp : polyp.id);
       }
     }
+
+    const gallery = Boolean(polypInfo.defaultGallery)
+      ? typeof polypInfo.defaultGallery === 'string' ? polypInfo.defaultGallery : polypInfo.defaultGallery.id
+      : null;
+
     return {
       id: polypInfo.id,
       title: polypInfo.title,
-      polyps: polyps
+      polyps: polyps,
+      defaultGallery: gallery
+    };
+  }
+
+  private static toPolypDatasetInfo(polypDataset: PolypDataset): PolypDatasetInfo {
+    const polyps: string[] = [];
+    for (const polyp of polypDataset.polyps) {
+      if (typeof polyp === 'string') {
+        polyps.push(polyp);
+      } else {
+        polyps.push(polyp.id);
+      }
+    }
+
+    return {
+      id: polypDataset.id,
+      title: polypDataset.title,
+      polyps: polyps,
+      defaultGallery: Boolean(polypDataset)
+        ? (typeof polypDataset.defaultGallery === 'string' ? polypDataset.defaultGallery : polypDataset.defaultGallery.id)
+        : null
     };
   }
 
@@ -138,6 +164,19 @@ export class PolypDatasetsService {
       PibaError.throwOnError(
         'Error retrieving polyp recordings in dataset',
         `Polyps recordings in dataset '${id}' could not be retrieved.`
+      )
+    );
+  }
+
+  editPolypDataset(polypDataset: PolypDataset): Observable<PolypDataset> {
+    return this.http.put<PolypDatasetInfo>(
+      `${environment.restApi}/polypdataset/${polypDataset.id}`,
+      PolypDatasetsService.toPolypDatasetInfo(polypDataset)
+    ).pipe(
+      map(PolypDatasetsService.mapPolypDatasetInfo),
+      PibaError.throwOnError(
+        'Error editing polyp dataset',
+        `Polyp dataset ${polypDataset.title} could not be edited.`
       )
     );
   }

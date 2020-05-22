@@ -22,12 +22,28 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Polyp} from './Polyp';
-import {Gallery} from './Gallery';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-export class PolypDataset {
-  id: string;
-  title: string;
-  polyps: Polyp[] | string[];
-  defaultGallery: Gallery | string;
-}
+import { LocatePolypInImageDialogComponent } from './locate-polyp-in-image-dialog.component';
+
+describe('LocatePolypInImageDialogComponent', () => {
+  let component: LocatePolypInImageDialogComponent;
+  let fixture: ComponentFixture<LocatePolypInImageDialogComponent>;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ LocatePolypInImageDialogComponent ]
+    })
+    .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(LocatePolypInImageDialogComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

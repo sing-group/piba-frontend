@@ -22,12 +22,28 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Polyp} from './Polyp';
-import {Gallery} from './Gallery';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-export class PolypDataset {
-  id: string;
-  title: string;
-  polyps: Polyp[] | string[];
-  defaultGallery: Gallery | string;
-}
+import { PolypRecordingInDatasetComponent } from './polyp-recording-in-dataset.component';
+
+describe('PolypRecordingInDatasetComponent', () => {
+  let component: PolypRecordingInDatasetComponent;
+  let fixture: ComponentFixture<PolypRecordingInDatasetComponent>;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ PolypRecordingInDatasetComponent ]
+    })
+    .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(PolypRecordingInDatasetComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

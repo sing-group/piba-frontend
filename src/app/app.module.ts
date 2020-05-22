@@ -69,7 +69,7 @@ import {PolypsComponent} from './components/polyps/polyps.component';
 import {PolypDatasetsComponent} from './components/polyp-datasets/polyp-datasets.component';
 import {PolypDatasetsService} from './services/polyp-datasets.service';
 import {PolypDatasetComponent} from './components/polyp-dataset/polyp-dataset.component';
-import {PolypRecordingInGalleryComponent} from './components/polyp-recording-in-gallery/polyp-recording-in-gallery.component';
+import {PolypRecordingInDatasetComponent} from './components/polyp-recording-in-dataset/polyp-recording-in-dataset.component';
 import {ImageAnnotatorComponent} from './components/image-annotator/image-annotator.component';
 import {
   ContinueWithoutSavingLocationDialogComponent
@@ -80,41 +80,45 @@ import {
 import {
   DescribePolypDeletionDialogComponent
 } from './components/image/describe-polyp-deletion-dialog/describe-polyp-deletion-dialog.component';
+import {
+  LocatePolypInImageDialogComponent
+} from './components/locate-polyp-in-image-dialog/locate-polyp-in-image-dialog.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    ExplorationComponent,
-    VideoComponent,
-    PatientsComponent,
-    VideoEditorComponent,
-    TimePipe,
-    ExplorationsComponent,
-    PolypComponent,
-    TimeToNumberPipe,
-    LoginComponent,
-    AgePipe,
-    IdspaceComponent,
-    UserComponent,
-    DeleteConfirmationComponent,
-    GalleryComponent,
-    SafehtmlPipe,
-    ImageComponent,
-    ProfileComponent,
-    GalleriesComponent,
-    ModifiersComponent,
-    DropdownFilterPipe,
-    VideoZoneEditorComponent,
-    ConfirmationModalComponent,
-    PolypsComponent,
-    PolypDatasetsComponent,
-    PolypDatasetComponent,
-    PolypRecordingInGalleryComponent,
-    ImageAnnotatorComponent,
-    ContinueWithoutSavingLocationDialogComponent,
-    ConfirmRemovingLocationDialogComponent,
-    DescribePolypDeletionDialogComponent
-  ],
+    declarations: [
+        AppComponent,
+        ExplorationComponent,
+        VideoComponent,
+        PatientsComponent,
+        VideoEditorComponent,
+        TimePipe,
+        ExplorationsComponent,
+        PolypComponent,
+        TimeToNumberPipe,
+        LoginComponent,
+        AgePipe,
+        IdspaceComponent,
+        UserComponent,
+        DeleteConfirmationComponent,
+        GalleryComponent,
+        SafehtmlPipe,
+        ImageComponent,
+        ProfileComponent,
+        GalleriesComponent,
+        ModifiersComponent,
+        DropdownFilterPipe,
+        VideoZoneEditorComponent,
+        ConfirmationModalComponent,
+        PolypsComponent,
+        PolypDatasetsComponent,
+        PolypDatasetComponent,
+        PolypRecordingInDatasetComponent,
+        ImageAnnotatorComponent,
+        ContinueWithoutSavingLocationDialogComponent,
+        ConfirmRemovingLocationDialogComponent,
+        DescribePolypDeletionDialogComponent,
+        LocatePolypInImageDialogComponent
+    ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

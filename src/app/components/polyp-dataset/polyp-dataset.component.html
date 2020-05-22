@@ -38,6 +38,16 @@
           <td class="left">Polyps</td>
           <td class="left">{{countPolyps()}}</td>
         </tr>
+        <tr>
+          <td class="left">Default gallery</td>
+          <td class="left select">
+            <select [value]="polypDataset.defaultGallery">
+              <option *ngFor="let gallery of galleries" [value]="gallery.id">
+                {{gallery.title}}
+              </option>
+            </select>
+          </td>
+        </tr>
         </tbody>
       </table>
     </section>

@@ -28,4 +28,5 @@ export interface PolypDatasetInfo {
   id: string;
   title: string;
   polyps: IdAndUri[] | string[];
+  defaultGallery?: IdAndUri | string;
 }

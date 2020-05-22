@@ -74,7 +74,7 @@ export class GalleriesComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.galleriesService.getGalleries().subscribe(galleries => this.galleries = galleries);
+    this.galleriesService.listGalleries().subscribe(galleries => this.galleries = galleries);
   }
 
   get galleries(): Gallery[] {

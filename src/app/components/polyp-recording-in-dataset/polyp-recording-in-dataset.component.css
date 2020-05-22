@@ -51,3 +51,7 @@ i {
   bottom: 0;
   margin: auto;
 }
+
+.snapshot-canvas {
+  visibility: hidden;
+}

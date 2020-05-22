@@ -50,6 +50,7 @@ import {VideoModification} from '../../models/VideoModification';
 import {VideoSnapshot} from '../video/VideoSnapshot';
 import {VideoComponent} from '../video/video.component';
 import {VideoIntervalHighlight} from '../video/VideoIntervalHighlight';
+import {DataUtils} from '../../utils/data.utils';
 
 @Pipe({
   name: 'dropdownFilter',
@@ -179,7 +180,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
 
     this.modifiersService.getModifiers().subscribe((modifiers) => this.modifiers = modifiers);
 
-    this.galleriesService.getGalleries().subscribe(galleries => {
+    this.galleriesService.listGalleries().subscribe(galleries => {
       this.galleries = galleries.sort((galleryA, galleryB) => galleryA.title > galleryB.title ? 1 : -1);
     });
 
@@ -329,28 +330,13 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     } else {
       imageUploadInfo = VideoEditorComponent.mapImage(this.image);
     }
-    imageUploadInfo.image = this.base64toFile(this.image.base64contents);
+    imageUploadInfo.image = DataUtils.imageUriToFile(this.image.base64contents);
 
     this.discardSnapshot();
 
     this.imagesService.uploadImage(imageUploadInfo).subscribe(() => {
       this.notificationService.success('Image registered successfully.', 'Image registered.');
     });
-  }
-
-  base64toFile(dataURI): File {
-    // convert the data URL to a byte string
-    const binary = atob(dataURI.split(',')[1]);
-
-    const array = [];
-    for (let i = 0; i < binary.length; i++) {
-      array.push(binary.charCodeAt(i));
-    }
-
-    const blob = new Blob([new Uint8Array(array)], {'type': 'image/png'});
-    blob['name'] = 'file';
-
-    return <File>blob;
   }
 
   doesGalleryNotExists(): boolean {

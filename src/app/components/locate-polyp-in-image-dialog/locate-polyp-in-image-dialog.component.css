@@ -22,28 +22,14 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+.snapshot-canvas {
+  width: 100%;
+  margin: 0 auto;
+  display: block;
+  visibility: hidden;
+}
 
-import { PolypRecordingInGalleryComponent } from './polyp-recording-in-gallery.component';
-
-describe('PolypRecordingInGalleryComponent', () => {
-  let component: PolypRecordingInGalleryComponent;
-  let fixture: ComponentFixture<PolypRecordingInGalleryComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ PolypRecordingInGalleryComponent ]
-    })
-    .compileComponents();
-  }));
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(PolypRecordingInGalleryComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+.modal-body {
+  display: grid;
+  justify-content: center;
+}

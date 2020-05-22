@@ -44,7 +44,7 @@
         </span>
         <app-video [video]="polypRecording.video" [interval]="polypRecording" limitToInterval="true"
                    [intervalBoundaries]="intervalBoundaries" [highlightZones]="highlightZones" [hidden]="!isVideoReady()"
-                   (ready)="onReady()">
+                   (ready)="onReady()" (snapshot)="onSnapshot($event)">
         </app-video>
       </div>
     </div>
@@ -102,6 +102,21 @@
       {{duration | time}}
     </div>
   </div>
+  <div class="clr-row margin-row">
+    <div class="col-lg-2 col-sm-3 col-xs-4">
+      Snapshots gallery
+    </div>
+    <div class="col-lg-4 col-sm-3 col-xs-8" *ngIf="dataset.defaultGallery">
+      dataset.defaultGallery.title
+    </div>
+    <div class="col-lg-4 col-sm-3 col-xs-8" *ngIf="!dataset.defaultGallery">
+      <clr-alert clrAlertType="danger" [clrAlertClosable]="false" clrAlertSizeSmall="true">
+        <clr-alert-item>
+          <span class="alert-text">None assigned</span>
+        </clr-alert-item>
+      </clr-alert>
+    </div>
+  </div>
   <hr *ngIf="hasModifications()"/>
   <div class="clr-row margin-row" *ngIf="hasModifications()">
     <div class="col-lg-2 col-sm-3 col-xs-4">
@@ -132,3 +147,11 @@
     </div>
   </div>
 </div>
+
+<canvas #canvas id="canvas" class="snapshot-canvas"></canvas>
+
+<app-locate-polyp-in-image-dialog [(open)]="showSnapshotDialog"
+  [src]="snapshotDataUrl" title="Locate and save snapshot"
+  [disabled]="!hasGallery()" disabledMessage="A gallery must be selected to store image."
+  (close)="onLocatePolypClose($event)">
+</app-locate-polyp-in-image-dialog>

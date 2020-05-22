@@ -39,7 +39,7 @@ export class GalleriesService {
   constructor(private http: HttpClient) {
   }
 
-  getGalleries(): Observable<Gallery[]> {
+  listGalleries(): Observable<Gallery[]> {
     return this.http.get<GalleryInfo[]>(`${environment.restApi}/gallery/`)
       .pipe(
         map(galleries => galleries.map(this.mapGalleryInfo.bind(this)))
