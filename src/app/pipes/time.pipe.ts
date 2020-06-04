@@ -29,12 +29,22 @@ import {Pipe, PipeTransform} from '@angular/core';
 })
 export class TimePipe implements PipeTransform {
 
-  transform(time: number): string {
+  transform(time: number, millisPrecision: number = 0): string {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time - minutes * 60);
 
     const formatTime = timeToFormat => timeToFormat < 10 ? '0' + timeToFormat : timeToFormat;
 
-    return formatTime(minutes) + ':' + formatTime(seconds);
+    const formattedTime = formatTime(minutes) + ':' + formatTime(seconds);
+    if (millisPrecision > 0) {
+      let millis = String(Math.round(time % 1 * Math.pow(10, millisPrecision)));
+      while (millis.length < millisPrecision) {
+        millis = '0' + millis;
+      }
+
+      return formattedTime + '.' + millis;
+    } else {
+      return formattedTime;
+    }
   }
 }

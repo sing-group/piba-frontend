@@ -42,10 +42,17 @@
         <span class="spinner" [hidden]="isVideoReady()">
           Loading...
         </span>
-        <app-video [video]="polypRecording.video" [interval]="polypRecording" limitToInterval="true"
+        <app-video #videoComponent *ngIf="polypRecording && polypRecording.video"
+                   [video]="polypRecording.video" [interval]="polypRecording" limitToInterval="true"
                    [intervalBoundaries]="intervalBoundaries" [highlightZones]="highlightZones" [hidden]="!isVideoReady()"
-                   (ready)="onReady()" (snapshot)="onSnapshot($event)">
+                   (ready)="onReady()" (snapshot)="onSnapshot($event)" (time)="onTimeChange($event)">
         </app-video>
+      </div>
+      <div *ngIf="currentImage" [class.located]="currentImage.polypLocation !== null" [class.not-located]="currentImage.polypLocation === null">
+        {{currentImage.polypLocation ? 'Image with polyp location in current frame.' : 'Image without polyp location in current frame.'}}
+      </div>
+      <div *ngIf="!currentImage">
+        No image in current frame.
       </div>
     </div>
     <div class="clr-col-1 clr-align-self-center" align="center">
@@ -57,101 +64,153 @@
 </div>
 
 <div class="card card-size" *ngIf="!isLoading()">
-  <div class="card-header">Polyp recording info</div>
-  <div class="clr-row margin-row">
-    <div class="col-lg-2 col-sm-3 col-xs-4">
-      Exploration
+  <div class="card-header">
+    Polyp recording info
+  </div>
+
+  <div class="card-block">
+    <div class="clr-row margin-row">
+      <div class="col-lg-2 col-sm-3 col-xs-4">
+        Exploration
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8">
+        <a routerLink="/explorations/{{polypRecording.polyp.exploration.id}}">
+          {{polypRecording.polyp.exploration.title}}
+        </a>
+      </div>
+      <div class="col-lg-2 col-sm-3 col-xs-4">
+        Start
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8">
+        {{polypRecording.start | time}}
+      </div>
     </div>
-    <div class="col-lg-4 col-sm-3 col-xs-8">
-      <a routerLink="/explorations/{{polypRecording.polyp.exploration.id}}">
-        {{polypRecording.polyp.exploration.title}}
-      </a>
+    <div class="clr-row margin-row">
+      <div class="col-lg-2 col-sm-3 col-xs-4">
+        Polyp
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8">
+        {{polypRecording.polyp.name}}
+      </div>
+      <div class="col-lg-2 col-sm-3 col-xs-4">
+        End time
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8">
+        {{polypRecording.end | time}}
+      </div>
     </div>
-    <div class="col-lg-2 col-sm-3 col-xs-4">
-      Start
+    <div class="clr-row margin-row">
+      <div class="col-lg-2 col-sm-3 col-xs-4">
+        Video
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8">
+        {{polypRecording.video.title}}
+      </div>
+      <div class="col-lg-2 col-sm-3 col-xs-4">
+        Duration
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8">
+        {{duration | time}}
+      </div>
     </div>
-    <div class="col-lg-4 col-sm-3 col-xs-8">
-      {{polypRecording.start | time}}
+    <div class="clr-row margin-row">
+      <div class="col-lg-2 col-sm-3 col-xs-4">
+        Snapshots gallery
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8" *ngIf="dataset.defaultGallery">
+        {{dataset.defaultGallery.title}}
+      </div>
+      <div class="col-lg-4 col-sm-3 col-xs-8" *ngIf="!dataset.defaultGallery">
+        <clr-alert clrAlertType="danger" [clrAlertClosable]="false" clrAlertSizeSmall="true">
+          <clr-alert-item>
+            <span class="alert-text">None assigned</span>
+          </clr-alert-item>
+        </clr-alert>
+      </div>
     </div>
   </div>
-  <div class="clr-row margin-row">
-    <div class="col-lg-2 col-sm-3 col-xs-4">
-      Polyp
-    </div>
-    <div class="col-lg-4 col-sm-3 col-xs-8">
-      {{polypRecording.polyp.name}}
-    </div>
-    <div class="col-lg-2 col-sm-3 col-xs-4">
-      End time
-    </div>
-    <div class="col-lg-4 col-sm-3 col-xs-8">
-      {{polypRecording.end | time}}
-    </div>
-  </div>
-  <div class="clr-row margin-row">
-    <div class="col-lg-2 col-sm-3 col-xs-4">
-      Video
-    </div>
-    <div class="col-lg-4 col-sm-3 col-xs-8">
-      {{polypRecording.video.title}}
-    </div>
-    <div class="col-lg-2 col-sm-3 col-xs-4">
-      Duration
-    </div>
-    <div class="col-lg-4 col-sm-3 col-xs-8">
-      {{duration | time}}
-    </div>
-  </div>
-  <div class="clr-row margin-row">
-    <div class="col-lg-2 col-sm-3 col-xs-4">
-      Snapshots gallery
-    </div>
-    <div class="col-lg-4 col-sm-3 col-xs-8" *ngIf="dataset.defaultGallery">
-      dataset.defaultGallery.title
-    </div>
-    <div class="col-lg-4 col-sm-3 col-xs-8" *ngIf="!dataset.defaultGallery">
-      <clr-alert clrAlertType="danger" [clrAlertClosable]="false" clrAlertSizeSmall="true">
-        <clr-alert-item>
-          <span class="alert-text">None assigned</span>
-        </clr-alert-item>
-      </clr-alert>
+
+  <div class="card-block" *ngIf="hasModifications()">
+    <div class="clr-row margin-row">
+      <h5>Modifiers</h5>
+      <table class="table table-noborder">
+        <thead>
+        <tr>
+          <th>Modification</th>
+          <th>Start in video</th>
+          <th>End in video</th>
+          <th>Length in video</th>
+          <th>Start in record</th>
+          <th>End in record</th>
+          <th>Length in record</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let modification of modifications; trackBy: trackById">
+          <td>{{modification.modifier.name}}</td>
+          <td>{{modification.start | time}}</td>
+          <td>{{modification.end | time}}</td>
+          <td>{{modification.end - modification.start | time}}</td>
+          <td>{{modification.start - polypRecording.start | time}}</td>
+          <td>{{modification.end - polypRecording.start | time}}</td>
+          <td>{{calculateModificationDuration(modification) | time}}</td>
+        </tr>
+        </tbody>
+      </table>
     </div>
   </div>
-  <hr *ngIf="hasModifications()"/>
-  <div class="clr-row margin-row" *ngIf="hasModifications()">
-    <div class="col-lg-2 col-sm-3 col-xs-4">
-      Modifications
-    </div>
-    <div class="col-lg-2 col-sm-2 col-xs-4">
-      Start
-    </div>
-    <div class="col-lg-2 col-sm-2 col-xs-4">
-      End
-    </div>
-    <div class="col-lg-2 col-sm-2 col-xs-4">
-      Duration
-    </div>
-  </div>
-  <div class="clr-row margin-row" *ngFor="let modification of modifications">
-    <div class="col-lg-2 col-sm-3 col-xs-4">
-      {{modification.modifier.name}}
-    </div>
-    <div class="col-lg-2 col-sm-2 col-xs-4">
-      {{modification.start | time}}
-    </div>
-    <div class="col-lg-2 col-sm-2 col-xs-4">
-      {{modification.end | time}}
-    </div>
-    <div class="col-lg-2 col-sm-2 col-xs-4">
-      {{calculateModificationDuration(modification) | time}}
+
+  <div class="card-block" *ngIf="hasImages()">
+    <div class="clr-row margin-row">
+      <h5>Images</h5>
+      <table class="table table-noborder">
+        <thead>
+        <tr>
+          <th>Is polyp located?</th>
+          <th>Frame</th>
+          <th>Sec. in video</th>
+          <th>Sec. in record</th>
+          <th>Observation</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let image of polypImages; trackBy: trackById"
+            [class.located]="isInCurrentFrame(image) && image.polypLocation !== null"
+            [class.not-located]="isInCurrentFrame(image) && image.polypLocation === null">
+          <td>{{image.polypLocation !== null && image.polypLocation !== undefined ? 'Yes' : 'No'}}</td>
+          <td>{{image.numFrame}}</td>
+          <td>{{image.numFrame / polypRecording.video.fps | time:3}}</td>
+          <td>{{image.numFrame / polypRecording.video.fps - polypRecording.start | time: 3}}</td>
+          <td>{{image.observation}}</td>
+          <td>
+            <button type="button" class="btn btn-icon" (click)="onGoToImage(image)">
+              <clr-icon shape="eye"></clr-icon>
+            </button>
+            <button type="button" class="btn btn-icon" (click)="onAskForImageDeletionConfirmation(image)">
+              <clr-icon shape="remove"></clr-icon>
+            </button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
 
 <canvas #canvas id="canvas" class="snapshot-canvas"></canvas>
 
-<app-locate-polyp-in-image-dialog [(open)]="showSnapshotDialog"
+<app-locate-polyp-in-image-dialog
+  [(open)]="showSnapshotDialog" [polypLocation]="currentPolypLocation"
   [src]="snapshotDataUrl" title="Locate and save snapshot"
   [disabled]="!hasGallery()" disabledMessage="A gallery must be selected to store image."
   (close)="onLocatePolypClose($event)">
 </app-locate-polyp-in-image-dialog>
+
+<app-delete-confirmation [open]="showDeleteImage" [id]="imageToDelete?.id"
+  modelName="image" name="the current image" (confirm)="onDeleteImageConfirmed()" (cancel)="onCancelDeleteImage()">
+</app-delete-confirmation>
+
+<app-describe-polyp-deletion-dialog [(open)]="showDescribePolypDeletionReason"
+                                    (close)="onDeleteImage($event)">
+</app-describe-polyp-deletion-dialog>

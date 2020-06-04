@@ -22,7 +22,7 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {Polyp} from '../../models/Polyp';
 import {ClrDatagridPagination, ClrDatagridStateInterface} from '@clr/angular';
 import {Subject} from 'rxjs/internal/Subject';
@@ -66,6 +66,7 @@ export class PolypDatasetComponent implements OnInit {
   polypRecordingsLoading = false;
 
   constructor(
+    private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly route: ActivatedRoute,
     private readonly explorationsService: ExplorationsService,
     private readonly galleriesService: GalleriesService,
@@ -229,6 +230,7 @@ export class PolypDatasetComponent implements OnInit {
 
   private getPagePolypRecordings() {
     this.polypRecordingsLoading = true;
+    this.changeDetectorRef.detectChanges();
     this.polypDatasetsService.listPolypRecordings(this.id, this.currentPolypRecordingsPage, this.polypRecordingsPageSize)
       .subscribe(polypRecordingsPage => {
         this.polypRecordings = polypRecordingsPage.polypRecordings;

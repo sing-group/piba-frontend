@@ -1,3 +1,27 @@
+/*
+ *  PIBA Frontend
+ *
+ * Copyright (C) 2018-2020 - Miguel Reboiro-Jato,
+ * Daniel Glez-Peña, Alba Nogueira Rodríguez, Florentino Fdez-Riverola,
+ * Rubén Domínguez Carbajales, Jesús Miguel Herrero Rivas,
+ * Eloy Sánchez Hernández, Laura Rivas Moral,
+ * Manuel Puga Jiménez de Azcárate, Joaquín Cubiella Fernández,
+ * Hugo López-Fernández, Silvia Rodríguez Iglesias, Fernando Campos Tato.
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import {ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild} from '@angular/core';
 import {PolypLocation} from '../../models/PolypLocation';
 
@@ -20,10 +44,6 @@ export class ImageAnnotatorComponent {
   private _polypLocation: PolypLocation;
   private _showLocation = true;
   private newPolypLocation: PolypLocation = null;
-
-  constructor(
-    private readonly cdRef: ChangeDetectorRef
-  ) { }
 
   @Input() set polypLocation(polypLocation: PolypLocation) {
     if (!PolypLocation.areEqual(this._polypLocation, polypLocation)) {
@@ -99,16 +119,19 @@ export class ImageAnnotatorComponent {
   private clearLocation(): void {
     let polypLocation = this.polypLocationToPaint;
     if (Boolean(polypLocation) && polypLocation.isValid()) {
-      polypLocation = polypLocation.regularize();
+      try {
+        const context = this.context2D;
+        polypLocation = polypLocation.regularize();
 
-      const context = this.context2D;
+        const x = Math.max(0, polypLocation.x - ImageAnnotatorComponent.STROKE_SIZE);
+        const y = Math.max(0, polypLocation.y - ImageAnnotatorComponent.STROKE_SIZE);
+        const width = Math.min(this.canvasElement.width, polypLocation.width + ImageAnnotatorComponent.STROKE_SIZE * 2);
+        const height = Math.min(this.canvasElement.height, polypLocation.height + ImageAnnotatorComponent.STROKE_SIZE * 2);
 
-      const x = Math.max(0, polypLocation.x - ImageAnnotatorComponent.STROKE_SIZE);
-      const y = Math.max(0, polypLocation.y - ImageAnnotatorComponent.STROKE_SIZE);
-      const width = Math.min(this.canvasElement.width, polypLocation.width + ImageAnnotatorComponent.STROKE_SIZE * 2);
-      const height = Math.min(this.canvasElement.height, polypLocation.height + ImageAnnotatorComponent.STROKE_SIZE * 2);
-
-      context.drawImage(this.imageElement, x, y, width, height, x, y, width, height);
+        context.drawImage(this.imageElement, x, y, width, height, x, y, width, height);
+      } catch (e) {
+        // If context is not available an exception will be thrown.
+      }
     }
   }
 

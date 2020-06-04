@@ -146,14 +146,14 @@ export class ImagesService {
       .pipe(map(ImagesService.mapBasicImageInfo));
   }
 
-  createLocation(id: string, polypLocation: PolypLocation): Observable<PolypLocation> {
-    return this.http.post<PolypLocationInfo>(`${environment.restApi}/image/${id}/polyplocation`, polypLocation)
+  createLocation(imageId: string, polypLocation: PolypLocation): Observable<PolypLocation> {
+    return this.http.post<PolypLocationInfo>(`${environment.restApi}/image/${imageId}/polyplocation`, polypLocation)
       .pipe(
         map(ImagesService.mapPolypLocationInfo),
         PibaError.throwOnError(
           'Error creating location',
           `Location (x: ${polypLocation.x}, y: ${polypLocation.y}, width: ${polypLocation.width}, height: ${polypLocation.height}) ` +
-          `could not be created in image '${id}'`
+          `could not be created in image '${imageId}'.`
         )
       );
   }
@@ -171,14 +171,25 @@ export class ImagesService {
     return this.http.delete(`${environment.restApi}/image/${id}`, httpOptions);
   }
 
-  deleteLocation(id: string) {
-    return this.http.delete(`${environment.restApi}/image/${id}/polyplocation`);
+  deleteLocation(imageId: string) {
+    return this.http.delete(`${environment.restApi}/image/${imageId}/polyplocation`);
+  }
+
+  modifyLocation(imageId: string, location: PolypLocation): Observable<PolypLocation> {
+    return this.http.put<PolypLocationInfo>(`${environment.restApi}/image/${imageId}/polyplocation`, location)
+      .pipe(
+        map(ImagesService.mapPolypLocationInfo),
+        PibaError.throwOnError(
+          'Error modifying location',
+          `Location of image ${imageId} could not be modified.`
+        )
+      );
   }
 
   getImagesByGallery(gallery: Gallery, page: number, pageSize: number, filter: ImageFilter = ImageFilter.ALL): Observable<ImagePage> {
     const withLocation = filter !== ImageFilter.UNLOCATED;
     return this.http.get<ImageInfo[]>
-    (`${environment.restApi}/image?gallery_id=${gallery.id}&page=${page}&pageSize=${pageSize}&filter=${ImageFilter[filter]}`,
+    (`${environment.restApi}/image?galleryId=${gallery.id}&page=${page}&pageSize=${pageSize}&filter=${ImageFilter[filter]}`,
       {observe: 'response'})
       .pipe(
         concatMap(response => {
@@ -205,8 +216,10 @@ export class ImagesService {
   }
 
   getImagesIdentifiersByGallery(gallery: Gallery, filter: ImageFilter = ImageFilter.ALL): Observable<ImagesInGalleryInfo> {
-    return this.http.get<IdAndUri[]>
-    (`${environment.restApi}/image/id?gallery_id=${gallery.id}&filter=${filter}`, {observe: 'response'})
+    return this.http.get<IdAndUri[]>(
+      `${environment.restApi}/image/id?galleryId=${gallery.id}&filter=${filter}`,
+      {observe: 'response'}
+    )
       .pipe(
         concatMap(response => {
           const ids = [];
@@ -220,6 +233,19 @@ export class ImagesService {
             imagesId: ids
           });
         })
+      );
+  }
+
+  listImagesByPolyp(polyp: Polyp, filter: ImageFilter = ImageFilter.ALL): Observable<Image[]> {
+    return this.http.get<ImageInfo[]>(
+      `${environment.restApi}/image?polypId=${polyp.id}&filter=${ImageFilter[filter]}`
+    )
+      .pipe(
+        map(images => images.map(ImagesService.mapBasicImageInfo)),
+        PibaError.throwOnError(
+          'Error listing images',
+          `Images of polyp ${polyp.name} could not be retrieved.`
+        )
       );
   }
 

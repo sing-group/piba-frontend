@@ -277,10 +277,14 @@ export class VideoComponent implements AfterViewChecked, OnInit {
     this.initializePlayWatcher();
   }
 
-  stopVideo() {
+  stopVideo(time = this.startTime) {
+    if (time < this.startTime || time > this.endTime) {
+      throw new Error('Invalid time: ' + time);
+    }
+
     this.videoElement.pause();
-    this.currentTime = this.startTime;
-    this.currentProgressTime = 0;
+    this.currentTime = time;
+    this.currentProgressTime = time - this.startTime;
     clearInterval(this.playWatcher);
     this.playWatcher = undefined;
   }

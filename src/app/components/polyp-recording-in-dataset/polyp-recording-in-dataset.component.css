@@ -55,3 +55,11 @@ i {
 .snapshot-canvas {
   visibility: hidden;
 }
+
+.located {
+  background-color: lightblue;
+}
+
+.not-located {
+  background-color: lightyellow;
+}

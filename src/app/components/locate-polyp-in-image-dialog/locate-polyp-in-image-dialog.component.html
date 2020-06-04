@@ -27,7 +27,7 @@
   <div class="modal-body">
     <app-image-annotator [src]="src" [(polypLocation)]="polypLocation">
     </app-image-annotator>
-    <clr-alert clrAlertType="warning" [clrAlertClosable]="false" *ngIf="disabledMessage">
+    <clr-alert clrAlertType="warning" [clrAlertClosable]="false" *ngIf="disabled">
       <clr-alert-item>
         <span class="alert-text">{{disabledMessage}}</span>
       </clr-alert-item>

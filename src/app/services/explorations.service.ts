@@ -66,15 +66,19 @@ export class ExplorationsService {
                 idAndUri => this.polypsService.getPolyp(idAndUri.id)
               )
             ),
-          this.patientsService.getPatient((<IdAndUri>explorationInfo.patient).id)
-          ).pipe(
-          map(videosAndPolypsAndPatient => this.mapExplorationInfo(
-            explorationInfo,
-            videosAndPolypsAndPatient[0],
-            videosAndPolypsAndPatient[1],
-            videosAndPolypsAndPatient[2]
-          ))
+          this.patientsService.getPatient((<IdAndUri>explorationInfo.patient).id))
+          .pipe(
+            map(videosAndPolypsAndPatient => this.mapExplorationInfo(
+              explorationInfo,
+              videosAndPolypsAndPatient[0],
+              videosAndPolypsAndPatient[1],
+              videosAndPolypsAndPatient[2]
+            ))
           )
+        ),
+        PibaError.throwOnError(
+          'Error retrieving exploration',
+          `Exploration ${uuid} could not be retrieved.`
         )
       );
   }
