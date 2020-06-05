@@ -63,15 +63,15 @@
   </div>
 </div>
 
-<div class="card card-size" *ngIf="!isLoading()">
+<div class="card" *ngIf="!isLoading()">
   <div class="card-header">
     Polyp recording info
   </div>
 
   <div class="card-block">
-    <div class="clr-row margin-row">
+    <div class="clr-row">
       <div class="col-lg-2 col-sm-3 col-xs-4">
-        Exploration
+        <label>Exploration</label>
       </div>
       <div class="col-lg-4 col-sm-3 col-xs-8">
         <a routerLink="/explorations/{{polypRecording.polyp.exploration.id}}">
@@ -79,43 +79,43 @@
         </a>
       </div>
       <div class="col-lg-2 col-sm-3 col-xs-4">
-        Start
+        <label>Start</label>
       </div>
       <div class="col-lg-4 col-sm-3 col-xs-8">
         {{polypRecording.start | time}}
       </div>
     </div>
-    <div class="clr-row margin-row">
+    <div class="clr-row">
       <div class="col-lg-2 col-sm-3 col-xs-4">
-        Polyp
+        <label>Polyp</label>
       </div>
       <div class="col-lg-4 col-sm-3 col-xs-8">
         {{polypRecording.polyp.name}}
       </div>
       <div class="col-lg-2 col-sm-3 col-xs-4">
-        End time
+        <label>End time</label>
       </div>
       <div class="col-lg-4 col-sm-3 col-xs-8">
         {{polypRecording.end | time}}
       </div>
     </div>
-    <div class="clr-row margin-row">
+    <div class="clr-row">
       <div class="col-lg-2 col-sm-3 col-xs-4">
-        Video
+        <label>Video</label>
       </div>
       <div class="col-lg-4 col-sm-3 col-xs-8">
         {{polypRecording.video.title}}
       </div>
       <div class="col-lg-2 col-sm-3 col-xs-4">
-        Duration
+        <label>Duration</label>
       </div>
       <div class="col-lg-4 col-sm-3 col-xs-8">
         {{duration | time}}
       </div>
     </div>
-    <div class="clr-row margin-row">
+    <div class="clr-row">
       <div class="col-lg-2 col-sm-3 col-xs-4">
-        Snapshots gallery
+        <label>Snapshots gallery</label>
       </div>
       <div class="col-lg-4 col-sm-3 col-xs-8" *ngIf="dataset.defaultGallery">
         {{dataset.defaultGallery.title}}
@@ -130,8 +130,12 @@
     </div>
   </div>
 
+  <div app-polyp-info *ngIf="currentImage && currentImage.polyp" class="card-block"
+                  [polyp]="currentImage.polyp" [manuallySelected]="currentImage.manuallySelected">
+  </div>
+
   <div class="card-block" *ngIf="hasModifications()">
-    <div class="clr-row margin-row">
+    <div class="clr-row">
       <h5>Modifiers</h5>
       <table class="table table-noborder">
         <thead>
@@ -161,7 +165,7 @@
   </div>
 
   <div class="card-block" *ngIf="hasImages()">
-    <div class="clr-row margin-row">
+    <div class="clr-row">
       <h5>Images</h5>
       <table class="table table-noborder">
         <thead>

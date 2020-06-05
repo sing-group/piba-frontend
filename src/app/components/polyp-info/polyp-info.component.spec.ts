@@ -22,54 +22,28 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-.card {
-  max-width: 50rem;
-  margin-left: auto;
-  margin-right: auto;
-}
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-.clr-row {
-  margin: 1%;
-}
+import { PolypInfoComponent } from './polyp-info.component';
 
-label {
-  font-weight: bold;
-}
+describe('PolypInfoComponent', () => {
+  let component: PolypInfoComponent;
+  let fixture: ComponentFixture<PolypInfoComponent>;
 
-i {
-  border: solid black;
-  border-width: 0 5px 5px 0;
-  display: inline-block;
-  padding: 5px;
-}
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ PolypInfoComponent ]
+    })
+    .compileComponents();
+  }));
 
-.arrow-right {
-  transform: rotate(-45deg);
-  -webkit-transform: rotate(-45deg);
-}
+  beforeEach(() => {
+    fixture = TestBed.createComponent(PolypInfoComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
-.arrow-left {
-  transform: rotate(135deg);
-  -webkit-transform: rotate(135deg);
-}
-
-.spinner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-}
-
-.snapshot-canvas {
-  visibility: hidden;
-}
-
-.located {
-  background-color: lightblue;
-}
-
-.not-located {
-  background-color: lightyellow;
-}
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

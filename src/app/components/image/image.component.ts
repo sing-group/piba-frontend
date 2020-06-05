@@ -31,7 +31,6 @@ import {PolypLocation} from '../../models/PolypLocation';
 import {ImagesService} from '../../services/images.service';
 import {NotificationService} from '../../modules/notification/services/notification.service';
 import {Location} from '@angular/common';
-import {Adenoma, PolypType, SSA, TSA} from '../../models/PolypHistology';
 import {AuthenticationService} from '../../services/authentication.service';
 import {Role} from '../../models/User';
 import {ImageFilter} from '../../models/ImageFilter';
@@ -76,9 +75,6 @@ export class ImageComponent implements OnInit {
   showContinueWithoutSavingLocation = false;
   showConfirmRemovingLocation = false;
   showDeleteConfirmation = false;
-
-  type: string;
-  dysplasingGrade: string;
 
   @ViewChild('imageAnnotator') private imageAnnotator: ImageAnnotatorComponent;
 
@@ -130,9 +126,6 @@ export class ImageComponent implements OnInit {
 
         this.polypLocation = Boolean(this.image.polypLocation)
           ? this.image.polypLocation.regularize() : null;
-        if (!this.isEndoscopist()) {
-          this.extractPolypInfo();
-        }
 
         this.isLoadingInitialData = false;
       });
@@ -480,28 +473,6 @@ export class ImageComponent implements OnInit {
     }
     this.router.navigateByUrl(`gallery/${this.gallery.id}?page=${page}&filter=${ImageFilter[this.filter]}` +
       `&show_location=${this.showPolypLocation}`);
-  }
-
-  private extractPolypInfo() {
-    if (this.hasPolyp()) {
-      switch (this.image.polyp.histology.polypType) {
-        case PolypType.ADENOMA:
-          this.type = (<Adenoma>this.image.polyp.histology).type;
-          this.dysplasingGrade = (<Adenoma>this.image.polyp.histology).dysplasingGrade;
-          break;
-        case PolypType.SESSILE_SERRATED_ADENOMA:
-          this.type = null;
-          this.dysplasingGrade = (<SSA>this.image.polyp.histology).dysplasingGrade;
-          break;
-        case PolypType.TRADITIONAL_SERRATED_ADENOMA:
-          this.type = null;
-          this.dysplasingGrade = (<TSA>this.image.polyp.histology).dysplasingGrade;
-          break;
-        default:
-          this.type = null;
-          this.dysplasingGrade = null;
-      }
-    }
   }
 
   private navigate() {

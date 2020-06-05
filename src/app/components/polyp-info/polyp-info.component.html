@@ -1,0 +1,130 @@
+<!--
+  ~  PIBA Frontend
+  ~
+  ~ Copyright (C) 2018-2020 - Miguel Reboiro-Jato,
+  ~ Daniel Glez-Peña, Alba Nogueira Rodríguez, Florentino Fdez-Riverola,
+  ~ Rubén Domínguez Carbajales, Jesús Miguel Herrero Rivas,
+  ~ Eloy Sánchez Hernández, Laura Rivas Moral,
+  ~ Manuel Puga Jiménez de Azcárate, Joaquín Cubiella Fernández,
+  ~ Hugo López-Fernández, Silvia Rodríguez Iglesias, Fernando Campos Tato.
+  ~
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="card-header">Polyp info</div>
+
+<div class="clr-row">
+  <div class="col-lg-2 col-sm-3 col-xs-4">
+    <label>Name</label>
+  </div>
+  <div class="col-lg-4 col-sm-3 col-xs-8">
+    {{polyp.name}}
+  </div>
+  <div class="col-lg-2 col-sm-3 col-xs-4">
+    <label>Size (mm)</label>
+  </div>
+  <div class="col-lg-4 col-sm-3 col-xs-8">
+    {{polyp.size}}
+  </div>
+</div>
+
+<div class="clr-row">
+  <div class="col-lg-2 col-sm-3 col-xs-4">
+    <label>Location</label>
+  </div>
+  <div class="col-lg-4 col-sm-3 col-xs-8">
+    {{polyp.location}}
+  </div>
+  <div class="col-lg-2 col-sm-3 col-xs-4">
+    <label>NICE</label>
+  </div>
+  <div class="col-lg-4 col-sm-3 col-xs-8">
+    {{polyp.nice}}
+  </div>
+</div>
+
+<div class="clr-row">
+  <div class="col-lg-2 col-sm-3 col-xs-4">
+    <label>WASP</label>
+  </div>
+  <div class="col-lg-4 col-sm-3 col-xs-8">
+    {{polyp.wasp}}
+  </div>
+  <div class="col-lg-2 col-sm-3 col-xs-4">
+    <label>LST</label>
+  </div>
+  <div class="col-lg-4 col-sm-3 col-xs-8">
+    {{polyp.lst}}
+  </div>
+</div>
+
+<div class="clr-row">
+  <div class="col-lg-2 col-sm-3 col-xs-4">
+    <label>PARIS</label>
+  </div>
+  <div class="col-lg-4 col-sm-3 col-xs-8">
+    {{polyp.parisPrimary}}
+  </div>
+  <div class="col-lg-2 col-sm-3 col-xs-4" *ngIf="polyp.parisSecondary !== undefined">
+    <label>PARIS Secondary</label>
+  </div>
+  <div class="col-lg-4 col-sm-3 col-xs-8" *ngIf="polyp.parisSecondary !== undefined">
+    {{polyp.parisSecondary}}
+  </div>
+</div>
+
+<div class="clr-row">
+  <div class="col-lg-2 col-sm-4 col-xs-4">
+    <label>Histology</label>
+  </div>
+  <div class="col-lg-4 col-sm-8 col-xs-8">
+    {{polyp.histology.polypType}}
+  </div>
+</div>
+
+<div class="clr-row" *ngIf="type || dysplasingGrade">
+  <div class="col-lg-2 col-sm-4 col-xs-4" *ngIf="type">
+    <label>Type</label>
+  </div>
+  <div class="col-lg-4 col-sm-8 col-xs-8" *ngIf="type">
+    {{type}}
+  </div>
+  <div class="col-lg-2 col-sm-4 col-xs-4" *ngIf="dysplasingGrade">
+    <label>Dyplasing drade</label>
+  </div>
+  <div class="col-lg-4 col-sm-8 col-xs-8" *ngIf="dysplasingGrade">
+    {{dysplasingGrade}}
+  </div>
+</div>
+
+<div class="clr-row">
+  <div class="col-lg-2 col-sm-4 col-xs-4">
+    <label>Manually selected</label>
+  </div>
+  <div class="col-lg-4 col-sm-8 col-xs-8">
+    {{manuallySelected ? 'Yes' : 'No' }}
+  </div>
+</div>
+
+<div class="clr-row">
+  <div class="col-lg-2 col-sm-4 col-xs-4">
+    <label>Observation</label>
+  </div>
+  <div class="col-lg-10 col-sm-8 col-xs-8" *ngIf="hasObservation()">
+    {{polyp.observation}}
+  </div>
+  <div class="col-lg-10 col-sm-8 col-xs-8" *ngIf="!hasObservation()" class="no-observation">
+    &lt;No observation&gt;
+  </div>
+</div>

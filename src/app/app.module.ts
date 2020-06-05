@@ -83,6 +83,7 @@ import {
 import {
   LocatePolypInImageDialogComponent
 } from './components/locate-polyp-in-image-dialog/locate-polyp-in-image-dialog.component';
+import { PolypInfoComponent } from './components/polyp-info/polyp-info.component';
 
 @NgModule({
     declarations: [
@@ -117,7 +118,8 @@ import {
         ContinueWithoutSavingLocationDialogComponent,
         ConfirmRemovingLocationDialogComponent,
         DescribePolypDeletionDialogComponent,
-        LocatePolypInImageDialogComponent
+        LocatePolypInImageDialogComponent,
+        PolypInfoComponent
     ],
   imports: [
     BrowserModule,

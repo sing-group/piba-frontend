@@ -106,7 +106,7 @@ export class PolypRecordingInDatasetComponent implements OnInit {
     private readonly datasetsService: PolypDatasetsService,
     private readonly explorationsService: ExplorationsService,
     private readonly galleriesService: GalleriesService,
-    private readonly imageService: ImagesService,
+    private readonly imagesService: ImagesService,
     private readonly modificationsService: VideoModificationsService,
     private readonly polypRecordingsService: PolypRecordingsService
   ) { }
@@ -274,7 +274,7 @@ export class PolypRecordingInDatasetComponent implements OnInit {
 
         if (Boolean(currentImage)) {
           if (!Boolean(currentPolypLocation) && Boolean(location.location)) {
-            this.imageService.createLocation(
+            this.imagesService.createLocation(
               currentImage.id,
               location.location
             ).subscribe(polypLocation => {
@@ -286,7 +286,7 @@ export class PolypRecordingInDatasetComponent implements OnInit {
               );
             });
           } else if (Boolean(currentPolypLocation) && !Boolean(location.location)) {
-            this.imageService.deleteLocation(currentImage.id)
+            this.imagesService.deleteLocation(currentImage.id)
               .subscribe(() => {
                 this.removePolypLocationFromImage(currentImage);
                 this.isStoringSnapshot = false;
@@ -296,7 +296,7 @@ export class PolypRecordingInDatasetComponent implements OnInit {
                 );
               });
           } else if (!PolypLocation.areEqual(currentPolypLocation, location.location)) {
-            this.imageService.modifyLocation(
+            this.imagesService.modifyLocation(
               currentImage.id,
               location.location
             ).subscribe(polypLocation => {
@@ -309,7 +309,7 @@ export class PolypRecordingInDatasetComponent implements OnInit {
             });
           }
         } else {
-          this.imageService.uploadImage({
+          this.imagesService.uploadImage({
             image: DataUtils.imageUriToFile(this.snapshotDataUrl),
             gallery: gallery.id,
             manuallySelected: true,
@@ -321,7 +321,7 @@ export class PolypRecordingInDatasetComponent implements OnInit {
             .pipe(
               mergeMap(image => iif(
                 () => Boolean(location.location),
-                defer(() => this.imageService.createLocation(image.id, location.location)
+                defer(() => this.imagesService.createLocation(image.id, location.location)
                   .pipe(
                     tap(polypLocation => image.polypLocation = polypLocation),
                     map(() => image)
@@ -375,12 +375,12 @@ export class PolypRecordingInDatasetComponent implements OnInit {
             forkJoin(
               this.explorationsService.getExploration((polypRecording.video.exploration as string)),
               this.modificationsService.listVideoModifications(polypRecording.video.id),
-              this.imageService.listImagesByPolyp(polypRecording.polyp)
+              this.imagesService.listImagesByPolyp(polypRecording.polyp)
                 .pipe(
                   concatMap(images => iif(
                       () => images.length === 0,
                       of(images),
-                      forkJoin(images.map(image => this.imageService.getLocation(image.id).pipe(
+                      forkJoin(images.map(image => this.imagesService.getLocation(image.id).pipe(
                         catchError(err => err.status === 400 ? of(null) : throwError(err))
                       )))
                       .pipe(
@@ -396,6 +396,7 @@ export class PolypRecordingInDatasetComponent implements OnInit {
                   polypRecording.polyp.exploration = expModAndImg[0];
                   polypRecording.video.exploration = expModAndImg[0];
                   polypRecording.video.modifications = expModAndImg[1];
+                  expModAndImg[2].forEach(image => image.polyp = polypRecording.polyp);
 
                   return {
                     polypRecording: polypRecording,
@@ -440,7 +441,7 @@ export class PolypRecordingInDatasetComponent implements OnInit {
     if (reason === null) {
       this.imageToDelete = null;
     } else {
-      this.imageService.delete(this.imageToDelete.id, 'Discarded')
+      this.imagesService.delete(this.imageToDelete.id, 'Discarded')
         .subscribe(() => {
           this.removeImage(this.imageToDelete);
           this.imageToDelete = null;
