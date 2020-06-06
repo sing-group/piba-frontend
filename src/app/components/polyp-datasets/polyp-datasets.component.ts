@@ -26,9 +26,14 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {ClrDatagridPagination, ClrDatagridStateInterface} from '@clr/angular';
 import {Subject} from 'rxjs/internal/Subject';
 import {NotificationService} from '../../modules/notification/services/notification.service';
-import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import {concatMap, debounceTime, distinctUntilChanged, map, tap} from 'rxjs/operators';
 import {PolypDataset} from '../../models/PolypDataset';
 import {PolypDatasetsService} from '../../services/polyp-datasets.service';
+import {iif} from 'rxjs/internal/observable/iif';
+import {defer} from 'rxjs/internal/observable/defer';
+import {GalleriesService} from '../../services/galleries.service';
+import {forkJoin} from 'rxjs/internal/observable/forkJoin';
+import {of} from 'rxjs/internal/observable/of';
 
 @Component({
   selector: 'app-polyp-datasets',
@@ -49,8 +54,16 @@ export class PolypDatasetsComponent implements OnInit {
   pageSize = 15;
   pageChangeEvent = new Subject<string>();
 
+  // Polyp dataset management
+  showCreatePolypDataset = false;
+  showDeleteConfirmation = false;
+
+  datasetToDelete: PolypDataset;
+  datasetToEdit: PolypDataset;
+
   constructor(
     private readonly notificationService: NotificationService,
+    private readonly galleriesService: GalleriesService,
     private readonly polypDatasetsService: PolypDatasetsService
   ) { }
 
@@ -97,6 +110,22 @@ export class PolypDatasetsComponent implements OnInit {
   private getPagePolypDatasets() {
     this.loading = true;
     this.polypDatasetsService.getPolypDatasets(this.currentPage, this.pageSize)
+      .pipe(
+        concatMap(datasets => iif(() => datasets.polypDatasets.length > 0,
+          defer(() => forkJoin(datasets.polypDatasets
+            .filter(dataset => Boolean(dataset.defaultGallery))
+            .map(dataset => dataset.defaultGallery as string)
+            .filter((v, i, a) => a.indexOf(v) === i) // Removes duplicates
+            .map(galleryId => this.galleriesService.getGallery(galleryId))
+          ).pipe(
+            tap(galleries => datasets.polypDatasets
+              .forEach(dataset => dataset.defaultGallery = galleries.find(gallery => gallery.id === dataset.defaultGallery))
+            ),
+            map(() => datasets)
+          )),
+          of(datasets)
+        ))
+      )
       .subscribe(polypsPage => {
         this.polypDatasets = polypsPage.polypDatasets;
         this.paginationTotalItems = polypsPage.totalItems;
@@ -104,11 +133,62 @@ export class PolypDatasetsComponent implements OnInit {
       });
   }
 
-  remove(dataset: PolypDataset) {
-
+  onAskForDeletionConfirmation(dataset: PolypDataset) {
+    this.datasetToDelete = dataset;
+    this.showDeleteConfirmation = true;
   }
 
-  edit(dataset: PolypDataset) {
+  onShowCreationDialog() {
+    this.showCreatePolypDataset = true;
+  }
 
+  onCreatePolypDataset(dataset: PolypDataset) {
+    if (Boolean(dataset)) {
+      this.loading = true;
+
+      if (Boolean(dataset.id)) {
+        this.polypDatasetsService.editPolypDataset(dataset)
+          .subscribe(() => {
+            this.getPagePolypDatasets();
+            this.notificationService.success(
+              `Polyp dataset '${dataset.title}' has been modified.`,
+              'Polyp dataset modified'
+            );
+          });
+      } else {
+        this.polypDatasetsService.createPolypDataset(dataset)
+          .subscribe(() => {
+            this.getPagePolypDatasets();
+            this.notificationService.success(
+              `Polyp dataset '${dataset.title}' has been created.`,
+              'Polyp dataset created'
+            );
+          });
+      }
+    }
+
+    this.showCreatePolypDataset = false;
+    this.datasetToEdit = null;
+  }
+
+  onShowEditionDialog(dataset: PolypDataset) {
+    this.datasetToEdit = dataset;
+    this.showCreatePolypDataset = true;
+  }
+
+  onDeletionConfirmation() {
+    this.showDeleteConfirmation = false;
+    this.polypDatasetsService.deletePolypDataset(this.datasetToDelete.id)
+      .subscribe(() => {
+        this.getPagePolypDatasets();
+        this.notificationService.success(
+          `Polyp dataset '${this.datasetToDelete.title}' has been deleted.`,
+          'Polyp dataset deleted'
+        );
+      });
+  }
+
+  onDeletionCancel() {
+    this.showDeleteConfirmation = false;
   }
 }

@@ -1,0 +1,50 @@
+<!--
+  ~  PIBA Frontend
+  ~
+  ~ Copyright (C) 2018-2020 - Miguel Reboiro-Jato,
+  ~ Daniel Glez-Peña, Alba Nogueira Rodríguez, Florentino Fdez-Riverola,
+  ~ Rubén Domínguez Carbajales, Jesús Miguel Herrero Rivas,
+  ~ Eloy Sánchez Hernández, Laura Rivas Moral,
+  ~ Manuel Puga Jiménez de Azcárate, Joaquín Cubiella Fernández,
+  ~ Hugo López-Fernández, Silvia Rodríguez Iglesias, Fernando Campos Tato.
+  ~
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<clr-modal [(clrModalOpen)]="open" [clrModalClosable]="false">
+  <h3 class="modal-title">
+    {{isEditing() ? 'Modify polyp dataset' : 'Add Polyp Dataset'}}
+  </h3>
+  <div class="modal-body">
+    <form *ngIf="open" clrForm clrLayout="horizontal" (ngSubmit)="submit()" [formGroup]="formGroup">
+      <clr-input-container>
+        <label for="title" class="required">Title</label>
+        <input clrInput id="title" name="title" formControlName="title" type="text" required>
+        <clr-control-error>Title can't be empty</clr-control-error>
+      </clr-input-container>
+      <clr-input-container>
+        <label for="gallery">Gallery</label>
+        <select clrInput id="gallery" name="gallery" formControlName="gallery">
+          <option *ngFor="let gallery of galleryOptions" [ngValue]="gallery.id">{{gallery.title}}</option>
+        </select>
+      </clr-input-container>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="!isValid()">
+      {{isEditing() ? 'Modify' : 'Create'}}
+    </button>
+  </div>
+</clr-modal>

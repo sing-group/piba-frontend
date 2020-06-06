@@ -30,13 +30,17 @@ import {PolypDataset} from '../../models/PolypDataset';
 import {ExplorationsService} from '../../services/explorations.service';
 import {NotificationService} from '../../modules/notification/services/notification.service';
 import {PolypRecordingsService} from '../../services/polyprecordings.service';
-import {concatMap, debounceTime, distinctUntilChanged, map} from 'rxjs/operators';
+import {concatMap, debounceTime, distinctUntilChanged, map, tap} from 'rxjs/operators';
 import {PolypDatasetsService} from '../../services/polyp-datasets.service';
 import {ActivatedRoute} from '@angular/router';
 import {PolypRecording} from '../../models/PolypRecording';
 import {forkJoin} from 'rxjs/internal/observable/forkJoin';
 import {GalleriesService} from '../../services/galleries.service';
 import {Gallery} from '../../models/Gallery';
+import {Subscription} from 'rxjs/internal/Subscription';
+import {iif} from 'rxjs/internal/observable/iif';
+import {defer} from 'rxjs/internal/observable/defer';
+import {of} from 'rxjs/internal/observable/of';
 
 @Component({
   selector: 'app-polyp-dataset',
@@ -53,6 +57,9 @@ export class PolypDatasetComponent implements OnInit {
 
   // Polyp Pagination
   private _polypsPagination: ClrDatagridPagination;
+  private polypsSubscription: Subscription;
+  private polypsLoadedPage = 1;
+  private polypsLoadedPageSize = 10;
   polypsPaginationTotalItems = 0;
   polypsPageSize = 10;
   polypsPageChangeEvent = new Subject<string>();
@@ -60,6 +67,9 @@ export class PolypDatasetComponent implements OnInit {
 
   // Polyp Recording Pagination
   private _polypRecordingsPagination: ClrDatagridPagination;
+  private polypRecordingsSubscription: Subscription;
+  private polypRecordingsLoadedPage = 1;
+  private polypRecordingsLoadedPageSize = 10;
   polypRecordingsPaginationTotalItems = 0;
   polypRecordingsPageSize = 10;
   polypRecordingsPageChangeEvent = new Subject<string>();
@@ -79,28 +89,48 @@ export class PolypDatasetComponent implements OnInit {
     this.id = this.route.snapshot.paramMap.get('id');
 
     this.polypDatasetsService.getPolypDataset(this.id)
+      .pipe(
+        concatMap(polypDataset => iif(() => Boolean(polypDataset.defaultGallery),
+          defer(() => this.galleriesService.getGallery(polypDataset.defaultGallery as string)
+            .pipe(
+              tap(gallery => polypDataset.defaultGallery = gallery),
+              map(() => polypDataset)
+            )
+          ),
+          of(polypDataset)
+        ))
+      )
       .subscribe(polypDataset => this.polypDataset = polypDataset);
     this.galleriesService.listGalleries()
       .subscribe(galleries => this.galleries = galleries);
   }
 
-  @ViewChild(ClrDatagridPagination) set polypsPagination(polypsPagination: ClrDatagridPagination) {
+  @ViewChild('polypsPagination') set polypsPagination(polypsPagination: ClrDatagridPagination) {
     if (this._polypsPagination !== polypsPagination) {
+      if (Boolean(this.polypsSubscription)) {
+        this.polypsSubscription.unsubscribe();
+        this.polypsSubscription = null;
+      }
+
       this._polypsPagination = polypsPagination;
 
-      this.polypsPageChangeEvent.pipe(
-        debounceTime(500),
-        distinctUntilChanged()
-      ).subscribe(page => {
-        if (this.isValidPolypsPage(page)) {
-          this.polypsPagination.page.current = Number(page);
-        } else {
-          this.notificationService.error('Invalid page entered.', 'Invalid page.');
-        }
-      });
+      if (Boolean(this._polypsPagination)) {
+        this.polypsSubscription = this.polypsPageChangeEvent.pipe(
+          debounceTime(500),
+          distinctUntilChanged()
+        ).subscribe(page => {
+          if (this.isValidPolypsPage(page)) {
+            this.polypsPagination.page.current = Number(page);
+          } else {
+            this.notificationService.error('Invalid page entered.', 'Invalid page.');
+          }
+        });
 
-      this.polypsPagination.page.current = 1;
-      this.getPagePolyps();
+        this.polypsPagination.page.current = this.polypsLoadedPage;
+        this.polypsPagination.page.size = this.polypsLoadedPageSize;
+        this.changeDetectorRef.detectChanges();
+        this.getPagePolyps(this.polyps.length === 0);
+      }
     }
   }
 
@@ -116,23 +146,32 @@ export class PolypDatasetComponent implements OnInit {
     return this.polypDataset.polyps.length;
   }
 
-  @ViewChild(ClrDatagridPagination) set polypRecordingsPagination(polypRecordingsPagination: ClrDatagridPagination) {
+  @ViewChild('polypRecordingsPagination') set polypRecordingsPagination(polypRecordingsPagination: ClrDatagridPagination) {
     if (this._polypRecordingsPagination !== polypRecordingsPagination) {
+      if (Boolean(this.polypRecordingsSubscription)) {
+        this.polypRecordingsSubscription.unsubscribe();
+        this.polypRecordingsSubscription = null;
+      }
+
       this._polypRecordingsPagination = polypRecordingsPagination;
 
-      this.polypRecordingsPageChangeEvent.pipe(
-        debounceTime(500),
-        distinctUntilChanged()
-      ).subscribe(page => {
-        if (this.isValidPolypRecordingsPage(page)) {
-          this.polypRecordingsPagination.page.current = Number(page);
-        } else {
-          this.notificationService.error('Invalid page entered.', 'Invalid page.');
-        }
-      });
+      if (Boolean(this._polypRecordingsPagination)) {
+        this.polypRecordingsSubscription = this.polypRecordingsPageChangeEvent.pipe(
+          debounceTime(500),
+          distinctUntilChanged()
+        ).subscribe(page => {
+          if (this.isValidPolypRecordingsPage(page)) {
+            this.polypRecordingsPagination.page.current = Number(page);
+          } else {
+            this.notificationService.error('Invalid page entered.', 'Invalid page.');
+          }
+        });
 
-      this.polypRecordingsPagination.page.current = 1;
-      this.getPagePolypRecordings();
+        this.polypRecordingsPagination.page.current = this.polypRecordingsLoadedPage;
+        this.polypRecordingsPagination.page.size = this.polypRecordingsLoadedPageSize;
+        this.changeDetectorRef.detectChanges();
+        this.getPagePolypRecordings(this.polypRecordings.length === 0);
+      }
     }
   }
 
@@ -172,32 +211,30 @@ export class PolypDatasetComponent implements OnInit {
     }
   }
 
-  private getPagePolyps() {
-    this.polypsLoading = true;
-    this.polypDatasetsService.getPolyps(this.id, this.currentPolypsPage, this.polypsPageSize)
-      .pipe(
-        concatMap(polypPage => this.explorationsService.addExplorationsToPolyps(polypPage.polyps)
-          .pipe(
-            map(polyps => {
-              polypPage.polyps = polyps;
-              return polypPage;
-            })
-          )
-        ),
-        concatMap(polypPage => this.polypRecordingsService.addRecordingsToPolyps(polypPage.polyps)
-          .pipe(
-            map(polyps => {
-              polypPage.polyps = polyps;
-              return polypPage;
-            })
-          )
+  private getPagePolyps(force: boolean = false) {
+    if (force || this.currentPolypsPage !== this.polypsLoadedPageSize || this.polypsPageSize !== this.polypsLoadedPageSize) {
+      this.polypsLoading = true;
+      this.changeDetectorRef.detectChanges();
+      this.polypDatasetsService.getPolyps(this.id, this.currentPolypsPage, this.polypsPageSize)
+        .pipe(
+          concatMap(polypPage => iif(() => polypPage.polyps.length > 0,
+            defer(() => forkJoin(
+              this.explorationsService.addExplorationsToPolyps(polypPage.polyps),
+              this.polypRecordingsService.addRecordingsToPolyps(polypPage.polyps)
+            ).pipe(
+              map(() => polypPage)
+            )),
+            of(polypPage)
+          ))
         )
-      )
-      .subscribe(polypsPage => {
-        this.polyps = polypsPage.polyps;
-        this.polypsPaginationTotalItems = polypsPage.totalItems;
-        this.polypsLoading = false;
-      });
+        .subscribe(polypsPage => {
+          this.polyps = polypsPage.polyps;
+          this.polypsLoadedPage = this.currentPolypsPage;
+          this.polypsLoadedPageSize = this.polypsPageSize;
+          this.polypsPaginationTotalItems = polypsPage.totalItems;
+          this.polypsLoading = false;
+        });
+    }
   }
 
   get currentPolypRecordingsPage(): number {
@@ -228,42 +265,42 @@ export class PolypDatasetComponent implements OnInit {
       && pageNumber <= Math.ceil(this.polypRecordingsPaginationTotalItems / this.polypsPageSize);
   }
 
-  private getPagePolypRecordings() {
-    this.polypRecordingsLoading = true;
-    this.changeDetectorRef.detectChanges();
-    this.polypDatasetsService.listPolypRecordings(this.id, this.currentPolypRecordingsPage, this.polypRecordingsPageSize)
-      .subscribe(polypRecordingsPage => {
-        this.polypRecordings = polypRecordingsPage.polypRecordings;
-        this.polypRecordingsPaginationTotalItems = polypRecordingsPage.totalItems;
-        this.polypRecordingsLoading = false;
-      });
-    this.polypDatasetsService.listPolypRecordings(this.id, this.currentPolypRecordingsPage, this.polypRecordingsPageSize)
-      .pipe(
-        concatMap(page =>
-          forkJoin(
-            page.polypRecordings.map(polypRecording => polypRecording.polyp.exploration)
-              .filter(exploration => typeof exploration === 'string')
-              .filter((v, i, a) => a.indexOf(v) === i) // Removes duplicates
-              .map(explorationId => this.explorationsService.getExploration((explorationId as string)))
-          ).pipe(
-            map(explorations => {
-              page.polypRecordings.forEach(polypRecording => {
-                const currentExploration = polypRecording.polyp.exploration;
+  private getPagePolypRecordings(force: boolean = false) {
+    if (force
+      || this.currentPolypRecordingsPage !== this.polypRecordingsLoadedPage
+      || this.polypRecordingsPageSize !== this.polypRecordingsLoadedPageSize
+    ) {
+      this.polypRecordingsLoading = true;
+      this.changeDetectorRef.detectChanges();
+      this.polypDatasetsService.listPolypRecordings(this.id, this.currentPolypRecordingsPage, this.polypRecordingsPageSize)
+        .pipe(
+          concatMap(page => iif(() => page.polypRecordings.some(polypRecording => typeof polypRecording.polyp.exploration === 'string'),
+            defer(() => forkJoin(
+                page.polypRecordings.map(polypRecording => polypRecording.polyp.exploration)
+                  .filter(exploration => typeof exploration === 'string')
+                  .filter((v, i, a) => a.indexOf(v) === i) // Removes duplicates
+                  .map(explorationId => this.explorationsService.getExploration((explorationId as string)))
+              ).pipe(
+                tap(explorations => page.polypRecordings.forEach(polypRecording => {
+                  const currentExploration = polypRecording.polyp.exploration;
 
-                if (typeof currentExploration === 'string') {
-                  polypRecording.polyp.exploration = explorations.find(exploration => exploration.id === currentExploration);
-                }
-              });
-
-              return page;
-            })
-          )
+                  if (typeof currentExploration === 'string') {
+                    polypRecording.polyp.exploration = explorations.find(exploration => exploration.id === currentExploration);
+                  }
+                })),
+                map(() => page)
+              )
+            ),
+            of(page)
+          ))
         )
-      )
-      .subscribe(polypRecordingsPage => {
-        this.polypRecordings = polypRecordingsPage.polypRecordings;
-        this.polypRecordingsPaginationTotalItems = polypRecordingsPage.totalItems;
-        this.polypRecordingsLoading = false;
-      });
+        .subscribe(polypRecordingsPage => {
+          this.polypRecordings = polypRecordingsPage.polypRecordings;
+          this.polypRecordingsLoadedPage = this.currentPolypRecordingsPage;
+          this.polypRecordingsLoadedPageSize = this.polypRecordingsPageSize;
+          this.polypRecordingsPaginationTotalItems = polypRecordingsPage.totalItems;
+          this.polypRecordingsLoading = false;
+        });
+    }
   }
 }

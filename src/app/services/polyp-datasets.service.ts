@@ -39,6 +39,9 @@ import {PolypPage} from './entities/PolypPage';
 import {PolypRecordingPage} from './entities/PolypRecordingPage';
 import {of} from 'rxjs/internal/observable/of';
 import {PolypRecordingBasicData} from '../models/PolypRecordingBasicData';
+import {PolypDatasetEditionInfo} from './entities/PolypDatasetEditionInfo';
+import {iif} from 'rxjs/internal/observable/iif';
+import {defer} from 'rxjs/internal/observable/defer';
 
 @Injectable()
 export class PolypDatasetsService {
@@ -68,7 +71,7 @@ export class PolypDatasetsService {
     };
   }
 
-  private static toPolypDatasetInfo(polypDataset: PolypDataset): PolypDatasetInfo {
+  private static toPolypDatasetEditionInfo(polypDataset: PolypDataset): PolypDatasetEditionInfo {
     const polyps: string[] = [];
     for (const polyp of polypDataset.polyps) {
       if (typeof polyp === 'string') {
@@ -79,10 +82,9 @@ export class PolypDatasetsService {
     }
 
     return {
-      id: polypDataset.id,
       title: polypDataset.title,
       polyps: polyps,
-      defaultGallery: Boolean(polypDataset)
+      defaultGallery: Boolean(polypDataset) && Boolean(polypDataset.defaultGallery)
         ? (typeof polypDataset.defaultGallery === 'string' ? polypDataset.defaultGallery : polypDataset.defaultGallery.id)
         : null
     };
@@ -142,14 +144,20 @@ export class PolypDatasetsService {
 
     return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polypdataset/${id}/polyprecording`, {params, observe: 'response'})
       .pipe(
-        concatMap(response =>
-          this.polypRecordingsService.fillMultiplePolypAndVideo(of(response.body)).pipe(
-            map(polypRecordingInfos => ({
-              totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
-              polypRecordings: polypRecordingInfos
-            }))
-          )
-        ),
+        concatMap(response => iif(() => response.body.length > 0,
+          defer(() =>
+            this.polypRecordingsService.fillMultiplePolypAndVideo(of(response.body)).pipe(
+              map(polypRecordingInfos => ({
+                totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
+                polypRecordings: polypRecordingInfos
+              }))
+            )
+          ),
+          of({
+            totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
+            polypRecordings: []
+          })
+        )),
         PibaError.throwOnError(
           'Error retrieving polyp recordings in dataset',
           `Polyps recordings in dataset '${id}' in page ${page} (page size: ${pageSize}) could not be retrieved.`
@@ -171,12 +179,35 @@ export class PolypDatasetsService {
   editPolypDataset(polypDataset: PolypDataset): Observable<PolypDataset> {
     return this.http.put<PolypDatasetInfo>(
       `${environment.restApi}/polypdataset/${polypDataset.id}`,
-      PolypDatasetsService.toPolypDatasetInfo(polypDataset)
+      PolypDatasetsService.toPolypDatasetEditionInfo(polypDataset)
     ).pipe(
       map(PolypDatasetsService.mapPolypDatasetInfo),
       PibaError.throwOnError(
         'Error editing polyp dataset',
         `Polyp dataset ${polypDataset.title} could not be edited.`
+      )
+    );
+  }
+
+  createPolypDataset(polypDataset: PolypDataset): Observable<PolypDataset> {
+    return this.http.post<PolypDatasetInfo>(
+      `${environment.restApi}/polypdataset`,
+      PolypDatasetsService.toPolypDatasetEditionInfo(polypDataset)
+    ).pipe(
+      map(PolypDatasetsService.mapPolypDatasetInfo),
+      PibaError.throwOnError(
+        'Error creating polyp dataset',
+        `Polyp dataset ${polypDataset.title} could not be created.`
+      )
+    );
+  }
+
+  deletePolypDataset(polypDatasetId: string) {
+    return this.http.delete(`${environment.restApi}/polypdataset/${polypDatasetId}`)
+    .pipe(
+      PibaError.throwOnError(
+        'Error deleting polyp dataset',
+        `Polyp dataset with id '${polypDatasetId}' could not be deleted.`
       )
     );
   }

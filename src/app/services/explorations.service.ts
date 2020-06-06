@@ -101,13 +101,14 @@ export class ExplorationsService {
 
   addExplorationsToPolyps(polyps: Polyp[]): Observable<Polyp[]> {
     return forkJoin(
-      polyps.map(polyp => {
-        const explorationId = typeof polyp.exploration === 'string' ? polyp.exploration : polyp.exploration.id;
-        return this.getExploration(explorationId);
-      })
+      polyps.map(polyp => typeof polyp.exploration === 'string' ? polyp.exploration : polyp.exploration.id)
+        .filter((v, i, a) => a.indexOf(v) === i) // Removes duplicates
+        .map(explorationId => this.getExploration(explorationId))
     ).pipe(
-      map(explorations => polyps.map((polyp, index) => {
-        polyp.exploration = explorations[index];
+      map(explorations => polyps.map(polyp => {
+        const polypExplorationId = typeof polyp.exploration === 'string' ? polyp.exploration : polyp.exploration.id;
+        polyp.exploration = explorations.find(exploration => exploration.id === polypExplorationId);
+
         return polyp;
       }))
     );

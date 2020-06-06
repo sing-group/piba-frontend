@@ -27,7 +27,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
-import {ClarityModule} from '@clr/angular';
+import {ClarityModule, ClrFormsNextModule} from '@clr/angular';
 
 import {AppComponent} from './app.component';
 import {AppRoutingModule} from './app-routing.module';
@@ -84,6 +84,7 @@ import {
   LocatePolypInImageDialogComponent
 } from './components/locate-polyp-in-image-dialog/locate-polyp-in-image-dialog.component';
 import { PolypInfoComponent } from './components/polyp-info/polyp-info.component';
+import { EditPolypDatasetDialogComponent } from './components/edit-polyp-dataset-dialog/edit-polyp-dataset-dialog.component';
 
 @NgModule({
     declarations: [
@@ -119,7 +120,8 @@ import { PolypInfoComponent } from './components/polyp-info/polyp-info.component
         ConfirmRemovingLocationDialogComponent,
         DescribePolypDeletionDialogComponent,
         LocatePolypInImageDialogComponent,
-        PolypInfoComponent
+        PolypInfoComponent,
+        EditPolypDatasetDialogComponent
     ],
   imports: [
     BrowserModule,
@@ -128,6 +130,7 @@ import { PolypInfoComponent } from './components/polyp-info/polyp-info.component
     FormsModule,
     AppRoutingModule,
     ClarityModule,
+    ClrFormsNextModule,
     ReactiveFormsModule,
     SimpleNotificationsModule.forRoot({
       timeOut: 5000,
