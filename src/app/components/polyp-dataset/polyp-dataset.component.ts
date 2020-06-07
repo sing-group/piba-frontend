@@ -41,6 +41,7 @@ import {Subscription} from 'rxjs/internal/Subscription';
 import {iif} from 'rxjs/internal/observable/iif';
 import {defer} from 'rxjs/internal/observable/defer';
 import {of} from 'rxjs/internal/observable/of';
+import {ImagesService} from '../../services/images.service';
 
 @Component({
   selector: 'app-polyp-dataset',
@@ -54,6 +55,7 @@ export class PolypDatasetComponent implements OnInit {
   polyps: Polyp[] = [];
   polypRecordings: PolypRecording[] = [];
   galleries: Gallery[] = [];
+  polypRecordingImages = new Map<PolypRecording, number>();
 
   // Polyp Pagination
   private _polypsPagination: ClrDatagridPagination;
@@ -80,6 +82,7 @@ export class PolypDatasetComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly explorationsService: ExplorationsService,
     private readonly galleriesService: GalleriesService,
+    private readonly imagesService: ImagesService,
     private readonly notificationService: NotificationService,
     private readonly polypDatasetsService: PolypDatasetsService,
     private readonly polypRecordingsService: PolypRecordingsService
@@ -247,6 +250,10 @@ export class PolypDatasetComponent implements OnInit {
     }
   }
 
+  countPolypRecordingImages(polypRecording: PolypRecording): number {
+    return this.polypRecordingImages.has(polypRecording) ? this.polypRecordingImages.get(polypRecording) : 0;
+  }
+
   refreshPolypRecordingsPage(state: ClrDatagridStateInterface) {
     if (state.page !== undefined && this.hasPolypRecordingsPagination()) {
       this.polypRecordingsPagination.page.current = (state.page.from / state.page.size) + 1;
@@ -287,6 +294,23 @@ export class PolypDatasetComponent implements OnInit {
                   if (typeof currentExploration === 'string') {
                     polypRecording.polyp.exploration = explorations.find(exploration => exploration.id === currentExploration);
                   }
+                })),
+                map(() => page)
+              )
+            ),
+            of(page)
+          )),
+          concatMap(page => iif(() => page.polypRecordings.length > 0 && Boolean(this.polypDataset.defaultGallery),
+            defer(() => forkJoin(
+                page.polypRecordings.map(
+                  polypRecording => this.imagesService.listImagesByPolypAndGallery(
+                    polypRecording.polyp, this.polypDataset.defaultGallery as Gallery
+                  )
+                )
+              ).pipe(
+                tap(images => images.forEach((polypImages, index) => {
+                  const count = polypImages.length;
+                  this.polypRecordingImages.set(page.polypRecordings[index], count);
                 })),
                 map(() => page)
               )

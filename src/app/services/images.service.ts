@@ -249,6 +249,19 @@ export class ImagesService {
       );
   }
 
+  listImagesByPolypAndGallery(polyp: Polyp, gallery: Gallery, filter: ImageFilter = ImageFilter.ALL): Observable<Image[]> {
+    return this.http.get<ImageInfo[]>(
+      `${environment.restApi}/image?polypId=${polyp.id}&galleryId=${gallery.id}&filter=${ImageFilter[filter]}`
+    )
+      .pipe(
+        map(images => images.map(ImagesService.mapBasicImageInfo)),
+        PibaError.throwOnError(
+          'Error listing images',
+          `Images of polyp ${polyp.name} could not be retrieved.`
+        )
+      );
+  }
+
   searchObservations(observationToRemoveStartsWith: string): Observable<string[]> {
     let params = new HttpParams();
     params = params.append('observationStartsWith', observationToRemoveStartsWith);

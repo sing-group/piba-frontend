@@ -375,35 +375,40 @@ export class PolypRecordingInDatasetComponent implements OnInit {
             forkJoin(
               this.explorationsService.getExploration((polypRecording.video.exploration as string)),
               this.modificationsService.listVideoModifications(polypRecording.video.id),
-              this.imagesService.listImagesByPolyp(polypRecording.polyp)
-                .pipe(
-                  concatMap(images => iif(
-                      () => images.length === 0,
-                      of(images),
-                      forkJoin(images.map(image => this.imagesService.getLocation(image.id).pipe(
-                        catchError(err => err.status === 400 ? of(null) : throwError(err))
-                      )))
-                      .pipe(
-                        tap(locations => images.forEach((image, index) => image.polypLocation = locations[index])),
-                        map(() => images)
+              iif(() => Boolean(this.dataset.defaultGallery),
+                defer(() =>
+                  this.imagesService.listImagesByPolypAndGallery(polypRecording.polyp, this.dataset.defaultGallery as Gallery)
+                    .pipe(
+                      concatMap(images => iif(
+                          () => images.length === 0,
+                          of(images),
+                          forkJoin(images.map(image => this.imagesService.getLocation(image.id).pipe(
+                            catchError(err => err.status === 400 ? of(null) : throwError(err))
+                          )))
+                          .pipe(
+                            tap(locations => images.forEach((image, index) => image.polypLocation = locations[index])),
+                            map(() => images)
+                          )
+                        )
                       )
                     )
-                  )
-                )
-            )
-              .pipe(
-                map(expModAndImg => {
-                  polypRecording.polyp.exploration = expModAndImg[0];
-                  polypRecording.video.exploration = expModAndImg[0];
-                  polypRecording.video.modifications = expModAndImg[1];
-                  expModAndImg[2].forEach(image => image.polyp = polypRecording.polyp);
-
-                  return {
-                    polypRecording: polypRecording,
-                    images: expModAndImg[2]
-                  };
-                })
+                ),
+                of([] as Image[])
               )
+            )
+            .pipe(
+              map(expModAndImg => {
+                polypRecording.polyp.exploration = expModAndImg[0];
+                polypRecording.video.exploration = expModAndImg[0];
+                polypRecording.video.modifications = expModAndImg[1];
+                expModAndImg[2].forEach(image => image.polyp = polypRecording.polyp);
+
+                return {
+                  polypRecording: polypRecording,
+                  images: expModAndImg[2]
+                };
+              })
+            )
           )
         )
         .subscribe(polypRecordingAndImages => {
