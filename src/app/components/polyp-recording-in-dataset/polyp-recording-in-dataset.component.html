@@ -130,8 +130,8 @@
     </div>
   </div>
 
-  <div app-polyp-info *ngIf="currentImage && currentImage.polyp" class="card-block"
-                  [polyp]="currentImage.polyp" [manuallySelected]="currentImage.manuallySelected">
+  <div app-polyp-info *ngIf="polypRecording.polyp" class="card-block"
+                  [polyp]="polypRecording.polyp" [manuallySelected]="currentImage.manuallySelected">
   </div>
 
   <div class="card-block" *ngIf="hasModifications()">

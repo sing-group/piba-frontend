@@ -89,12 +89,31 @@ export class PolypRecordingInDatasetComponent implements OnInit {
   @ViewChild('videoComponent') private video: VideoComponent;
 
   private static convertFrameToInterval(frame: number, fps: number): Interval {
-    const timePerFrame = 1 / fps;
-
     return {
-      start: Number((frame * timePerFrame).toFixed(3)),
-      end: Number(((frame + 1) * timePerFrame - 0.001).toFixed(3))
+      start: PolypRecordingInDatasetComponent.convertFrameToTime(frame, fps),
+      end: PolypRecordingInDatasetComponent.convertFrameToTime(frame + 1, fps)
     };
+  }
+
+  private static convertTimeToFrame(time: number, fps: number): number {
+    return Math.floor(time * fps);
+  }
+
+  private static convertFrameToTime(frame: number, fps: number): number {
+    return Number((frame / fps).toFixed(3));
+  }
+
+  private static convertPolypRecordingToInterval(polypRecording: PolypRecording): Interval {
+    switch (PolypRecordingInDatasetComponent.INTERVAL_BOUNDARIES) {
+      case IntervalBoundaries.BOTH_INCLUDED:
+        return {
+          start: polypRecording.start,
+          end: polypRecording.end + 0.999 // Adjustment to completely include the last second
+        };
+      // In case default boundaries are changed, other calculations should be added
+      default:
+        throw new Error('Interval boundaries not supported');
+    }
   }
 
   constructor(
@@ -144,8 +163,9 @@ export class PolypRecordingInDatasetComponent implements OnInit {
   }
 
   get modifications() {
+    const polypRecordingInterval = PolypRecordingInDatasetComponent.convertPolypRecordingToInterval(this.polypRecording);
     return this.polypRecording.video.modifications
-      .filter(modification => areOverlappingIntervals(modification, this.polypRecording, this.intervalBoundaries));
+      .filter(modification => areOverlappingIntervals(modification, polypRecordingInterval, this.intervalBoundaries));
   }
 
   get snapshot(): VideoSnapshot {
@@ -255,9 +275,7 @@ export class PolypRecordingInDatasetComponent implements OnInit {
   }
 
   onTimeChange(time: number): void {
-    const timePerFrame = 1 / this.polypRecording.video.fps;
-
-    this.currentFrame = Math.floor(time / timePerFrame);
+    this.currentFrame = PolypRecordingInDatasetComponent.convertTimeToFrame(time, this.polypRecording.video.fps);
   }
 
   onLocatePolypClose(location: LocationResult): void {
@@ -313,8 +331,8 @@ export class PolypRecordingInDatasetComponent implements OnInit {
             image: DataUtils.imageUriToFile(this.snapshotDataUrl),
             gallery: gallery.id,
             manuallySelected: true,
-            numFrame: Math.round(this.polypRecording.video.fps * this.snapshot.time),
-            observation: '',
+            numFrame: PolypRecordingInDatasetComponent.convertTimeToFrame(this.snapshot.time, this.polypRecording.video.fps),
+            observation: '', // TODO: allow introducing the image observation
             polyp: this.polypRecording.polyp.id,
             video: this.polypRecording.video.id
           })
@@ -345,6 +363,49 @@ export class PolypRecordingInDatasetComponent implements OnInit {
           'Image storage fail'
         );
       }
+    }
+  }
+
+  onCancelDeleteImage(): void {
+    this.imageToDelete = null;
+  }
+
+  onAskForImageDeletionConfirmation(image: Image): void {
+    this.imageToDelete = image;
+    this.showDeleteConfirmation = true;
+  }
+
+  onDeleteImageConfirmed(): void {
+    this.showDeleteConfirmation = false;
+    this.showDescribePolypDeletionReason = true;
+  }
+
+  onDeleteImage(reason: string): void {
+    this.showDescribePolypDeletionReason = false;
+
+    if (reason === null) {
+      this.imageToDelete = null;
+    } else {
+      this.imagesService.delete(this.imageToDelete.id, 'Discarded')
+        .subscribe(() => {
+          this.removeImage(this.imageToDelete);
+          this.imageToDelete = null;
+          this.notificationService.success(
+            'Image successfully removed.',
+            'Image removed'
+          );
+        });
+    }
+  }
+
+  onGoToImage(image: Image): void {
+    const time = PolypRecordingInDatasetComponent.convertFrameToTime(image.numFrame + 0.5, this.polypRecording.video.fps);
+    this.video.stopVideo(time);
+
+    // Scrolls to top
+    const parent: HTMLElement = this.elementRef.nativeElement.parentElement;
+    if (Boolean(parent)) {
+      parent.scrollTo({left: 0, top: 0, behavior: 'smooth'});
     }
   }
 
@@ -413,59 +474,19 @@ export class PolypRecordingInDatasetComponent implements OnInit {
         )
         .subscribe(polypRecordingAndImages => {
           const polypRecording = polypRecordingAndImages.polypRecording;
-          const images = polypRecordingAndImages.images.filter(image => areOverlappingIntervals(
-              polypRecording,
+          const polypRecordingInterval = PolypRecordingInDatasetComponent.convertPolypRecordingToInterval(polypRecording);
+          const images = polypRecordingAndImages.images
+            .filter(image => areOverlappingIntervals(
+              polypRecordingInterval,
               PolypRecordingInDatasetComponent.convertFrameToInterval(image.numFrame, polypRecording.video.fps),
               IntervalBoundaries.BOTH_INCLUDED
-          )).sort((i1, i2) => i1.numFrame - i2.numFrame);
+            ))
+            .sort((i1, i2) => i1.numFrame - i2.numFrame);
 
           this.completePolypRecordings.set(polypRecording.id, polypRecording);
           this.polypRecordingImages.set(polypRecording.id, images);
           this.changePolypRecording(polypRecording, images);
         });
-    }
-  }
-
-  onCancelDeleteImage(): void {
-    this.imageToDelete = null;
-  }
-
-  onAskForImageDeletionConfirmation(image: Image): void {
-    this.imageToDelete = image;
-    this.showDeleteConfirmation = true;
-  }
-
-  onDeleteImageConfirmed(): void {
-    this.showDeleteConfirmation = false;
-    this.showDescribePolypDeletionReason = true;
-  }
-
-  onDeleteImage(reason: string): void {
-    this.showDescribePolypDeletionReason = false;
-
-    if (reason === null) {
-      this.imageToDelete = null;
-    } else {
-      this.imagesService.delete(this.imageToDelete.id, 'Discarded')
-        .subscribe(() => {
-          this.removeImage(this.imageToDelete);
-          this.imageToDelete = null;
-          this.notificationService.success(
-            'Image successfully removed.',
-            'Image removed'
-          );
-        });
-    }
-  }
-
-  onGoToImage(image: Image): void {
-    const fps = this.polypRecording.video.fps;
-    this.video.stopVideo((image.numFrame + 0.5) / fps);
-
-    // Scrolls to top
-    const parent: HTMLElement = this.elementRef.nativeElement.parentElement;
-    if (Boolean(parent)) {
-      parent.scrollTo({left: 0, top: 0, behavior: 'smooth'});
     }
   }
 
@@ -491,7 +512,6 @@ export class PolypRecordingInDatasetComponent implements OnInit {
       this.polypImages.splice(imageIndex, 1);
     }
   }
-
 
   public trackById(index: number, element: { id: string }): string {
     return element.id;
