@@ -131,7 +131,7 @@
   </div>
 
   <div app-polyp-info *ngIf="polypRecording.polyp" class="card-block"
-                  [polyp]="polypRecording.polyp" [manuallySelected]="currentImage.manuallySelected">
+                  [polyp]="polypRecording.polyp" [manuallySelected]="null">
   </div>
 
   <div class="card-block" *ngIf="hasModifications()">
@@ -171,6 +171,7 @@
         <thead>
         <tr>
           <th>Is polyp located?</th>
+          <th>Manually selected?</th>
           <th>Frame</th>
           <th>Sec. in video</th>
           <th>Sec. in record</th>
@@ -183,6 +184,7 @@
             [class.located]="isInCurrentFrame(image) && image.polypLocation !== null"
             [class.not-located]="isInCurrentFrame(image) && image.polypLocation === null">
           <td>{{image.polypLocation !== null && image.polypLocation !== undefined ? 'Yes' : 'No'}}</td>
+          <td>{{image.manuallySelected ? 'Yes' : 'No'}}</td>
           <td>{{image.numFrame}}</td>
           <td>{{image.numFrame / polypRecording.video.fps | time:3}}</td>
           <td>{{image.numFrame / polypRecording.video.fps - polypRecording.start | time: 3}}</td>

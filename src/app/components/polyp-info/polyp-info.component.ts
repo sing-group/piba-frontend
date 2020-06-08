@@ -34,7 +34,7 @@ import {Adenoma, PolypType, SSA, TSA} from '../../models/PolypHistology';
 })
 export class PolypInfoComponent implements OnInit {
   @Input() public polyp: Polyp;
-  @Input() public manuallySelected: boolean;
+  @Input() public manuallySelected?: boolean = null;
 
   public type: string;
   public dysplasingGrade: string;
