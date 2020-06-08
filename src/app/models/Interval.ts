@@ -84,6 +84,25 @@ export function isValidInterval(interval: Interval, boundaries: IntervalBoundari
   return calculateIntervalSize(interval, boundaries) > 0;
 }
 
+export function isInInterval(value: number, interval: Interval, boundaries: IntervalBoundaries): boolean {
+  if (interval === null || interval === undefined || !isValidInterval(interval, boundaries)) {
+    return false;
+  } else {
+    switch (boundaries) {
+      case IntervalBoundaries.BOTH_INCLUDED:
+        return (interval.start <= value && interval.end >= value);
+      case IntervalBoundaries.BOTH_EXCLUDED:
+        return (interval.start < value && interval.end > value);
+      case IntervalBoundaries.START_INCLUDED_END_EXCLUDED:
+        return (interval.start <= value && interval.end > value);
+      case IntervalBoundaries.START_EXCLUDED_END_INCLUDED:
+        return (interval.start < value && interval.end >= value);
+      default:
+        throw new Error('Invalid interval boundaries: ' + boundaries);
+    }
+  }
+}
+
 export function areOverlappingIntervals(
   intervalA: Interval, intervalB: Interval, boundaries: IntervalBoundaries
 ): boolean {

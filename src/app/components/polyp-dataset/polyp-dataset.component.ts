@@ -42,6 +42,8 @@ import {iif} from 'rxjs/internal/observable/iif';
 import {defer} from 'rxjs/internal/observable/defer';
 import {of} from 'rxjs/internal/observable/of';
 import {ImagesService} from '../../services/images.service';
+import {IntervalBoundaries, isInInterval} from '../../models/Interval';
+import {Image} from '../../models/Image';
 
 @Component({
   selector: 'app-polyp-dataset',
@@ -279,6 +281,14 @@ export class PolypDatasetComponent implements OnInit {
     ) {
       this.polypRecordingsLoading = true;
       this.changeDetectorRef.detectChanges();
+
+      const isImageInRecording = (image: Image, polypRecording: PolypRecording) => {
+        const fps = polypRecording.video.fps;
+        const time = (image.numFrame) / fps;
+
+        return isInInterval(time, polypRecording, IntervalBoundaries.BOTH_INCLUDED);
+      };
+
       this.polypDatasetsService.listPolypRecordings(this.id, this.currentPolypRecordingsPage, this.polypRecordingsPageSize)
         .pipe(
           concatMap(page => iif(() => page.polypRecordings.some(polypRecording => typeof polypRecording.polyp.exploration === 'string'),
@@ -309,7 +319,7 @@ export class PolypDatasetComponent implements OnInit {
                 )
               ).pipe(
                 tap(images => images.forEach((polypImages, index) => {
-                  const count = polypImages.length;
+                  const count = polypImages.filter(image => isImageInRecording(image, page.polypRecordings[index])).length;
                   this.polypRecordingImages.set(page.polypRecordings[index], count);
                 })),
                 map(() => page)
