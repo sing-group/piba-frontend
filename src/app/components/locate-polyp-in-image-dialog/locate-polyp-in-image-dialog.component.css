@@ -33,3 +33,7 @@
   display: grid;
   justify-content: center;
 }
+
+input#observation {
+  width: 100%;
+}

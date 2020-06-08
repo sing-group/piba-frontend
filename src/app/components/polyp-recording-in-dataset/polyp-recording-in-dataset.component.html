@@ -207,9 +207,10 @@
 <canvas #canvas id="canvas" class="snapshot-canvas"></canvas>
 
 <app-locate-polyp-in-image-dialog
-  [(open)]="showSnapshotDialog" [polypLocation]="currentPolypLocation"
-  [src]="snapshotDataUrl" title="Locate and save snapshot"
-  [disabled]="!hasGallery()" disabledMessage="A gallery must be selected to store image."
+  [(open)]="showSnapshotDialog"
+  [polypLocation]="currentPolypLocation" [src]="snapshotDataUrl" [disabled]="!hasGallery()"
+  [observation]="currentImage?.observation" [showObservationField]="true" [disabledObservationField]="hasCurrentImage()"
+  title="Locate and save snapshot" disabledMessage="A gallery must be selected to store image."
   (close)="onLocatePolypClose($event)">
 </app-locate-polyp-in-image-dialog>
 

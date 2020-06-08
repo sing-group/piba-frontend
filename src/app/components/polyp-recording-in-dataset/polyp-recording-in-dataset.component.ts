@@ -230,6 +230,10 @@ export class PolypRecordingInDatasetComponent implements OnInit {
     return this.polypImages.length > 0;
   }
 
+  hasCurrentImage() {
+    return Boolean(this.currentImage);
+  }
+
   calculateModificationDuration(modification: VideoModification): number {
     return this.calculateIntervalDuration({
       start: Math.max(this.polypRecording.start, modification.start),
@@ -332,7 +336,7 @@ export class PolypRecordingInDatasetComponent implements OnInit {
             gallery: gallery.id,
             manuallySelected: true,
             numFrame: PolypRecordingInDatasetComponent.convertTimeToFrame(this.snapshot.time, this.polypRecording.video.fps),
-            observation: '', // TODO: allow introducing the image observation
+            observation: location.observation,
             polyp: this.polypRecording.polyp.id,
             video: this.polypRecording.video.id
           })

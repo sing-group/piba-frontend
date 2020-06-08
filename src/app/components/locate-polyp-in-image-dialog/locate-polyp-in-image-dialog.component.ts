@@ -28,6 +28,7 @@ import {PolypLocation} from '../../models/PolypLocation';
 export class LocationResult {
   readonly cancelled: boolean;
   readonly location?: PolypLocation;
+  readonly observation?: string;
 }
 
 @Component({
@@ -46,6 +47,10 @@ export class LocatePolypInImageDialogComponent {
   @Input() disabled = false;
   @Input() disabledMessage = '';
 
+  @Input() showObservationField = false;
+  @Input() disabledObservationField = false;
+  @Input() observation: string = null;
+
   @Output() close = new EventEmitter<LocationResult>();
 
   constructor() { }
@@ -59,6 +64,14 @@ export class LocatePolypInImageDialogComponent {
       this._open = open;
       this.openChange.emit(open);
     }
+  }
+
+  public showObservationAsForm(): boolean {
+    return this.showObservationField && !this.disabledObservationField;
+  }
+
+  public hasObservation(): boolean {
+    return Boolean(this.observation);
   }
 
   hasPolypLocation(): boolean {
@@ -80,7 +93,8 @@ export class LocatePolypInImageDialogComponent {
   onSave(): void {
     this.close.emit({
       cancelled: false,
-      location: this.polypLocation
+      location: this.polypLocation,
+      observation: this.observation
     });
     this.open = false;
     this.polypLocation = null;

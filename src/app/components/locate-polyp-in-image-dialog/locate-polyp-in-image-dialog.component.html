@@ -25,8 +25,23 @@
 <clr-modal [(clrModalOpen)]="open" [clrModalClosable]="false" clrModalSize="lg">
   <h3 class="modal-title">{{title}}</h3>
   <div class="modal-body">
-    <app-image-annotator [src]="src" [(polypLocation)]="polypLocation">
-    </app-image-annotator>
+    <app-image-annotator [src]="src" [(polypLocation)]="polypLocation"></app-image-annotator>
+    <form class="clr-form clr-form-horizontal" *ngIf="showObservationAsForm()">
+      <div class="clr-form-control clr-row">
+        <label for="observation" class="clr-control-label clr-col-md-2">Observation</label>
+        <div class="clr-control-container clr-col-md-10">
+          <div class="clr-input-wrapper">
+            <input id="observation" name="observation" type="text" class="clr-input"
+                   [(ngModel)]="observation" [disabled]="disabledObservationField">
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="clr-row" *ngIf="!showObservationAsForm() && hasObservation()">
+      <div class="clr-col-md-12">
+        {{observation}}
+      </div>
+    </div>
     <clr-alert clrAlertType="warning" [clrAlertClosable]="false" *ngIf="disabled">
       <clr-alert-item>
         <span class="alert-text">{{disabledMessage}}</span>
