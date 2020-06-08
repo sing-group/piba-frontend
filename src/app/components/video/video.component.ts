@@ -55,6 +55,8 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   @Input() limitToInterval = false;
   @Input() intervalBoundaries = IntervalBoundaries.BOTH_INCLUDED;
   private _highlightZones: VideoIntervalHighlight[] = [];
+  private _videoSpeed = VideoSpeed.SECONDS_3;
+  @Output() videoSpeedChange = new EventEmitter<VideoSpeed>();
 
   // tslint:disable-next-line:no-output-rename
   @Output('time') timeEmitter = new EventEmitter<number>();
@@ -68,7 +70,6 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   @ViewChild('progressElement') progressElementRef: ElementRef<HTMLInputElement>;
 
   fullscreen = false;
-  videoSpeed = VideoSpeed.SECONDS_3;
 
   readonly videoSpeedValues = EnumUtils.enumValues(VideoSpeed);
 
@@ -117,6 +118,17 @@ export class VideoComponent implements AfterViewChecked, OnInit {
       : this.currentProgressTime;
 
     this.changeDetectorRef.detectChanges();
+  }
+
+  @Input() set videoSpeed(speed: VideoSpeed) {
+    if (this._videoSpeed !== speed) {
+      this._videoSpeed = speed;
+      this.videoSpeedChange.emit(this._videoSpeed);
+    }
+  }
+
+  get videoSpeed(): VideoSpeed {
+    return this._videoSpeed;
   }
 
   @Input() set highlightZones(highlightZones: VideoIntervalHighlight[]) {

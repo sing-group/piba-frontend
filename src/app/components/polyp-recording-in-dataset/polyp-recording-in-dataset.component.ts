@@ -50,6 +50,7 @@ import {throwError} from 'rxjs/internal/observable/throwError';
 import {PolypLocation} from '../../models/PolypLocation';
 import {defer} from 'rxjs/internal/observable/defer';
 import {VideoComponent} from '../video/video.component';
+import {VideoSpeed} from '../video/VideoSpeed';
 
 @Component({
   selector: 'app-polyp-recording-in-dataset',
@@ -84,6 +85,8 @@ export class PolypRecordingInDatasetComponent implements OnInit {
   public showDeleteConfirmation = false;
   public showDescribePolypDeletionReason = false;
   public imageToDelete: Image = null;
+
+  public videoSpeed = VideoSpeed.FRAMES_1;
 
   @ViewChild('canvas') private canvas: ElementRef<HTMLCanvasElement>;
   @ViewChild('videoComponent') private video: VideoComponent;

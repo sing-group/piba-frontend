@@ -42,7 +42,7 @@
         <span class="spinner" [hidden]="isVideoReady()">
           Loading...
         </span>
-        <app-video #videoComponent *ngIf="polypRecording && polypRecording.video"
+        <app-video #videoComponent *ngIf="polypRecording && polypRecording.video" [(videoSpeed)]="videoSpeed"
                    [video]="polypRecording.video" [interval]="polypRecording" limitToInterval="true"
                    [intervalBoundaries]="intervalBoundaries" [highlightZones]="highlightZones" [hidden]="!isVideoReady()"
                    (ready)="onReady()" (snapshot)="onSnapshot($event)" (time)="onTimeChange($event)">
