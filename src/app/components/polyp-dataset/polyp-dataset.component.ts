@@ -44,6 +44,7 @@ import {of} from 'rxjs/internal/observable/of';
 import {ImagesService} from '../../services/images.service';
 import {IntervalBoundaries, isInInterval} from '../../models/Interval';
 import {Image} from '../../models/Image';
+import {SortDirection} from '../../services/entities/SortDirection';
 
 @Component({
   selector: 'app-polyp-dataset',
@@ -78,6 +79,18 @@ export class PolypDatasetComponent implements OnInit {
   polypRecordingsPageSize = 10;
   polypRecordingsPageChangeEvent = new Subject<string>();
   polypRecordingsLoading = false;
+
+  private polypRecordingSort: { images: SortDirection } = null;
+
+  get polypRecordingQueryParams(): { imagesSort: SortDirection } {
+    if (Boolean(this.polypRecordingSort)) {
+      return {
+        imagesSort: this.polypRecordingSort.images
+      };
+    } else {
+      return undefined;
+    }
+  }
 
   constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
@@ -257,9 +270,20 @@ export class PolypDatasetComponent implements OnInit {
   }
 
   refreshPolypRecordingsPage(state: ClrDatagridStateInterface) {
+    let force = false;
+    if (Boolean(state.sort) && state.sort.by === 'images') {
+      const newDirection = state.sort.reverse ? SortDirection.DESCENDING : SortDirection.ASCENDING;
+      if (this.polypRecordingSort === null || this.polypRecordingSort.images !== newDirection) {
+        force = true;
+        this.polypRecordingSort = {
+          images: newDirection
+        };
+      }
+    }
+
     if (state.page !== undefined && this.hasPolypRecordingsPagination()) {
       this.polypRecordingsPagination.page.current = (state.page.from / state.page.size) + 1;
-      this.getPagePolypRecordings();
+      this.getPagePolypRecordings(force);
     }
   }
 
@@ -289,7 +313,9 @@ export class PolypDatasetComponent implements OnInit {
         return isInInterval(time, polypRecording, IntervalBoundaries.BOTH_INCLUDED);
       };
 
-      this.polypDatasetsService.listPolypRecordings(this.id, this.currentPolypRecordingsPage, this.polypRecordingsPageSize)
+      this.polypDatasetsService.listPolypRecordings(
+        this.id, this.currentPolypRecordingsPage, this.polypRecordingsPageSize, this.polypRecordingSort
+      )
         .pipe(
           concatMap(page => iif(() => page.polypRecordings.some(polypRecording => typeof polypRecording.polyp.exploration === 'string'),
             defer(() => forkJoin(

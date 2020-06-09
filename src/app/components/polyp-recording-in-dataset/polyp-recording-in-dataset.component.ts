@@ -23,7 +23,7 @@
  */
 
 import {ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, NavigationExtras, Router} from '@angular/router';
 import {PolypRecording} from '../../models/PolypRecording';
 import {PolypRecordingsService} from '../../services/polyprecordings.service';
 import {VideoIntervalHighlight} from '../video/VideoIntervalHighlight';
@@ -51,6 +51,7 @@ import {PolypLocation} from '../../models/PolypLocation';
 import {defer} from 'rxjs/internal/observable/defer';
 import {VideoComponent} from '../video/video.component';
 import {VideoSpeed} from '../video/VideoSpeed';
+import {SortDirection} from '../../services/entities/SortDirection';
 
 @Component({
   selector: 'app-polyp-recording-in-dataset',
@@ -72,6 +73,7 @@ export class PolypRecordingInDatasetComponent implements OnInit {
   readonly intervalBoundaries = PolypRecordingInDatasetComponent.INTERVAL_BOUNDARIES;
 
   private polypRecordings: PolypRecordingBasicData[] = [];
+  private imagesSort: { images: SortDirection };
   private completePolypRecordings: Map<number, PolypRecording> = new Map<number, PolypRecording>();
   private polypRecordingImages: Map<number, Image[]> = new Map<number, Image[]>();
   private currentIndex: number;
@@ -136,8 +138,10 @@ export class PolypRecordingInDatasetComponent implements OnInit {
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.datasetId = this.route.snapshot.paramMap.get('datasetId');
+    const imagesSortDirection = SortDirection[this.route.snapshot.queryParamMap.get('imagesSort')];
+    this.imagesSort = Boolean(imagesSortDirection) ? { images: imagesSortDirection } : undefined;
 
-    this.datasetsService.listAllPolypRecordingBasicData(this.datasetId)
+    this.datasetsService.listAllPolypRecordingBasicData(this.datasetId, this.imagesSort)
       .subscribe(polypRecordings => {
         this.polypRecordings = polypRecordings;
         this.fillAndChangePolypRecording(id);
@@ -257,23 +261,11 @@ export class PolypRecordingInDatasetComponent implements OnInit {
   }
 
   onGoToPrevious(): void {
-    if (!this.hasPrevious()) {
-      throw new Error('No previous polyp recording');
-    }
-
-    const previous = this.polypRecordings[this.currentIndex - 1];
-    this.router.navigateByUrl(`/polypdatasets/${this.datasetId}/polyprecording/${previous.id}`)
-      .then(() => this.fillAndChangePolypRecording(previous.id));
+    this.goToByDisplacement(-1);
   }
 
   onGoToNext(): void {
-    if (!this.hasNext()) {
-      throw new Error('No next polyp recording');
-    }
-
-    const next = this.polypRecordings[this.currentIndex + 1];
-    this.router.navigateByUrl(`/polypdatasets/${this.datasetId}/polyprecording/${next.id}`)
-      .then(() => this.fillAndChangePolypRecording(next.id));
+    this.goToByDisplacement(1);
   }
 
   onSnapshot(snapshot: VideoSnapshot): void {
@@ -413,6 +405,28 @@ export class PolypRecordingInDatasetComponent implements OnInit {
     const parent: HTMLElement = this.elementRef.nativeElement.parentElement;
     if (Boolean(parent)) {
       parent.scrollTo({left: 0, top: 0, behavior: 'smooth'});
+    }
+  }
+
+  private goToByDisplacement(displacement: number): void {
+    const newIndex = this.currentIndex + displacement;
+
+    if (newIndex < 0 || newIndex >= this.polypRecordings.length) {
+      throw new Error('New polyp index out of bounds: ' + newIndex);
+    }
+
+    const polypRecordingId = this.polypRecordings[newIndex].id;
+    this.router.navigate(['polypdatasets', this.datasetId, 'polyprecording', polypRecordingId], this.createNavigationExtras())
+      .then(() => this.fillAndChangePolypRecording(polypRecordingId));
+  }
+
+  private createNavigationExtras(): NavigationExtras {
+    if (Boolean(this.imagesSort)) {
+      return {
+        queryParams: this.imagesSort
+      };
+    } else {
+      return undefined;
     }
   }
 

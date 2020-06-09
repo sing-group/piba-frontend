@@ -42,6 +42,7 @@ import {PolypRecordingBasicData} from '../models/PolypRecordingBasicData';
 import {PolypDatasetEditionInfo} from './entities/PolypDatasetEditionInfo';
 import {iif} from 'rxjs/internal/observable/iif';
 import {defer} from 'rxjs/internal/observable/defer';
+import {SortDirection} from './entities/SortDirection';
 
 @Injectable()
 export class PolypDatasetsService {
@@ -137,12 +138,22 @@ export class PolypDatasetsService {
       );
   }
 
-  listPolypRecordings(id: string, page?: number, pageSize?: number): Observable<PolypRecordingPage> {
-    const params = new HttpParams()
-      .append('page', page.toString())
-      .append('pageSize', pageSize.toString());
+  listPolypRecordings(
+    id: string, page?: number, pageSize?: number, sortFields?: { images: SortDirection }
+  ): Observable<PolypRecordingPage> {
+    let params = new HttpParams();
 
-    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polypdataset/${id}/polyprecording`, {params, observe: 'response'})
+    if (Boolean(page) && Boolean(pageSize)) {
+      params = params
+        .append('page', page.toString())
+        .append('pageSize', pageSize.toString());
+    }
+
+    if (Boolean(sortFields)) {
+      params = params.append('imagesSort', sortFields.images);
+    }
+
+    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polypdataset/${id}/polyprecording`, { params, observe: 'response' })
       .pipe(
         concatMap(response => iif(() => response.body.length > 0,
           defer(() =>
@@ -165,8 +176,14 @@ export class PolypDatasetsService {
       );
   }
 
-  listAllPolypRecordingBasicData(id: string): Observable<PolypRecordingBasicData[]> {
-    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polypdataset/${id}/polyprecording`)
+  listAllPolypRecordingBasicData(id: string, sortFields?: { images: SortDirection }): Observable<PolypRecordingBasicData[]> {
+    const options: {params?: HttpParams} = {};
+    if (Boolean(sortFields)) {
+      options.params = new HttpParams();
+      options.params = options.params.append('imagesSort', sortFields.images);
+    }
+
+    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polypdataset/${id}/polyprecording`, options)
     .pipe(
       map(infos => infos.map(PolypRecordingsService.mapPolypRecordingBasicData)),
       PibaError.throwOnError(
