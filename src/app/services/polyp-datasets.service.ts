@@ -67,6 +67,7 @@ export class PolypDatasetsService {
     return {
       id: polypInfo.id,
       title: polypInfo.title,
+      description: polypInfo.description,
       polyps: polyps,
       defaultGallery: gallery
     };
@@ -84,6 +85,7 @@ export class PolypDatasetsService {
 
     return {
       title: polypDataset.title,
+      description: polypDataset.description,
       polyps: polyps,
       defaultGallery: Boolean(polypDataset) && Boolean(polypDataset.defaultGallery)
         ? (typeof polypDataset.defaultGallery === 'string' ? polypDataset.defaultGallery : polypDataset.defaultGallery.id)

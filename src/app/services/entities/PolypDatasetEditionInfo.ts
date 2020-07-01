@@ -26,6 +26,7 @@ import {IdAndUri} from './IdAndUri';
 
 export interface PolypDatasetEditionInfo {
   title: string;
+  description: string;
   polyps: IdAndUri[] | string[];
   defaultGallery?: IdAndUri | string;
 }

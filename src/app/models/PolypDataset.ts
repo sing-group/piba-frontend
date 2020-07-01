@@ -28,6 +28,7 @@ import {Gallery} from './Gallery';
 export class PolypDataset {
   id: string;
   title: string;
+  description: string;
   polyps: Polyp[] | string[];
   defaultGallery: Gallery | string;
 }

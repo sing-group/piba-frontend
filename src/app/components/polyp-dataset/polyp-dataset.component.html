@@ -37,6 +37,10 @@
           </td>
         </tr>
         <tr>
+          <td class="left">Description</td>
+          <td class="left" [innerHTML]="polypDataset.description | markdown"></td>
+        </tr>
+        <tr>
           <td class="left">Linked gallery</td>
           <td class="left">{{polypDataset.defaultGallery !== null ? polypDataset.defaultGallery.title : '&lt;None selected&gt;'}}</td>
         </tr>

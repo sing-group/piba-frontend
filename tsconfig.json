@@ -16,6 +16,7 @@
     "lib": [
       "es2017",
       "dom"
-    ]
+    ],
+    "skipLibCheck": true // Added to avoid problems with ngx-markdown
   }
 }

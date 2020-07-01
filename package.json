@@ -1,7 +1,7 @@
 {
   "name": "@piba/frontend",
   "description": "PIBA - Polyp Image Bank",
-  "version": "0.1.0-alpha.296",
+  "version": "0.1.0-alpha.297",
   "license": "GPLv3",
   "author": {
     "name": "Miguel Reboiro-Jato",
@@ -53,6 +53,7 @@
     "angular2-notifications": "1.0.4",
     "bootstrap": "^4.0.0-alpha.5",
     "core-js": "^2.4.1",
+    "ngx-markdown": "^10.0.0",
     "rxjs": "^6.3.1",
     "zone.js": "^0.8.26"
   },

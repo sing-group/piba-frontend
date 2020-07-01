@@ -61,6 +61,7 @@ export class EditPolypDatasetDialogComponent implements OnInit {
 
     this.formGroup = this.formBuilder.group({
       title: ['', Validators.required],
+      description: [''],
       gallery: [null]
     });
   }
@@ -89,11 +90,13 @@ export class EditPolypDatasetDialogComponent implements OnInit {
 
         this.formGroup = this.formBuilder.group({
           title: [this.dataset.title, Validators.required],
+          description: [this.dataset.description],
           gallery: [galleryId]
         });
       } else {
         this.formGroup = this.formBuilder.group({
           title: ['', Validators.required],
+          description: [''],
           gallery: [null]
         });
       }
@@ -117,6 +120,7 @@ export class EditPolypDatasetDialogComponent implements OnInit {
       this.create.emit({
         id: this.isEditing() ? this.dataset.id : null,
         title: this.formGroup.get('title').value,
+        description: this.formGroup.get('description').value,
         polyps: this.isEditing() ? this.dataset.polyps : [],
         defaultGallery: this.formGroup.get('gallery').value
       });

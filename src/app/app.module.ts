@@ -85,6 +85,7 @@ import {
 } from './components/locate-polyp-in-image-dialog/locate-polyp-in-image-dialog.component';
 import { PolypInfoComponent } from './components/polyp-info/polyp-info.component';
 import { EditPolypDatasetDialogComponent } from './components/edit-polyp-dataset-dialog/edit-polyp-dataset-dialog.component';
+import {MarkdownModule} from 'ngx-markdown';
 
 @NgModule({
     declarations: [
@@ -136,7 +137,8 @@ import { EditPolypDatasetDialogComponent } from './components/edit-polyp-dataset
       timeOut: 5000,
       preventDuplicates: true
     }),
-    NotificationModule.forRoot()
+    NotificationModule.forRoot(),
+    MarkdownModule.forRoot()
   ],
   providers: [
     PolypsService,
