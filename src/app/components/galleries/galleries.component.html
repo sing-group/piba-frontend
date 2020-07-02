@@ -29,7 +29,7 @@
   </button>
 </div>
 
-<form ngNativeValidate #galleryForm="ngForm" (submit)="save()">
+<form ngNativeValidate #galleryForm="ngForm" (submit)="$event.preventDefault(); save()">
   <clr-modal [(clrModalOpen)]="creatingGallery || editingGallery" [clrModalClosable]="false">
     <h3 class="modal-title" *ngIf="creatingGallery">Add gallery</h3>
     <h3 class="modal-title" *ngIf="editingGallery">Edit gallery</h3>
@@ -50,8 +50,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
-      <button type="submit" class="btn btn-primary"
-              [disabled]="titleGallery.invalid ">
+      <button type="submit" class="btn btn-primary" [disabled]="titleGallery.invalid ">
         Ok
       </button>
     </div>
@@ -62,7 +61,7 @@
 
   <clr-dg-placeholder>We couldn't find any galleries!</clr-dg-placeholder>
 
-  <clr-dg-column [clrDgField]="'title'" [clrDgSortOrder]="ascOrder">Title</clr-dg-column>
+  <clr-dg-column [clrDgField]="'title'" [clrDgSortOrder]="titleOrder">Title</clr-dg-column>
   <clr-dg-column>Description</clr-dg-column>
   <clr-dg-column [clrDgField]="'imagesLocated'">Images located</clr-dg-column>
   <clr-dg-column [clrDgField]="'totalImages'">Total images</clr-dg-column>
@@ -115,7 +114,7 @@
               <option value="UNLOCATED_WITH_POLYP">Not Located With Polyp</option>
             </select>
           </div>
-          <div *ngIf="getNumberOfImagesAccordingToFilter() == 0" class="alert alert-danger not-margin-top">
+          <div *ngIf="getNumberOfImagesAccordingToFilter() === 0" class="alert alert-danger not-margin-top">
             The applied filter returns 0 images
           </div>
         </div>
@@ -129,8 +128,8 @@
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
       <a type="button" class="btn btn-primary" id="download-zip" target="_blank" href=""
-         [class.disabled]="getNumberOfImagesAccordingToFilter() == 0"
-         [class.not-allowed]="getNumberOfImagesAccordingToFilter() == 0" (click)="downloadGallery()">
+         [class.disabled]="getNumberOfImagesAccordingToFilter() === 0"
+         [class.not-allowed]="getNumberOfImagesAccordingToFilter() === 0" (click)="downloadGallery()">
         Download
       </a>
     </div>

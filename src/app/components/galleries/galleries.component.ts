@@ -65,7 +65,7 @@ export class GalleriesComponent implements OnInit {
   _galleriesData: GallerySummary[] = [];
   role = Role;
 
-  readonly ascOrder = ClrDatagridSortOrder.ASC;
+  readonly titleOrder: ClrDatagridSortOrder = ClrDatagridSortOrder.UNSORTED;
 
   constructor(private galleriesService: GalleriesService,
               private imagesService: ImagesService,
@@ -73,8 +73,18 @@ export class GalleriesComponent implements OnInit {
               public authenticationService: AuthenticationService) {
   }
 
+  private static compareGalleries(g1: Gallery, g2: Gallery): number {
+    let diff;
+    return ((diff = g1.creationDate.getTime() - g2.creationDate.getTime()) === 0)
+      ? ((diff = g1.title.localeCompare(g2.title)) === 0)
+        ? g1.id.localeCompare(g2.id)
+        : diff
+      : -diff;
+  }
+
   ngOnInit() {
-    this.galleriesService.listGalleries().subscribe(galleries => this.galleries = galleries);
+    this.galleriesService.listGalleries()
+      .subscribe(galleries => this.galleries = galleries);
   }
 
   get galleries(): Gallery[] {
@@ -82,7 +92,8 @@ export class GalleriesComponent implements OnInit {
   }
 
   set galleries(galleries: Gallery[]) {
-    this._galleries = galleries;
+    this._galleries = this.sortGalleries(galleries);
+    console.log(this._galleries);
 
     const newGalleries = this._galleries
       .filter(gallery => !this.imagesInGalleryInfoMap.has(gallery.id));
@@ -109,7 +120,7 @@ export class GalleriesComponent implements OnInit {
   }
 
   private updateGalleriesData() {
-    this._galleriesData = this._galleries.map(gallery => {
+    this._galleriesData = this.galleries.map(gallery => {
       const imagesInGalleryInfo = this.getImagesInGalleryInfo(gallery);
 
       return ({
@@ -123,11 +134,19 @@ export class GalleriesComponent implements OnInit {
     });
   }
 
-  get sortedGalleries() {
-    return this.galleries.sort((g1, g2) => {
-      const compare = g1.title.localeCompare(g2.title);
-
-      return this.ascOrder === ClrDatagridSortOrder.ASC ? compare : -compare;
+  private sortGalleries(galleries: Gallery[]): Gallery[] {
+    console.log(galleries);
+    return galleries.sort((g1, g2) => {
+      switch (this.titleOrder) {
+        case ClrDatagridSortOrder.ASC:
+          return g1.title.localeCompare(g2.title);
+        case ClrDatagridSortOrder.DESC:
+          return -g1.title.localeCompare(g2.title);
+        case ClrDatagridSortOrder.UNSORTED:
+          return GalleriesComponent.compareGalleries(g1, g2);
+        default:
+          throw new Error('Invalid order: ' + this.titleOrder);
+      }
     });
   }
 
@@ -142,6 +161,7 @@ export class GalleriesComponent implements OnInit {
     } else {
       this.galleriesService.editGallery(this.gallery).subscribe(updated => {
           Object.assign(this.galleries.find((gallery) => gallery.id === this.gallery.id), updated);
+          this.updateGalleriesData();
           this.notificationService.success('Gallery edited successfully.', 'Gallery edited.');
           this.cancel();
         }

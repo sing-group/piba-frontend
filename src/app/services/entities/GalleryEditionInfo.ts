@@ -22,9 +22,8 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export class Gallery {
-  id: string;
+export class GalleryEditionInfo {
+  id?: string;
   title: string;
   description: string;
-  creationDate: Date;
 }
