@@ -58,7 +58,7 @@ export class VideoZoneEditorComponent implements DoCheck {
 
   private _creationModalOpened = false;
 
-  ascSort = ClrDatagridSortOrder.ASC;
+  startSortOrder: ClrDatagridSortOrder = ClrDatagridSortOrder.ASC;
 
   creationModalSubmitted = false;
   selectedZoneType: VideoZoneType;

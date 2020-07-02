@@ -87,10 +87,10 @@
 </button>
 <div class="elementrecordings-container">
   <clr-datagrid>
-    <clr-dg-column [clrDgField]="'element.name'" [clrDgSortOrder]="ascSort">{{elementName}}</clr-dg-column>
-    <clr-dg-column [clrDgField]="'start'">Start</clr-dg-column>
-    <clr-dg-column [clrDgField]="'end'">Stop</clr-dg-column>
-    <clr-dg-column [clrDgField]="'status'">Status</clr-dg-column>
+    <clr-dg-column clrDgField="element.name">{{elementName}}</clr-dg-column>
+    <clr-dg-column clrDgSortBy="start" [clrDgSortOrder]="startSortOrder">Start</clr-dg-column>
+    <clr-dg-column clrDgSortBy="end">Stop</clr-dg-column>
+    <clr-dg-column clrDgSortBy="confirmed">Status</clr-dg-column>
     <clr-dg-column>Actions</clr-dg-column>
 
     <clr-dg-row *clrDgItems="let element of elements">
