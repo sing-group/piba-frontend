@@ -189,31 +189,25 @@ export class ImagesService {
   }
 
   getImagesByGallery(gallery: Gallery, page: number, pageSize: number, filter: ImageFilter = ImageFilter.ALL): Observable<ImagePage> {
-    const withLocation = filter !== ImageFilter.UNLOCATED;
+    const withLocation = filter !== ImageFilter.WITHOUT_LOCATION;
     return this.http.get<ImageInfo[]>
     (`${environment.restApi}/image?galleryId=${gallery.id}&page=${page}&pageSize=${pageSize}&filter=${ImageFilter[filter]}`,
       {observe: 'response'})
       .pipe(
-        concatMap(response => {
-          // if images are not received
-          if (response.body.length === 0) {
-            return of({
+        concatMap(response =>
+          iif(() => response.body.length === 0,
+            defer(() => of({
               totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
-              locatedImages: Number(response.headers.get('X-Located-Total-Items')),
-              imagesWithPolyp: Number(response.headers.get('X-With-Polyp-Total-Items')),
               images: []
-            });
-          } else {
-            return this.videoAndImagesContentsAndGalleryAndOptionalLocation(of(response.body), gallery, withLocation).pipe(
+            })),
+            this.videoAndImagesContentsAndGalleryAndOptionalLocation(of(response.body), gallery, withLocation).pipe(
               map(images => ({
                 totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
-                locatedImages: Number(response.headers.get('X-Located-Total-Items')),
-                imagesWithPolyp: Number(response.headers.get('X-With-Polyp-Total-Items')),
                 images: images
               }))
-            );
-          }
-        })
+            )
+          )
+        )
       );
   }
 
@@ -230,8 +224,6 @@ export class ImagesService {
           });
           return of({
             totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
-            locatedImages: Number(response.headers.get('X-Located-Total-Items')),
-            imagesWithPolyp: Number(response.headers.get('X-With-Polyp-Total-Items')),
             imagesId: ids
           });
         })

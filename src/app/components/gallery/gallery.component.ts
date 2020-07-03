@@ -50,8 +50,6 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
   pageLength = 0;
   totalImages = -1;
   filter = ImageFilter.ALL;
-  locatedImages: number;
-  imagesWithPolyp: number;
   loading = false;
   showPolypLocation = true;
 
@@ -59,6 +57,15 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
   pagination: ClrDatagridPagination;
 
   private viewChecked = false;
+
+  private static drawPolypLocation(ctx: CanvasRenderingContext2D, polypLocation: PolypLocation) {
+    ctx.beginPath();
+    // left, top, width, height
+    ctx.rect(polypLocation.x, polypLocation.y, polypLocation.width, polypLocation.height);
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
 
   constructor(private route: ActivatedRoute,
               private galleryService: GalleriesService,
@@ -95,6 +102,13 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
       this.route.snapshot.queryParamMap.get('show_location') === 'true';
   }
 
+  ngAfterViewChecked() {
+    if (!this.viewChecked) {
+      this.loadImages();
+      this.viewChecked = true;
+    }
+  }
+
   get page(): number {
     return this.pagination.page.current;
   }
@@ -122,7 +136,7 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  filterChange() {
+  onFilterChanged() {
     const pageToGo = <HTMLInputElement>document.getElementById('page-to-go') as HTMLInputElement;
     if (pageToGo != null) {
       pageToGo.value = '1';
@@ -133,19 +147,26 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
     this.changeURL();
   }
 
-  private getImages() {
-    this.loading = true;
-    this.imageService.getImagesByGallery(this.gallery, this.pagination.page.current, this.pageSize, this.filter).subscribe(imagePage => {
-      this.images = imagePage.images;
-      this.totalImages = imagePage.totalItems;
-      this.imagesWithPolyp = imagePage.imagesWithPolyp;
-      this.locatedImages = imagePage.locatedImages;
-      this.viewChecked = false;
-      this.loading = false;
-    });
+  hasImages(): boolean {
+    return this.totalImages > 0;
   }
 
-  loadImages() {
+  private getImages() {
+    this.loading = true;
+    this.imageService.getImagesByGallery(this.gallery, this.pagination.page.current, this.pageSize, this.filter)
+      .subscribe(imagePage => {
+        this.images = imagePage.images;
+        this.totalImages = imagePage.totalItems;
+        this.viewChecked = false;
+        this.loading = false;
+      });
+  }
+
+  onShowPolypLocationChanged() {
+    this.loadImages();
+  }
+
+  private loadImages() {
     if (this.images.length > 0) {
       this.images.forEach(image => {
           const canvas: HTMLCanvasElement = document.getElementById('canvas-' + image.id) as HTMLCanvasElement;
@@ -154,13 +175,6 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
       );
     }
     this.changeURL();
-  }
-
-  ngAfterViewChecked() {
-    if (!this.viewChecked) {
-      this.loadImages();
-      this.viewChecked = true;
-    }
   }
 
   private drawCanvasWithImage(canvas: HTMLCanvasElement, image: Image) {
@@ -176,19 +190,9 @@ export class GalleryComponent implements OnInit, AfterViewChecked {
       ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
 
       if (image.polypLocation !== null && this.showPolypLocation) {
-        this.drawPolypLocation(ctx, image.polypLocation);
+        GalleryComponent.drawPolypLocation(ctx, image.polypLocation);
       }
     };
     imageElement.src = 'data:image/png;base64,' + image.base64contents;
   }
-
-  private drawPolypLocation(ctx: CanvasRenderingContext2D, polypLocation: PolypLocation) {
-      ctx.beginPath();
-      // left, top, width, height
-      ctx.rect(polypLocation.x, polypLocation.y, polypLocation.width, polypLocation.height);
-      ctx.strokeStyle = 'red';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-  }
-
 }

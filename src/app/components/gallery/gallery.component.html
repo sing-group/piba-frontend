@@ -44,37 +44,38 @@
     </section>
   </div>
 
-  <div *ngIf="totalImages > 0" class="row progress-margin">
+  <div *ngIf="hasImages()" class="row progress-margin">
     <div class="col-xs-12">
-      <h5>Polyp location progress: {{locatedImages}} of {{totalImages}} ({{(locatedImages*100)/totalImages |
-        number:'.0-1'}}%)</h5>
+      <div class="progress-label">Polyp location progress:
+        {{gallery.stats.countImagesWithPolypAndLocation}} of {{gallery.stats.countImagesWithPolyp}}
+        ({{(gallery.stats.countImagesWithPolypAndLocation / gallery.stats.countImagesWithPolyp) * 100 | number:'.0-1'}}%)
+      </div>
       <div class="progress success">
-        <progress max="{{imagesWithPolyp}}" value="{{locatedImages}}"></progress>
+        <progress max="{{gallery.stats.countImagesWithPolyp}}" value="{{gallery.stats.countImagesWithPolypAndLocation}}"></progress>
       </div>
     </div>
   </div>
 
   <clr-datagrid (clrDgRefresh)="refreshPage($event)" [clrDgLoading]="loading">
     <div class="clr-row clr-justify-content-lg-end not-margin-right">
-      <clr-checkbox class="checkbox-margin" [(clrChecked)]="showPolypLocation" (change)="loadImages()">
-        Show polyp location
-      </clr-checkbox>
+      <div class="toggle-switch checkbox-margin">
+        <input id="showPolypLocation" type="checkbox" [(ngModel)]="showPolypLocation" (change)="onShowPolypLocationChanged()">
+        <label for="showPolypLocation">Show polyp location</label>
+      </div>
       <div class="clr-select-wrapper">
-        <select class="clr-select select-margin" [(ngModel)]="filter" (change)="filterChange()">
+        <select class="clr-select select-margin" [(ngModel)]="filter" (change)="onFilterChanged()">
           <option value="ALL">All</option>
-          <option value="LOCATED">Located</option>
-          <option value="UNLOCATED">Not Located</option>
-          <option value="UNLOCATED_WITH_POLYP">Not Located With Polyp</option>
+          <option value="WITH_POLYP_AND_LOCATION">Located</option>
+          <option value="WITH_POLYP_AND_WITHOUT_LOCATION">Not located</option>
         </select>
       </div>
     </div>
-    <clr-dg-placeholder *ngIf="images.length == 0 && totalImages !== -1">There are no images in this gallery
-    </clr-dg-placeholder>
+    <clr-dg-placeholder *ngIf="!hasImages()">There are no images in this gallery</clr-dg-placeholder>
     <div class="gallery-container">
       <div *ngFor="let image of images">
         <div class="gallery-item">
           <a routerLink="/gallery/{{gallery.id}}/image/{{image.id}}"
-             [queryParams]="{filter:this.filter, show_location:this.showPolypLocation}">
+             [queryParams]="{filter: this.filter, show_location: this.showPolypLocation}">
             <canvas id="canvas-{{image.id}}"></canvas>
           </a>
         </div>

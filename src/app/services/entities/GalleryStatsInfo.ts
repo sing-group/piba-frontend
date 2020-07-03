@@ -22,12 +22,11 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GalleryStats} from './GalleryStats';
-
-export class Gallery {
-  id: string;
-  title: string;
-  description: string;
-  creationDate: Date;
-  stats?: GalleryStats;
+export class GalleryStatsInfo {
+  countImages: number;
+  countImagesWithPolyp: number;
+  countImagesWithoutLocation: number;
+  countImagesWithLocation: number;
+  countImagesWithPolypAndWithoutLocation: number;
+  countImagesWithPolypAndLocation: number;
 }

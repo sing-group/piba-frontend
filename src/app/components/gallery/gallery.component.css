@@ -64,7 +64,7 @@ canvas {
 }
 
 .not-margin-right {
-  margin-right: 0px;
+  margin-right: 0;
 }
 
 .progress-margin {
@@ -87,4 +87,10 @@ canvas {
 .select-margin {
   padding-top: 2.7%;
   height: 115%;
+}
+
+.progress-label {
+  font-weight: 400;
+  font-size: .666667rem;
+  margin: 12px 0;
 }

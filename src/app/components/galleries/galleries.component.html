@@ -57,34 +57,50 @@
   </clr-modal>
 </form>
 
-<clr-datagrid [clrDgLoading]="loadingImagesInGalleryInfo">
-
+<clr-datagrid>
   <clr-dg-placeholder>We couldn't find any galleries!</clr-dg-placeholder>
 
-  <clr-dg-column [clrDgField]="'title'" [clrDgSortOrder]="titleOrder">Title</clr-dg-column>
+  <clr-dg-column clrDgField="title" [clrDgSortOrder]="titleOrder">Title</clr-dg-column>
   <clr-dg-column>Description</clr-dg-column>
-  <clr-dg-column [clrDgField]="'imagesLocated'">Images located</clr-dg-column>
-  <clr-dg-column [clrDgField]="'totalImages'">Total images</clr-dg-column>
-  <clr-dg-column [clrDgField]="'locatedPercentage'">% of images located</clr-dg-column>
+  <clr-dg-column clrDgField="stats.countImagesWithPolypAndLocation">Images with location</clr-dg-column>
+  <clr-dg-column clrDgField="stats.countImagesWithPolypAndWithoutLocation">Images without location</clr-dg-column>
+  <clr-dg-column clrDgField="stats.countImages">Total images</clr-dg-column>
   <clr-dg-column>Actions</clr-dg-column>
 
-  <clr-dg-row *clrDgItems="let gallery of galleriesData" [clrDgItem]="gallery">
+  <clr-dg-row *clrDgItems="let gallery of galleries" [clrDgItem]="gallery">
     <clr-dg-cell>{{gallery.title}}</clr-dg-cell>
     <clr-dg-cell>{{gallery.description}}</clr-dg-cell>
-    <clr-dg-cell>{{gallery.imagesLocated}}</clr-dg-cell>
-    <clr-dg-cell>{{gallery.totalImages}}</clr-dg-cell>
-    <clr-dg-cell>{{gallery.locatedPercentage | number:'.0-1'}}%</clr-dg-cell>
+    <clr-dg-cell *ngIf="gallery.stats.countImagesWithPolypAndLocation > 0; else noWithLocation" >
+      {{gallery.stats.countImagesWithPolypAndLocation}}
+      ({{(gallery.stats.countImagesWithPolypAndLocation / gallery.stats.countImagesWithPolyp) * 100 | number:'.0-1'}}%)
+    </clr-dg-cell>
+    <ng-template #noWithLocation>
+      <clr-dg-cell>None</clr-dg-cell>
+    </ng-template>
+    <clr-dg-cell *ngIf="gallery.stats.countImagesWithPolypAndWithoutLocation > 0; else noWithoutLocation" >
+      {{gallery.stats.countImagesWithPolypAndWithoutLocation}}
+      ({{(gallery.stats.countImagesWithPolypAndWithoutLocation / gallery.stats.countImagesWithPolyp) * 100 | number:'.0-1'}}%)
+    </clr-dg-cell>
+    <ng-template #noWithoutLocation>
+      <clr-dg-cell>None</clr-dg-cell>
+    </ng-template>
+    <clr-dg-cell *ngIf="gallery.stats.countImages > 0; else noImages">
+      {{gallery.stats.countImagesWithPolyp}}
+    </clr-dg-cell>
+    <ng-template #noImages>
+      <clr-dg-cell>None</clr-dg-cell>
+    </ng-template>
     <clr-dg-cell>
       <div class="btn-group btn-link btn-icon">
         <button class="btn" routerLink="/gallery/{{gallery.id}}">
           <clr-icon shape="eye"></clr-icon>
           <span class="clr-icon-title">View</span>
         </button>
-        <button class="btn" (click)="edit(gallery.id)" *ngIf="authenticationService.getRole() == role.ADMIN">
+        <button class="btn" (click)="edit(gallery.id)" *ngIf="authenticationService.getRole() === role.ADMIN">
           <clr-icon shape="cog"></clr-icon>
           <span class="clr-icon-title">Settings</span>
         </button>
-        <button class="btn" (click)="download(gallery.id)" *ngIf="gallery.totalImages > 0">
+        <button class="btn" (click)="download(gallery.id)" *ngIf="gallery.stats.countImages > 0">
           <clr-icon shape="download"></clr-icon>
           <span class="clr-icon-title">Download</span>
         </button>
@@ -99,6 +115,7 @@
     </clr-dg-pagination>
   </clr-dg-footer>
 </clr-datagrid>
+
 <form ngNativeValidate #downloadForm="ngForm">
   <clr-modal [(clrModalOpen)]="downloadingGallery" [clrModalClosable]="false">
     <h3 class="modal-title">Download gallery</h3>
@@ -109,30 +126,50 @@
           <div class="select">
             <select id="filter" name="filter" [(ngModel)]="filter">
               <option value="ALL">All</option>
-              <option value="LOCATED">Located</option>
-              <option value="UNLOCATED">Not Located</option>
-              <option value="UNLOCATED_WITH_POLYP">Not Located With Polyp</option>
+              <option value="WITH_POLYP_AND_LOCATION">Located</option>
+              <option value="WITH_POLYP_AND_WITHOUT_LOCATION">Not located</option>
             </select>
-          </div>
-          <div *ngIf="getNumberOfImagesAccordingToFilter() === 0" class="alert alert-danger not-margin-top">
-            The applied filter returns 0 images
           </div>
         </div>
         <div class="form-group">
-          <label>Add Polyp Location</label>
-          <clr-checkbox [(clrChecked)]="addPolypLocation" [clrDisabled]="filter.includes('not_located')">
+          <label>Draw polyp location</label>
+          <clr-checkbox [(clrChecked)]="addPolypLocation" [clrDisabled]="filter.includes('WITHOUT_LOCATION')">
           </clr-checkbox>
         </div>
+        <div class="alert alert-success" *ngIf="hasCurrentGalleryFilteredImages(); else noImages">
+          <div class="alert-items">
+            <div class="alert-item static">
+              <div class="alert-text">
+                <ng-template [ngIf]="countCurrentGalleryFilteredImages() === 1" [ngIfElse]="moreThanOne">
+                  One image was found that matches the filter.
+                </ng-template>
+                <ng-template #moreThanOne>
+                  {{countCurrentGalleryFilteredImages()}} images were found that match the filter.
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ng-template #noImages>
+          <div class="alert alert-danger">
+            <div class="alert-items">
+              <div class="alert-item static">
+                <div class="alert-text">
+                  No images were found that match the filter.
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
       </section>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel()">Cancel</button>
       <a type="button" class="btn btn-primary" id="download-zip" target="_blank" href=""
-         [class.disabled]="getNumberOfImagesAccordingToFilter() === 0"
-         [class.not-allowed]="getNumberOfImagesAccordingToFilter() === 0" (click)="downloadGallery()">
+         [class.disabled]="hasCurrentGalleryFilteredImages()"
+         [class.not-allowed]="hasCurrentGalleryFilteredImages()" (click)="downloadGallery()">
         Download
       </a>
     </div>
-
   </clr-modal>
 </form>

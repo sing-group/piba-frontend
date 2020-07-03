@@ -29,20 +29,9 @@ import {NotificationService} from '../../modules/notification/services/notificat
 import {Role} from '../../models/User';
 import {AuthenticationService} from '../../services/authentication.service';
 import {ImagesService} from '../../services/images.service';
-import {ImagesInGalleryInfo} from '../../services/entities/ImagesInGalleryInfo';
 import {environment} from '../../../environments/environment';
 import {ClrDatagridSortOrder} from '@clr/angular';
-import {forkJoin} from 'rxjs/internal/observable/forkJoin';
 import {ImageFilter} from '../../models/ImageFilter';
-
-class GallerySummary {
-  id: string;
-  title: string;
-  description: string;
-  imagesLocated: number;
-  totalImages: number;
-  locatedPercentage: number;
-}
 
 @Component({
   selector: 'app-galleries',
@@ -54,15 +43,10 @@ export class GalleriesComponent implements OnInit {
   editingGallery = false;
   downloadingGallery = false;
   gallery: Gallery = new Gallery();
-  loadingImagesInGalleryInfo = false;
   filter = ImageFilter.ALL;
   addPolypLocation = true;
 
-  restApi = environment.restApi;
-
-  imagesInGalleryInfoMap = new Map();
   _galleries: Gallery[] = [];
-  _galleriesData: GallerySummary[] = [];
   role = Role;
 
   readonly titleOrder: ClrDatagridSortOrder = ClrDatagridSortOrder.UNSORTED;
@@ -93,49 +77,9 @@ export class GalleriesComponent implements OnInit {
 
   set galleries(galleries: Gallery[]) {
     this._galleries = this.sortGalleries(galleries);
-    console.log(this._galleries);
-
-    const newGalleries = this._galleries
-      .filter(gallery => !this.imagesInGalleryInfoMap.has(gallery.id));
-
-    if (newGalleries.length > 0) {
-      this.loadingImagesInGalleryInfo = true;
-
-      forkJoin(newGalleries.map(gallery => this.imagesService.getImagesIdentifiersByGallery(gallery)))
-        .subscribe(imagesInGalleriesInfo => {
-          imagesInGalleriesInfo.forEach((imagesInGalleryInfo, index) => {
-            const gallery = newGalleries[index];
-            this.imagesInGalleryInfoMap.set(gallery.id, imagesInGalleryInfo);
-          });
-
-          this.updateGalleriesData();
-
-          this.loadingImagesInGalleryInfo = false;
-        });
-    }
-  }
-
-  get galleriesData(): GallerySummary[] {
-    return this._galleriesData;
-  }
-
-  private updateGalleriesData() {
-    this._galleriesData = this.galleries.map(gallery => {
-      const imagesInGalleryInfo = this.getImagesInGalleryInfo(gallery);
-
-      return ({
-        id: gallery.id,
-        title: gallery.title,
-        description: gallery.description,
-        imagesLocated: imagesInGalleryInfo !== undefined ? imagesInGalleryInfo.locatedImages : 0,
-        totalImages: imagesInGalleryInfo !== undefined ? imagesInGalleryInfo.totalItems : 0,
-        locatedPercentage: this.getPercentageOfLocatedPolyps(imagesInGalleryInfo)
-      });
-    });
   }
 
   private sortGalleries(galleries: Gallery[]): Gallery[] {
-    console.log(galleries);
     return galleries.sort((g1, g2) => {
       switch (this.titleOrder) {
         case ClrDatagridSortOrder.ASC:
@@ -161,7 +105,6 @@ export class GalleriesComponent implements OnInit {
     } else {
       this.galleriesService.editGallery(this.gallery).subscribe(updated => {
           Object.assign(this.galleries.find((gallery) => gallery.id === this.gallery.id), updated);
-          this.updateGalleriesData();
           this.notificationService.success('Gallery edited successfully.', 'Gallery edited.');
           this.cancel();
         }
@@ -181,62 +124,40 @@ export class GalleriesComponent implements OnInit {
     Object.assign(this.gallery, this.galleries.find((gallery) => gallery.id === id));
   }
 
-  getNumberOfImagesAccordingToFilter(): number {
-    let totalImages = 0;
-    const imagesInGalleryInfo = this.getImagesInGalleryInfo(this.gallery);
+  hasCurrentGalleryFilteredImages(): boolean {
+    return this.countCurrentGalleryFilteredImages() > 0;
+  }
 
-    if (imagesInGalleryInfo !== undefined) {
+  countCurrentGalleryFilteredImages(): number {
+    if (Boolean(this.gallery.stats)) {
       switch (this.filter) {
         case ImageFilter.ALL:
-          totalImages = imagesInGalleryInfo.totalItems;
-          break;
-        case ImageFilter.LOCATED:
-          totalImages = imagesInGalleryInfo.locatedImages;
-          break;
-        case ImageFilter.UNLOCATED:
-          totalImages = imagesInGalleryInfo.totalItems - imagesInGalleryInfo.locatedImages;
-          break;
-        case ImageFilter.UNLOCATED_WITH_POLYP:
-          totalImages = imagesInGalleryInfo.imagesWithPolyp - imagesInGalleryInfo.locatedImages;
-          break;
+          return this.gallery.stats.countImages;
+        case ImageFilter.WITH_POLYP_AND_LOCATION:
+          return this.gallery.stats.countImagesWithPolypAndLocation;
+        case ImageFilter.WITH_POLYP_AND_WITHOUT_LOCATION:
+          return this.gallery.stats.countImagesWithPolypAndWithoutLocation;
+      case ImageFilter.WITH_POLYP:
+        return 1;
+        default:
+          throw Error('Unsupported filter type: ' + this.filter);
       }
+    } else {
+      return 0;
     }
-
-    return totalImages;
   }
 
   downloadGallery() {
-    if (this.filter.includes('not_located')) {
+    if (this.filter.includes('WITHOUT_LOCATION')) {
       this.addPolypLocation = false;
     }
     const download = document.getElementById('download-zip') as HTMLAnchorElement;
-    if (this.getNumberOfImagesAccordingToFilter() > 0) {
-      download.href = `${this.restApi}/download/gallery/${this.gallery.id}?filter=${this.filter}&withLocation=${this.addPolypLocation}`;
+    if (this.countCurrentGalleryFilteredImages() > 0) {
+      download.href = `${environment.restApi}/download/gallery/${this.gallery.id}?filter=${this.filter}` +
+        `&withLocation=${this.addPolypLocation}`;
     }
 
     this.cancel();
-  }
-
-  getImagesInGalleryInfo(gallery: Gallery): ImagesInGalleryInfo {
-    if (this.imagesInGalleryInfoMap.has(gallery.id)) {
-      return this.imagesInGalleryInfoMap.get(gallery.id);
-    } else {
-      return {
-        totalItems: 0,
-        imagesWithPolyp: 0,
-        locatedImages: 0,
-        imagesId: []
-      };
-    }
-  }
-
-  getPercentageOfLocatedPolyps(imagesInGallery: ImagesInGalleryInfo): number {
-    if (imagesInGallery === undefined || imagesInGallery.imagesWithPolyp === 0) {
-      return 100;
-    } else {
-      return ((imagesInGallery.imagesWithPolyp + imagesInGallery.locatedImages - imagesInGallery.imagesWithPolyp)
-        / imagesInGallery.totalItems) * 100;
-    }
   }
 
   cancel() {
