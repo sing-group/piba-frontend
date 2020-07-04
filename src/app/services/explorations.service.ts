@@ -175,7 +175,7 @@ export class ExplorationsService {
       );
   }
 
-  getPolyps(uuidOrExploration: string | Exploration): Observable<Polyp[]> {
+  listPolyps(uuidOrExploration: string | Exploration): Observable<Polyp[]> {
     const uuid = typeof uuidOrExploration === 'string' ? uuidOrExploration : uuidOrExploration.id;
     return this.polypsService.getPolypsOfExploration(uuid);
   }

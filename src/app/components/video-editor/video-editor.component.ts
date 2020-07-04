@@ -51,6 +51,8 @@ import {VideoSnapshot} from '../video/VideoSnapshot';
 import {VideoComponent} from '../video/video.component';
 import {VideoIntervalHighlight} from '../video/VideoIntervalHighlight';
 import {DataUtils} from '../../utils/data.utils';
+import {forkJoin} from 'rxjs/internal/observable/forkJoin';
+import {concatMap, map} from 'rxjs/operators';
 
 @Pipe({
   name: 'dropdownFilter',
@@ -110,6 +112,8 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
 
   private snapshotTime: number;
 
+  loading: boolean;
+
   @ViewChild('canvas') private canvas: ElementRef<HTMLCanvasElement>;
   @ViewChild('videoComponent') private videoComponent: VideoComponent;
   @ViewChild('legendCheckboxContainer') private legendCheckboxContainer: ElementRef<HTMLDivElement>;
@@ -159,15 +163,57 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
+    this.loading = true;
 
-    this.videosService.getVideo(id)
+    forkJoin(
+      this.videosService.getVideo(id)
+        .pipe(
+          concatMap(video => forkJoin(
+            this.explorationsService.getExploration(video.exploration as string),
+            this.polypRecordingsService.listPolypRecordingsByVideo(video.id),
+            this.videoModificationsService.listVideoModifications(video.id),
+            this.explorationsService.listPolyps(video.exploration)
+          ).pipe(
+            map(explorationRecordingsVideosAndPolyps => {
+              video.exploration = explorationRecordingsVideosAndPolyps[0];
+              video.polypRecording = explorationRecordingsVideosAndPolyps[1];
+              video.modifications = explorationRecordingsVideosAndPolyps[2];
+
+              return {
+                video: video,
+                polyps: explorationRecordingsVideosAndPolyps[3].filter(polyp => !polyp.confirmed)
+              };
+            })
+          ))
+        ),
+      this.modifiersService.listModifiers(),
+      this.galleriesService.listGalleries()
+    ).subscribe(videoPolypsModifiersAndGalleries => {
+      this.video = videoPolypsModifiersAndGalleries[0].video;
+      this.polyps = videoPolypsModifiersAndGalleries[0].polyps;
+      this.modifiers = videoPolypsModifiersAndGalleries[1];
+      this.galleries = videoPolypsModifiersAndGalleries[2]
+        .sort((galleryA, galleryB) => galleryA.title > galleryB.title ? 1 : -1);
+
+      this.updatePolypRecordingZones();
+      this.updateVideoModificationZones();
+
+      this.loading = false;
+    });
+
+    /*this.videosService.getVideo(id)
       .subscribe(video => {
         this.video = video;
-        this.explorationsService.getPolyps(this.video.exploration)
+
+        this.explorationsService.getExploration(this.video.exploration as string)
+          .subscribe(exploration =>
+            this.video.exploration = exploration
+          );
+        this.explorationsService.listPolyps(this.video.exploration)
           .subscribe(polyps =>
             this.polyps = polyps.filter(polyp => !polyp.confirmed)
           );
-        this.polypRecordingsService.getPolypRecordingsByVideo(this.video.id).subscribe(polypRecordings => {
+        this.polypRecordingsService.listPolypRecordingsByVideo(this.video.id).subscribe(polypRecordings => {
           this.video.polypRecording = polypRecordings;
           this.updatePolypRecordingZones();
         });
@@ -178,11 +224,11 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
           });
       });
 
-    this.modifiersService.getModifiers().subscribe((modifiers) => this.modifiers = modifiers);
+    this.modifiersService.listModifiers().subscribe((modifiers) => this.modifiers = modifiers);
 
     this.galleriesService.listGalleries().subscribe(galleries => {
       this.galleries = galleries.sort((galleryA, galleryB) => galleryA.title > galleryB.title ? 1 : -1);
-    });
+    });*/
 
   }
 

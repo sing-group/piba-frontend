@@ -128,19 +128,19 @@ export class PolypRecordingsService {
       );
   }
 
-  getPolypRecordingsByVideo(videoId: string): Observable<PolypRecording[]> {
+  listPolypRecordingsByVideo(videoId: string): Observable<PolypRecording[]> {
     return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording/video/${videoId}`)
       .pipe(this.createFillMultiplePolypAndVideoOperator());
   }
 
-  getPolypRecordingsByPolyp(polypId: string): Observable<PolypRecording[]> {
+  listPolypRecordingsByPolyp(polypId: string): Observable<PolypRecording[]> {
     return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polyprecording/polyp/${polypId}`)
       .pipe(this.createFillMultiplePolypAndVideoOperator());
   }
 
   addRecordingsToPolyps(polyps: Polyp[]): Observable<Polyp[]> {
     return forkJoin(
-      polyps.map(polyp => this.getPolypRecordingsByPolyp(polyp.id))
+      polyps.map(polyp => this.listPolypRecordingsByPolyp(polyp.id))
     ).pipe(
       map(recordings => polyps.map((polyp, index) => {
         polyp.polypRecordings = recordings[index];

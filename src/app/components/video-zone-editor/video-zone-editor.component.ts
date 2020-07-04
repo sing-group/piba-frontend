@@ -42,7 +42,8 @@ export class VideoZoneEditorComponent implements DoCheck {
   @Input() elementName: string;
   @Input() elements: ElementInVideoZone[];
   @Input() videoZoneTypes: VideoZoneType[];
-  @Input() canBeCreated: boolean;
+  @Input() canEdit = true;
+  @Input() canCreateZoneTypes: boolean;
   @Input() isValidInterval: (interval: Interval) => boolean;
   @Input() getCurrentTimeStart: () => string;
   @Input() getCurrentTimeEnd: () => string;

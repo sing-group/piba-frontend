@@ -85,7 +85,7 @@ export class PolypComponent implements OnInit {
     this._exploration = exploration;
     this.polyps = this.exploration.polyps;
     this.polyps.map((polyp) => {
-      this.polypRecordingsService.getPolypRecordingsByPolyp(polyp.id)
+      this.polypRecordingsService.listPolypRecordingsByPolyp(polyp.id)
         .subscribe((polypRecordings) => polyp.polypRecordings = polypRecordings);
     });
   }
@@ -200,7 +200,7 @@ export class PolypComponent implements OnInit {
       );
     } else {
       this.polypsService.editPolyp(this.polyp).subscribe(updatedPolyp => {
-        this.polypRecordingsService.getPolypRecordingsByPolyp(updatedPolyp.id)
+        this.polypRecordingsService.listPolypRecordingsByPolyp(updatedPolyp.id)
           .subscribe((polypRecordings) => {
             updatedPolyp.polypRecordings = polypRecordings;
             Object.assign(this.exploration.polyps.find((polyp) => {

@@ -21,147 +21,149 @@
   ~  You should have received a copy of the GNU General Public License
   ~  along with this program. If not, see <http://www.gnu.org/licenses/>.
   -->
+<ng-template [ngIf]="!loading">
 
-<div class="row">
-  <button type="button" *ngIf="this.video !== undefined" class="btn-back btn btn-primary"
-          routerLink="/explorations/{{this.video.exploration}}">
-    Back
-  </button>
-</div>
-
-<div class="row video-container" *ngIf="hasVideo()">
-  <app-video #videoComponent [video]="video" [highlightZones]="highlightZones" (time)="onTimeUpdate($event)"
-             (snapshot)="onSnapshot($event)"></app-video>
-</div>
-
-<div #legendCheckboxContainer class="clr-row video-container col-xs-12">
-  <div class="clr-row legends-container">
-    <div class="square polyp-square"></div>
-    <label>Polyp</label>
-    <div class="square modification-square"></div>
-    <label>Modification</label>
-    <div class="square polyp-modification-square"></div>
-    <label>Polyp-Modification</label>
-  </div>
-  <div class="clr-row checkboxes-container">
-    <clr-checkbox [(clrChecked)]="showPolyp">
-      Show polyps
-    </clr-checkbox>
-    <clr-checkbox [(clrChecked)]="showModification">
-      Show modifications
-    </clr-checkbox>
-  </div>
-</div>
-
-<clr-tabs *ngIf="hasVideo()">
-  <clr-tab>
-    <button clrTabLink id="Polyps">Polyps</button>
-    <clr-tab-content *clrIfActive="true">
-
-      <div class="tab-container">
-        <app-video-zone-editor [elementName]="'Polyp'" [canBeCreated]="true"
-                               [elements]="polypRecordingZones" [videoZoneTypes]="polyps"
-                               [isValidInterval]="isValidInterval.bind(this)"
-                               [getCurrentTimeStart]="stopAtSecondStart.bind(this)"
-                               [getCurrentTimeEnd]="stopAtSecondEnd.bind(this)"
-                               (playInterval)="playInterval($event)" (addZoneType)="onAddPolyp($event)"
-                               (createElement)="onAddPolypRecording($event)"
-                               (removeElement)="onRemovePolypRecording($event)"
-                               (confirmElement)="onConfirmPolypRecording($event)"
-                               (confirmAllElements)="onConfirmAllPolypRecordings()"
-                                ></app-video-zone-editor>
-      </div>
-
-    </clr-tab-content>
-  </clr-tab>
-  <clr-tab>
-    <button clrTabLink>Modifications</button>
-    <clr-tab-content *clrIfActive>
-
-      <div class="tab-container">
-        <app-video-zone-editor [elementName]="'Modifier'" [canBeCreated]="false"
-                               [elements]="videoModificationZones" [videoZoneTypes]="modifiers"
-                               [isValidInterval]="isValidInterval.bind(this)"
-                               [getCurrentTimeStart]="stopAtSecondStart.bind(this)"
-                               [getCurrentTimeEnd]="stopAtSecondEnd.bind(this)"
-                               (playInterval)="playInterval($event)"
-                               (createElement)="onAddVideoModification($event)"
-                               (removeElement)="onRemoveVideoModification($event)"
-                               (confirmElement)="onConfirmVideoModification($event)"
-                               (confirmAllElements)="onConfirmAllVideoModifications()"
-        ></app-video-zone-editor>
-      </div>
-
-    </clr-tab-content>
-  </clr-tab>
-</clr-tabs>
-
-<!-- Snapshot modal -->
-<clr-modal [(clrModalOpen)]="openSnapshotModal" [clrModalClosable]="false">
-  <h3 class="modal-title">Save snapshot</h3>
-  <div class="modal-body">
-    <div>
-      <canvas #canvas id="canvas" class="snapshot-canvas"></canvas>
-    </div>
-
-    <div *ngIf="isEndoscopist()" class="margin-top-gallery clr-row">
-      <label for="snapshot-form-gallery" class="col-xs-3">Gallery <span
-        class="required-gallery">*</span></label>
-      <clr-dropdown class="col-xs-9 col-sm-6">
-        <input type="text" clrDropdownTrigger id="snapshot-form-gallery" [(ngModel)]="galleryInputModel"
-               name="galleryInput" autocomplete="off"
-               #galleryValue="ngModel" placeholder="Search gallery"/>
-        <clr-dropdown-menu *clrIfOpen class="clr-dropdown">
-          <button *ngIf="(galleries | dropdownFilter:galleryInputModel)?.length === 0" type="button" class="btn"
-                  disabled>No matches found
-          </button>
-          <div *ngFor="let gallery of galleries | dropdownFilter:galleryInputModel">
-            <button type="button" clrDropdownItem (click)="selectGallery(gallery)">{{gallery.title}}
-            </button>
-          </div>
-        </clr-dropdown-menu>
-      </clr-dropdown>
-    </div>
-
-    <div *ngIf="isEndoscopist()" class="clr-row">
-      <label for="snapshot-form-polyp" class="col-xs-3 margin-top-polyp">Polyp</label>
-      <clr-dropdown class="col-xs-9 col-sm-6 margin-top-polyp">
-        <input type="text" clrDropdownTrigger id="snapshot-form-polyp" [(ngModel)]="snapshotPolypInputModel"
-               name="polypInput"
-               autocomplete="off" #polypValue="ngModel" placeholder="Search polyp"/>
-        <clr-dropdown-menu *clrIfOpen class="clr-dropdown">
-          <button *ngIf="(getPolypsForSnapshot() | dropdownFilter:snapshotPolypInputModel)?.length === 0" type="button" class="btn"
-                  disabled>No matches found
-          </button>
-          <div *ngFor="let polyp of getPolypsForSnapshot() | dropdownFilter:snapshotPolypInputModel">
-            <button type="button" clrDropdownItem (click)="selectPolypForSnapshot(polyp)">{{polyp.name}}
-            </button>
-          </div>
-        </clr-dropdown-menu>
-      </clr-dropdown>
-      <div *ngIf="showPolypCheckbox" class="col-xs-12 col-sm-3 clr-align-self-end polyp-checkbox">
-        <clr-checkbox [(clrChecked)]="showPolypsInFrame">
-          Polyps in frame
-        </clr-checkbox>
-      </div>
-    </div>
-
-    <div *ngIf="isEndoscopist()" class="clr-row">
-      <label for="snapshot-form-observation" class="col-xs-3">Observation</label>
-      <textarea class="col-xs-9 margin-textarea" type="text" id="snapshot-form-observation" name="observation"
-                [(ngModel)]="imageObservation"></textarea>
-    </div>
-  </div>
-
-  <div class="modal-footer">
-    <button type="button" class="btn btn-danger-outline" (click)="discardSnapshot()">Discard snapshot
+  <div class="row">
+    <button type="button" *ngIf="this.video !== undefined" class="btn-back btn btn-primary"
+            routerLink="/explorations/{{this.video.exploration.id}}">
+      Back
     </button>
-    <button *ngIf="isEndoscopist()" type="button" class="btn btn-success-outline"
-            (click)="saveSnapshot()" [disabled]="doesGalleryNotExists() || !isPolypCorrect()">
-      Save to gallery
-    </button>
-    <a #downloadImageButton class="btn btn-info-outline" href="#"
-       (click)="downloadSnapshot()" download="{{snapshotFileName}}">Download</a>
   </div>
-</clr-modal>
 
+  <div class="row video-container" *ngIf="hasVideo()">
+    <app-video #videoComponent [video]="video" [highlightZones]="highlightZones" (time)="onTimeUpdate($event)"
+               (snapshot)="onSnapshot($event)"></app-video>
+  </div>
+
+  <div #legendCheckboxContainer class="clr-row video-container col-xs-12">
+    <div class="clr-row legends-container">
+      <div class="square polyp-square"></div>
+      <label>Polyp</label>
+      <div class="square modification-square"></div>
+      <label>Modification</label>
+      <div class="square polyp-modification-square"></div>
+      <label>Polyp-Modification</label>
+    </div>
+    <div class="clr-row checkboxes-container">
+      <clr-checkbox [(clrChecked)]="showPolyp">
+        Show polyps
+      </clr-checkbox>
+      <clr-checkbox [(clrChecked)]="showModification">
+        Show modifications
+      </clr-checkbox>
+    </div>
+  </div>
+
+  <clr-tabs *ngIf="hasVideo()">
+    <clr-tab>
+      <button clrTabLink id="Polyps">Polyps</button>
+      <clr-tab-content *clrIfActive="true">
+
+        <div class="tab-container">
+          <app-video-zone-editor [elementName]="'Polyp'" [canEdit]="!video.exploration.confirmed" [canCreateZoneTypes]="true"
+                                 [elements]="polypRecordingZones" [videoZoneTypes]="polyps"
+                                 [isValidInterval]="isValidInterval.bind(this)"
+                                 [getCurrentTimeStart]="stopAtSecondStart.bind(this)"
+                                 [getCurrentTimeEnd]="stopAtSecondEnd.bind(this)"
+                                 (playInterval)="playInterval($event)" (addZoneType)="onAddPolyp($event)"
+                                 (createElement)="onAddPolypRecording($event)"
+                                 (removeElement)="onRemovePolypRecording($event)"
+                                 (confirmElement)="onConfirmPolypRecording($event)"
+                                 (confirmAllElements)="onConfirmAllPolypRecordings()"
+                                  ></app-video-zone-editor>
+        </div>
+
+      </clr-tab-content>
+    </clr-tab>
+    <clr-tab>
+      <button clrTabLink>Modifications</button>
+      <clr-tab-content *clrIfActive>
+
+        <div class="tab-container">
+          <app-video-zone-editor [elementName]="'Modifier'" [canEdit]="!video.exploration.confirmed" [canCreateZoneTypes]="false"
+                                 [elements]="videoModificationZones" [videoZoneTypes]="modifiers"
+                                 [isValidInterval]="isValidInterval.bind(this)"
+                                 [getCurrentTimeStart]="stopAtSecondStart.bind(this)"
+                                 [getCurrentTimeEnd]="stopAtSecondEnd.bind(this)"
+                                 (playInterval)="playInterval($event)"
+                                 (createElement)="onAddVideoModification($event)"
+                                 (removeElement)="onRemoveVideoModification($event)"
+                                 (confirmElement)="onConfirmVideoModification($event)"
+                                 (confirmAllElements)="onConfirmAllVideoModifications()"
+          ></app-video-zone-editor>
+        </div>
+
+      </clr-tab-content>
+    </clr-tab>
+  </clr-tabs>
+
+  <!-- Snapshot modal -->
+  <clr-modal [(clrModalOpen)]="openSnapshotModal" [clrModalClosable]="false">
+    <h3 class="modal-title">Save snapshot</h3>
+    <div class="modal-body">
+      <div>
+        <canvas #canvas id="canvas" class="snapshot-canvas"></canvas>
+      </div>
+
+      <div *ngIf="isEndoscopist()" class="margin-top-gallery clr-row">
+        <label for="snapshot-form-gallery" class="col-xs-3">Gallery <span
+          class="required-gallery">*</span></label>
+        <clr-dropdown class="col-xs-9 col-sm-6">
+          <input type="text" clrDropdownTrigger id="snapshot-form-gallery" [(ngModel)]="galleryInputModel"
+                 name="galleryInput" autocomplete="off"
+                 #galleryValue="ngModel" placeholder="Search gallery"/>
+          <clr-dropdown-menu *clrIfOpen class="clr-dropdown">
+            <button *ngIf="(galleries | dropdownFilter:galleryInputModel)?.length === 0" type="button" class="btn"
+                    disabled>No matches found
+            </button>
+            <div *ngFor="let gallery of galleries | dropdownFilter:galleryInputModel">
+              <button type="button" clrDropdownItem (click)="selectGallery(gallery)">{{gallery.title}}
+              </button>
+            </div>
+          </clr-dropdown-menu>
+        </clr-dropdown>
+      </div>
+
+      <div *ngIf="isEndoscopist()" class="clr-row">
+        <label for="snapshot-form-polyp" class="col-xs-3 margin-top-polyp">Polyp</label>
+        <clr-dropdown class="col-xs-9 col-sm-6 margin-top-polyp">
+          <input type="text" clrDropdownTrigger id="snapshot-form-polyp" [(ngModel)]="snapshotPolypInputModel"
+                 name="polypInput"
+                 autocomplete="off" #polypValue="ngModel" placeholder="Search polyp"/>
+          <clr-dropdown-menu *clrIfOpen class="clr-dropdown">
+            <button *ngIf="(getPolypsForSnapshot() | dropdownFilter:snapshotPolypInputModel)?.length === 0" type="button" class="btn"
+                    disabled>No matches found
+            </button>
+            <div *ngFor="let polyp of getPolypsForSnapshot() | dropdownFilter:snapshotPolypInputModel">
+              <button type="button" clrDropdownItem (click)="selectPolypForSnapshot(polyp)">{{polyp.name}}
+              </button>
+            </div>
+          </clr-dropdown-menu>
+        </clr-dropdown>
+        <div *ngIf="showPolypCheckbox" class="col-xs-12 col-sm-3 clr-align-self-end polyp-checkbox">
+          <clr-checkbox [(clrChecked)]="showPolypsInFrame">
+            Polyps in frame
+          </clr-checkbox>
+        </div>
+      </div>
+
+      <div *ngIf="isEndoscopist()" class="clr-row">
+        <label for="snapshot-form-observation" class="col-xs-3">Observation</label>
+        <textarea class="col-xs-9 margin-textarea" type="text" id="snapshot-form-observation" name="observation"
+                  [(ngModel)]="imageObservation"></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-danger-outline" (click)="discardSnapshot()">Discard snapshot
+      </button>
+      <button *ngIf="isEndoscopist()" type="button" class="btn btn-success-outline"
+              (click)="saveSnapshot()" [disabled]="doesGalleryNotExists() || !isPolypCorrect()">
+        Save to gallery
+      </button>
+      <a #downloadImageButton class="btn btn-info-outline" href="#"
+         (click)="downloadSnapshot()" download="{{snapshotFileName}}">Download</a>
+    </div>
+  </clr-modal>
+
+</ng-template>

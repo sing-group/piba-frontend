@@ -92,7 +92,7 @@
                     Your browser does not support the video tag.
                   </video>
                   <div *ngIf="video.isProcessing">
-                    <img *ngIf="video.isProcessing" src="assets/images/loading.gif"> Video is being processed
+                    <img *ngIf="video.isProcessing" src="assets/images/loading.gif" alt="Loading video"> Video is being processed
                   </div>
                 </clr-dg-cell>
                 <clr-dg-cell class="not-scroll">
@@ -143,9 +143,9 @@
                         Save information
                       </button>
                       <button type="button" class="btn btn-secondary" routerLink="/video/{{video.id}}"
-                              [disabled]="video.isProcessing || isExplorationConfirmed()">
+                              [disabled]="video.isProcessing">
                         <clr-icon shape="video-gallery"></clr-icon>
-                        Edit video
+                        {{isExplorationConfirmed() ? 'View video' : 'Edit video'}}
                       </button>
                       <button type="button" class="btn btn-secondary" (click)="selectedVideoToRemove(video.id)"
                               [disabled]="video.isProcessing || isExplorationConfirmed() || hasConfirmedElements(video)">

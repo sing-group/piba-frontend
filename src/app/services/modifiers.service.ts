@@ -35,54 +35,54 @@ import {ModifierInfo} from './entities/ModifierInfo';
 })
 export class ModifiersService {
 
-  constructor(private http: HttpClient) {
-  }
-
-  getModifiers(): Observable<Modifier[]> {
-    return this.http.get<ModifierInfo[]>(`${environment.restApi}/modifier/`)
-      .pipe(
-        map(modifiers => modifiers.map(this.mapModifierInfo.bind(this)))
-      );
-  }
-
-  getModifier(id: string): Observable<Modifier> {
-    return this.http.get<ModifierInfo>(`${environment.restApi}/modifier/${id}`)
-      .pipe(
-        map(this.mapModifierInfo)
-      );
-  }
-
-  createModifier(modifier: Modifier): Observable<Modifier> {
-    const modifierInfo = this.toModifierInfo(modifier);
-    return this.http.post<ModifierInfo>(`${environment.restApi}/modifier`, modifierInfo)
-      .pipe(
-        map(this.mapModifierInfo.bind(this))
-      );
-  }
-
-  editModifier(modifier: Modifier): Observable<Modifier> {
-    const modifierInfo = this.toModifierInfo(modifier);
-    return this.http.put<ModifierInfo>(`${environment.restApi}/modifier/${modifierInfo.id}`, modifierInfo)
-      .pipe(
-        map(this.mapModifierInfo.bind(this))
-      );
-  }
-
-  deleteModifier(id: string) {
-    return this.http.delete(`${environment.restApi}/modifier/${id}`);
-  }
-
-  private mapModifierInfo(modifierInfo: ModifierInfo): Modifier {
+  private static mapModifierInfo(modifierInfo: ModifierInfo): Modifier {
     return {
       id: modifierInfo.id,
       name: modifierInfo.name
     };
   }
 
-  private toModifierInfo(modifier: Modifier): ModifierInfo {
+  private static toModifierInfo(modifier: Modifier): ModifierInfo {
     return {
       id: modifier.id,
       name: modifier.name
     };
+  }
+
+  constructor(private http: HttpClient) {
+  }
+
+  listModifiers(): Observable<Modifier[]> {
+    return this.http.get<ModifierInfo[]>(`${environment.restApi}/modifier/`)
+      .pipe(
+        map(modifiers => modifiers.map(ModifiersService.mapModifierInfo))
+      );
+  }
+
+  getModifier(id: string): Observable<Modifier> {
+    return this.http.get<ModifierInfo>(`${environment.restApi}/modifier/${id}`)
+      .pipe(
+        map(ModifiersService.mapModifierInfo)
+      );
+  }
+
+  createModifier(modifier: Modifier): Observable<Modifier> {
+    const modifierInfo = ModifiersService.toModifierInfo(modifier);
+    return this.http.post<ModifierInfo>(`${environment.restApi}/modifier`, modifierInfo)
+      .pipe(
+        map(ModifiersService.mapModifierInfo)
+      );
+  }
+
+  editModifier(modifier: Modifier): Observable<Modifier> {
+    const modifierInfo = ModifiersService.toModifierInfo(modifier);
+    return this.http.put<ModifierInfo>(`${environment.restApi}/modifier/${modifierInfo.id}`, modifierInfo)
+      .pipe(
+        map(ModifiersService.mapModifierInfo)
+      );
+  }
+
+  deleteModifier(id: string) {
+    return this.http.delete(`${environment.restApi}/modifier/${id}`);
   }
 }

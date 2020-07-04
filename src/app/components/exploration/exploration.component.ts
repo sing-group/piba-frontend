@@ -117,7 +117,7 @@ export class ExplorationComponent implements OnInit, OnDestroy {
           video.modifications = modifications;
           this.videoClones.find(clone => clone.id === video.id).modifications = modifications.map(m => ({...m}));
         });
-        this.polypRecordingsService.getPolypRecordingsByVideo(video.id).subscribe(polypRecordings => {
+        this.polypRecordingsService.listPolypRecordingsByVideo(video.id).subscribe(polypRecordings => {
           video.polypRecording = polypRecordings;
           this.videoClones.find(clone => clone.id === video.id).polypRecording = polypRecordings.map(pr => ({...pr}));
         });

@@ -42,7 +42,7 @@ export class ModifiersComponent implements OnInit {
   modifiers: Modifier[] = [];
 
   constructor(private modifiersService: ModifiersService, private notificationService: NotificationService) {
-    this.modifiersService.getModifiers().subscribe((modifiers) => this.modifiers = modifiers);
+    this.modifiersService.listModifiers().subscribe((modifiers) => this.modifiers = modifiers);
   }
 
   ngOnInit() {

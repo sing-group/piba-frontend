@@ -21,8 +21,7 @@
   ~  You should have received a copy of the GNU General Public License
   ~  along with this program. If not, see <http://www.gnu.org/licenses/>.
   -->
-
-<form #elementRecordingForm="ngForm" ngNativeValidate>
+<form #elementRecordingForm="ngForm" ngNativeValidate *ngIf="canEdit">
 
   <div class="form-group row">
     <div class="col-lg-2 col-md-4 col-sm-5 col-xs-5">
@@ -36,7 +35,7 @@
         </select>
       </div>
     </div>
-    <div class="col-lg-2 col-md-2 col-sm-1 col-xs-2" *ngIf="canBeCreated">
+    <div class="col-lg-2 col-md-2 col-sm-1 col-xs-2" *ngIf="canCreateZoneTypes">
       <button type="button" class="btn btn-icon" title="Add {{elementName}}" (click)="onShowCreationDialog()">
         <clr-icon shape="plus"></clr-icon>
       </button>
@@ -80,11 +79,13 @@
     Add
   </button>
 </form>
-<button *ngIf="isEndoscopist()" class="btn btn-primary margin-confirm-button" (click)="onShowConfirmElementsDialog()"
+
+<button *ngIf="isEndoscopist() && canEdit" class="btn btn-primary margin-confirm-button" (click)="onShowConfirmElementsDialog()"
         [disabled]="areAllElementsConfirmed()">
   <clr-icon shape="check"></clr-icon>
   Confirm all {{elementName}} recordings
 </button>
+
 <div class="elementrecordings-container">
   <clr-datagrid>
     <clr-dg-column clrDgField="element.name">{{elementName}}</clr-dg-column>
