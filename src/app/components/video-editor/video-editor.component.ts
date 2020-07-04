@@ -84,8 +84,8 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
   start: string;
   end: string;
 
-  showPolyp = true;
-  showModification = true;
+  showPolyps = true;
+  showModifications = true;
 
   polyps: Polyp[] = [];
   modifiers: Modifier[] = [];
@@ -236,7 +236,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
     const highlightZones: VideoIntervalHighlight[] = [];
 
     if (this.hasVideo()) {
-      if (this.showPolyp) {
+      if (this.showPolyps) {
         this.video.polypRecording.map(polypRecording => ({
           color: VideoEditorComponent.POLYP_COLOR,
           interval: {
@@ -246,7 +246,7 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
         })).forEach(zone => highlightZones.push(zone));
       }
 
-      if (this.showModification) {
+      if (this.showModifications) {
         this.video.modifications.map(modification => ({
           color: VideoEditorComponent.MODIFICATION_COLOR,
           interval: {

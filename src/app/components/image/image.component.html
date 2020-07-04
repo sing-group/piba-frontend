@@ -56,9 +56,10 @@
   </div>
 
   <div class="clr-row clr-justify-content-end polyp-checkbox" id="show-location-checkbox">
-    <clr-checkbox [(clrChecked)]="showPolypLocation">
-      Show polyp location
-    </clr-checkbox>
+    <div class="toggle-switch">
+      <input id="showPolypLocation" type="checkbox" [(ngModel)]="showPolypLocation">
+      <label for="showPolypLocation">Show polyp location</label>
+    </div>
   </div>
   <div *ngIf="isEndoscopist()" class="clr-row clr-justify-content-center">
     <button *ngIf="hasPolyp()" class="btn btn-success" (click)="onSave()" [disabled]="!canSaveLocation()">

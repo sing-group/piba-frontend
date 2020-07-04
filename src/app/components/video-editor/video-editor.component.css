@@ -52,6 +52,10 @@
   margin-top: 2%;
 }
 
+.margin-top-show-polyp {
+  margin-top: 2%;
+}
+
 .margin-textarea {
   max-width: 70.3%;
   margin-left: 2.3%;
@@ -149,5 +153,9 @@ clr-dropdown > input {
 .checkboxes-container {
   min-width: 11.5rem;
   justify-content: space-between;
+}
+
+.toggle-switch {
+  margin-right: 0;
 }
 

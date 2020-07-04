@@ -45,12 +45,14 @@
       <label>Polyp-Modification</label>
     </div>
     <div class="clr-row checkboxes-container">
-      <clr-checkbox [(clrChecked)]="showPolyp">
-        Show polyps
-      </clr-checkbox>
-      <clr-checkbox [(clrChecked)]="showModification">
-        Show modifications
-      </clr-checkbox>
+      <div class="toggle-switch">
+        <input id="showPolyps" type="checkbox" [(ngModel)]="showPolyps">
+        <label for="showPolyps">Show polyps</label>
+      </div>
+      <div class="toggle-switch">
+        <input id="showModifications" type="checkbox" [(ngModel)]="showModifications">
+        <label for="showModifications">Show modifications</label>
+      </div>
     </div>
   </div>
 
@@ -108,7 +110,7 @@
       <div *ngIf="isEndoscopist()" class="margin-top-gallery clr-row">
         <label for="snapshot-form-gallery" class="col-xs-3">Gallery <span
           class="required-gallery">*</span></label>
-        <clr-dropdown class="col-xs-9 col-sm-6">
+        <clr-dropdown class="col-xs-9">
           <input type="text" clrDropdownTrigger id="snapshot-form-gallery" [(ngModel)]="galleryInputModel"
                  name="galleryInput" autocomplete="off"
                  #galleryValue="ngModel" placeholder="Search gallery"/>
@@ -126,7 +128,7 @@
 
       <div *ngIf="isEndoscopist()" class="clr-row">
         <label for="snapshot-form-polyp" class="col-xs-3 margin-top-polyp">Polyp</label>
-        <clr-dropdown class="col-xs-9 col-sm-6 margin-top-polyp">
+        <clr-dropdown class="col-xs-9 margin-top-polyp">
           <input type="text" clrDropdownTrigger id="snapshot-form-polyp" [(ngModel)]="snapshotPolypInputModel"
                  name="polypInput"
                  autocomplete="off" #polypValue="ngModel" placeholder="Search polyp"/>
@@ -140,10 +142,14 @@
             </div>
           </clr-dropdown-menu>
         </clr-dropdown>
-        <div *ngIf="showPolypCheckbox" class="col-xs-12 col-sm-3 clr-align-self-end polyp-checkbox">
-          <clr-checkbox [(clrChecked)]="showPolypsInFrame">
-            Polyps in frame
-          </clr-checkbox>
+      </div>
+
+      <div *ngIf="isEndoscopist() && showPolypCheckbox" class="clr-row">
+        <div class="col-xs-12 margin-top-show-polyp">
+          <div class="toggle-switch">
+            <input id="showPolypsInFrame" type="checkbox" [(ngModel)]="showPolypsInFrame">
+            <label for="showPolypsInFrame">Show polyp in frame</label>
+          </div>
         </div>
       </div>
 
