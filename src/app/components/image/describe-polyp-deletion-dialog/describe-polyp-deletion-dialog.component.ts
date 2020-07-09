@@ -1,5 +1,34 @@
+/*
+ *  PIBA Frontend
+ *
+ * Copyright (C) 2018-2020 - Miguel Reboiro-Jato,
+ * Daniel Glez-Peña, Alba Nogueira Rodríguez, Florentino Fdez-Riverola,
+ * Rubén Domínguez Carbajales, Jesús Miguel Herrero Rivas,
+ * Eloy Sánchez Hernández, Laura Rivas Moral,
+ * Manuel Puga Jiménez de Azcárate, Joaquín Cubiella Fernández,
+ * Hugo López-Fernández, Silvia Rodríguez Iglesias, Fernando Campos Tato.
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ImagesService} from '../../../services/images.service';
+
+class DeletionReason {
+  public readonly label: string;
+  public readonly reason: string;
+}
 
 @Component({
   selector: 'app-describe-polyp-deletion-dialog',
@@ -14,11 +43,10 @@ export class DescribePolypDeletionDialogComponent {
 
   readonly predefinedReasons = ['Not dataset', 'Bad quality', 'Others'];
   selectedPredefinedReason = '';
+  newReason: string | DeletionReason = '';
+  suggestedReasons: DeletionReason[] = [];
 
-  newReasonPrefix = '';
-
-  newReason?: string;
-  suggestedReasons: string[] = [];
+  loadingSuggestedReasons = false;
 
   constructor(
     private readonly imagesService: ImagesService
@@ -46,41 +74,44 @@ export class DescribePolypDeletionDialogComponent {
     return this.suggestedReasons.length > 0;
   }
 
-  onFindSuggestedReasons(event: KeyboardEvent) {
-    this.newReason = null;
-    this.suggestedReasons = [];
-
-    if (event.key === 'Enter') {
-      this.newReason = this.newReasonPrefix;
-    } else if (Boolean(this.newReasonPrefix) && this.newReasonPrefix.length >= 3) {
-      this.imagesService.searchObservations(this.newReasonPrefix)
-        .subscribe(suggestedReasons => {
-          this.suggestedReasons = suggestedReasons
-            .filter(reason => !this.predefinedReasons.includes(reason));
-
-          if (this.suggestedReasons.length === 0) {
-            this.newReason = this.newReasonPrefix;
-          }
-        });
-    }
-  }
-
-  onSelectSuggestedReason(reason: string) {
-    this.newReason = reason;
-    this.newReasonPrefix = reason;
-  }
-
   onCancelDeletion() {
-    this.open = false;
-    this.close.emit(null);
+    this.clearAndClose(null);
   }
 
   onConfirmDeletion() {
-    this.open = false;
+    let reason: string;
     if (this.isOthersSelected()) {
-      this.close.emit(this.newReason);
+      if (typeof this.newReason === 'string') {
+        reason = this.newReason;
+      } else {
+        reason = this.newReason.reason;
+      }
     } else {
-      this.close.emit(this.selectedPredefinedReason);
+      reason = this.selectedPredefinedReason;
     }
+
+    this.clearAndClose(reason);
+  }
+
+  private clearAndClose(reason: string): void {
+    this.newReason = '';
+    this.selectedPredefinedReason = '';
+    this.suggestedReasons = [];
+    this.open = false;
+    console.log(reason);
+    this.close.emit(reason);
+  }
+
+  onSuggestedReasonChanged(suggestedReason: string) {
+    this.loadingSuggestedReasons = true;
+    this.imagesService.searchObservations(suggestedReason)
+      .subscribe(
+        suggestedReasons => this.suggestedReasons = suggestedReasons.map(reason => ({
+          label: reason,
+          reason: reason
+        })),
+        undefined,
+        () => this.loadingSuggestedReasons = false
+      );
   }
 }

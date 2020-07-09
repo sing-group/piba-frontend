@@ -86,6 +86,7 @@ import {
 import { PolypInfoComponent } from './components/polyp-info/polyp-info.component';
 import { EditPolypDatasetDialogComponent } from './components/edit-polyp-dataset-dialog/edit-polyp-dataset-dialog.component';
 import {MarkdownModule} from 'ngx-markdown';
+import {AutocompleteLibModule} from 'angular-ng-autocomplete';
 
 @NgModule({
     declarations: [
@@ -138,7 +139,8 @@ import {MarkdownModule} from 'ngx-markdown';
       preventDuplicates: true
     }),
     NotificationModule.forRoot(),
-    MarkdownModule.forRoot()
+    MarkdownModule.forRoot(),
+    AutocompleteLibModule
   ],
   providers: [
     PolypsService,

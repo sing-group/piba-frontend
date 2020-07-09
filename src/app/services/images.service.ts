@@ -167,6 +167,7 @@ export class ImagesService {
   }
 
   delete(id: string, observationsToRemove: string): Observable<any> {
+    console.log(observationsToRemove);
     const httpOptions = {
       headers: new HttpHeaders({'X-ReasonToRemove': observationsToRemove})
     };
@@ -256,11 +257,16 @@ export class ImagesService {
       );
   }
 
-  searchObservations(observationToRemoveStartsWith: string): Observable<string[]> {
-    let params = new HttpParams();
-    params = params.append('observationStartsWith', observationToRemoveStartsWith);
+  searchObservations(observationToRemoveStartsWith?: string): Observable<string[]> {
+    let options: {params?: HttpParams};
+    if (Boolean(observationToRemoveStartsWith)) {
+      options = {
+        params: new HttpParams()
+          .append('observationStartsWith', observationToRemoveStartsWith)
+      };
+    }
 
-    return this.http.get<string[]>(`${environment.restApi}/image/observations`, {params});
+    return this.http.get<string[]>(`${environment.restApi}/image/observations`, options);
   }
 
   private videoAndImagesContentsAndGalleryAndOptionalLocation(
