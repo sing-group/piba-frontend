@@ -74,7 +74,7 @@ export class VideoZoneEditorComponent implements DoCheck {
   end: string;
 
   constructor(
-    private timeToNumber: TimeToNumberPipe,
+    private readonly timeToNumber: TimeToNumberPipe,
     private readonly authenticationService: AuthenticationService
   ) {
   }

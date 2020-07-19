@@ -39,7 +39,7 @@ export class DeleteConfirmationComponent implements OnInit {
   @Input() modelName: string;
   @Input() message: string;
 
-  @Input() open = false;
+  private _open = false;
   @Output() openChange = new EventEmitter<boolean>();
 
   @Output() confirm = new EventEmitter<string>();
@@ -50,6 +50,18 @@ export class DeleteConfirmationComponent implements OnInit {
       this.message = `Are you sure you want to delete <strong>${this.name}</strong>?` +
         '<div class="warning">This action is permanent and cannot be undone.</div>';
     }
+  }
+
+  @Input()
+  public set open(open: boolean) {
+    if (this._open !== open) {
+      this._open = open;
+      this.openChange.emit(this._open);
+    }
+  }
+
+  public get open(): boolean {
+    return this._open;
   }
 
   onConfirm(): void {
