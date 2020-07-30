@@ -433,8 +433,9 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
   onAddPolyp(newPolypName: string) {
     const newPolyp = new Polyp();
     newPolyp.name = newPolypName;
+    newPolyp.exploration = this.video.exploration;
 
-    this.explorationsService.addPolypToExploration(newPolyp, this.video.exploration as string)
+    this.polypsService.createPolyp(newPolyp)
       .subscribe(polyp => {
         this.polyps.push(polyp);
         this.notificationService.success('Polyp registered successfully.', 'Polyp registered.');

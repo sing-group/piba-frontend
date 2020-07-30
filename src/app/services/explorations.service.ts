@@ -30,7 +30,7 @@ import {Video} from '../models/Video';
 import {Polyp} from '../models/Polyp';
 import {ExplorationInfo} from './entities/ExplorationInfo';
 import {environment} from '../../environments/environment';
-import {concatMap, flatMap, map} from 'rxjs/operators';
+import {concatMap, map} from 'rxjs/operators';
 import {VideosService} from './videos.service';
 import {PolypsService} from './polyps.service';
 import {PatientsService} from './patients.service';
@@ -162,16 +162,6 @@ export class ExplorationsService {
     return this.http.put<ExplorationInfo>(`${environment.restApi}/exploration/${explorationInfo.id}`, explorationInfo)
       .pipe(
         map(this.mapOnlyExplorationInfo.bind(this))
-      );
-  }
-
-  addPolypToExploration(newPolyp: Polyp, explorationUuid: string): Observable<Polyp> {
-    return this.getExploration(explorationUuid)
-      .pipe(
-        flatMap(exploration => {
-          newPolyp.exploration = exploration;
-          return this.polypsService.createPolyp(newPolyp);
-        })
       );
   }
 
