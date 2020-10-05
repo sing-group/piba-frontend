@@ -141,11 +141,6 @@ export class PolypRecordingInDatasetComponent implements OnInit {
     const imagesSortDirection = SortDirection[this.route.snapshot.queryParamMap.get('imagesSort')];
     this.imagesSort = Boolean(imagesSortDirection) ? { images: imagesSortDirection } : undefined;
 
-    this.datasetsService.listAllPolypRecordingBasicData(this.datasetId, this.imagesSort)
-      .subscribe(polypRecordings => {
-        this.polypRecordings = polypRecordings;
-        this.fillAndChangePolypRecording(id);
-      });
 
     this.datasetsService.getPolypDataset(this.datasetId)
       .pipe(
@@ -162,6 +157,12 @@ export class PolypRecordingInDatasetComponent implements OnInit {
       )
       .subscribe(dataset => {
         this.dataset = dataset;
+
+        this.datasetsService.listAllPolypRecordingBasicData(this.datasetId, this.imagesSort)
+          .subscribe(polypRecordings => {
+            this.polypRecordings = polypRecordings;
+            this.fillAndChangePolypRecording(id);
+          });
       });
   }
 
