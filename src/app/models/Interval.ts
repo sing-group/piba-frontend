@@ -84,19 +84,27 @@ export function isValidInterval(interval: Interval, boundaries: IntervalBoundari
   return calculateIntervalSize(interval, boundaries) > 0;
 }
 
-export function isInInterval(value: number, interval: Interval, boundaries: IntervalBoundaries): boolean {
+export function isInInterval(value: number, interval: Interval, boundaries: IntervalBoundaries, float_adjust: boolean = false): boolean {
   if (interval === null || interval === undefined || !isValidInterval(interval, boundaries)) {
     return false;
   } else {
+    const start = interval.start;
+    let end = interval.end;
     switch (boundaries) {
       case IntervalBoundaries.BOTH_INCLUDED:
-        return (interval.start <= value && interval.end >= value);
+        if (float_adjust) {
+          end += 0.999;
+        }
+        return (start <= value && end >= value);
       case IntervalBoundaries.BOTH_EXCLUDED:
-        return (interval.start < value && interval.end > value);
+        return (start < value && end > value);
       case IntervalBoundaries.START_INCLUDED_END_EXCLUDED:
-        return (interval.start <= value && interval.end > value);
+        return (start <= value && end > value);
       case IntervalBoundaries.START_EXCLUDED_END_INCLUDED:
-        return (interval.start < value && interval.end >= value);
+        if (float_adjust) {
+          end += 0.999;
+        }
+        return (start < value && end >= value);
       default:
         throw new Error('Invalid interval boundaries: ' + boundaries);
     }

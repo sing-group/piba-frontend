@@ -307,10 +307,9 @@ export class PolypDatasetComponent implements OnInit {
       this.changeDetectorRef.detectChanges();
 
       const isImageInRecording = (image: Image, polypRecording: PolypRecording) => {
-        const fps = polypRecording.video.fps;
-        const time = (image.numFrame) / fps;
+        const time = image.numFrame / polypRecording.video.fps;
 
-        return isInInterval(time, polypRecording, IntervalBoundaries.BOTH_INCLUDED);
+        return isInInterval(time, polypRecording, IntervalBoundaries.BOTH_INCLUDED, true);
       };
 
       this.polypDatasetsService.listPolypRecordings(
