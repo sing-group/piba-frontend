@@ -58,7 +58,7 @@ export enum LST {
 }
 
 export enum PARIS {
-  PEDUNCULATED = '(0-Ip) Pendunculated', SESSILE = '(0-Is) Sessile',
+  PEDUNCULATED = '(0-Ip) Pedunculated', SESSILE = '(0-Is) Sessile',
   SLIGHTLY_ELEVATED = '(0-IIa) Slightly elevated', FLAT = '(0-IIb) Flat', DEPRESSED = '(0-IIc) depressed',
   ULCERATED = '(0-III) Excavated/Ulcerated'
 }
