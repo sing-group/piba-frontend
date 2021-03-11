@@ -22,7 +22,7 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild} from '@angular/core';
 import {PolypLocation} from '../../models/PolypLocation';
 
 @Component({
@@ -47,9 +47,13 @@ export class ImageAnnotatorComponent {
 
   @Input() set polypLocation(polypLocation: PolypLocation) {
     if (!PolypLocation.areEqual(this._polypLocation, polypLocation)) {
-      this.clearLocation();
+      if (this._showLocation) {
+        this.clearLocation();
+      }
       this._polypLocation = polypLocation;
-      this.paintLocation();
+      if (this._showLocation) {
+        this.paintLocation();
+      }
     }
   }
 
@@ -103,7 +107,9 @@ export class ImageAnnotatorComponent {
 
   private repaint(): void {
     this.paintImage();
-    this.paintLocation();
+    if (this._showLocation) {
+      this.paintLocation();
+    }
   }
 
   private paintImage(): void {
