@@ -24,7 +24,7 @@
 
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {forkJoin, Observable} from 'rxjs';
+import {forkJoin, iif, Observable, of} from 'rxjs';
 import {PolypRecording} from '../models/PolypRecording';
 import {PolypRecordingInfo} from './entities/PolypRecordingInfo';
 import {environment} from '../../environments/environment';
@@ -102,12 +102,16 @@ export class PolypRecordingsService {
   private createFillMultiplePolypAndVideoOperator():
     OperatorFunction<PolypRecordingInfo[], PolypRecording[]> {
     return concatMap(polypRecordingInfos =>
-      forkJoin(polypRecordingInfos.map(polypRecordingInfo =>
-        forkJoin(
-          this.videosService.getVideo((<IdAndUri>polypRecordingInfo.video).id),
-          this.polypsService.getPolyp((<IdAndUri>polypRecordingInfo.polyp).id)
-        )
-      )).pipe(
+      iif(
+        () => polypRecordingInfos.length === 0,
+        of([]),
+        forkJoin(polypRecordingInfos.map(polypRecordingInfo =>
+          forkJoin(
+            this.videosService.getVideo((<IdAndUri>polypRecordingInfo.video).id),
+            this.polypsService.getPolyp((<IdAndUri>polypRecordingInfo.polyp).id)
+          )
+        ))
+      ).pipe(
         map(videoAndPolyps =>
           polypRecordingInfos.map((polypRecordingInfo, index) =>
             PolypRecordingsService.mapPolypRecordingInfo(polypRecordingInfo, videoAndPolyps[index][0], videoAndPolyps[index][1])

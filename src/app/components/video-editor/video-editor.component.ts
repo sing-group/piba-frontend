@@ -200,36 +200,6 @@ export class VideoEditorComponent implements AfterViewChecked, OnInit {
 
       this.loading = false;
     });
-
-    /*this.videosService.getVideo(id)
-      .subscribe(video => {
-        this.video = video;
-
-        this.explorationsService.getExploration(this.video.exploration as string)
-          .subscribe(exploration =>
-            this.video.exploration = exploration
-          );
-        this.explorationsService.listPolyps(this.video.exploration)
-          .subscribe(polyps =>
-            this.polyps = polyps.filter(polyp => !polyp.confirmed)
-          );
-        this.polypRecordingsService.listPolypRecordingsByVideo(this.video.id).subscribe(polypRecordings => {
-          this.video.polypRecording = polypRecordings;
-          this.updatePolypRecordingZones();
-        });
-        this.videoModificationsService.listVideoModifications(this.video.id)
-          .subscribe(videoModifications => {
-            this.video.modifications = videoModifications;
-            this.updateVideoModificationZones();
-          });
-      });
-
-    this.modifiersService.listModifiers().subscribe((modifiers) => this.modifiers = modifiers);
-
-    this.galleriesService.listGalleries().subscribe(galleries => {
-      this.galleries = galleries.sort((galleryA, galleryB) => galleryA.title > galleryB.title ? 1 : -1);
-    });*/
-
   }
 
   get highlightZones(): VideoIntervalHighlight[] {

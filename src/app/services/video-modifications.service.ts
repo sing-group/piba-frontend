@@ -36,6 +36,7 @@ import {Modifier} from '../models/Modifier';
 import {Video} from '../models/Video';
 import {PibaError} from '../modules/notification/entities';
 import {CollectionUtils} from '../utils/collection.utils';
+import {of} from 'rxjs/internal/observable/of';
 
 @Injectable({
   providedIn: 'root'
@@ -94,32 +95,41 @@ export class VideoModificationsService {
       listVideos = () => forkJoin(this.videosService.getVideo(videoId));
     } else {
       listVideos = videoModificationInfos => {
-        const videoIds = CollectionUtils.mapToUniques(
-          videoModificationInfos,
-          info => (info.video as IdAndUri).id
-        );
+        if (videoModificationInfos.length === 0) {
+          return of([]);
+        } else {
+          const videoIds = CollectionUtils.mapToUniques(
+            videoModificationInfos,
+            info => (info.video as IdAndUri).id
+          );
 
-        return forkJoin(videoIds.map(id => this.videosService.getVideo(id)));
+          return forkJoin(videoIds.map(id => this.videosService.getVideo(id)));
+        }
       };
     }
 
     return concatMap(videoModificationInfos => {
-      const modifierIds = CollectionUtils.mapToUniques(
-        videoModificationInfos,
-        info => (info.modifier as IdAndUri).id
-      );
+      if (videoModificationInfos.length === 0) {
+        return of([]);
+      } else {
+        const modifierIds = CollectionUtils.mapToUniques(
+          videoModificationInfos,
+          info => (info.modifier as IdAndUri).id
+        );
 
-      return forkJoin(
-        listVideos(videoModificationInfos),
-        forkJoin(modifierIds.map(modifierId => this.modifiersService.getModifier(modifierId)))
-      ).pipe(
-        map(videosAndModifiers => videoModificationInfos.map(videoModificationInfo => {
-          return VideoModificationsService.mapVideoModificationInfo(
-            videoModificationInfo,
-            videosAndModifiers[0].find(video => video.id === (videoModificationInfo.video as IdAndUri).id),
-            videosAndModifiers[1].find(modifier => modifier.id === (videoModificationInfo.modifier as IdAndUri).id));
-        }))
-      );
+        return forkJoin(
+          listVideos(videoModificationInfos),
+          forkJoin(modifierIds.map(modifierId => this.modifiersService.getModifier(modifierId)))
+        ).pipe(
+          map(videosAndModifiers => videoModificationInfos.map(videoModificationInfo => {
+            return VideoModificationsService.mapVideoModificationInfo(
+              videoModificationInfo,
+              videosAndModifiers[0].find(video => video.id === (videoModificationInfo.video as IdAndUri).id),
+              videosAndModifiers[1].find(modifier => modifier.id === (videoModificationInfo.modifier as IdAndUri).id));
+          }))
+        );
+
+      }
     });
   }
 
