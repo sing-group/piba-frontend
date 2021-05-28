@@ -54,6 +54,7 @@ export class VideoComponent implements AfterViewChecked, OnInit {
   @Input() interval: Interval = null;
   @Input() limitToInterval = false;
   @Input() intervalBoundaries = IntervalBoundaries.BOTH_INCLUDED;
+  @Input() snapshotEnabled = true;
   private _highlightZones: VideoIntervalHighlight[] = [];
   private _videoSpeed = VideoSpeed.SECONDS_3;
   @Output() videoSpeedChange = new EventEmitter<VideoSpeed>();

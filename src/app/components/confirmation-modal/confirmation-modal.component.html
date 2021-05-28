@@ -31,5 +31,9 @@
     <button type="button" class="btn btn-danger-outline" (click)="onActionToDo(id)">
       {{action}}
     </button>
+    <button *ngIf="secondaryAction !== undefined" type="button" class="btn btn-warning-outline"
+            (click)="onSecondaryActionToDo(id)">
+      {{secondaryAction}}
+    </button>
   </div>
 </clr-modal>

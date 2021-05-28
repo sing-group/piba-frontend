@@ -52,6 +52,7 @@ import {defer} from 'rxjs/internal/observable/defer';
 import {VideoComponent} from '../video/video.component';
 import {VideoSpeed} from '../video/VideoSpeed';
 import {SortDirection} from '../../services/entities/SortDirection';
+import {PolypRecordingInDatasetBasicData} from '../../models/PolypRecordingInDatasetBasicData';
 
 @Component({
   selector: 'app-polyp-recording-in-dataset',
@@ -72,11 +73,12 @@ export class PolypRecordingInDatasetComponent implements OnInit {
 
   readonly intervalBoundaries = PolypRecordingInDatasetComponent.INTERVAL_BOUNDARIES;
 
-  private polypRecordings: PolypRecordingBasicData[] = [];
+  private polypRecordings: PolypRecordingInDatasetBasicData[] = [];
   private imagesSort: { images: SortDirection };
   private completePolypRecordings: Map<number, PolypRecording> = new Map<number, PolypRecording>();
   private polypRecordingImages: Map<number, Image[]> = new Map<number, Image[]>();
   private currentIndex: number;
+  private newIndex?: number;
   private currentFrame: number;
 
   private _snapshot: VideoSnapshot;
@@ -92,6 +94,9 @@ export class PolypRecordingInDatasetComponent implements OnInit {
 
   @ViewChild('canvas') private canvas: ElementRef<HTMLCanvasElement>;
   @ViewChild('videoComponent') private video: VideoComponent;
+
+  public markModalOpened = false;
+  public secondaryMarkAction?: string;
 
   private static convertFrameToInterval(frame: number, fps: number): Interval {
     return {
@@ -216,6 +221,10 @@ export class PolypRecordingInDatasetComponent implements OnInit {
 
   isVideoReady(): boolean {
     return this.videoIsReady;
+  }
+
+  isCurrentPolypRecordingReviewed(): boolean {
+    return this.polypRecordings.some(pr => pr.id === this.polypRecording.id && pr.reviewed);
   }
 
   hasModifications(): boolean {
@@ -416,6 +425,16 @@ export class PolypRecordingInDatasetComponent implements OnInit {
       throw new Error('New polyp index out of bounds: ' + newIndex);
     }
 
+    if (this.isCurrentPolypRecordingReviewed()) {
+      this.goToIndex(newIndex);
+    } else {
+      this.newIndex = newIndex;
+      this.secondaryMarkAction = 'Continue without mark';
+      this.markModalOpened = true;
+    }
+  }
+
+  private goToIndex(newIndex: number): void {
     const polypRecordingId = this.polypRecordings[newIndex].id;
     this.router.navigate(['polypdatasets', this.datasetId, 'polyprecording', polypRecordingId], this.createNavigationExtras())
       .then(() => this.fillAndChangePolypRecording(polypRecordingId));
@@ -537,5 +556,38 @@ export class PolypRecordingInDatasetComponent implements OnInit {
 
   public trackById(index: number, element: { id: string }): string {
     return element.id;
+  }
+
+  public onMarkAsReviewed() {
+    this.markModalOpened = true;
+  }
+
+  public onCancelMark() {
+    this.newIndex = undefined;
+    this.secondaryMarkAction = undefined;
+    this.markModalOpened = false;
+  }
+
+  public onConfirmMark() {
+    this.datasetsService.markPolypDatasetAsReviewed(this.datasetId, this.polypRecording.id)
+      .subscribe(() => {
+        this.polypRecordings.find(pr => pr.id === this.polypRecording.id).reviewed = true;
+        this.markModalOpened = false;
+        this.secondaryMarkAction = undefined;
+        if (this.newIndex !== undefined) {
+          this.goToIndex(this.newIndex);
+          this.newIndex = undefined;
+        }
+      });
+  }
+
+  public onConfirmWithoutMark() {
+    this.markModalOpened = false;
+    this.secondaryMarkAction = undefined;
+
+    if (this.newIndex !== undefined) {
+      this.goToIndex(this.newIndex);
+      this.newIndex = undefined;
+    }
   }
 }

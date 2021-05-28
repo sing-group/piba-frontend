@@ -1,7 +1,7 @@
 /*
  *  PIBA Frontend
  *
- * Copyright (C) 2018-2020 - Miguel Reboiro-Jato,
+ * Copyright (C) 2018-2021 - Miguel Reboiro-Jato,
  * Daniel Glez-Peña, Alba Nogueira Rodríguez, Florentino Fdez-Riverola,
  * Rubén Domínguez Carbajales, Jesús Miguel Herrero Rivas,
  * Eloy Sánchez Hernández, Laura Rivas Moral,
@@ -22,40 +22,8 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import {PolypRecordingInfo} from './PolypRecordingInfo';
 
-@Component({
-  selector: 'app-confirmation-modal',
-  templateUrl: './confirmation-modal.component.html',
-  styleUrls: ['./confirmation-modal.component.css']
-})
-export class ConfirmationModalComponent implements OnInit {
-
-  @Input() title: string;
-  @Input() id: string;
-  @Input() message: string;
-  @Input() action: string;
-  @Input() secondaryAction?: string;
-
-  @Output() cancelAction = new EventEmitter<any>();
-  @Output() actionToDo = new EventEmitter<string>();
-  @Output() secondaryActionToDo = new EventEmitter<string>();
-
-  opened = true;
-
-  ngOnInit() {
-  }
-
-  onActionToDo(id: string) {
-    this.actionToDo.emit(id);
-  }
-
-  onSecondaryActionToDo(id: string) {
-    this.secondaryActionToDo.emit(id);
-  }
-
-  onCancelAction() {
-    this.cancelAction.emit();
-  }
-
+export interface PolypRecordingInDatasetInfo extends PolypRecordingInfo {
+  reviewed: boolean;
 }

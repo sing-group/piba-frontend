@@ -134,6 +134,7 @@
         <clr-dg-column>End</clr-dg-column>
         <clr-dg-column>Duration</clr-dg-column>
         <clr-dg-column clrDgSortBy="images">Images</clr-dg-column>
+        <clr-dg-column>Reviewed</clr-dg-column>
         <clr-dg-column>Actions</clr-dg-column>
 
         <clr-dg-row *ngFor="let polypRecording of polypRecordings" clrDgItem="polypRecording">
@@ -148,6 +149,7 @@
           <clr-dg-cell>{{polypRecording.end | time}}</clr-dg-cell>
           <clr-dg-cell>{{polypRecording.end - polypRecording.start | time}}</clr-dg-cell>
           <clr-dg-cell>{{countPolypRecordingImages(polypRecording)}}</clr-dg-cell>
+          <clr-dg-cell>{{polypRecording.reviewed === true ? "YES" : "NO" }}</clr-dg-cell>
           <clr-dg-cell class="btn-cell-datagrid">
             <div class="btn-group btn-link btn-icon">
               <button class="btn" routerLink="/polypdatasets/{{polypDataset.id}}/polyprecording/{{polypRecording.id}}" [queryParams]="polypRecordingQueryParams">

@@ -36,13 +36,15 @@ import {PibaError} from '../modules/notification/entities';
 import {PolypRecordingInfo} from './entities/PolypRecordingInfo';
 import {PolypRecordingsService} from './polyprecordings.service';
 import {PolypPage} from './entities/PolypPage';
-import {PolypRecordingPage} from './entities/PolypRecordingPage';
+import {PolypRecordingInDatasetPage} from './entities/PolypRecordingInDatasetPage';
 import {of} from 'rxjs/internal/observable/of';
 import {PolypRecordingBasicData} from '../models/PolypRecordingBasicData';
 import {PolypDatasetEditionInfo} from './entities/PolypDatasetEditionInfo';
 import {iif} from 'rxjs/internal/observable/iif';
 import {defer} from 'rxjs/internal/observable/defer';
 import {SortDirection} from './entities/SortDirection';
+import {PolypRecordingInDatasetInfo} from './entities/PolypRecordingInDatasetInfo';
+import {PolypRecordingInDatasetBasicData} from '../models/PolypRecordingInDatasetBasicData';
 
 @Injectable()
 export class PolypDatasetsService {
@@ -142,7 +144,7 @@ export class PolypDatasetsService {
 
   listPolypRecordings(
     id: string, page?: number, pageSize?: number, sortFields?: { images: SortDirection }
-  ): Observable<PolypRecordingPage> {
+  ): Observable<PolypRecordingInDatasetPage> {
     let params = new HttpParams();
 
     if (Boolean(page) && Boolean(pageSize)) {
@@ -155,14 +157,19 @@ export class PolypDatasetsService {
       params = params.append('imagesSort', sortFields.images);
     }
 
-    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polypdataset/${id}/polyprecording`, { params, observe: 'response' })
+    return this.http.get<PolypRecordingInDatasetInfo[]>(
+      `${environment.restApi}/polypdataset/${id}/polyprecording`, { params, observe: 'response' }
+    )
       .pipe(
         concatMap(response => iif(() => response.body.length > 0,
           defer(() =>
             this.polypRecordingsService.fillMultiplePolypAndVideo(of(response.body)).pipe(
               map(polypRecordingInfos => ({
                 totalItems: Number(response.headers.get('X-Pagination-Total-Items')),
-                polypRecordings: polypRecordingInfos
+                polypRecordings: polypRecordingInfos.map((value, index) => ({
+                  ...value,
+                  reviewed: response.body[index].reviewed
+                }))
               }))
             )
           ),
@@ -178,16 +185,19 @@ export class PolypDatasetsService {
       );
   }
 
-  listAllPolypRecordingBasicData(id: string, sortFields?: { images: SortDirection }): Observable<PolypRecordingBasicData[]> {
+  listAllPolypRecordingBasicData(id: string, sortFields?: { images: SortDirection }): Observable<PolypRecordingInDatasetBasicData[]> {
     const options: {params?: HttpParams} = {};
     if (Boolean(sortFields)) {
       options.params = new HttpParams();
       options.params = options.params.append('imagesSort', sortFields.images);
     }
 
-    return this.http.get<PolypRecordingInfo[]>(`${environment.restApi}/polypdataset/${id}/polyprecording`, options)
+    return this.http.get<PolypRecordingInDatasetBasicData[]>(`${environment.restApi}/polypdataset/${id}/polyprecording`, options)
     .pipe(
-      map(infos => infos.map(PolypRecordingsService.mapPolypRecordingBasicData)),
+      map(infos => infos.map(info => ({
+        ...PolypRecordingsService.mapPolypRecordingBasicData(info),
+        reviewed: info.reviewed
+      }))),
       PibaError.throwOnError(
         'Error retrieving polyp recordings in dataset',
         `Polyps recordings in dataset '${id}' could not be retrieved.`
@@ -221,7 +231,7 @@ export class PolypDatasetsService {
     );
   }
 
-  deletePolypDataset(polypDatasetId: string) {
+  deletePolypDataset(polypDatasetId: string): Observable<any> {
     return this.http.delete(`${environment.restApi}/polypdataset/${polypDatasetId}`)
     .pipe(
       PibaError.throwOnError(
@@ -229,5 +239,15 @@ export class PolypDatasetsService {
         `Polyp dataset with id '${polypDatasetId}' could not be deleted.`
       )
     );
+  }
+
+  markPolypDatasetAsReviewed(polypDatasetId: string, polypRecordingId: number): Observable<any> {
+    return this.http.put(`${environment.restApi}/polypdataset/${polypDatasetId}/polyprecording/${polypRecordingId}/reviewed`, true)
+      .pipe(
+        PibaError.throwOnError(
+          'Error marking polyp recording',
+          `Polyp recording with id '${polypRecordingId}' could not be marked as reviewed in polyp dataset ${polypDatasetId}.`
+        )
+      );
   }
 }

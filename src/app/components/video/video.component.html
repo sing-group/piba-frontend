@@ -41,7 +41,7 @@
              (mousedown)="mouseDownProgress()" (mouseup)="mouseUpProgress()">
       <span>{{displayTime | time}}/{{duration | time}}</span>
     </div>
-    <button class="snapshot" aria-label="snapshot" (click)="getSnapshot()">
+    <button class="snapshot" aria-label="snapshot" (click)="getSnapshot()" *ngIf="snapshotEnabled">
       <clr-icon shape="camera"></clr-icon>
     </button>
     <button class="backward" aria-label="backward" (click)="backwardVideo()">

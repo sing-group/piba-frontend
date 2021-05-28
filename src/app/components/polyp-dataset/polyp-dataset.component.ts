@@ -33,7 +33,6 @@ import {PolypRecordingsService} from '../../services/polyprecordings.service';
 import {concatMap, debounceTime, distinctUntilChanged, map, tap} from 'rxjs/operators';
 import {PolypDatasetsService} from '../../services/polyp-datasets.service';
 import {ActivatedRoute} from '@angular/router';
-import {PolypRecording} from '../../models/PolypRecording';
 import {forkJoin} from 'rxjs/internal/observable/forkJoin';
 import {GalleriesService} from '../../services/galleries.service';
 import {Gallery} from '../../models/Gallery';
@@ -45,6 +44,7 @@ import {ImagesService} from '../../services/images.service';
 import {IntervalBoundaries, isInInterval} from '../../models/Interval';
 import {Image} from '../../models/Image';
 import {SortDirection} from '../../services/entities/SortDirection';
+import {PolypRecordingInDataset} from '../../models/PolypRecordingInDataset';
 
 @Component({
   selector: 'app-polyp-dataset',
@@ -56,9 +56,9 @@ export class PolypDatasetComponent implements OnInit {
   id: string;
   polypDataset: PolypDataset;
   polyps: Polyp[] = [];
-  polypRecordings: PolypRecording[] = [];
+  polypRecordings: PolypRecordingInDataset[] = [];
   galleries: Gallery[] = [];
-  polypRecordingImages = new Map<PolypRecording, number>();
+  polypRecordingImages = new Map<PolypRecordingInDataset, number>();
 
   // Polyp Pagination
   private _polypsPagination: ClrDatagridPagination;
@@ -265,7 +265,7 @@ export class PolypDatasetComponent implements OnInit {
     }
   }
 
-  countPolypRecordingImages(polypRecording: PolypRecording): number {
+  countPolypRecordingImages(polypRecording: PolypRecordingInDataset): number {
     return this.polypRecordingImages.has(polypRecording) ? this.polypRecordingImages.get(polypRecording) : 0;
   }
 
@@ -306,7 +306,7 @@ export class PolypDatasetComponent implements OnInit {
       this.polypRecordingsLoading = true;
       this.changeDetectorRef.detectChanges();
 
-      const isImageInRecording = (image: Image, polypRecording: PolypRecording) => {
+      const isImageInRecording = (image: Image, polypRecording: PolypRecordingInDataset) => {
         const time = image.numFrame / polypRecording.video.fps;
 
         return isInInterval(time, polypRecording, IntervalBoundaries.BOTH_INCLUDED, true);

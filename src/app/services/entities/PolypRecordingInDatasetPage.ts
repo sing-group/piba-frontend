@@ -1,7 +1,7 @@
 /*
  *  PIBA Frontend
  *
- * Copyright (C) 2018-2020 - Miguel Reboiro-Jato,
+ * Copyright (C) 2018-2021 - Miguel Reboiro-Jato,
  * Daniel Glez-Peña, Alba Nogueira Rodríguez, Florentino Fdez-Riverola,
  * Rubén Domínguez Carbajales, Jesús Miguel Herrero Rivas,
  * Eloy Sánchez Hernández, Laura Rivas Moral,
@@ -22,9 +22,9 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PolypRecording} from '../../models/PolypRecording';
+import {PolypRecordingInDataset} from '../../models/PolypRecordingInDataset';
 
-export interface PolypRecordingPage {
+export interface PolypRecordingInDatasetPage {
   totalItems: number;
-  polypRecordings: PolypRecording[];
+  polypRecordings: PolypRecordingInDataset[];
 }

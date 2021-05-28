@@ -31,6 +31,19 @@
     <button class="btn btn-primary" routerLink="/polypdatasets/{{datasetId}}">Back</button>
   </div>
 
+  <div class="alert alert-success" role="alert" *ngIf="isCurrentPolypRecordingReviewed()">
+    <div class="alert-items">
+      <div class="alert-item static">
+        <div class="alert-icon-wrapper">
+          <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+        </div>
+        <span class="alert-text">
+            Reviewed
+          </span>
+      </div>
+    </div>
+  </div>
+
   <div class="clr-row">
     <div class="clr-col-1 clr-align-self-center" align="center">
       <button class="btn btn-link" [class.disabled]="!hasPrevious()" (click)="onGoToPrevious()">
@@ -45,6 +58,7 @@
         <app-video #videoComponent *ngIf="polypRecording && polypRecording.video" [(videoSpeed)]="videoSpeed"
                    [video]="polypRecording.video" [interval]="polypRecording" limitToInterval="true"
                    [intervalBoundaries]="intervalBoundaries" [highlightZones]="highlightZones" [hidden]="!isVideoReady()"
+                   [snapshotEnabled]="!isCurrentPolypRecordingReviewed()"
                    (ready)="onReady()" (snapshot)="onSnapshot($event)" (time)="onTimeChange($event)">
         </app-video>
       </div>
@@ -53,6 +67,11 @@
       </div>
       <div *ngIf="!currentImage">
         No image in current frame.
+      </div>
+      <div align="center">
+        <button *ngIf="!isCurrentPolypRecordingReviewed()" class="btn btn-primary" (click)="onMarkAsReviewed()">
+          Mark as reviewed
+        </button>
       </div>
     </div>
     <div class="clr-col-1 clr-align-self-center" align="center">
@@ -64,7 +83,7 @@
 </div>
 
 <div class="card" *ngIf="!isLoading()">
-  <div class="card-header">
+  <div class="card-header clr-row">
     Polyp recording info
   </div>
 
@@ -193,7 +212,8 @@
             <button type="button" class="btn btn-icon" (click)="onGoToImage(image)">
               <clr-icon shape="eye"></clr-icon>
             </button>
-            <button type="button" class="btn btn-icon" (click)="onAskForImageDeletionConfirmation(image)">
+            <button type="button" class="btn btn-icon" (click)="onAskForImageDeletionConfirmation(image)"
+                    *ngIf="!isCurrentPolypRecordingReviewed()">
               <clr-icon shape="remove"></clr-icon>
             </button>
           </td>
@@ -221,3 +241,17 @@
 <app-describe-polyp-deletion-dialog [(open)]="showDescribePolypDeletionReason"
                                     (close)="onDeleteImage($event)">
 </app-describe-polyp-deletion-dialog>
+
+<app-confirmation-modal
+  *ngIf="markModalOpened"
+  title="Mark as reviewed"
+  message="Do you want to mark this polyp as reviewed?"
+  [message]="'Do you want to mark this polyp as reviewed? <div class=\'warning\'>'
+    + 'This action cannot be undone and the polyp recording will no longer be modifiable.</div>'"
+  action="Mark"
+  [secondaryAction]="secondaryMarkAction"
+  (cancelAction)="onCancelMark()"
+  (actionToDo)="onConfirmMark()"
+  (secondaryActionToDo)="onConfirmWithoutMark()"
+>
+</app-confirmation-modal>
