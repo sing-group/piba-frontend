@@ -436,6 +436,7 @@ export class VideoComponent implements AfterViewChecked, OnInit {
       }, 100);
 
       this.videoElement.play();
+      this.initializePlayWatcher();
     }
   }
 
